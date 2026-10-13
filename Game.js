@@ -191,7 +191,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('treasure-coin', 'assets/items/treasure_coin.png');
         this.load.image('treasure-crate', 'assets/items/treasure_crate.png');
         this.load.image('treasure-chest', 'assets/items/treasure_chest.png');
-        this.load.image('command-console', 'assets/ui/command_console.png');
+        this.load.image('command-console-analog', 'assets/ui/command_console_analog.png');
         this.load.image('upgrade-hull', 'assets/upgrades/upgrade_hull.png');
         this.load.image('upgrade-sails', 'assets/upgrades/upgrade_sails.png');
         this.load.image('upgrade-guns', 'assets/upgrades/upgrade_guns.png');
@@ -345,7 +345,9 @@ class Game extends Phaser.Scene {
         this.resultsBanked = false; this.speed = 0; this.lastImpact = -1000;
         this.lastRockContact = -1000; this.lastShot = -1000;
         this.lastPortShot = -1000; this.lastStarboardShot = -1000; this.lastDamageTime = -1000;
-        this.touch = { left: false, right: false, up: false, down: false };
+        // Controle independente por dedo: a mão do leme não impede a dos canhões.
+        this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 58, deadzone: .12 };
+        this.cannonPointers = new Map();
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
         this.survivalTime = 0; this.goalName = ''; this.bossAlert = '';
@@ -401,10 +403,24 @@ class Game extends Phaser.Scene {
             this.input.keyboard.off('keydown-E', this.onStarboard);
             this.input.keyboard.off('keydown-ESC', this.onPause);
         });
-        this.input.on('pointerup', () => this.clearTouch()); this.input.on('gameout', () => this.clearTouch());
+        // Eventos por pointer: soltar um dedo NÃO cancela o movimento dos demais.
+        // Mouse (desktop) usa Phaser. Touch (celular) usa changedTouches diretamente:
+        // Phaser pode reciclar a atribuição de pointers quando um de dois dedos sai.
+        this.input.on('pointerdown', p => { if (!this.isNativeTouchPointer(p)) this.touchStart(p); });
+        this.input.on('pointermove', p => { if (!this.isNativeTouchPointer(p)) this.touchMove(p); });
+        this.input.on('pointerup', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
+        this.input.on('pointerupoutside', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
+        this.installNativeTouch();
+        this.onLoseFocus = () => this.touchReset();
+        window.addEventListener('blur', this.onLoseFocus);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            this.touchReset();
+            this.removeNativeTouch();
+            window.removeEventListener('blur', this.onLoseFocus);
+        });
         const tip = this.add.text(240, 137,
             (this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
-            '\nCANHÕES AGORA DISPARAM PELOS BORDOS!\nQ: bombordo · E: estibordo · ESPAÇO: ambos\nO mapa é grande: use o radar no alto.', {
+            '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE O CANHÃO PARA DISPARAR\nDOIS DEDOS FUNCIONAM JUNTOS.', {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
@@ -599,10 +615,10 @@ class Game extends Phaser.Scene {
             .setScrollFactor(0).setInteractive().on('pointerdown', () => this.toggleCaptainMenu());
         this.add.text(424, 79, '⚓ PORTO', { fontFamily: 'monospace', fontSize: '12px', color: '#ffe4b6' })
             .setOrigin(.5).setDepth(111).setScrollFactor(0);
-        this.add.rectangle(240, 780, 480, 42, 0x111c28, .92).setScrollFactor(0).setDepth(90);
-        this.add.text(242, 784, 'Q: bombordo  E: estibordo  ESPAÇO: ambos', {
-            fontFamily: 'monospace', fontSize: '11px', color: '#ceb9b0'
-        }).setOrigin(.5).setScrollFactor(0).setDepth(100);
+        this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
+            fontFamily: 'monospace', fontSize: '10px', color: '#dbbc98',
+            stroke: '#101720', strokeThickness: 3
+        }).setOrigin(.5).setScrollFactor(0).setDepth(103);
         this.impactMessage = this.add.text(240, 125, '', { fontFamily: 'monospace', fontSize: '16px',
             color: '#ffe1b2', align: 'center', backgroundColor: '#171a29b0', padding: { x: 7, y: 4 }
         }).setOrigin(.5).setScrollFactor(0).setDepth(140).setAlpha(0);
@@ -611,24 +627,126 @@ class Game extends Phaser.Scene {
             .setScrollFactor(0).setDepth(112);
     }
     createTouchControls() {
-        this.add.image(240, 690, 'command-console').setScrollFactor(0).setDepth(102).setScale(0.49).setAlpha(.98);
-        this.control(49, 681, '◀', 'left', 20); this.control(145, 681, '▶', 'right', 20);
-        this.control(97, 605, '▲', 'up', 18); this.control(97, 757, '▼', 'down', 18);
-        this.control(345, 676, '◀●', 'port', 27); this.control(432, 676, '●▶', 'starboard', 24);
+        // Arte e zonas de toque partilham EXATAMENTE as mesmas coordenadas.
+        // 480×220 centralizado em (240, 690): joystick (106,702), canhões (342,702)/(432,702).
+        this.add.image(240, 690, 'command-console-analog').setScrollFactor(0).setDepth(102);
+        const knobShadow = this.add.circle(108, 706, 26, 0x060c16, .65)
+            .setStrokeStyle(2, 0x263342, .6).setScrollFactor(0).setDepth(110);
+        const knob = this.add.circle(106, 702, 25, 0x87939c, 1)
+            .setStrokeStyle(3, 0xc2c9cc, .92).setScrollFactor(0).setDepth(111);
+        const inner = this.add.circle(106, 702, 12, 0x65737e, .8)
+            .setStrokeStyle(1, 0xd5d9d2, .65).setScrollFactor(0).setDepth(112);
+        this.joystick.knob = knob;
+        this.joystick.shadow = knobShadow;
+        this.joystick.inner = inner;
+        this.cannonHighlights = {
+            port: this.add.circle(342, 702, 39, 0xebcb91, 0).setScrollFactor(0).setDepth(108),
+            starboard: this.add.circle(432, 702, 39, 0xebcb91, 0).setScrollFactor(0).setDepth(108)
+        };
+        // Suporte à depuração automatizada do layout; não interfere com inputs.
+        this.touchLayout = { joystick: { x: 106, y: 702, radius: 76 },
+            port: { x: 342, y: 702, radius: 43 },
+            starboard: { x: 432, y: 702, radius: 43 } };
     }
-    control(x, y, label, key, radius = 35) {
-        const circle = this.add.circle(x, y, radius, 0xffffff, 0.001)
-            .setScrollFactor(0).setDepth(105).setInteractive({ useHandCursor: true });
-        this.add.text(x, y, label, { fontFamily: 'Georgia', fontSize: label.includes('●') ? '18px' : '21px', fontStyle: 'bold',
-            color: label.includes('●') ? '#ffddb3' : '#f3e2c4', stroke: '#29140e', strokeThickness: 3 }).setOrigin(.5).setScrollFactor(0).setDepth(106);
-        circle.on('pointerdown', () => {
-            if (key === 'port' || key === 'starboard') this.fire(key);
-            else this.touch[key] = true;
-        });
-        circle.on('pointerup', () => { if (this.touch[key] !== undefined) this.touch[key] = false; });
-        circle.on('pointerout', () => { if (this.touch[key] !== undefined) this.touch[key] = false; });
+    isNativeTouchPointer(pointer) {
+        const event = pointer?.event;
+        return event && (event.pointerType === 'touch' ||
+            event.type?.startsWith('touch') || 'changedTouches' in event);
     }
-    clearTouch() { this.touch.left = this.touch.right = this.touch.up = this.touch.down = false; }
+    installNativeTouch() {
+        this.touchCanvas = this.game.canvas;
+        const options = { passive: false };
+        this.nativeTouchHandlers = {};
+        const consume = (kind, event) => {
+            if (!this.scene.isActive() || this.ended) return;
+            event.preventDefault();
+            const rect = this.touchCanvas.getBoundingClientRect();
+            const xScale = this.scale.width / Math.max(1, rect.width);
+            const yScale = this.scale.height / Math.max(1, rect.height);
+            for (const touch of Array.from(event.changedTouches || [])) {
+                const point = { id: `touch-${touch.identifier}`,
+                    x: (touch.clientX - rect.left) * xScale,
+                    y: (touch.clientY - rect.top) * yScale };
+                if (kind === 'start') this.touchStart(point);
+                if (kind === 'move') this.touchMove(point);
+                if (kind === 'end') this.touchEnd(point);
+            }
+        };
+        const handlers = {
+            touchstart: e => consume('start', e),
+            touchmove: e => consume('move', e),
+            touchend: e => consume('end', e),
+            touchcancel: e => consume('end', e)
+        };
+        for (const [type, fn] of Object.entries(handlers)) this.touchCanvas.addEventListener(type, fn, options);
+        this.nativeTouchHandlers = handlers;
+    }
+    removeNativeTouch() {
+        if (this.touchCanvas && this.nativeTouchHandlers)
+            for (const [type, fn] of Object.entries(this.nativeTouchHandlers))
+                this.touchCanvas.removeEventListener(type, fn);
+        this.nativeTouchHandlers = null;
+    }
+    touchStart(pointer) {
+        if (this.ended || this.pausedByCaptain || !pointer) return;
+        const { joystick, port, starboard } = this.touchLayout;
+        const near = (area) => Math.hypot(pointer.x - area.x, pointer.y - area.y) <= area.radius;
+        if (near(joystick) && this.joystick.id === null) {
+            this.joystick.id = pointer.id;
+            this.touchMove(pointer);
+            return;
+        }
+        // Canhões são independentes e funcionam enquanto o primeiro dedo gira o leme.
+        // Ambas as baterias também podem ser acionadas com dois dedos diferentes.
+        if (near(port) || near(starboard)) {
+            const side = near(port) ? 'port' : 'starboard';
+            this.cannonPointers.set(pointer.id, side);
+            this.fire(side);
+            this.updateCannonHighlights();
+        }
+    }
+    touchMove(pointer) {
+        if (!pointer || this.joystick.id !== pointer.id || !this.touchLayout) return;
+        const j = this.joystick;
+        let x = (pointer.x - j.centerX) / j.radius;
+        let y = (pointer.y - j.centerY) / j.radius;
+        const magnitude = Math.hypot(x, y);
+        if (magnitude > 1) { x /= magnitude; y /= magnitude; }
+        // Eixos analógicos com zona morta: desvio sutil é suave; centro não deriva.
+        const remap = v => Math.abs(v) < j.deadzone ? 0 : Math.sign(v) *
+            (Math.abs(v) - j.deadzone) / (1 - j.deadzone);
+        j.x = remap(x); j.y = remap(y);
+        const dx = x * j.radius, dy = y * j.radius;
+        j.knob?.setPosition(j.centerX + dx, j.centerY + dy);
+        j.shadow?.setPosition(j.centerX + dx + 2, j.centerY + dy + 4);
+        j.inner?.setPosition(j.centerX + dx, j.centerY + dy);
+    }
+    touchEnd(pointer) {
+        if (!pointer) return;
+        if (this.joystick?.id === pointer.id) this.releaseJoystick();
+        this.cannonPointers?.delete(pointer.id);
+        this.updateCannonHighlights();
+    }
+    releaseJoystick() {
+        const j = this.joystick;
+        if (!j) return;
+        j.id = null; j.x = 0; j.y = 0;
+        j.knob?.setPosition(j.centerX, j.centerY);
+        j.shadow?.setPosition(j.centerX + 2, j.centerY + 4);
+        j.inner?.setPosition(j.centerX, j.centerY);
+    }
+    updateCannonHighlights() {
+        if (!this.cannonHighlights) return;
+        const sides = new Set(this.cannonPointers.values());
+        for (const [side, circle] of Object.entries(this.cannonHighlights)) {
+            circle.setAlpha(sides.has(side) ? .16 : 0);
+        }
+    }
+    touchReset() {
+        this.releaseJoystick();
+        this.cannonPointers?.clear();
+        this.updateCannonHighlights();
+    }
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
     fire(side = 'both') {
@@ -881,15 +999,19 @@ class Game extends Phaser.Scene {
         const dt = Math.min(delta / 1000, .05);
         this.elapsed += dt; this.waveElapsed += dt;
         if (this.waveElapsed > .065) { this.waveElapsed = 0; this.drawSea(this.elapsed); }
-        const left = this.touch.left || this.keys.LEFT.isDown || this.keys.A.isDown;
-        const right = this.touch.right || this.keys.RIGHT.isDown || this.keys.D.isDown;
-        const up = this.touch.up || this.keys.UP.isDown || this.keys.W.isDown;
-        const down = this.touch.down || this.keys.DOWN.isDown || this.keys.S.isDown;
-        if (left) this.player.rotation -= this.shipStats.turnSpeed * dt;
-        if (right) this.player.rotation += this.shipStats.turnSpeed * dt;
+        const keyboardTurn = Number(this.keys.RIGHT.isDown || this.keys.D.isDown) -
+            Number(this.keys.LEFT.isDown || this.keys.A.isDown);
+        const keyboardThrottle = Number(this.keys.UP.isDown || this.keys.W.isDown) -
+            Number(this.keys.DOWN.isDown || this.keys.S.isDown);
+        const turn = SEA_MATH.clamp(keyboardTurn + this.joystick.x, -1, 1);
+        const throttle = SEA_MATH.clamp(keyboardThrottle - this.joystick.y, -1, 1);
+        this.player.rotation += turn * this.shipStats.turnSpeed * dt;
         const faceX = Math.sin(this.player.rotation), faceY = -Math.cos(this.player.rotation);
-        if (up) { this.playerVelocity.x += faceX * this.shipStats.accel * dt; this.playerVelocity.y += faceY * this.shipStats.accel * dt; }
-        if (down) { this.playerVelocity.x -= faceX * 210 * dt; this.playerVelocity.y -= faceY * 210 * dt; }
+        const up = throttle > 0.01, down = throttle < -0.01;
+        if (up) { this.playerVelocity.x += faceX * this.shipStats.accel * throttle * dt; this.playerVelocity.y += faceY * this.shipStats.accel * throttle * dt; }
+        if (down) { this.playerVelocity.x += faceX * 210 * throttle * dt; this.playerVelocity.y += faceY * 210 * throttle * dt; }
+        // Manter canhões pressionados dispara automaticamente quando recarregados.
+        for (const side of new Set(this.cannonPointers.values())) this.fire(side);
         const vx = this.playerVelocity.x, vy = this.playerVelocity.y;
         const forward = vx * faceX + vy * faceY;
         const sideX = vx - forward * faceX, sideY = vy - forward * faceY;
@@ -1192,9 +1314,9 @@ class Game extends Phaser.Scene {
     toggleCaptainMenu() {
         if (this.ended) return;
         if (this.pauseElements) {
-            this.pauseElements.destroy(true); this.pauseElements = null; this.pausedByCaptain = false; this.clearTouch(); return;
+            this.pauseElements.destroy(true); this.pauseElements = null; this.pausedByCaptain = false; this.touchReset(); return;
         }
-        this.pausedByCaptain = true; this.clearTouch();
+        this.pausedByCaptain = true; this.touchReset();
         this.pauseElements = this.add.container(0, 0).setScrollFactor(0).setDepth(240);
         const c = this.pauseElements;
         c.add(this.add.rectangle(240, 400, 480, 800, 0x08111b, .92));
@@ -1233,6 +1355,7 @@ const config = {
     antialias: false,
     roundPixels: true,
     render: { pixelArt: true, antialias: false, roundPixels: true },
+    input: { activePointers: 3 },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.NO_CENTER },
     scene: [SeaBoot, SeaPort, Game]
 };
