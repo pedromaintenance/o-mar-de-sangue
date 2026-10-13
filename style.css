@@ -40,3 +40,8 @@ canvas {
   font: 600 14px Georgia, serif;
   box-shadow: 0 8px 24px rgba(0,0,0,.35);
 }
+
+/* Proíbe scroll, duplo toque para zoom e gestos do navegador sobre o controle. */
+html, body, #app-shell, #game-container, #game-container canvas {
+  touch-action: none; overscroll-behavior: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+}
