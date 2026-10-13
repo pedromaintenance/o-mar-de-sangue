@@ -1,0 +1,18 @@
+O MAR DE SANGUE — v1.2 Controle Xbox
+
+PUBLICAÇÃO: GitHub Pages. Extraia os arquivos na raiz do repositório e sirva como site. PWA instalável e offline após o primeiro carregamento.
+
+CONTROLE XBOX (USB ou Bluetooth):
+  Analógico esquerdo: acelerar, dar ré, virar
+  LT/LB: canhão de bombordo
+  RT/RB: canhão de estibordo
+  LT+RT ou LB+RB: ambos os bordos
+  Menu (☰): pausa
+  A: confirmar menus
+  B: voltar/pausar
+  Direcional ou analógico esquerdo: navegar pelos menus
+
+TECLADO: WASD/setas para navegar, Q/E canhões, Espaço ambos, Esc pausa.
+CELULAR: analógico arrastável e dois canhões multitoque, como na v1.1.
+
+Alterações: somente Game.js, sw.js e documentação. O progresso salvo utiliza a mesma chave v4.
