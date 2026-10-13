@@ -1,8 +1,8 @@
-// PIXEL_ASSET_PACK_V1
+// ABYSSAL_V10 — pixel art de navios e criaturas, boss raids e controles preservados
 /*
- * O MAR DE SANGUE — v0.4, FROTAS & ESTALEIRO INFINITO — CARCAÇA
- * Compatível com o editor Phaser 3: substitua SOMENTE Game.js.
- * Recursos desenhados por código; não depende de sprites ou bibliotecas adicionais.
+ * O MAR DE SANGUE — Pixel Art & Bestiário Abissal v1.0 — CARCAÇA
+ * Aplicação web independente (GitHub Pages/PWA). Usa Phaser e imagens locais.
+ * Salve a pasta inteira; não é um script isolado para editor online.
  * Sistema de abalroamento e colisões baseado na versão v0.2/v0.3.
  * Teclado: WASD/setas, Q bombordo, E estibordo, espaço ambos, ESC pausa.
  * Progresso local v3 é migrado para v4 automaticamente.
@@ -36,10 +36,10 @@ const SEA_MISSION_TITLES = [
     'O Ouro de Portomonte', 'Carga nas Águas Rubras', 'As Sentinelas de Daegon',
     'O Bloqueio dos Mercadores', 'O Almirante da Lua Morta', 'Rota dos Náufragos',
     'O Tesouro do Arquipélago', 'O Cerco dos Quatro Faróis', 'Sombras da Garganta',
-    'O Galeão de Uln-Shayr', 'Piratas da Maré Cinzenta', 'Os Cofres da Costa Sul',
-    'O Reino de Peixes Mortos', 'A Caçada dos Ossos', 'O Sangue do Almirante',
+    'A Ira do Kraken', 'Piratas da Maré Cinzenta', 'Os Cofres da Costa Sul',
+    'O Reino de Peixes Mortos', 'A Caçada dos Ossos', 'Dagon, o Ídolo das Águas',
     'Os Dentes de Daegon', 'O Resgate das Redes', 'Tempestade na Boca do Abismo',
-    'A Guarda do Mar Vermelho', 'A Coroa do Corsário', 'Sinos sob as Ondas',
+    'A Guarda do Mar Vermelho', 'A Fortaleza Abissal', 'Sinos sob as Ondas',
     'As Esmeraldas Perdidas', 'O Horizonte dos Afogados', 'A Frota das Lanternas',
     'O Trono Naval da Noite'
 ];
@@ -51,7 +51,16 @@ const SEA_FOES = {
     bombardeiro: { name: 'Bombardeiro Élfico', tint: 0xb8b1a7, hp: 90, speed: 82, atk: 23, reward: 57, radius: 32, mass: 1.1, range: 670, cooldown: 2450, pattern: 'sniper' },
     espectral: { name: 'Nau Espectral', tint: 0x7fd0c2, hp: 115, speed: 133, atk: 20, reward: 62, radius: 31, mass: 1.05, range: 490, cooldown: 1400, pattern: 'flank' },
     galeao: { name: 'Galeão Uln-Shayr', tint: 0xefb9b8, hp: 205, speed: 89, atk: 27, reward: 95, radius: 43, mass: 2.5, range: 550, cooldown: 1700, pattern: 'broadside' },
-    almirante: { name: 'Almirante das Sombras', tint: 0xffc970, hp: 390, speed: 117, atk: 36, reward: 170, radius: 51, mass: 3.4, range: 670, cooldown: 1150, pattern: 'boss' }
+    almirante: { name: 'Almirante das Sombras', tint: 0xffc970, hp: 390, speed: 117, atk: 36, reward: 170, radius: 51, mass: 3.4, range: 670, cooldown: 1150, pattern: 'boss' },
+    cultista: { name: 'Nau do Culto de Daegon', hp: 170, speed: 107, atk: 23, reward: 84, radius: 38, mass: 2.2, range: 530, cooldown: 1750, pattern: 'broadside' },
+    nauabissal: { name: 'Fortaleza Abissal', hp: 470, speed: 74, atk: 43, reward: 210, radius: 59, mass: 4.2, range: 590, cooldown: 1280, pattern: 'boss' },
+    enguia: { name: 'Enguia das Profundezas', hp: 77, speed: 183, atk: 16, reward: 39, radius: 26, mass: .78, range: 168, cooldown: 2500, pattern: 'chase' },
+    afogados: { name: 'Cortejo dos Afogados', hp: 100, speed: 125, atk: 18, reward: 53, radius: 30, mass: .91, range: 335, cooldown: 1900, pattern: 'flank' },
+    coral: { name: 'Horror de Coral', hp: 143, speed: 64, atk: 22, reward: 62, radius: 38, mass: 1.65, range: 480, cooldown: 2250, pattern: 'sniper' },
+    caranguejo: { name: 'Guardião Caranguejo', hp: 196, speed: 92, atk: 22, reward: 75, radius: 42, mass: 2.8, range: 145, cooldown: 5000, pattern: 'ram' },
+    tartaruga: { name: 'Templo-Tartaruga', hp: 268, speed: 58, atk: 28, reward: 109, radius: 51, mass: 3.6, range: 445, cooldown: 2400, pattern: 'broadside' },
+    kraken: { name: 'KRAKEN — O Abismo Desperta', hp: 690, speed: 61, atk: 53, reward: 380, radius: 83, mass: 7.5, range: 380, cooldown: 2750, pattern: 'tentacle' },
+    dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 88, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
 };
 const SeaProfile = {
     defaults() { const levels = {}; for (const x of SEA_UPGRADES) levels[x.id] = 0;
@@ -150,6 +159,17 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-bombard', 'assets/sprites/enemy_bombard.png');
         this.load.image('foe-spectral', 'assets/sprites/enemy_spectral.png');
         this.load.image('foe-admiral', 'assets/sprites/enemy_admiral.png');
+        this.load.image('foe-cult', 'assets/abyss/cult_barge.png');
+        this.load.image('foe-dreadnought', 'assets/abyss/dreadnought.png');
+        this.load.image('foe-eel', 'assets/abyss/abyss_eel.png');
+        this.load.image('foe-drowned', 'assets/abyss/drowned_choir.png');
+        this.load.image('foe-coral', 'assets/abyss/coral_horror.png');
+        this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
+        this.load.image('foe-turtle', 'assets/abyss/temple_turtle.png');
+        this.load.image('boss-kraken', 'assets/abyss/kraken.png');
+        this.load.image('boss-dagon', 'assets/abyss/dagon.png');
+        this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
+        this.load.image('fx-dagon-eye', 'assets/abyss/dagon_eye.png');
         this.load.image('fx-splash-0', 'assets/fx/splash_0.png');
         this.load.image('fx-splash-1', 'assets/fx/splash_1.png');
         this.load.image('fx-splash-2', 'assets/fx/splash_2.png');
@@ -171,6 +191,11 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('treasure-coin', 'assets/items/treasure_coin.png');
         this.load.image('treasure-crate', 'assets/items/treasure_crate.png');
         this.load.image('treasure-chest', 'assets/items/treasure_chest.png');
+        this.load.image('command-console', 'assets/ui/command_console.png');
+        this.load.image('upgrade-hull', 'assets/upgrades/upgrade_hull.png');
+        this.load.image('upgrade-sails', 'assets/upgrades/upgrade_sails.png');
+        this.load.image('upgrade-guns', 'assets/upgrades/upgrade_guns.png');
+        this.load.image('upgrade-ram', 'assets/upgrades/upgrade_ram.png');
 
         const cx = this.scale.width / 2;
         const cy = this.scale.height / 2;
@@ -314,7 +339,8 @@ class Game extends Phaser.Scene {
         this.maxShipHP = this.shipStats.maxHP;
         this.shipHP = this.maxShipHP;
         this.playerVelocity = { x: 0, y: 0 }; this.hullRadius = 34;
-        this.gold = 0; this.kills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
+        this.gold = 0; this.kills = 0; this.bossKills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
+        this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
         this.elapsed = 0; this.waveElapsed = 0; this.ended = false; this.pausedByCaptain = false;
         this.resultsBanked = false; this.speed = 0; this.lastImpact = -1000;
         this.lastRockContact = -1000; this.lastShot = -1000;
@@ -322,7 +348,7 @@ class Game extends Phaser.Scene {
         this.touch = { left: false, right: false, up: false, down: false };
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
-        this.survivalTime = 0; this.goalName = '';
+        this.survivalTime = 0; this.goalName = ''; this.bossAlert = '';
         this.currentDifficulty = this.mode === 'mission' ? this.stage : 1;
         if (this.mode === 'mission') {
             this.objective = this.stage % 5 === 0 ? 'boss' : this.stage % 4 === 1 ? 'kill' : this.stage % 4 === 2 ? 'cargo' : this.stage % 4 === 3 ? 'survive' : 'hunt';
@@ -338,9 +364,10 @@ class Game extends Phaser.Scene {
         this.player = this.add.container(start.x, start.y).setDepth(20);
         const playerScale = (this.hullRadius * 2.25) / this.textures.get('player-ship').getSourceImage().height;
         this.playerSprite = this.add.image(0, 0, 'player-ship').setScale(playerScale);
+        this.upgradeLayer = this.add.container(0, 0);
         this.player.add(this.playerSprite);
-        this.sail = this.add.triangle(0, -5, -15, 15, 0, -43, 16, 16, 0xe7d7b5, 0).setStrokeStyle(0, 0x987f67, 0);
-        this.player.add(this.sail); this.decorateUpgradedShip();
+        this.player.add(this.upgradeLayer);
+        this.decorateUpgradedShip();
         this.playerHull = {
             ship: this.player, isPlayer: true, radius: this.hullRadius, mass: 1.5,
             get x() { return this.ship.x; }, set x(v) { this.ship.x = v; },
@@ -349,13 +376,18 @@ class Game extends Phaser.Scene {
             get lastRamming() { return this.ship._lastRamming ?? -1000; },
             set lastRamming(v) { this.ship._lastRamming = v; }
         };
-        this.tweens.add({ targets: this.sail, angle: { from: -6, to: 6 }, duration: 1080, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
         this.cameras.main.startFollow(this.player, true, .095, .095);
         const startingFoes = this.mode === 'mission' ? (this.objective === 'boss' ? 5 : 7) : 6;
         for (let i = 0; i < startingFoes; i++) this.spawnEnemy(this.chooseFoe(i), 430 + i * 95);
-        if (this.objective === 'boss') this.spawnEnemy('almirante', 600);
+        if (this.objective === 'boss') {
+            const bossTypes = ['almirante','kraken','dagon','nauabissal'];
+            this.missionBoss = bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
+            this.spawnEnemy(this.missionBoss, this.missionBoss === 'kraken' ? 560 : 600);
+            this.bossAlert = `ALERTA · ${SEA_FOES[this.missionBoss].name}`;
+        }
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
         this.createHUD(); this.createTouchControls();
+        if (this.bossAlert) this.announce(this.bossAlert);
         this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC');
         this.onBoth = () => this.fire('both'); this.onPort = () => this.fire('port'); this.onStarboard = () => this.fire('starboard');
         this.onPause = () => { if (!this.ended) this.toggleCaptainMenu(); };
@@ -381,38 +413,41 @@ class Game extends Phaser.Scene {
     }
     decorateUpgradedShip() {
         const lv = this.profile.levels;
-        if (lv.casco || lv.blindagem) {
-            const g = this.add.graphics();
-            g.lineStyle(2 + Math.min(5, lv.casco * .25 + lv.blindagem * .2), 0xe6bd82, .85);
-            g.strokeRoundedRect(-30, -25, 60, 76, 15);
-            for (let j = 0; j < Math.min(5, Math.ceil((lv.casco + lv.blindagem) / 2)); j++)
-                g.lineBetween(-25, -12 + j * 12, 25, -12 + j * 12);
-            this.player.add(g);
+        if (!this.upgradeLayer || !this.playerSprite) return;
+        this.upgradeLayer.removeAll(true);
+        const scale = this.playerSprite.scaleX || 1;
+        const addOverlay = (key, tint = null, alpha = 1, extraScale = 1) => {
+            const img = this.add.image(0, 0, key).setScale(scale * extraScale).setAlpha(alpha);
+            if (tint !== null) img.setTint(tint);
+            this.upgradeLayer.add(img);
+            return img;
+        };
+        const hullScore = (lv.casco || 0) + (lv.blindagem || 0);
+        if (hullScore > 0) {
+            const tint = hullScore >= 24 ? 0xffd08a : hullScore >= 12 ? 0xe6bd82 : 0xcaa27d;
+            addOverlay('upgrade-hull', tint, Math.min(.96, .48 + hullScore * .03));
         }
-        if (lv.velas) {
-            this.sail.setFillStyle(lv.velas >= 6 ? 0xd65c71 : 0xe0a596);
-            this.sail.setStrokeStyle(2 + Math.min(4, lv.velas * .15), 0xf5d5ac);
+        const sailScore = (lv.velas || 0);
+        if (sailScore > 0) {
+            const tint = sailScore >= 18 ? 0xffd37d : sailScore >= 9 ? 0xf1c06e : 0xdca0a8;
+            addOverlay('upgrade-sails', tint, Math.min(.95, .35 + sailScore * .05));
         }
-        if (lv.canhoes || lv.bateria) {
-            const g = this.add.graphics().fillStyle(0x0e1722);
-            const count = Math.min(5, Math.ceil((lv.canhoes + lv.bateria) / 3) + 1);
-            for (let j = 0; j < count; j++) {
-                g.fillCircle(-28, -22 + j * 15, 5); g.fillCircle(28, -22 + j * 15, 5);
-            }
-            this.player.add(g);
+        const gunScore = (lv.canhoes || 0) + (lv.bateria || 0);
+        if (gunScore > 0) {
+            const tint = gunScore >= 20 ? 0x1e2632 : 0x111923;
+            addOverlay('upgrade-guns', tint, Math.min(.98, .45 + gunScore * .03));
         }
-        if (lv.esporao) {
-            const g = this.add.graphics().fillStyle(lv.esporao >= 8 ? 0xffd58b : 0xb5c5cc);
-            g.fillTriangle(0, -85 - Math.min(18, lv.esporao * 2), -10, -43, 10, -43);
-            g.lineStyle(2, 0xf0ce91); g.lineBetween(0, -84, 0, -41);
-            this.player.add(g);
+        const ramScore = (lv.esporao || 0);
+        if (ramScore > 0) {
+            const tint = ramScore >= 16 ? 0xffd388 : ramScore >= 8 ? 0xd6dee8 : 0xb3c1cf;
+            addOverlay('upgrade-ram', tint, Math.min(.98, .5 + ramScore * .05));
         }
     }
     createSeaLayers() {
         this.seaBase = this.add.tileSprite(240, 400, 480, 800, 'sea-base').setScrollFactor(0).setDepth(-110);
         this.seaBlood = this.add.tileSprite(240, 400, 480, 800, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.85);
-        this.seaFoam = this.add.tileSprite(240, 400, 480, 800, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.75);
-        this.seaMist = this.add.tileSprite(240, 400, 480, 800, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.85);
+        this.seaFoam = this.add.tileSprite(240, 400, 480, 800, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.56);
+        this.seaMist = this.add.tileSprite(240, 400, 480, 800, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.57);
     }
     drawShipTextures() { return; }
     buildWorld() {
@@ -458,7 +493,7 @@ class Game extends Phaser.Scene {
         for (let i = 0; i < 16; i++) {
             const x = rng.between(120, this.W - 120), y = rng.between(120, this.H - 120);
             if (this.islands.some(isl => Math.hypot(isl.x - x, isl.y - y) < isl.radius + 60)) continue;
-            const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.38).setRotation((i % 7) * .3).setScale(1.1 + (i % 3) * .2);
+            const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3).setScale(0.42 + (i % 3) * .06);
             this.tweens.add({ targets: s, y: y - 5, duration: 1400 + i * 60, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
         }
         const border = this.add.graphics().setDepth(2).lineStyle(6, 0xba8c77, .36);
@@ -489,10 +524,12 @@ class Game extends Phaser.Scene {
         const rank = this.currentDifficulty;
         const pool = ['patrulha', 'corsario', 'ariete'];
         if (rank >= 2) pool.push('fragata');
-        if (rank >= 3) pool.push('bombardeiro');
-        if (rank >= 4) pool.push('espectral');
-        if (rank >= 6) pool.push('galeao');
-        if (rank >= 9) pool.push('almirante');
+        if (rank >= 3) pool.push('bombardeiro','enguia');
+        if (rank >= 4) pool.push('espectral','afogados');
+        if (rank >= 5) pool.push('cultista');
+        if (rank >= 6) pool.push('galeao','coral');
+        if (rank >= 8) pool.push('caranguejo');
+        if (rank >= 10) pool.push('tartaruga');
         return pool[(Math.floor(Math.random() * pool.length) + (seed % 2)) % pool.length];
     }
     spawnEnemy(type = 'patrulha', spacing = 450) {
@@ -512,13 +549,16 @@ class Game extends Phaser.Scene {
         }
         if (!pos) pos = this.findWaterSpot(this.W / 2, this.H / 2, f.radius + 40);
         const scaleDifficulty = 1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .24 : .12);
-        const elite = type === 'almirante';
+        const elite = ['almirante','nauabissal','kraken','dagon'].includes(type);
         const maxhp = Math.round(f.hp * scaleDifficulty), id = ++this.foeSerial;
         const tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
-            almirante:'foe-admiral' })[type] || 'foe-sloop';
+            almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
+            enguia:'foe-eel', afogados:'foe-drowned', coral:'foe-coral',
+            caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'boss-dagon' })[type] || 'foe-sloop';
         const sourceH = this.textures.get(tex).getSourceImage().height || 160;
-        const heightFactor = ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
+        const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
+        const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
         const ship = this.add.image(pos.x, pos.y, tex)
             .setScale((f.radius * heightFactor) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
@@ -527,7 +567,7 @@ class Game extends Phaser.Scene {
             atk: f.atk * (1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .16 : .095)),
             reward: Math.round(f.reward * (1 + this.currentDifficulty * .31)),
             vx: 0, vy: 0, radius: f.radius, mass: f.mass,
-            lastRockContact: -1000, lastRamming: -1000, dead: false,
+            lastRockContact: -1000, lastRamming: -1000, specialPhase: 0, dead: false,
             maxRange: f.range, cooldownBase: f.cooldown, pattern: f.pattern, elite, boss: elite, bar: null };
         enemy.bar = this.add.graphics().setDepth(22);
         enemy.label = this.add.text(pos.x, pos.y - f.radius - 38, f.name, {
@@ -540,7 +580,8 @@ class Game extends Phaser.Scene {
     dropTreasure(x, y, fromEnemy = false, value = 14) {
         const coin = this.add.container(x, y).setDepth(8);
         const kind = fromEnemy ? 'treasure-chest' : ((Math.floor(x + y + value) % 3 === 0) ? 'treasure-crate' : 'treasure-coin');
-        coin.add(this.add.image(0, 0, kind));
+        const scaleMap = { 'treasure-coin': 0.34, 'treasure-crate': 0.42, 'treasure-chest': 0.5 };
+        coin.add(this.add.image(0, 0, kind).setScale(scaleMap[kind] || 0.38).setAngle(((x + y) % 18) - 9));
         this.tweens.add({ targets: coin, y: y - 7, duration: 950, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
         this.treasures.push({ x, y, coin, value: Math.round(value), taken: false });
     }
@@ -570,15 +611,16 @@ class Game extends Phaser.Scene {
             .setScrollFactor(0).setDepth(112);
     }
     createTouchControls() {
-        this.control(57, 680, '◀', 'left'); this.control(139, 680, '▶', 'right');
-        this.control(98, 598, '▲', 'up'); this.control(98, 731, '▼', 'down', 30);
-        this.control(351, 674, '◀●', 'port', 49); this.control(442, 674, '●▶', 'starboard', 37);
+        this.add.image(240, 690, 'command-console').setScrollFactor(0).setDepth(102).setScale(0.49).setAlpha(.98);
+        this.control(49, 681, '◀', 'left', 20); this.control(145, 681, '▶', 'right', 20);
+        this.control(97, 605, '▲', 'up', 18); this.control(97, 757, '▼', 'down', 18);
+        this.control(345, 676, '◀●', 'port', 27); this.control(432, 676, '●▶', 'starboard', 24);
     }
     control(x, y, label, key, radius = 35) {
-        const circle = this.add.circle(x, y, radius, 0x243643, .82).setStrokeStyle(2, 0xba907a)
+        const circle = this.add.circle(x, y, radius, 0xffffff, 0.001)
             .setScrollFactor(0).setDepth(105).setInteractive({ useHandCursor: true });
-        this.add.text(x, y, label, { fontFamily: 'monospace', fontSize: label.includes('●') ? '20px' : '24px',
-            color: label.includes('●') ? '#ffcba8' : '#e7d5bd' }).setOrigin(.5).setScrollFactor(0).setDepth(106);
+        this.add.text(x, y, label, { fontFamily: 'Georgia', fontSize: label.includes('●') ? '18px' : '21px', fontStyle: 'bold',
+            color: label.includes('●') ? '#ffddb3' : '#f3e2c4', stroke: '#29140e', strokeThickness: 3 }).setOrigin(.5).setScrollFactor(0).setDepth(106);
         circle.on('pointerdown', () => {
             if (key === 'port' || key === 'starboard') this.fire(key);
             else this.touch[key] = true;
@@ -885,7 +927,7 @@ class Game extends Phaser.Scene {
             const distance = Math.max(.01, Phaser.Math.Distance.Between(e.x, e.y, this.player.x, this.player.y));
             const aim = Math.atan2(this.player.x - e.x, -(this.player.y - e.y));
             const sideAngle = Phaser.Math.Angle.Wrap(aim - e.heading);
-            const aggressive = e.pattern === 'ram' || e.pattern === 'chase';
+            const aggressive = ['ram','chase','tentacle'].includes(e.pattern);
             const kiting = e.pattern === 'sniper' && distance < e.maxRange * .52;
             let desired;
             if (aggressive) desired = aim;
@@ -893,7 +935,7 @@ class Game extends Phaser.Scene {
                 const sign = Math.sin(sideAngle) >= 0 ? 1 : -1;
                 desired = aim - sign * Math.PI * .5;
                 if (e.pattern === 'flank') desired += .27;
-                if (e.pattern === 'boss') desired += .14;
+                if (e.pattern === 'boss' || e.pattern === 'abyss') desired += .14;
             }
             if (kiting) desired = aim + Math.PI;
             if (distance < 850) {
@@ -925,15 +967,26 @@ class Game extends Phaser.Scene {
         }
     }
     enemyFire(e, distance) {
+        // Um monstro não deve parecer que está disparando canhões de dentro do corpo.
+        if (e.pattern === 'tentacle') { this.tentacleAttack(e); return; }
+        if (e.pattern === 'abyss') { this.dagonAttack(e, distance); return; }
+        if (e.type === 'enguia' || e.type === 'afogados' || e.type === 'coral') {
+            const dx = (this.player.x-e.x)/distance, dy=(this.player.y-e.y)/distance;
+            const count = e.type === 'afogados' ? 2 : 1;
+            for (let j=0;j<count;j++) {
+                let x=e.x+dx*e.radius,y=e.y+dy*e.radius;
+                this.makeShot(x,y,(dx+(j?-.09:0))*280,(dy+(j?.09:0))*280,false,e.atk,1.75);
+            }
+            this.splash(e.x,e.y,0x79d2ca,12);
+            return;
+        }
         const dx = (this.player.x - e.x) / distance, dy = (this.player.y - e.y) / distance;
-        // Inimigos também usam bordadas, exceto o corsário (arma giratória) e o atirador de precisão.
         const rx = Math.cos(e.heading), ry = Math.sin(e.heading);
         const sign = dx * rx + dy * ry > 0 ? 1 : -1;
         const sideVX = rx * sign, sideVY = ry * sign;
         const fireDX = (e.pattern === 'chase' || e.pattern === 'sniper') ? dx : sideVX;
         const fireDY = (e.pattern === 'chase' || e.pattern === 'sniper') ? dy : sideVY;
-        const f = SEA_FOES[e.type];
-        const bullets = e.pattern === 'boss' ? 3 : e.pattern === 'broadside' && e.type === 'galeao' ? 2 : 1;
+        const bullets = e.boss ? 3 : e.pattern === 'broadside' && (e.type === 'galeao' || e.type === 'tartaruga') ? 2 : 1;
         for (let j = 0; j < bullets; j++) {
             const offset = (j - (bullets - 1) / 2) * 15;
             this.makeShot(e.x + fireDX * 31 + Math.sin(e.heading) * offset,
@@ -942,15 +995,60 @@ class Game extends Phaser.Scene {
                 false, e.atk, e.pattern === 'sniper' ? 2.2 : 1.85);
         }
         this.splash(e.x + fireDX * 29, e.y + fireDY * 29, e.boss ? 0xffac83 : 0xc8a8bd, 7);
-        void f;
+    }
+    tentacleAttack(e) {
+        if (e.dead || this.ended) return;
+        const cx=this.player.x + this.playerVelocity.x*.3, cy=this.player.y + this.playerVelocity.y*.3;
+        const r=62;
+        // Aviso claro antes do golpe, especialmente em tela de toque.
+        const warning=this.add.circle(cx,cy,r,0x922838,.14).setStrokeStyle(3,0xf39d8d,.9).setDepth(36);
+        this.tweens.add({ targets:warning,alpha:.52,scale:1.10,duration:470,onComplete:()=>warning.destroy() });
+        this.announce('KRAKEN · TENTÁCULOS À VISTA!');
+        this.time.delayedCall(560,()=>{
+            if (this.ended || !e.ship.active || e.dead) return;
+            const fx=this.add.image(cx,cy,'fx-tentacle').setDepth(36).setScale(.75).setAlpha(.9);
+            this.tweens.add({targets:fx,alpha:0,scale:1.3,duration:570,onComplete:()=>fx.destroy()});
+            this.splash(cx,cy,0xf2bcc1,20);
+            if (Math.hypot(this.player.x-cx,this.player.y-cy)<r+this.hullRadius) {
+                this.damageShip(e.atk,cx,cy,'ram');
+            }
+        });
+        if (e.hp/e.maxhp<.51 && e.specialPhase<1) {
+            e.specialPhase=1;
+            this.announce('O KRAKEN ENFURECEU · ENGUiAS EMERGEM');
+            for(let i=0;i<2;i++)this.spawnEnemy('enguia',340+i*80);
+            e.cooldownBase*=.76;
+        }
+    }
+    dagonAttack(e,distance) {
+        if (e.dead || this.ended) return;
+        const px=this.player.x,py=this.player.y;
+        const dx=(px-e.x)/Math.max(1,distance),dy=(py-e.y)/Math.max(1,distance);
+        const eye=this.add.image(e.x+dx*50,e.y+dy*50,'fx-dagon-eye').setDepth(35).setScale(.38).setAlpha(.9);
+        this.tweens.add({targets:eye,x:px,y:py,alpha:0,scale:.65,duration:720,onComplete:()=>eye.destroy()});
+        this.announce('DAGON · MARÉ DA COROA!');
+        this.time.delayedCall(780,()=>{
+            if (this.ended || e.dead || !e.ship.active) return;
+            this.splash(px,py,0x79d6c4,23);
+            if (Math.hypot(this.player.x-px,this.player.y-py)<100+this.hullRadius)
+                this.damageShip(e.atk,px,py,'cannon');
+        });
+        if(e.hp/e.maxhp<.66&&e.specialPhase===0) {
+            e.specialPhase=1;
+            this.spawnEnemy('afogados',380);this.spawnEnemy('afogados',450);
+        } else if(e.hp/e.maxhp<.34&&e.specialPhase===1){
+            e.specialPhase=2;
+            this.spawnEnemy('coral',390);this.spawnEnemy('caranguejo',470);
+        }
     }
     paintEnemies() {
         for (const e of this.enemies) {
             if (e.dead) continue;
             e.ship.setPosition(e.x, e.y).setRotation(e.heading);
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 38);
-            e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - 29, e.y - e.radius - 24, 58, 7);
-            e.bar.fillStyle(e.boss ? 0xf3bb6e : 0xc87c86).fillRect(e.x - 28, e.y - e.radius - 23, Math.max(0, 56 * e.hp / e.maxhp), 5);
+            const width=e.boss?112:58;
+            e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - width/2-1, e.y - e.radius - 24, width+2, 7);
+            e.bar.fillStyle(e.boss ? 0xf3bb6e : 0xc87c86).fillRect(e.x - width/2, e.y - e.radius - 23, Math.max(0, width * e.hp / e.maxhp), 5);
         }
     }
     // Colisão contínua de projéteis para não atravessar cascos quando estão rápidos.
@@ -1015,7 +1113,12 @@ class Game extends Phaser.Scene {
                 this.waveClock -= 52; this.wave++; this.currentDifficulty = this.wave;
                 this.shipHP = Math.min(this.maxShipHP, this.shipHP + Math.max(8, this.maxShipHP * .10));
                 this.announce(`ONDA ${this.wave} · AS SOMBRAS SE FORTALECEM`);
-                if (this.wave % 5 === 0) this.spawnEnemy('almirante', 530);
+                if (this.wave % 5 === 0) {
+                    const bosses=['almirante','kraken','dagon','nauabissal'];
+                    const selected=bosses[(this.wave / 5 - 1) % bosses.length];
+                    this.spawnEnemy(selected, 530);
+                    this.announce(`ONDA ${this.wave} · ${SEA_FOES[selected].name}`);
+                }
                 for (let j = 0; j < Math.min(9, 2 + Math.floor(this.wave / 2)); j++) this.spawnEnemy(this.chooseFoe(j), 490 + j * 50);
                 this.dropTreasure(this.player.x + 150, this.player.y + 150, false, 20 + this.wave * 17);
             }
@@ -1042,7 +1145,7 @@ class Game extends Phaser.Scene {
     }
     objectiveText() {
         if (this.mode === 'sandbox') return `ONDA ${this.wave} · +${Math.max(0, Math.ceil(52 - this.waveClock))}s até reforços`;
-        if (this.objective === 'boss') return `CAÇA AO ALMIRANTE · CHEFE ${this.bossKills || 0}/1`;
+        if (this.objective === 'boss') return `ENFRENTAR ${SEA_FOES[this.missionBoss]?.name || 'O CHEFE'} · ${this.bossKills || 0}/1`;
         if (this.objective === 'kill') return `CAÇA À CORTE · ${this.kills}/${this.targetKills} navios`;
         if (this.objective === 'hunt') return `ROMPER BLOQUEIO · FRAGATAS ${this.huntKills || 0}/${this.huntTarget}`;
         if (this.objective === 'cargo') return `RECUPERAR CARGA · ${SEA_MATH.nice(this.gold)}/${SEA_MATH.nice(this.targetGold)} ouro`;
