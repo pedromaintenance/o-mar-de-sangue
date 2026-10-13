@@ -22,8 +22,8 @@ Substituir artes procedurais provisórias da PWA por assets PNG consistentes e o
 
 ## Processo iterativo
 1. [x] **F0 — Base e direção:** localizar repo, confirmar acesso, criar branch e salvar este plano. **Concluído.**
-2. [ ] **F1 — Extração e QC dos navios:** cortar sprites isolados (jogador, Corte leve, galeão, aríete, moeda, baú), padronizar transparência/escala e conferir PNGs; enviar assets e planilha/manifesto. **Em execução.**
-3. [ ] **F2 — Mar e ilhas:** gerar tiles periódicos (não repetir diretamente conceitos com costuras), espuma/névoa alpha, recife, ruína e altar Daegon; comparar repetição 3×3; documentar limitações. 
+2. [x] **F1 — Extração e QC dos navios:** cortar sprites isolados (jogador, Corte leve, galeão, aríete, moeda, baú), padronizar transparência/escala e conferir PNGs; enviar assets e planilha/manifesto. **Concluído e comitado (ba74b172).**
+3. [ ] **F2 — Mar e ilhas:** gerar tiles periódicos (não repetir diretamente conceitos com costuras), espuma/névoa alpha, recife, ruína e altar Daegon; comparar repetição 3×3; documentar limitações. **Parcial: tiles preparados e verificados; limpeza de ilhas e teste visual no jogo pendentes.** 
 4. [ ] **F3 — Integração no Phaser:** trocar chaves de textura e referências no `Game.js`, garantir preloader e física inalterados; checar sprites, scale, mipmap/nearest, HUD, assets em modo offline. 
 5. [ ] **F4 — Refinamento e animação:** esteiras/ondas, tiro lateral, clarão, impactos, destroços, danos de casco e feedback visual; reavaliar tamanho e desempenho no celular. 
 6. [ ] **F5 — Regressão e entrega:** validar sintaxe, assets, navegação, modo missões/sandbox, upgrades/save, Service Worker, viewport e carga offline; abrir PR da branch para `main`. **Merge só depois de testes e aprovação.**
@@ -37,3 +37,5 @@ Substituir artes procedurais provisórias da PWA por assets PNG consistentes e o
 
 ## Log de execução
 - 2026-10-13 — F0: GitHub `pedromaintenance/o-mar-de-sangue` conectado; branch isolada criada; fontes de arte iniciais localizadas. Próximo: F1.
+
+- 2026-10-13 — F1: seis sprites recortados e orientados; PNG e QC em `assets/pixel/sprites/` e `docs/sprite-review.png`. F2 parcial: três tiles com bordas opostas idênticas, três ilhas com máscara automática em revisão. Commit `ba74b172`. **Próximo não executado:** F2.1 revisar visualmente e limpar a máscara das ilhas; F3 integrar arte com toggle A/B sem afetar colisões, radar ou salvamento.
