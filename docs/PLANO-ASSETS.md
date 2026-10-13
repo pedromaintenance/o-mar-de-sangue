@@ -1,23 +1,22 @@
-# O Mar de Sangue — pipeline visual e bestiário
+# O Mar de Sangue — plano de produção de pixel art e bestiário
 
-**Branch planejada:** `develop/bestiario-abissal-v10` (base: main 67918b1).  **Pixel art:** medieval sombria, perspectiva de topo, paleta carmesim/bronze/verde feérico.
+**Direção:** pixel art medieval sombria, top-down, legível em celular. **Desenvolvimento:** `develop/bestiario-abissal-v10`. **Integrado à main:** PR #2, commit `4f022e5`, em 13/10/2026.
 
-## Objetivo desta iteração
-Unificar a arte dos colecionáveis, HUD e melhorias, preservar colisões e o sistema de progressão, e acrescentar encontros sobrenaturais genuínos. Usar os conceitos já aprovados como fontes para sprites individuais e versões otimizadas.
+## Fluxo e fases
+- [x] F0 — Inspecionar as capturas e confirmar acesso, código e branch.
+- [x] F1 — Recortar e preparar 11 PNGs originais: navios cultistas, criaturas e chefes Kraken/Dagon, com transparência limpa e tamanhos apropriados.
+- [x] F2 — Manter colecionáveis reduzidos; substituir o console antigo; eliminar desenhos vetoriais residuais dos upgrades; **corrigir os preloads ausentes** do console e das camadas de upgrade.
+- [x] F3 — Integrar criaturas sobrenaturais e ataques distintos: tentáculos telegráficos, magia da maré, afogados invocados e fauna hostil.
+- [x] F4 — Rodízio de chefes a cada 5 missões/ondas e preservação de abatimento por canhões/abalroamento, salvamento v4 e estaleiro infinito.
+- [x] F5 — Testes isolados no Chromium: inicialização, Kraken, Dagon com reforços, sandbox onda 10 e camadas de upgrades; sintaxe JS e integridade dos caminhos offline.
+- [x] F6 — Commit em branch, PR #2 e merge conferido na `main`.
+- [ ] F7 — Aceitação em celular real: carregar duas viagens consecutivas, instalar PWA, navegar offline e verificar desempenho sob ondas altas.
 
-## Fases / definição de pronto
-- [x] F0 — Inspecionar bugs documentados nas capturas (colecionáveis gigantes, placeholders antigos, overlays vetoriais de upgrades). Confirmar codebase e acesso ao GitHub.
-- [x] F1 — Preparar assets novos (11 PNGs): seis criaturas/ameaças menores e cinco imagens de chefes/efeitos/navios; recortar camadas sobrepostas, limpar transparência e documentar proveniência.
-- [x] F2 — Escala e uniformidade: preservar correções v09, carregar console/overlays no Preloader e calibrar o tamanho do navio, itens e ilhas; retirar a lógica antiga de vela vetorial.
-- [x] F3 — Encontros: integrar Kraken, Dagon/Arauto de Daegon, enguia, cortejo afogado, horror de coral, caranguejo e templo-tartaruga; ataques mágicos, telegráficos e invocação de reforços.
-- [x] F4 — Campanha: bosses nos níveis 5/10/15/20 em rodízio, com progressão de dificuldade, aparições no sandbox nas ondas 5/10/15/20. Preservar saves, estaleiro infinito e abalroamento.
-- [x] F5 — QA técnico: sintaxe, resolução das texturas, integração no Chromium com todas as imagens carregadas. Verificar que não há assets externos. Corrigir cache offline incluindo Phaser.
-- [ ] F6 — PR e merge após verificar ao menos uma jornada completa e sequência de boss/porto sem travamentos. **Nunca afirmar teste real em Android; isso exige ensaio no dispositivo.**
+## O que os testes não provaram
+O teste automatizado de viagens consecutivas mostrou que a segunda cena de jogo completou a inicialização, porém o renderer Chromium headless congestionou antes de confirmar a partida. Isso **não** equivale a um teste de jogabilidade contínua bem-sucedido. O commit foi integrado com esta limitação explicitamente documentada. Não foi realizado teste em Android físico.
 
-## Decisões de lore
-- **Kraken** é uma criatura marinha colossal autônoma.
-- **Dagon/Arauto de Daegon** é uma interpretação jogável criada para este jogo, associada aos cultos submarinos; não declarar o desenho como descrição canônica do culto.
-- Os **afogados, enguias e horrores de coral** são criações desta adaptação.
+## Próxima etapa
+Recolher evidências do uso real, ajustar transição/consumo de memória se necessário e só então passar a novas animações e padrões de chefes. Cada nova iteração deve nascer em uma branch própria, manter os assets locais e atualizar este plano antes do merge.
 
-## Regras do pipeline
-Cada sprint deve conter sprites individuais PNG RGBA, origens na documentação, indicação de escala em relação ao casco, integração funcional e capturas QA. A branch vem primeiro; a main só recebe depois da validação. A versão anterior deve permanecer recuperável por tag/commit.
+## Nota de ambientação
+**Kraken** é uma ameaça marítima colossal. **Dagon, Arauto de Daegon** é a representação criada para este jogo e não constitui declaração de cânone sobre Daegon. Afogados, enguias e terrores de coral aqui representados são adaptações originais.
