@@ -1,3 +1,4 @@
+// PIXEL_ASSET_PACK_V1
 /*
  * O MAR DE SANGUE — v0.4, FROTAS & ESTALEIRO INFINITO — CARCAÇA
  * Compatível com o editor Phaser 3: substitua SOMENTE Game.js.
@@ -145,6 +146,22 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-sloop', 'assets/sprites/enemy_court_ship.png');
         this.load.image('foe-galleon', 'assets/sprites/enemy_galleon.png');
         this.load.image('foe-ram', 'assets/sprites/enemy_ram.png');
+        this.load.image('foe-corsair', 'assets/sprites/enemy_corsair.png');
+        this.load.image('foe-bombard', 'assets/sprites/enemy_bombard.png');
+        this.load.image('foe-spectral', 'assets/sprites/enemy_spectral.png');
+        this.load.image('foe-admiral', 'assets/sprites/enemy_admiral.png');
+        this.load.image('fx-splash-0', 'assets/fx/splash_0.png');
+        this.load.image('fx-splash-1', 'assets/fx/splash_1.png');
+        this.load.image('fx-splash-2', 'assets/fx/splash_2.png');
+        this.load.image('fx-splash-3', 'assets/fx/splash_3.png');
+        this.load.image('fx-muzzle-0', 'assets/fx/muzzle_0.png');
+        this.load.image('fx-muzzle-1', 'assets/fx/muzzle_1.png');
+        this.load.image('fx-muzzle-2', 'assets/fx/muzzle_2.png');
+        this.load.image('fx-muzzle-3', 'assets/fx/muzzle_3.png');
+        this.load.image('fx-splinters-0', 'assets/fx/splinters_0.png');
+        this.load.image('fx-splinters-1', 'assets/fx/splinters_1.png');
+        this.load.image('fx-splinters-2', 'assets/fx/splinters_2.png');
+        this.load.image('fx-splinters-3', 'assets/fx/splinters_3.png');
         this.load.image('island-reef', 'assets/islands/island_reef.png');
         this.load.image('island-ruin', 'assets/islands/island_ruin.png');
         this.load.image('island-monastery', 'assets/islands/island_monastery.png');
@@ -319,8 +336,10 @@ class Game extends Phaser.Scene {
         this.buildWorld();
         const start = this.findWaterSpot(this.W / 2, this.H / 2, 400);
         this.player = this.add.container(start.x, start.y).setDepth(20);
-        this.player.add(this.add.image(0, 0, 'player-ship'));
-        this.sail = this.add.triangle(0, -5, -15, 15, 0, -43, 16, 16, 0xe7d7b5).setStrokeStyle(2, 0x987f67);
+        const playerScale = (this.hullRadius * 2.25) / this.textures.get('player-ship').getSourceImage().height;
+        this.playerSprite = this.add.image(0, 0, 'player-ship').setScale(playerScale);
+        this.player.add(this.playerSprite);
+        this.sail = this.add.triangle(0, -5, -15, 15, 0, -43, 16, 16, 0xe7d7b5, 0).setStrokeStyle(0, 0x987f67, 0);
         this.player.add(this.sail); this.decorateUpgradedShip();
         this.playerHull = {
             ship: this.player, isPlayer: true, radius: this.hullRadius, mass: 1.5,
@@ -416,7 +435,7 @@ class Game extends Phaser.Scene {
         const keyMap = { reef: 'island-reef', ruin: 'island-ruin', monastery: 'island-monastery', daegon: 'island-daegon', demeter: 'island-demeter', wreck: 'island-wreck' };
         spots.forEach(([x, y, radius, kind], i) => {
             this.islands.push({ x, y, radius, kind });
-            const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale((radius * 2.2) / 160);
+            const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale((radius * 2.8) / 256);
             if (kind === 'demeter') {
                 const glow = this.add.circle(x, y - radius * .2, Math.max(14, radius * .3), 0xc8e8bd, .14).setDepth(1);
                 this.tweens.add({ targets: glow, alpha: .04, duration: 1800 + i * 35, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
@@ -495,9 +514,13 @@ class Game extends Phaser.Scene {
         const scaleDifficulty = 1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .24 : .12);
         const elite = type === 'almirante';
         const maxhp = Math.round(f.hp * scaleDifficulty), id = ++this.foeSerial;
-        const tex = type === 'ariete' ? 'foe-ram' : ['fragata', 'galeao', 'almirante'].includes(type) ? 'foe-galleon' : 'foe-sloop';
+        const tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
+            espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
+            almirante:'foe-admiral' })[type] || 'foe-sloop';
+        const sourceH = this.textures.get(tex).getSourceImage().height || 160;
+        const heightFactor = ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
         const ship = this.add.image(pos.x, pos.y, tex)
-            .setTint(f.tint).setScale((f.radius / (tex === 'foe-galleon' ? 39 : tex === 'foe-ram' ? 35 : 31)) * .82).setDepth(15);
+            .setScale((f.radius * heightFactor) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
             speed: f.speed * (1 + Math.min(.85, this.currentDifficulty * .014)),
@@ -589,6 +612,7 @@ class Game extends Phaser.Scene {
                     dirY * speed + this.playerVelocity.y * .22, true,
                     this.shipStats.cannonDamage, this.shipStats.shotTTL);
                 this.splash(x, y, 0xffdfab, 4);
+                this.pixelFx('muzzle',x,y,1.2);
             }
             // Recuo lateral dos canhões: pequeno, mas perceptível em navios leves.
             this.playerVelocity.x -= sign * rightX * 2.5;
@@ -601,7 +625,15 @@ class Game extends Phaser.Scene {
             .setStrokeStyle(2, friendly ? 0xffffff : 0x512a47).setDepth(30);
         this.shots.push({ x, y, px: x, py: y, vx, vy, friendly, object: sprite, ttl, damage });
     }
+    pixelFx(name,x,y,scale=1) {
+        const key='fx-'+name+'-0';
+        if (!this.textures.exists(key)) return;
+        const spr=this.add.image(x,y,key).setDepth(44).setScale(scale);
+        for(let i=1;i<4;i++)this.time.delayedCall(i*62,()=>{if(spr.active)spr.setTexture('fx-'+name+'-'+i);});
+        this.time.delayedCall(260,()=>{if(spr.active)spr.destroy();});
+    }
     splash(x, y, color = 0xe4bbc1, r = 6) {
+        this.pixelFx('splash',x,y,Math.max(.6,r/9));
         const ring = this.add.circle(x, y, r, 0x000000, 0).setStrokeStyle(2, color, .8).setDepth(11);
         this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
     }
@@ -619,6 +651,7 @@ class Game extends Phaser.Scene {
     }
     // Exibe fragmentos de madeira, espuma e a força do impacto.
     impactFX(x, y, magnitude, label, isRock = false) {
+        this.pixelFx('splinters',x,y,Math.min(2,magnitude/90+.5));
         const strength = Phaser.Math.Clamp(magnitude / 170, 0.25, 1);
         this.splash(x, y, isRock ? 0xffbdb1 : 0xffd69d, 9 + strength * 15);
         for (let i = 0; i < 7; i++) {
@@ -1093,6 +1126,10 @@ const config = {
     height: 800,
     parent: 'game-container',
     backgroundColor: '#251423',
+    pixelArt: true,
+    antialias: false,
+    roundPixels: true,
+    render: { pixelArt: true, antialias: false, roundPixels: true },
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.NO_CENTER },
     scene: [SeaBoot, SeaPort, Game]
 };

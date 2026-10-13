@@ -1,0 +1,60 @@
+{
+  "version": "f1-f2-provisional",
+  "style": "pixel art medieval sombria, top-down",
+  "sprites": {
+    "player": [
+      100,
+      152
+    ],
+    "court_sloop": [
+      92,
+      160
+    ],
+    "court_galleon": [
+      122,
+      184
+    ],
+    "ram": [
+      112,
+      156
+    ],
+    "coin": [
+      48,
+      48
+    ],
+    "chest": [
+      70,
+      56
+    ]
+  },
+  "tiles": {
+    "sea_base": [
+      256,
+      256
+    ],
+    "sea_foam": [
+      256,
+      256
+    ],
+    "sea_mist": [
+      256,
+      256
+    ]
+  },
+  "islands": {
+    "reef": [
+      256,
+      256
+    ],
+    "ruin": [
+      256,
+      256
+    ],
+    "daegon": [
+      256,
+      256
+    ]
+  },
+  "status": "pré-produção: integração Phaser ainda pendente",
+  "notes": "Sprites extraídos de concept sheet; ilhas têm máscara automática a revisar; tiles passaram QA de borda pixel a pixel."
+}
