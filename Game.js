@@ -1,4 +1,4 @@
-// ABYSSAL_V10 — pixel art de navios e criaturas, boss raids e controles preservados
+// O MAR DE SANGUE v1.7 — combate, áudio procedural e afundamentos
 /*
  * O MAR DE SANGUE — Pixel Art & Bestiário Abissal v1.0 — CARCAÇA
  * Aplicação web independente (GitHub Pages/PWA). Usa Phaser e imagens locais.
@@ -327,6 +327,7 @@ class SeaPort extends Phaser.Scene {
         }
         this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
         this.paintBackground();
+        SEA_AUDIO.bind(this, 465, 24);
         if (this.page === 'yard') this.showYard();
         else if (this.page === 'help') this.showHelp();
         else if (this.page === 'reset') this.showReset();
@@ -452,7 +453,7 @@ class SeaPort extends Phaser.Scene {
     showHelp() {
         this.banner('DIÁRIO DE BORDO', 'Regras do mar, da guerra e do estaleiro');
         const lines = [
-            '↑/W acelerar   ↓/S ré/freio   ←→/AD virar\nQ / E canhões   ·   ESPAÇO: dois bordos',
+            '↑/W acelerar   ↓/S ré/freio   ←→/AD virar\nQ / E canhões   ·   ESPAÇO: ambos · M: som',
             'XBOX: analógico esquerdo; LT/LB = bombordo;\nRT/RB = estibordo; Menu pausa; A OK; B volta.',
             'ABALROAR: proa e velocidade amplificam o impacto.\nRochas são sólidas e danificam o casco.',
             'MISSÕES: etapas de escolta de carga, caça,\nsobrevivência e chefes. A etapa avança ao vencer.',
@@ -533,6 +534,7 @@ class Game extends Phaser.Scene {
         this.upgradeLayer = this.add.container(0, 0);
         this.playerVisual = this.add.container(0, 0);
         this.playerVisual.add([this.playerSprite, this.upgradeLayer]);
+        SEA_COMBAT.init(this);
         this.player.add(this.playerVisual);
         this.playerWake = this.add.image(start.x,start.y,'fx-foam-0').setDepth(13).setAlpha(0).setScale(1.75);
         this.decorateUpgradedShip();
@@ -555,6 +557,7 @@ class Game extends Phaser.Scene {
         }
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
         this.createHUD();
+        SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
         this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC');
@@ -768,6 +771,8 @@ class Game extends Phaser.Scene {
         enemy.wake = this.add.image(pos.x,pos.y,supernatural ? 'fx-violet-0' : 'fx-foam-0')
             .setDepth(13).setAlpha(0).setScale(supernatural ? 2.2 : 1.35);
         enemy.flashUntil = 0;
+        enemy.lastHitVisualTime = -1000;
+        enemy.nextDamageSmokeAt = 0;
         enemy.bar = this.add.graphics().setDepth(22);
         enemy.label = this.add.text(pos.x, pos.y - f.radius - 54, f.name, {
             fontFamily: 'monospace', fontSize: '12px', color: elite ? '#ffe2a2' : '#edb6b8',
@@ -788,6 +793,8 @@ class Game extends Phaser.Scene {
     createHUD() {
         this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 532 : 480, 101, 0x111c28, .94).setScrollFactor(0).setDepth(90);
         this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 524 : 472, 93, 0x0f1620, .35).setStrokeStyle(1, 0x9c8267, .7).setScrollFactor(0).setDepth(91);
+        this.damageFlash = this.add.rectangle(SEA_VIEW.width / 2, SEA_VIEW.height / 2,
+            SEA_VIEW.width, SEA_VIEW.height, 0x99283a, 0).setScrollFactor(0).setDepth(82);
         this.statusBars=this.add.graphics().setScrollFactor(0).setDepth(101);
         this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
             fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#f0c58c'
@@ -937,7 +944,7 @@ class Game extends Phaser.Scene {
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
     fire(side = 'both') {
-        if (!this.player || this.ended || this.pausedByCaptain) return false;
+        if (!this.player || this.ended || this.sinking || this.pausedByCaptain) return false;
         let fired = false;
         const rot = this.player.rotation;
         const rightX = Math.cos(rot), rightY = Math.sin(rot);
@@ -966,6 +973,7 @@ class Game extends Phaser.Scene {
             this.playerVelocity.y -= sign * rightY * 2.5;
             this.triggerCannonUiFx(sign < 0 ? 'port' : 'starboard');
         }
+        if (fired) SEA_AUDIO.play('cannon', .85 + Math.min(.45, this.shipStats.balls * .11));
         return fired;
     }
     v15Burst(x,y,start=0,scale=1) {
@@ -1006,6 +1014,7 @@ class Game extends Phaser.Scene {
             onComplete:()=>{if(spr.active)spr.destroy();this.effectsActive=Math.max(0,this.effectsActive-1);}});
     }
     animateWorldVisuals() {
+        SEA_COMBAT.animate(this);
         // Throttled visual update. Physics uses unmodified player/enemy positions.
         const t=this.elapsed;
         if(this.playerVisual) {
@@ -1077,7 +1086,7 @@ class Game extends Phaser.Scene {
         this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
     }
     damageShip(amount, x, y, source = 'normal') {
-        if (this.ended || this.elapsed < this.gracePeriod || this.time.now - this.lastImpact < 330) return false;
+        if (this.ended || this.sinking || this.elapsed < this.gracePeriod || this.time.now - this.lastImpact < 330) return false;
         this.lastImpact = this.time.now; this.lastDamageTime = this.time.now;
         const reduction = source === 'rock' ? this.shipStats.rockReduction :
             source === 'ram' ? this.shipStats.ramProtection : this.shipStats.armor;
@@ -1085,7 +1094,9 @@ class Game extends Phaser.Scene {
         this.shipHP = Math.max(0, this.shipHP - amount);
         this.cameras.main.shake(120, .004); this.burst(x,y,'smoke',.75);
         this.splash(x, y, 0xffd4ad, 11);
-        if (this.shipHP <= 0) this.finish(false);
+        SEA_COMBAT.damagePlayer(this, x, y, amount);
+        this.updateHUD();
+        if (this.shipHP <= 0) SEA_COMBAT.sinkPlayer(this);
         return true;
     }
     // Exibe fragmentos de madeira, espuma e a força do impacto.
@@ -1118,6 +1129,7 @@ class Game extends Phaser.Scene {
             alpha: 0, delay: 700, duration: 420 });
         this.cameras.main.shake(100 + Math.min(125, magnitude),
             0.002 + strength * 0.005);
+        SEA_AUDIO.play(isRock ? 'rock' : 'ram', strength * 1.35);
     }
 
     // Madeira contra rocha: obstáculo sólido, restituição, arrasto e dano.
@@ -1231,7 +1243,7 @@ class Game extends Phaser.Scene {
         enemy.dead = true;
         if(enemy.wake) enemy.wake.destroy();
         this.burst(enemy.x,enemy.y,enemy.boss?'blast':'smoke',enemy.boss?2.4:1.4);
-        enemy.ship.destroy();
+        SEA_COMBAT.sinkEnemy(this, enemy);
         enemy.bar.destroy();
         if (enemy.label) enemy.label.destroy();
         this.dropTreasure(enemy.x, enemy.y, true, enemy.reward);
@@ -1277,7 +1289,7 @@ class Game extends Phaser.Scene {
 
     update(time, delta) {
         const pad = SEA_GAMEPAD.poll();
-        if (this.ended) return;
+        if (this.ended || this.sinking) return;
         if (pad.just[9] || (pad.just[1] && !this.pausedByCaptain)) { this.toggleCaptainMenu(); return; }
         if (this.pausedByCaptain) {
             if (pad.just[1]) { this.toggleCaptainMenu(); return; }
@@ -1328,11 +1340,13 @@ class Game extends Phaser.Scene {
             if (this.ended) break;
             for (let j = i + 1; j < this.enemies.length; j++) if (!this.enemies[j].dead) this.collideShips(e, this.enemies[j]);
         }
-        if (this.ended) return;
+        if (this.ended || this.sinking) return;
         this.speed = Math.round(this.playerVelocity.x * faceX + this.playerVelocity.y * faceY);
         this.paintEnemies();
         this.animateWorldVisuals();
-        this.updateShots(dt); this.collectTreasures(dt);
+        this.updateShots(dt);
+        if (this.sinking) return;
+        this.collectTreasures(dt);
         this.progressBattle(dt);
         if (this.ended) return;
         if (this.shipStats.repair > 0 && this.elapsed * 1000 - this.lastDamageTime > 5300) {
@@ -1414,6 +1428,7 @@ class Game extends Phaser.Scene {
                 false, e.atk, e.pattern === 'sniper' ? 2.2 : 1.85);
         }
         this.splash(e.x + fireDX * 29, e.y + fireDY * 29, e.boss ? 0xffac83 : 0xc8a8bd, 7);
+        if (distance < 840) SEA_AUDIO.play('enemy', e.boss ? .8 : .46, distance);
     }
     tentacleAttack(e) {
         if (e.dead || this.ended) return;
@@ -1494,6 +1509,7 @@ class Game extends Phaser.Scene {
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; e.hp = Math.max(0, e.hp - p.damage);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
+                        SEA_COMBAT.hitEnemy(this, e, p.x, p.y, p.damage);
                         this.splash(p.x, p.y, 0xffdfb4, 9);
                         if (e.hp <= 0) this.sinkEnemy(e);
                         break;
@@ -1522,6 +1538,7 @@ class Game extends Phaser.Scene {
             if (Math.hypot(this.player.x - t.x, this.player.y - t.y) < Math.max(96, range + 16)) {
                 t.taken = true; this.gold = SEA_MATH.safe(this.gold + t.value);
                 t.coin.destroy(); this.burst(t.x,t.y,'gold',.75); this.splash(t.x,t.y,0xf9d77b,8);
+                SEA_AUDIO.play('gold', .65);
             }
         }
     }
@@ -1624,7 +1641,7 @@ class Game extends Phaser.Scene {
             i === this.pausePadIndex ? 0xffeea4 : 0xe5c894));
     }
     toggleCaptainMenu() {
-        if (this.ended) return;
+        if (this.ended || this.sinking) return;
         if (this.pauseElements) {
             this.pauseElements.destroy(true); this.pauseElements = null; this.pausedByCaptain = false;
             this.pausePadOptions = null; this.pauseNavAt = 0; this.touchReset(); return;
@@ -1651,6 +1668,9 @@ class Game extends Phaser.Scene {
     }
     finish(won, withdrawn = false) {
         if (this.ended || this.resultsBanked) return;
+        if (won) SEA_AUDIO.play('victory', 1);
+        else if (withdrawn) SEA_AUDIO.play('gold', .8);
+        else if (!this.sinking) SEA_AUDIO.play('defeat', 1);
         this.ended = true; this.resultsBanked = true; this.pausedByCaptain = false;
         this.playerVelocity.x = this.playerVelocity.y = 0;
         if (this.pauseElements) { this.pauseElements.destroy(true); this.pauseElements = null; }
