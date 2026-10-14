@@ -1,22 +1,28 @@
-# O Mar de Sangue — plano de produção de pixel art e bestiário
+# O Mar de Sangue — Plano Mestre: Pixel Art, Animação e Polimento
 
-**Direção:** pixel art medieval sombria, top-down, legível em celular. **Desenvolvimento:** `develop/bestiario-abissal-v10`. **Integrado à main:** PR #2, commit `4f022e5`, em 13/10/2026.
+**Padrão visual:** pixel art medieval sombria, perspectiva top-down, navios/ilhas/monstros da Carcaça com silhuetas próprias. **Entrega:** PWA independente no GitHub Pages, sem CDN. **Preservar:** controles touch multitoque, teclado e Xbox, save v4, economia, abalroamento, missões e sandbox.
 
-## Fluxo e fases
-- [x] F0 — Inspecionar as capturas e confirmar acesso, código e branch.
-- [x] F1 — Recortar e preparar 11 PNGs originais: navios cultistas, criaturas e chefes Kraken/Dagon, com transparência limpa e tamanhos apropriados.
-- [x] F2 — Manter colecionáveis reduzidos; substituir o console antigo; eliminar desenhos vetoriais residuais dos upgrades; **corrigir os preloads ausentes** do console e das camadas de upgrade.
-- [x] F3 — Integrar criaturas sobrenaturais e ataques distintos: tentáculos telegráficos, magia da maré, afogados invocados e fauna hostil.
-- [x] F4 — Rodízio de chefes a cada 5 missões/ondas e preservação de abatimento por canhões/abalroamento, salvamento v4 e estaleiro infinito.
-- [x] F5 — Testes isolados no Chromium: inicialização, Kraken, Dagon com reforços, sandbox onda 10 e camadas de upgrades; sintaxe JS e integridade dos caminhos offline.
-- [x] F6 — Commit em branch, PR #2 e merge conferido na `main`.
-- [ ] F7 — Aceitação em celular real: carregar duas viagens consecutivas, instalar PWA, navegar offline e verificar desempenho sob ondas altas.
+## Fases concluídas
+- [x] **v1.0 — Bestiário abissal:** 11 assets do mar, Kraken, Dagon, criaturas e barcos sobrenaturais (PR #2).
+- [x] **v1.1 — Controles mobile:** analógico, dois/três dedos independentes e console redesenhado (PR #3).
+- [x] **v1.2 — Controle Xbox:** analógico, gatilhos, menu e reconexão pelo navegador (PR #4).
+- [x] **v1.3 — Base de animação/polimento:** 20 quadros pixel art de espuma, brilho, fumaça, explosão e aura + halo; navios com rastro/balanço, bestiário com pulsação, efeitos nas magias, coleta animada, HUD de casco/recarga e redução de animações permanentes de objetos distantes. Proteção nos 3 segundos iniciais (PR #5, merge `2dc3e196`). Relatório: [POLIMENTO-V13.md](POLIMENTO-V13.md).
 
-## O que os testes não provaram
-O teste automatizado de viagens consecutivas mostrou que a segunda cena de jogo completou a inicialização, porém o renderer Chromium headless congestionou antes de confirmar a partida. Isso **não** equivale a um teste de jogabilidade contínua bem-sucedido. O commit foi integrado com esta limitação explicitamente documentada. Não foi realizado teste em Android físico.
+## Replanejamento após v1.3
+O jogo ganhou animação de **movimento e efeitos** nas categorias jogáveis, mas ainda faltam spritesheets completos quadro a quadro de cada personagem. É incorreto tratar a v1.3 como “tudo animado”. A limpeza de tweens permanentes reduz trabalho, mas o teste automático de duas viagens consecutivas segue travando o Chromium headless (limitação observada também antes da v1.3).
 
-## Próxima etapa
-Recolher evidências do uso real, ajustar transição/consumo de memória se necessário e só então passar a novas animações e padrões de chefes. Cada nova iteração deve nascer em uma branch própria, manter os assets locais e atualizar este plano antes do merge.
+### Próximo lote — executar em branch separada
+1. [ ] **P0 — Perfil de desempenho:** instrumentar contagem de sprites, tweens, timers, memória e FPS; investigar reinício de cenas e eliminar recursos transitórios deixados para trás. Testar longa duração e duas viagens sucessivas num navegador convencional.
+2. [ ] **P1 — Spritesheets de navios:** quatro a oito quadros de vela/bandeira, dois níveis de dano (intacto/danificado), faísca de canhão por bordo e sequência de afundamento; posicionar as camadas de upgrades no mesmo plano do convés. Manter proporções físicas independentes do sprite.
+3. [ ] **P2 — Spritesheets sobrenaturais:** frames únicos para enguias, cortejo dos afogados, coral vivo, caranguejo, tartaruga, Kraken e Dagon; telegráfos e fases de chefe animadas.
+4. [ ] **P3 — UX e combate:** identificar recargas, feedback de alcance e coleta, ajustar brilho/visibilidade em celular e acessibilidade; rever intensidade de tremor e partículas.
+5. [ ] **P4 — QA PWA:** Chrome Android físico (dois/três toques), Chrome/Edge com Xbox, modo avião, abertura/fechamento, duas viagens seguidas, onda 10/15, compra de upgrades, armazenamento persistido.
+6. [ ] **P5 — Publicação:** commit, PR, checks, merge apenas depois da regressão possível; registrar eventuais ressalvas.
 
-## Nota de ambientação
-**Kraken** é uma ameaça marítima colossal. **Dagon, Arauto de Daegon** é a representação criada para este jogo e não constitui declaração de cânone sobre Daegon. Afogados, enguias e terrores de coral aqui representados são adaptações originais.
+## Regras de qualidade
+- Não alterar física de abalroamento para compensar sprite maior/menor.
+- Tocar em apenas um sistema de cada vez, executar QA isolado e comparar capturas.
+- Efeitos fora da tela devem pausar; animações devem ter limites de quantidade.
+- Todos os arquivos usados pelo carregador devem estar disponíveis offline no Service Worker.
+- Todo pacote inclui fontes, arte e documentação; o novo ciclo deve atualizar este plano quando terminar.
+- Teste headless **não equivale** a validação em Android ou Xbox físico.
