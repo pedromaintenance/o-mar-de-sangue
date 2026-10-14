@@ -127,6 +127,7 @@ const SEA_ISLANDS = {
         s.islandDocked=true;
         s.islandSelected=near.island;
         s.islandOutcome='';
+        s.islandError='';
         s.islandChoiceIndex=0;
         s.anchorButton.setVisible(false);s.anchorText.setVisible(false);
         s.anchorHint.setVisible(false);s.anchorPulse.clear();
@@ -157,7 +158,7 @@ const SEA_ISLANDS = {
         }
         if(choice.hp){
             // Um ritual não pode derrotar silenciosamente o jogador dentro do menu.
-            const lost=Math.min(s.shipHP-1,Math.abs(choice.hp));
+            const lost=Math.max(0,Math.min(s.shipHP-1,Math.abs(choice.hp)));
             s.shipHP-=lost;changes.push('-'+Math.floor(lost)+' casco');
         }
         if(choice.heal||choice.healPercent){
@@ -201,9 +202,11 @@ const SEA_ISLANDS = {
         return true;
     },
     screenButton(s,root,x,y,w,h,name,detail,index,disabled=false) {
-        const bg=disabled?0x252b30:index===s.islandChoiceIndex?0x806140:0x233c45;
-        const edge=disabled?0x6a5b5a:index===s.islandChoiceIndex?0xf0d09d:0x91a7a2;
-        root.add(s.add.rectangle(x,y,w,h,bg,.97).setStrokeStyle(index===s.islandChoiceIndex?3:2,edge,.95));
+        const selected=index>=0?index===s.islandChoiceIndex:
+            (s.islandOutcome?s.islandChoiceIndex===0:s.islandChoiceIndex===3);
+        const bg=disabled?0x252b30:selected?0x806140:0x233c45;
+        const edge=disabled?0x6a5b5a:selected?0xf0d09d:0x91a7a2;
+        root.add(s.add.rectangle(x,y,w,h,bg,.97).setStrokeStyle(selected?3:2,edge,.95));
         root.add(s.add.text(x,y-10,name,{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',fontStyle:'bold',
             color:disabled?'#ab9c93':'#f5e4c6',align:'center',wordWrap:{width:w-25}
@@ -223,7 +226,7 @@ const SEA_ISLANDS = {
         if(!island)return;
         const type=island.kind;
         const x=SEA_VIEW.width/2,ymid=SEA_VIEW.height/2;
-        const top=SEA_DESKTOP?55:62,width=SEA_DESKTOP?620:448,height=SEA_DESKTOP?610:668;
+        const top=SEA_DESKTOP?30:62,width=SEA_DESKTOP?620:448,height=SEA_DESKTOP?650:668;
         const root=s.add.container(0,0).setScrollFactor(0).setDepth(430);
         s.islandOverlay=root;s.islandOptions=[];
         root.add(s.add.rectangle(x,ymid,SEA_VIEW.width,SEA_VIEW.height,0x060d16,.91));
@@ -277,7 +280,6 @@ const SEA_ISLANDS = {
         }
         this.screenButton(s,root,x,top+height-44,width-56,49,
             s.islandOutcome?'⚓  VOLTAR AO MAR':'◀  NÃO ATRACAR / VOLTAR', '',-1);
-        s.islandChoiceIndex=0;
     },
     pointer(s,x,y) {
         if(!s.islandDocked)return false;
@@ -289,10 +291,8 @@ const SEA_ISLANDS = {
     navigate(s,direction) {
         if(!s.islandDocked||!s.islandOptions.length)return;
         s.islandChoiceIndex=(s.islandChoiceIndex+direction+s.islandOptions.length)%s.islandOptions.length;
-        // Mostra foco sem reconstruir repetidamente durante navegação pelo gamepad.
+        // Recria só o modal, preservando a opção selecionada (sem alterar o mundo).
         this.render(s);
-        // render restaura foco em 0; recupera índice e realça o novo alvo.
-        // Navegação alternativa via Enter/A sempre seleciona pelo índice atualizado.
     },
     select(s) {
         if(!s.islandDocked)return;
