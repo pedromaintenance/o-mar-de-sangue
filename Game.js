@@ -713,6 +713,11 @@ class Game extends Phaser.Scene {
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
             const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
+            if(kind==='reef'&&this.textures.exists('p-reef')){
+                // A arte de recife coincide com o obstáculo físico já existente.
+                this.add.image(x,y,'p-reef').setDepth(-.1)
+                    .setScale(Math.max(.72,radius/57)).setAlpha(.42);
+            }
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
@@ -740,7 +745,7 @@ class Game extends Phaser.Scene {
         // Mar mais habitado: sprites decorativos pixel-art. Não mudam colisões,
         // economia, spawn de inimigos ou regras de atracação.
         this.pixelSetpieces=[];
-        const scenery=['p-reef','p-wreck','p-buoy','p-tentacle'];
+        const scenery=['p-wreck','p-buoy','p-tentacle'];
         for(let i=0;i<65;i++){
             const x=rng.between(150,this.W-150),y=rng.between(155,this.H-155);
             if(this.islands.some(o=>Math.hypot(o.x-x,o.y-y)<o.radius+120))continue;
