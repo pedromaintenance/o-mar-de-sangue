@@ -205,7 +205,7 @@ const SEA_UI = {
             scene.txt(x,y-15,name,10,'#a5c1c3',{center:true,mid:true,depth:20,width:193});
             scene.txt(x,y+12,val,22,i===1?'#f6d18b':'#f0e2c7',{center:true,mid:true,bold:true,depth:20,width:194});
         });
-        scene.txt(240,462,'O mar não esquece o nome dos seus capitães.',12,'#bfaca0',{center:true,depth:20});
+        scene.txt(240,462,`Ilhas exploradas: ${report.islands || 0} · O mar guarda seus segredos.`,12,'#bfaca0',{center:true,depth:20});
     },
     pause(scene){
         const x=SEA_VIEW.width/2, y=SEA_VIEW.height/2,desktop=SEA_DESKTOP;
