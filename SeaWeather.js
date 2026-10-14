@@ -33,8 +33,28 @@ const SEA_MUSIC = {
                 })));
                 db.close();
             } catch (_) { /* Modo temporário funciona mesmo sem armazenamento. */ }
-            // Permite publicação direta de MP3s no repositório futuramente.
-            // Não requisita arquivos inexistentes automaticamente, evitando 404 no modo offline.
+            // Quando as faixas forem enviadas ao GitHub, reconhecê-las e salvá-las
+            // automaticamente. Até lá, a importação local continua disponível.
+            if (typeof fetch === 'function') {
+                await Promise.all(['crimson','black'].filter(id=>!this.tracks[id]).map(async id=>{
+                    try {
+                        const response=await fetch(this.paths[id]);
+                        if(!response.ok || !response.headers.get('content-type')?.includes('audio'))return;
+                        const blob=await response.blob();
+                        if(!blob.size)return;
+                        this.use(id,blob);
+                        try{
+                            const db=await this.db();
+                            await new Promise((resolve,reject)=>{
+                                const tx=db.transaction(this.storeName,'readwrite');
+                                tx.objectStore(this.storeName).put(blob,id);
+                                tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+                            });
+                            db.close();
+                        }catch(_){}
+                    }catch(_){}
+                }));
+            }
             this.ready=true;
         })();
         return this.loading;
@@ -58,7 +78,7 @@ const SEA_MUSIC = {
     },
     count() { return ['crimson','black'].filter(id=>this.tracks[id]).length; },
     setVolume(n) {
-        this.volume=Math.max(0,Math.min(.6,Math.round(n*100)/100));
+        this.volume=Math.max(0,Math.min(.8,Math.round(n*100)/100));
         try{localStorage.setItem('carcaca.mar.music.volume',String(this.volume));}catch(_){}
         return this.volume;
     },
@@ -205,7 +225,8 @@ const SEA_WEATHER = {
         const power=next==='storm'?62:next==='current'?87:0;
         s.seaCurrent={x:Math.cos(a)*power,y:Math.sin(a)*power};
         if(next==='maelstrom'){
-            let x=s.player.x,y=s.player.y;
+            let x=SEA_MATH.clamp(s.player.x+450,220,s.W-220);
+            let y=SEA_MATH.clamp(s.player.y+450,220,s.H-220);
             for(let i=0;i<24;i++){
                 const theta=Math.random()*Math.PI*2;
                 const r=440+Math.random()*110;
