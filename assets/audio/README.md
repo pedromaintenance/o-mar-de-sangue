@@ -1,21 +1,18 @@
-# Trilha sonora pública — O Mar de Sangue
+# Trilha sonora oficial — FLAC
 
-A v1.8 já consegue obter e reproduzir estas músicas automaticamente para qualquer visitante do GitHub Pages, sem importação individual, quando os dois MP3 originais forem publicados neste diretório.
+Arquivos publicados e reconhecidos automaticamente em O Mar de Sangue v1.8.1:
 
-Coloque os **arquivos binários**, com estes nomes exatos, aqui:
+| Arquivo | Uso |
+|---|---|
+| `Beneath The Crimson Tide.flac` | Porto, calmaria e navegação |
+| `Beneath The Black Tide.flac` | Tempestade, redemoinho, chefe e maldição elevada |
 
-- `Beneath_The_Crimson_Tide.mp3` (4,27 MB; navegação)
-- `Beneath_the_Black_Tide.mp3` (4,34 MB; tempestades, chefes e perigo)
+Ambos ficam hospedados em `assets/audio/`. O carregador usa o caminho exato (com espaços corretamente codificados na URL) e **não requer upload nem importação por parte dos visitantes**.
 
-## Como publicar de uma só vez
-1. Abra esta pasta `assets/audio/` na branch `main` do GitHub.
-2. Escolha **Add file → Upload files**.
-3. Arraste os dois arquivos MP3 para a área de upload.
-4. Clique em **Commit changes**.
-5. Aguarde a publicação do GitHub Pages e teste o jogo em uma janela anônima. Música começa após o primeiro toque/clique (regra dos navegadores).
+Os navegadores modernos reproduzem FLAC nativamente. O jogo baixa os arquivos, valida o formato e tenta salvá-los no IndexedDB; após a primeira reprodução, os áudios também ficam disponíveis offline quando o armazenamento permite. A reprodução começa no primeiro toque/clique/tecla, respeitando as regras de autoplay.
 
-O código `SeaWeather.js` usa esses caminhos, faz crossfade das faixas e as guarda para o jogo offline. Não coloque apenas um ZIP no repositório: o navegador precisa dos MP3s separados.
+A opção **♫ TROCAR TRILHAS** permite importar FLAC ou MP3 manualmente, inclusive nos navegadores sem suporte a FLAC. Não é necessária nenhuma conversão para quem usa Chrome, Firefox, Edge ou Safari atualizados.
 
-Se os arquivos ainda não estiverem presentes, o botão **♫ IMPORTAR TRILHAS** permanece como opção local.
+Para substituir os áudios futuramente mantendo os mesmos nomes, atualize `hostedVersion` em `SeaWeather.js` e a versão de cache em `sw.js`, para invalidar os arquivos locais antigos.
 
-**Licenças:** publique somente se você tiver autorização para distribuir as gravações.
+> Publique apenas gravações cuja distribuição pública esteja autorizada.
