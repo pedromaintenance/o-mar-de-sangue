@@ -446,7 +446,7 @@ class SeaPort extends Phaser.Scene {
         const upgrades = SEA_UPGRADES.filter(x => x.group === this.yardGroup);
         upgrades.forEach((u, i) => {
             const lv = p.levels[u.id] || 0, cost = SeaProfile.price(u, lv), y = 271 + i * 108;
-            this.add.rectangle(240, y + 20, 441, 97, 0x202e39, .97).setStrokeStyle(1, 0x705a4b).setDepth(10);
+            SEA_UI.yardCard(this, y, lv, p.gold >= cost);
             this.txt(31, y - 19, `${u.icon}  ${u.name}`, 18, '#f4d2a2', { bold: true });
             this.txt(31, y + 9, u.desc, 12, '#bdd0d0');
             this.txt(31, y + 39, `NÍVEL ${SEA_MATH.nice(lv)}  ·  PRÓXIMO: ${SEA_MATH.nice(cost)} ◉`, 13, '#d5bc99');
@@ -474,7 +474,7 @@ class SeaPort extends Phaser.Scene {
         ];
         lines.forEach((line, i) => {
             const y = 161 + i * 64;
-            this.add.rectangle(240, y + 17, 439, 60, 0x1c2c39, .95).setStrokeStyle(1, 0x625451).setDepth(8);
+            SEA_UI.helpEntry(this, i, y);
             this.txt(32, y, line, 13, '#e2dbcc');
         });
         this.button(754, '◀ VOLTAR AO MENU', () => this.scene.start('SeaPort', { page: 'menu' }), 'gold', 240, 400, 43);
@@ -489,7 +489,7 @@ class SeaPort extends Phaser.Scene {
         const r = this.report;
         if (!r) { this.showMenu(); return; }
         this.banner(r.won ? 'MISSÃO CUMPRIDA' : r.withdrawn ? 'DE VOLTA AO PORTO' : 'O MAR TE RECLAMOU');
-        this.txt(240, 284, `Modo: ${r.mode === 'mission' ? 'MISSÕES · Etapa ' + r.stage : 'SANDBOX · Onda ' + r.wave}\n\nNavios afundados: ${r.kills}\nAbalroamentos: ${r.rammings}\nOuro encontrado: ${SEA_MATH.nice(r.collected)}\nOuro depositado: ${SEA_MATH.nice(r.reward)}\nCofre atual: ${SEA_MATH.nice(r.bank)}`, 20, '#f0dec4', { center: true, mid: true, spacing: 9 });
+        SEA_UI.resultSummary(this, r);
         this.button(502, '⚒ ESTALEIRO E MELHORIAS', () => this.scene.start('SeaPort', { page: 'yard', group: 'armas' }), 'gold');
         this.button(566, '⚓ MENU PRINCIPAL', () => this.scene.start('SeaPort', { page: 'menu' }));
         this.button(630, r.mode === 'mission' ? '✦ PRÓXIMA MISSÃO' : '♾ NOVA JORNADA SANDBOX', () => {
