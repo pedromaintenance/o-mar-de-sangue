@@ -13,7 +13,7 @@ No porto, **♫ TROCAR TRILHAS** permanece como opção avançada para substitui
 
 ## Atualização de versão e compatibilidade
 
-A v1.8.1 **prioriza os FLACs hospedados** sobre MP3s importados anteriormente. As faixas FLAC ficam salvas sob chaves versionadas no IndexedDB, separadas das importações locais e dos saves de campanha.
+A v1.8.1 **prioriza os FLACs hospedados** sobre MP3s importados nas versões anteriores. As faixas FLAC ficam salvas sob chaves versionadas no IndexedDB, separadas das importações locais e dos saves de campanha. Se alguém escolher novas músicas pelo botão **♫ TROCAR TRILHAS** na v1.8.1, essa escolha explícita será respeitada nas visitas seguintes.
 
 Em navegadores sem FLAC nativo, a importação opcional de MP3 funciona como alternativa. Para cobertura universal nesse caso, publique também MP3s de fallback e ajuste o código em uma próxima versão.
 
