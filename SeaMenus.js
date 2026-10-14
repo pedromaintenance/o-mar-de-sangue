@@ -155,6 +155,58 @@ const SEA_UI = {
         scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,objects:[inset,left,caption]});
         return frame;
     },
+    yardCard(scene,y,level,affordable){
+        const g=scene.add.graphics().setDepth(10);
+        const top=y-29;
+        g.fillStyle(affordable?0x233641:0x1a2733,.97);
+        g.fillRoundedRect(20,top,441,97,7);
+        g.lineStyle(2,affordable?0xc39f70:0x65585a,.91);
+        g.strokeRoundedRect(22,top+2,437,93,6);
+        g.fillStyle(affordable?0xe0b87c:0x835c60,.94);
+        g.fillRoundedRect(23,top+12,4,70,2);
+        // O reforço visual aparece ao aprimorar, sem prometer limite mecânico.
+        const units=Math.min(8,Math.floor(Math.log2(1+Math.max(0,level)))*2);
+        for(let i=0;i<8;i++){
+            g.fillStyle(i<units?0xcaa776:0x344654,.92);
+            g.fillRoundedRect(35+i*19,top+80,14,4,2);
+        }
+        return g;
+    },
+    helpEntry(scene,index,y){
+        const g=scene.add.graphics().setDepth(8);
+        g.fillStyle(index%2?0x1b2d39:0x182633,.96);
+        g.fillRoundedRect(20,y-6,440,59,6);
+        g.lineStyle(1,0x78644e,.73);
+        g.strokeRoundedRect(21,y-5,438,57,5);
+        g.fillStyle(0xc4a376,.75);
+        g.fillRect(446,y+3,3,35);
+        return g;
+    },
+    resultSummary(scene,report){
+        const gold=SEA_MATH.nice;
+        const state=report.won?['✦  A CARCAÇA RECORDARÁ ESTA VITÓRIA',0x2a483f,0xb8d4ab]:
+            report.withdrawn?['⚓  RETORNO SEGURO AO PORTO',0x3b3938,0xf0d39e]:
+            ['☠  O OCEANO COBROU SEU PREÇO',0x4a2634,0xf0afb2];
+        scene.add.rectangle(240,216,420,45,state[1],.93).setStrokeStyle(1,state[2]).setDepth(11);
+        scene.txt(240,216,state[0],13,'#f9e4c6',{center:true,mid:true,bold:true,depth:20,width:406});
+        const tiles=[
+            ['OURO ENCONTRADO',gold(report.collected)],
+            ['OURO RECUPERADO',gold(report.reward)],
+            ['INIMIGOS AFUNDADOS',String(report.kills)],
+            ['ABALROAMENTOS',String(report.rammings)],
+            ['COFRE DO CAPITÃO',gold(report.bank)],
+            [report.mode==='mission'?'MISSÃO':'ONDA',String(report.mode==='mission'?report.stage:report.wave)]
+        ];
+        tiles.forEach(([name,val],i)=>{
+            const x=i%2?348:132;
+            const y=276+Math.floor(i/2)*75;
+            scene.add.rectangle(x,y,204,68,0x1b303a,.94)
+                .setStrokeStyle(1,i===1?0xe4c083:0x6f8382).setDepth(10);
+            scene.txt(x,y-15,name,10,'#a5c1c3',{center:true,mid:true,depth:20,width:193});
+            scene.txt(x,y+12,val,22,i===1?'#f6d18b':'#f0e2c7',{center:true,mid:true,bold:true,depth:20,width:194});
+        });
+        scene.txt(240,462,'O mar não esquece o nome dos seus capitães.',12,'#bfaca0',{center:true,depth:20});
+    },
     pause(scene){
         const x=SEA_VIEW.width/2, y=SEA_VIEW.height/2,desktop=SEA_DESKTOP;
         const w=desktop?630:454,h=desktop?612:612,top=y-h/2;
