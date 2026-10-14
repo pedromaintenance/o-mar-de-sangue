@@ -192,6 +192,7 @@ const SEA_ISLANDS = {
         }
         s.islandVisits.add(s.islandSelected.id);
         s.islandError='';
+        s.islandChoiceIndex=0;
         s.islandOutcome=changes.join('  ·  ')||'Os ventos mudaram.';
         s.lastDamageTime=s.time.now;
         s.updateHUD();
@@ -266,17 +267,14 @@ const SEA_ISLANDS = {
             }).setOrigin(.5));
         }else{
             const actions=this.choices[type];
-            root.add(s.add.text(x,top+328,'QUAL SERÁ A SUA DECISÃO?',{
-                fontFamily:'monospace',fontSize:'12px',color:'#b7c6bf'
+            root.add(s.add.text(x,top+328,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
+                fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#f1a69c':'#b7c6bf'
             }).setOrigin(.5));
             for(let i=0;i<actions.length;i++){
                 const choice=actions[i];
                 this.screenButton(s,root,x,top+385+i*72,width-48,63,
                     choice.name,choice.hint,i,!!(choice.cost&&s.gold<choice.cost));
             }
-            if(s.islandError)root.add(s.add.text(x,top+603,s.islandError,{
-                fontFamily:'monospace',fontSize:'11px',color:'#f1a69c'
-            }).setOrigin(.5));
         }
         this.screenButton(s,root,x,top+height-44,width-56,49,
             s.islandOutcome?'⚓  VOLTAR AO MAR':'◀  NÃO ATRACAR / VOLTAR', '',-1);
