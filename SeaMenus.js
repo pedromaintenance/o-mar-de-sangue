@@ -130,12 +130,16 @@ const SEA_UI = {
             .setInteractive({useHandCursor:true});
         const inset=scene.add.rectangle(x,y,w-8,h-8,0x0f1b29,.095).setDepth(25);
         const left=scene.add.rectangle(x-w/2+5,y,4,h-10,scheme.shine,.92).setDepth(25);
-        const caption=scene.txt(x,y,label,font,scheme.text,{center:true,mid:true,bold:true,depth:27,width:w-25});
+        const art=SEA_ART_PILOT.button(scene,x,y,w,h,style);
+        const caption=scene.txt(x,y,label,font,art?'#f7e9d1':scheme.text,
+            {center:true,mid:true,bold:true,depth:27,width:w-25});
         const focus=(active)=>{
             frame.setFillStyle(active?(style==='red'?0x633142:0xd4a672):scheme.bg,1);
             frame.setStrokeStyle(active?3:2,active?0xffedbd:scheme.border,1);
             left.setFillStyle(active?0xffd39b:scheme.shine,.95);
-            caption.setColor(active?'#0c1823':scheme.text);
+            SEA_ART_PILOT.focus(scene,art,active,style);
+            caption.setColor(art?(active||style==='gold'?'#1a1618':'#f7e9d1'):
+                (active?'#0c1823':scheme.text));
         };
         frame.on('pointerover',()=>{
             const index=scene.padOptions.findIndex(o=>o.rect===frame);
@@ -153,7 +157,8 @@ const SEA_UI = {
             }
             onTap();
         });
-        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,objects:[inset,left,caption]});
+        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,
+            objects:[inset,left,caption,...(art?[art.left,art.mid,art.right]:[])]});
         return frame;
     },
     yardCard(scene,y,level,affordable){

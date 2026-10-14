@@ -1,0 +1,77 @@
+{
+  "version": "2.0.0-pilot",
+  "default_enabled": false,
+  "query_param": "artPilot=1",
+  "root": "assets/art-v2",
+  "source_format": "RGBA PNG 24-bit color + 8-bit alpha",
+  "source_files": [
+    "kit_de_interface_pixel_art_náutico_sombrio.png",
+    "atlas_de_pesadelos_náuticos_em_pixel_art.png"
+  ],
+  "resources": [
+    {
+      "key": "art2-logo",
+      "path": "ui/logo/main.png",
+      "width": 790,
+      "height": 282,
+      "alpha": true
+    },
+    {
+      "key": "art2-dark-left",
+      "path": "ui/buttons/dark_left.png",
+      "width": 73,
+      "height": 75,
+      "alpha": true
+    },
+    {
+      "key": "art2-dark-middle",
+      "path": "ui/buttons/dark_middle.png",
+      "width": 7,
+      "height": 75,
+      "alpha": true
+    },
+    {
+      "key": "art2-dark-right",
+      "path": "ui/buttons/dark_right.png",
+      "width": 73,
+      "height": 75,
+      "alpha": true
+    },
+    {
+      "key": "art2-focus-left",
+      "path": "ui/buttons/focus_left.png",
+      "width": 73,
+      "height": 75,
+      "alpha": true
+    },
+    {
+      "key": "art2-focus-middle",
+      "path": "ui/buttons/focus_middle.png",
+      "width": 7,
+      "height": 75,
+      "alpha": true
+    },
+    {
+      "key": "art2-focus-right",
+      "path": "ui/buttons/focus_right.png",
+      "width": 54,
+      "height": 75,
+      "alpha": true
+    },
+    {
+      "key": "art2-reef",
+      "path": "sea/hazards/reef_needles.png",
+      "width": 277,
+      "height": 239,
+      "alpha": true
+    },
+    {
+      "key": "art2-wreck",
+      "path": "sea/hazards/wreck_reef.png",
+      "width": 313,
+      "height": 253,
+      "alpha": true
+    }
+  ],
+  "status": "PNG binary assets prepared separately; awaiting upload and visual QA before merge"
+}
