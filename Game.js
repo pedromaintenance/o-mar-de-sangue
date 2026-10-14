@@ -327,6 +327,7 @@ class SeaPort extends Phaser.Scene {
         }
         this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
         this.paintBackground();
+        SEA_GOTHIC.backdrop(this);
         SEA_UI.portDecor(this);
         SEA_MUSIC.setMood('crimson');
         SEA_MUSIC.load();
