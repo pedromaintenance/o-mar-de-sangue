@@ -708,8 +708,11 @@ class Game extends Phaser.Scene {
         spots.forEach(([x, y, radius, kind], i) => {
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
-            const tex=SEA_ART_PILOT.islandTexture(this,kind,keyMap[kind]||'island-reef');
-            const originalWidth=this.textures.get(tex).getSourceImage().width||256;
+            const baseTexture=keyMap[kind]||'island-reef';
+            const tex=SEA_ART_PILOT.islandTexture(this,kind,baseTexture);
+            // Sem ?artPilot=1, preserva EXATAMENTE o divisor 256 da v1.9.3.
+            const originalWidth=tex===baseTexture?256:
+                (this.textures.get(tex).getSourceImage().width||256);
             const img = this.add.image(x, y, tex).setDepth(0)
                 .setScale(((radius * 2.8) / originalWidth) * (islandScaleMap[kind] || 1));
             if (kind !== 'reef') {
