@@ -1,40 +1,46 @@
-# O Mar de Sangue — Atlas pixel art integrado (v1.9.2)
+# Direção de arte — pixel art do Mar de Sangue
 
-## O que está no jogo
+## Hotfix v1.9.3 — fidelidade visual restaurada
 
-A arte gerada para O Mar de Sangue foi recortada e convertida para pequenos sprites **pixelados de verdade**. A fonte é a ilustração original, mas os pixels foram reduzidos, quantizados e compactados. O carregamento da PWA não depende das grandes imagens de conceito.
+**A experiência do jogador deixou de usar os sprites experimentais da v1.9.2.**
+Eles permaneceram no repositório somente como **arquivo técnico / experimento rejeitado**.
+O HTML, o precache do service worker e as cenas voltaram ao pipeline visual da v1.9.1;
+as texturas `pixel-*` criadas por `SeaRasterAssets.js` **não são carregadas em jogo**.
 
-**Biblioteca incluída no GitHub:**
-- `SeaRasterAssets.js`: decodificador de sprites PNG-like paletizados, 4 bits por pixel, com Deflate e CanvasTexture Phaser.
-- `SeaRasterDataA.js`: logotipo **O MAR DE SANGUE**, botões normal/focado, texturas oceânicas rubras e escuras.
-- `SeaRasterDataB.js`: redemoinho, recifes, destroços, ossadas, tentáculo, farol/boia e coral sobrenatural.
+### Causa do problema
 
-São **12 sprites reais**, armazenados como dados de pixels compactados em arquivos JS UTF-8, não como imagens PNG individuais. Os arquivos são decodificados uma vez pelo `SeaBoot` antes de iniciar o porto. As texturas são registradas com chaves `pixel-<nome>` no Phaser.
+O pacote experimental reduziu pinturas detalhadas dos atlas a:
+- título de **112 × 52 px** (exibido a cerca de **407 × 188 px**);
+- ilhas e ornamentos de **40 × 40 px** (substituindo sprites de 256 px);
+- botões de **48 × 22 px**, redimensionados para larguras superiores a 400 px;
+- apenas 15 cores opacas por sprite e um índice adicional marcado como transparente.
 
-**Aplicações:**
-- Porto: logotipo pixelado original, molduras dos botões com três segmentos, alternância visual do botão em foco.
-- Mundo: texturas do mar de sangue e mar amaldiçoado em camadas parallax.
-- Ilhas: substituição visual para recife, ruínas, altar de Daegon e destroços, mantendo os raios de colisão originais.
-- Costa: faróis e tentáculos ornamentais perto de alguns santuários.
-- Clima: redemoinho original pixelado acompanha a física preexistente.
-- UI e cenários anteriores continuam como fallback em navegadores incapazes de decodificar o pacote.
+O renderizador Phaser com NEAREST foi correto para pixel art, mas **não pode restaurar detalhes
+já destruídos por redução e quantização**. Em sprites com regiões escuras,
+o índice convertido indevidamente para transparência abriu lacunas na imagem.
+A revisão verificou apenas se os arquivos decodificavam e se os botões respondiam,
+**não se a qualidade visual permanecia aceitável**. Isso foi um erro de validação.
 
-## Pixel art e renderização
+### Diretrizes para a próxima implementação
 
-A renderização do jogo continua `pixelArt: true`, `antialias: false`, `roundPixels: true`. As imagens são renderizadas em canvas com pixels discretos e filtro NEAREST; os botões usam uma composição horizontal de três segmentos para conservar ornamentos das extremidades quando mudam de largura.
+1. Usar os atlas originais de alta resolução como fonte e salvar **PNGs RGBA individuais**,
+   conservando resolução suficiente para cada tamanho exibido. Não substituir sprites
+   de 256 px por miniaturas de 40 px quando o jogo os amplia.
+2. Recortar elementos separadamente, com canal alfa de verdade. Nunca transformar
+   a primeira cor de uma imagem opaca em transparência automaticamente.
+3. Evitar quantização agressiva de 15 cores para texturas ricas. Se paletizar,
+   comparar a imagem produzida lado a lado com o original na resolução de exibição.
+4. Para botões que variam de largura, produzir molduras reais de nove fatias,
+   preservando cantos e separando explicitamente áreas elásticas.
+5. Testar visualmente **menu principal, estaleiro, pausa, resultados, ilhas, mar
+   em movimento e controles mobile/desktop** em navegador, antes de integrar.
+6. Manter a arte original versionada, não substituí-la apenas por um atlas compactado.
 
-## Formato interno dos dados
+## Arquivos de arquivo (não utilizados no runtime da v1.9.3)
 
-Cada registro tem o formato `[nome, largura, altura, paletaHex, conteudoDeflateBase64]`.
+- `SeaRasterAssets.js`
+- `SeaRasterDataA.js`
+- `SeaRasterDataB.js`
 
-- A primeira cor (índice zero) é transparente.
-- Cada byte descompactado guarda dois pixels de quatro bits.
-- A paleta de até quinze cores opacas é convertida em RGBA.
-- `DecompressionStream('deflate')` decodifica o mapa, sem bibliotecas externas.
-- Navegadores incompatíveis retornam ao visual preexistente.
-
-## Direitos e evolução
-
-A direção de arte deriva dos atlas de conceitos criados especificamente para este projeto em outubro de 2026. A futura etapa pode substituir partes dos menus restantes e adicionar mais navios/efeitos. Os arquivos-fonte em alta resolução são conservados separadamente das versões compactas para facilitar reedição e novos recortes.
-
-Esta atualização não altera os saves v4, as regras de atracação, o balanceamento, os controles e nem a trilha sonora FLAC.
+As artes existentes em `assets/islands`, `assets/tiles` e `assets/sprites`
+continuam como fontes ativas da versão restaurada.
