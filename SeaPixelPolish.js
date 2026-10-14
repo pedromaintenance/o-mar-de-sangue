@@ -73,7 +73,7 @@ const SEA_PIXEL = {
     }
   },
   seaInit(scene) {
-    if(!scene.seaPixel || !scene.seaBase)return;
+    if(!scene.seaBase)return;
     scene.seaPixelG=scene.add.graphics().setScrollFactor(0).setDepth(-106.6);
     scene.seaPixelT=0;
     // Borda de espuma e pequenos vestígios são elementos visuais, não colisores.
