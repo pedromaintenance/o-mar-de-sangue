@@ -126,6 +126,14 @@ const SEA_GOTHIC = {
         .setDepth(-46).setAlpha(.11).setTint(0xb85f6a);
     }
   },
+  titlePlate(scene){
+    if(!this.enabled)return;
+    const g=scene.add.graphics().setDepth(16);
+    this.panel(g,240,95,406,76,'blood');
+    this.rope(g,66,414,54);
+    this.skull(g,63,95,.5,.78);
+    this.skull(g,417,95,.5,.78);
+  },
   decoratePort(scene){
     if(!this.enabled)return;
     const c=this.c,p=scene.page;
@@ -192,7 +200,7 @@ const SEA_GOTHIC = {
     const l=x-w/2,t=y-h/2;
     g.clear();
     const highlight=selected||style==='gold',warning=style==='red';
-    const fill=highlight?0x724326:warning?0x461922:0x141d25;
+    const fill=highlight?0xb88b53:warning?0x461922:0x141d25;
     const edge=highlight?0xf0d29a:warning?0xc57974:0xa88657;
     g.fillStyle(0x090b12,.98).fillRect(l+3,t+4,w,h);
     g.fillStyle(edge,1).fillRect(l,t,w,h);
