@@ -312,7 +312,11 @@ class SeaBoot extends Phaser.Scene {
         }).setOrigin(.5);
         this.load.on('progress', (v)=>{ this._bar.width = 4 + 416 * v; });
     }
-    create() { this.scene.start('SeaPort'); }
+    create() {
+        try { SEA_PIXELS.build(this); }
+        catch(err) { console.warn('[O Mar de Sangue] Pixel art fallback:',err); }
+        this.scene.start('SeaPort');
+    }
 }
 
 class SeaPort extends Phaser.Scene {
@@ -678,6 +682,12 @@ class Game extends Phaser.Scene {
         this.seaBase = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-base').setScrollFactor(0).setDepth(-110);
         this.seaBlood = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.85);
         this.seaFoam = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.56);
+        this.seaPixelWave = this.add.tileSprite(SEA_VIEW.width/2,SEA_VIEW.height/2,
+            SEA_VIEW.width,SEA_VIEW.height,this.textures.exists('p-sea-red')?'p-sea-red':'sea-blood')
+            .setScrollFactor(0).setDepth(-107.8).setAlpha(.27);
+        this.seaPixelHaunted = this.add.tileSprite(SEA_VIEW.width/2,SEA_VIEW.height/2,
+            SEA_VIEW.width,SEA_VIEW.height,this.textures.exists('p-sea-haunted')?'p-sea-haunted':'sea-foam')
+            .setScrollFactor(0).setDepth(-107.7).setAlpha(.07);
         this.seaMist = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.57);
     }
     drawShipTextures() { return; }
@@ -703,6 +713,11 @@ class Game extends Phaser.Scene {
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
             const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
+            if(kind==='reef'&&this.textures.exists('p-reef')){
+                // A arte de recife coincide com o obstáculo físico já existente.
+                this.add.image(x,y,'p-reef').setDepth(-.1)
+                    .setScale(Math.max(.72,radius/57)).setAlpha(.42);
+            }
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
@@ -727,6 +742,23 @@ class Game extends Phaser.Scene {
             const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3).setScale((0.42 + (i % 3) * .06) * 1.6);
             this.flotsam.push({ sprite: s, y, phase: i*.63 });
         }
+        // Mar mais habitado: sprites decorativos pixel-art. Não mudam colisões,
+        // economia, spawn de inimigos ou regras de atracação.
+        this.pixelSetpieces=[];
+        const scenery=['p-wreck','p-buoy','p-tentacle'];
+        for(let i=0;i<65;i++){
+            const x=rng.between(150,this.W-150),y=rng.between(155,this.H-155);
+            if(this.islands.some(o=>Math.hypot(o.x-x,o.y-y)<o.radius+120))continue;
+            const key=scenery[(i*7+Math.floor(i/4))%scenery.length];
+            if(!this.textures.exists(key))continue;
+            const sprite=this.add.image(x,y,key).setDepth(key==='p-tentacle'?5:2)
+                .setScale(key==='p-wreck'?.80:key==='p-tentacle'?.75:.75+rng.frac()*.28)
+                .setAlpha(key==='p-buoy'?.83:.68+(i%4)*.06);
+            this.pixelSetpieces.push(sprite);
+        }
+        const vortexKey=this.textures.exists('p-vortex')?'p-vortex':'fx-splash-0';
+        this.pixelWhirlpool=this.add.image(0,0,vortexKey)
+            .setDepth(7).setVisible(false).setAlpha(.70);
         const border = this.add.graphics().setDepth(2).lineStyle(6, 0xba8c77, .36);
         border.strokeRect(5, 5, this.W - 10, this.H - 10);
     }
@@ -750,6 +782,15 @@ class Game extends Phaser.Scene {
         this.seaFoam.tilePositionY = sy * .28 + t * 15;
         this.seaMist.tilePositionX = sx * .08 - t * 3;
         this.seaMist.tilePositionY = sy * .05 - t * 2;
+        if(this.seaPixelWave){
+            this.seaPixelWave.tilePositionX = sx*.39+t*18;
+            this.seaPixelWave.tilePositionY = sy*.29+t*11;
+            this.seaPixelHaunted.tilePositionX = -sx*.20-t*9;
+            this.seaPixelHaunted.tilePositionY = sy*.26+t*7;
+            this.seaPixelWave.setAlpha(this.seaEvent==='storm'?.39:.27);
+            this.seaPixelHaunted.setAlpha(this.seaEvent==='fog'?.26:
+                this.curse>65?.23:.07);
+        }
     }
     chooseFoe(seed = 0) {
         const rank = this.currentDifficulty;
@@ -850,8 +891,8 @@ class Game extends Phaser.Scene {
         // roteador, evitando disputas entre Phaser e o joystick nativo.
         this.pauseButtonHitbox = {x: SEA_DESKTOP ? 454 : 412, y: 78, w: 120, h: 40};
         const ph=this.pauseButtonHitbox;
-        this.add.rectangle(ph.x,ph.y,ph.w,ph.h,0x61402d,.98)
-            .setStrokeStyle(2,0xedca96).setDepth(111).setScrollFactor(0);
+        const pauseSkin=this.add.graphics().setDepth(111).setScrollFactor(0);
+        SEA_PIXELS.button(pauseSkin,ph.x,ph.y,ph.w,ph.h,'gold',false);
         this.add.text(ph.x,ph.y,'☰ PAUSA',{
             fontFamily:'Georgia',fontSize:'16px',fontStyle:'bold',color:'#ffdfad'
         }).setOrigin(.5).setDepth(112).setScrollFactor(0);
@@ -1403,6 +1444,15 @@ class Game extends Phaser.Scene {
         for (const isl of this.islands) this.collideRock(this.player, isl, true);
         this.updateEnemies(dt);
         SEA_WEATHER.update(this, dt);
+        if (this.pixelWhirlpool) {
+            const active=this.seaEvent==='maelstrom' && !!this.seaPool;
+            this.pixelWhirlpool.setVisible(active);
+            if(active){
+                this.pixelWhirlpool.setPosition(this.seaPool.x,this.seaPool.y);
+                this.pixelWhirlpool.rotation+=dt*.52;
+                this.pixelWhirlpool.setScale(1.45+Math.sin(this.elapsed*2)*.07);
+            }
+        }
         if (this.sinking) return;
         SEA_ISLANDS.update(this,dt);
         for (let i = 0; i < this.enemies.length; i++) {
@@ -1710,8 +1760,10 @@ class Game extends Phaser.Scene {
         if (!this.pausePadOptions?.length) return;
         this.pausePadIndex = ((index % this.pausePadOptions.length) + this.pausePadOptions.length) % this.pausePadOptions.length;
         this.pausePadOptions.forEach((item,i)=>{
-            item.box.setStrokeStyle(i===this.pausePadIndex?4:2,
-                i===this.pausePadIndex?0xffe2a0:item.base);
+            const selected=i===this.pausePadIndex;
+            item.box.setStrokeStyle(selected?2:0,selected?0xffdc9d:item.base);
+            if(item.artwork)SEA_PIXELS.button(item.artwork,item.hit.x,item.hit.y,
+                item.hit.w,item.hit.h,item.tone||'dark',selected);
         });
     }
     handleCaptainPointer(x,y) {

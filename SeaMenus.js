@@ -5,34 +5,23 @@ const SEA_UI = {
     ink:0x101a26, shadow:0x080d16, wine:0x431f33, bronze:0x94704d,
     gold:0xf0ca88, pale:0xf1e0c8, foam:0x91b5b9,
     frame(scene,x,y,w,h,opt={}) {
-        const g=scene.add.graphics().setDepth(opt.depth??7);
-        const left=x-w/2,top=y-h/2;
-        g.fillStyle(opt.fill??this.ink,opt.alpha??.94);
-        g.fillRoundedRect(left,top,w,h,opt.radius??9);
-        g.lineStyle(opt.lineWidth??2,opt.stroke??0xa78560,opt.strokeAlpha??.85);
-        g.strokeRoundedRect(left+2,top+2,w-4,h-4,opt.radius??9);
-        g.lineStyle(1,0xd1a66d,.35);
-        g.strokeRoundedRect(left+7,top+7,w-14,h-14,Math.max(2,(opt.radius??9)-3));
-        for (const side of [-1,1]) for(const vertical of [-1,1]){
-            const bx=x+side*(w/2-16),by=y+vertical*(h/2-16);
-            g.fillStyle(0xd2af78,.79);g.fillCircle(bx,by,2.7);
-        }
-        return g;
+        return SEA_PIXELS.panel(scene,x,y,w,h,opt);
     },
     divider(scene,y,x=240,w=380,depth=14){
         const g=scene.add.graphics().setDepth(depth);
-        g.lineStyle(1,0xc6a279,.64);
+        g.lineStyle(2,0xc6a279,.72);
         g.lineBetween(x-w/2,y,x-29,y);
         g.lineBetween(x+29,y,x+w/2,y);
         g.fillStyle(0xd3ab79,.9);
         g.fillTriangle(x,y-6,x+6,y,x,y+6);
         g.fillTriangle(x,y-6,x-6,y,x,y+6);
+        SEA_PIXELS.flourish(scene,x,y,depth+1,.62);
         return g;
     },
     rim(scene){
         const g=scene.add.graphics().setDepth(-43);
         const x=12,y=16,w=456,h=766;
-        g.lineStyle(2,0xc5a575,.73);g.strokeRect(x,y,w,h);
+        g.lineStyle(3,0xc5a575,.91);g.strokeRect(x,y,w,h);
         g.lineStyle(1,0x522f3b,.77);g.strokeRect(x+6,y+6,w-12,h-12);
         for(let i=0;i<4;i++){
             const py=38+i*236;
@@ -77,10 +66,13 @@ const SEA_UI = {
                     .setScale(132/h).setRotation(-.08);
                 scene.tweens.add({targets:ship,rotation:.075,y:237,duration:4000,yoyo:true,repeat:-1,ease:'Sine.easeInOut'});
             }
+            this.frame(scene,240,109,439,114,{fill:0x0d1622,alpha:.94,depth:4});
+            SEA_PIXELS.flourish(scene,240,168,12,.85);
             this.divider(scene,417);
         }else if(page==='yard'){
             this.frame(scene,240,502,447,495,{fill:0x101c29,alpha:.58,depth:5});
             this.divider(scene,166);
+            SEA_PIXELS.flourish(scene,240,174,14,.9);
         }else if(page==='help'){
             this.frame(scene,240,439,453,581,{fill:0x101a28,alpha:.67,depth:5});
             this.divider(scene,146);
@@ -92,6 +84,7 @@ const SEA_UI = {
             this.frame(scene,240,405,443,503,{fill:0x142330,alpha:.92,depth:5});
             this.compass(scene,240,270,99,.20);
             this.divider(scene,190);
+            SEA_PIXELS.flourish(scene,240,190,14,.7);
         }
         if(SEA_DESKTOP)this.desktopWings(scene);
     },
@@ -119,67 +112,45 @@ const SEA_UI = {
         }
     },
     button(scene,y,label,onTap,style='dark',x=240,w=416,h=43,font=16){
-        const scheme=style==='gold'
-            ?{bg:0xa77a4b,border:0xf3d19a,text:'#131e28',shine:0xe9c28a}
-            :style==='red'
-            ?{bg:0x442637,border:0xc78b86,text:'#ffe1d5',shine:0xb66b71}
-            :{bg:0x203242,border:0x829ba0,text:'#f0e2d1',shine:0x8ab4b6};
-        const frame=scene.add.rectangle(x,y,w,h,scheme.bg,.97)
-            .setStrokeStyle(2,scheme.border,.94).setDepth(24)
-            .setInteractive({useHandCursor:true});
-        const inset=scene.add.rectangle(x,y,w-8,h-8,0x0f1b29,.095).setDepth(25);
-        const left=scene.add.rectangle(x-w/2+5,y,4,h-10,scheme.shine,.92).setDepth(25);
-        const caption=scene.txt(x,y,label,font,scheme.text,{center:true,mid:true,bold:true,depth:27,width:w-25});
-        const focus=(active)=>{
-            frame.setFillStyle(active?(style==='red'?0x633142:0xd4a672):scheme.bg,1);
-            frame.setStrokeStyle(active?3:2,active?0xffedbd:scheme.border,1);
-            left.setFillStyle(active?0xffd39b:scheme.shine,.95);
-            caption.setColor(active?'#0c1823':scheme.text);
+        // Pixel UI is painted as sprites on a 2px grid; the invisible hitbox
+        // remains full-sized so keyboard, controller and touch are forgiving.
+        const selectedColor=style==='gold'?'#ffdfaf':style==='red'?'#f7dfc7':'#f4dbb8';
+        const hit=scene.add.rectangle(x,y,w,h,0x0a131c,.001)
+            .setDepth(29).setInteractive({useHandCursor:true});
+        const skin=scene.add.graphics().setDepth(24);
+        const caption=scene.txt(x,y,label,font,selectedColor,
+            {center:true,mid:true,bold:true,depth:28,width:w-31});
+        const focus=active=>{
+            SEA_PIXELS.button(skin,x,y,w,h,style,active);
+            caption.setColor(active?'#fff0c6':selectedColor);
         };
-        frame.on('pointerover',()=>{
-            const index=scene.padOptions.findIndex(o=>o.rect===frame);
-            if(index>=0)scene.setPadFocus(index);
-            focus(true);
+        focus(false);
+        hit.on('pointerover',()=>{
+            const i=scene.padOptions.findIndex(o=>o.rect===hit);
+            if(i>=0)scene.setPadFocus(i);
+            else focus(true);
         });
-        frame.on('pointerout',()=>{
-            const active=scene.padOptions[scene.padIndex]?.rect===frame;
-            focus(active);
+        hit.on('pointerout',()=>{
+            focus(scene.padOptions[scene.padIndex]?.rect===hit);
         });
-        frame.on('pointerdown',()=>{
-            if(scene.input.activePointer?.event?.pointerType==='touch'){
-                // Phaser lida com o menu do porto normalmente. Apenas o combate
-                // usa roteamento nativo de toques para canhões simultâneos.
-            }
-            onTap();
-        });
-        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,objects:[inset,left,caption]});
-        return frame;
+        hit.on('pointerdown',()=>onTap());
+        scene.padOptions.push({rect:hit,x,y,label,onTap,color:0xe1bf82,focus,objects:[skin,caption]});
+        return hit;
     },
     yardCard(scene,y,level,affordable){
-        const g=scene.add.graphics().setDepth(10);
+        const g=this.frame(scene,240,y+20,441,97,{fill:affordable?0x1c313a:0x18242e,depth:10});
         const top=y-29;
-        g.fillStyle(affordable?0x233641:0x1a2733,.97);
-        g.fillRoundedRect(20,top,441,97,7);
-        g.lineStyle(2,affordable?0xc39f70:0x65585a,.91);
-        g.strokeRoundedRect(22,top+2,437,93,6);
-        g.fillStyle(affordable?0xe0b87c:0x835c60,.94);
-        g.fillRoundedRect(23,top+12,4,70,2);
-        // O reforço visual aparece ao aprimorar, sem prometer limite mecânico.
+        g.fillStyle(affordable?0xb28a56:0x6d4d50,.93).fillRect(24,top+12,4,69);
         const units=Math.min(8,Math.floor(Math.log2(1+Math.max(0,level)))*2);
         for(let i=0;i<8;i++){
-            g.fillStyle(i<units?0xcaa776:0x344654,.92);
-            g.fillRoundedRect(35+i*19,top+80,14,4,2);
+            g.fillStyle(i<units?0xd1ae76:0x314652,.96).fillRect(35+i*18,top+80,13,4);
         }
         return g;
     },
     helpEntry(scene,index,y){
-        const g=scene.add.graphics().setDepth(8);
-        g.fillStyle(index%2?0x1b2d39:0x182633,.96);
-        g.fillRoundedRect(20,y-6,440,59,6);
-        g.lineStyle(1,0x78644e,.73);
-        g.strokeRoundedRect(21,y-5,438,57,5);
-        g.fillStyle(0xc4a376,.75);
-        g.fillRect(446,y+3,3,35);
+        const g=this.frame(scene,240,y+20,439,60,
+            {fill:index%2?0x132735:0x192b37,depth:8});
+        g.fillStyle(0xb68e61,.95).fillRect(445,y+2,3,34);
         return g;
     },
     resultSummary(scene,report){
@@ -216,7 +187,7 @@ const SEA_UI = {
         // Máscara interativa impede clicar em controles do jogo atrás do diário.
         add(scene.add.rectangle(x,y,SEA_VIEW.width,SEA_VIEW.height,0x070d14,.90)
             .setInteractive());
-        add(scene.add.rectangle(x,y,w,h,0x111d29,.985).setStrokeStyle(3,0xb28b5c));
+        add(SEA_PIXELS.panel(scene,x,y,w,h,{fill:0x131c29,depth:1}));
         add(scene.add.rectangle(x,y,w-15,h-15,0x341e2d,.2).setStrokeStyle(1,0xddbd88,.53));
         const ornament=scene.add.graphics();
         add(ornament);
@@ -265,12 +236,17 @@ const SEA_UI = {
             const ww=desktop?520:392,hh=55;
             const pal=tone==='exit'?[0x592a37,0xd79587,'#f9e6d5']:
                 tone==='gold'?[0xa8804d,0xf2d09b,'#182431']:[0x203b48,0x9cbdba,'#f6ddbb'];
-            const box=add(scene.add.rectangle(x,cy,ww,hh,pal[0],1)
-                .setStrokeStyle(2,pal[1],.96));
+            const box=add(scene.add.rectangle(x,cy,ww,hh,0x08121c,.001));
+            const artwork=scene.add.graphics();
+            SEA_PIXELS.button(artwork,x,cy,ww,hh,
+                tone==='exit'?'red':tone==='gold'?'gold':'dark',false);
+            add(artwork);
             add(scene.add.rectangle(x-ww/2+8,cy,4,hh-10,pal[1]));
             const txt=add(scene.add.text(x,cy,text,{fontFamily:'Georgia',fontSize:desktop?'17px':'16px',
                 color:pal[2],fontStyle:'bold',align:'center',wordWrap:{width:ww-25}}).setOrigin(.5));
             const option={box,text:txt,onTap,hit:{x,y:cy,w:ww,h:hh},base:pal[1]};
+            option.artwork=artwork;
+            option.tone=tone==='exit'?'red':tone==='gold'?'gold':'dark';
             scene.pausePadOptions.push(option);
             return option;
         };
