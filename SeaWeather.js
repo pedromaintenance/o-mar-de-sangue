@@ -245,9 +245,6 @@ const SEA_WEATHER = {
             SEA_VIEW.width,SEA_VIEW.height,0xffe8cb,0).setScrollFactor(0).setDepth(69);
         s.seaSky=s.add.graphics().setScrollFactor(0).setDepth(70);
         s.seaPoolArt=s.add.graphics().setDepth(8);
-        s.seaPixelVortex=s.textures.exists('pixel-vortex')
-            ?s.add.image(0,0,'pixel-vortex').setDepth(-1).setAlpha(.87).setVisible(false)
-            :null;
         s.seaWeatherLabel=s.add.text(15,115,'MAR SERENO  ·  MALDIÇÃO 0%',{
             fontFamily:'monospace',fontSize:'11px',color:'#ffe2b5',
             stroke:'#100e19',strokeThickness:3
@@ -397,13 +394,6 @@ const SEA_WEATHER = {
             }
         }
         const pool=s.seaPool,wp=s.seaPoolArt;wp.clear();
-        if(s.seaPixelVortex){
-            const show=!!pool&&ev==='maelstrom';
-            s.seaPixelVortex.setVisible(show);
-            if(show)s.seaPixelVortex.setPosition(pool.x,pool.y)
-                .setScale(6.5*Math.min(1,pool.age/1.8))
-                .setRotation(s.elapsed*.19);
-        }
         if(pool&&ev==='maelstrom'){
             const radius=Math.min(1,pool.age/1.8)*150;
             for(let i=0;i<7;i++){
