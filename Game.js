@@ -1,3 +1,4 @@
+// O MAR DE SANGUE v1.5 — ART PIPELINE (sprites autorais e efeitos de quatro quadros)
 // ABYSSAL_V10 — pixel art de navios e criaturas, boss raids e controles preservados
 /*
  * O MAR DE SANGUE — Pixel Art & Bestiário Abissal v1.0 — CARCAÇA
@@ -81,23 +82,23 @@ const SEA_MISSION_TITLES = [
     'O Trono Naval da Noite'
 ];
 const SEA_FOES = {
-    patrulha: { name: 'Patrulha da Corte', tint: 0xa47d8d, hp: 60, speed: 100, atk: 10, reward: 22, radius: 29, mass: 1, range: 430, cooldown: 1900, pattern: 'broadside' },
-    corsario: { name: 'Corsário de Sangue', tint: 0xcc746b, hp: 68, speed: 150, atk: 11, reward: 29, radius: 27, mass: .95, range: 330, cooldown: 1150, pattern: 'chase' },
-    ariete: { name: 'Aríete do Abismo', tint: 0xe1a765, hp: 125, speed: 160, atk: 9, reward: 41, radius: 39, mass: 1.85, range: 125, cooldown: 5000, pattern: 'ram' },
-    fragata: { name: 'Fragata Sombria', tint: 0x9177bc, hp: 135, speed: 108, atk: 18, reward: 49, radius: 35, mass: 1.55, range: 510, cooldown: 1750, pattern: 'broadside' },
-    bombardeiro: { name: 'Bombardeiro Élfico', tint: 0xb8b1a7, hp: 90, speed: 82, atk: 23, reward: 57, radius: 32, mass: 1.1, range: 670, cooldown: 2450, pattern: 'sniper' },
-    espectral: { name: 'Nau Espectral', tint: 0x7fd0c2, hp: 115, speed: 133, atk: 20, reward: 62, radius: 31, mass: 1.05, range: 490, cooldown: 1400, pattern: 'flank' },
-    galeao: { name: 'Galeão Uln-Shayr', tint: 0xefb9b8, hp: 205, speed: 89, atk: 27, reward: 95, radius: 43, mass: 2.5, range: 550, cooldown: 1700, pattern: 'broadside' },
-    almirante: { name: 'Almirante das Sombras', tint: 0xffc970, hp: 390, speed: 117, atk: 36, reward: 170, radius: 51, mass: 3.4, range: 670, cooldown: 1150, pattern: 'boss' },
-    cultista: { name: 'Nau do Culto de Daegon', hp: 170, speed: 107, atk: 23, reward: 84, radius: 38, mass: 2.2, range: 530, cooldown: 1750, pattern: 'broadside' },
-    nauabissal: { name: 'Fortaleza Abissal', hp: 470, speed: 74, atk: 43, reward: 210, radius: 59, mass: 4.2, range: 590, cooldown: 1280, pattern: 'boss' },
-    enguia: { name: 'Enguia das Profundezas', hp: 77, speed: 183, atk: 16, reward: 39, radius: 26, mass: .78, range: 168, cooldown: 2500, pattern: 'chase' },
-    afogados: { name: 'Cortejo dos Afogados', hp: 100, speed: 125, atk: 18, reward: 53, radius: 30, mass: .91, range: 335, cooldown: 1900, pattern: 'flank' },
-    coral: { name: 'Horror de Coral', hp: 143, speed: 64, atk: 22, reward: 62, radius: 38, mass: 1.65, range: 480, cooldown: 2250, pattern: 'sniper' },
-    caranguejo: { name: 'Guardião Caranguejo', hp: 196, speed: 92, atk: 22, reward: 75, radius: 42, mass: 2.8, range: 145, cooldown: 5000, pattern: 'ram' },
-    tartaruga: { name: 'Templo-Tartaruga', hp: 268, speed: 58, atk: 28, reward: 109, radius: 51, mass: 3.6, range: 445, cooldown: 2400, pattern: 'broadside' },
-    kraken: { name: 'KRAKEN — O Abismo Desperta', hp: 690, speed: 61, atk: 53, reward: 380, radius: 83, mass: 7.5, range: 380, cooldown: 2750, pattern: 'tentacle' },
-    dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 88, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
+    patrulha: { name: 'Patrulha da Corte', tint: 0xa47d8d, hp: 60, speed: 100, atk: 10, reward: 22, radius: 58, mass: 1, range: 430, cooldown: 1900, pattern: 'broadside' },
+    corsario: { name: 'Corsário de Sangue', tint: 0xcc746b, hp: 68, speed: 150, atk: 11, reward: 29, radius: 54, mass: .95, range: 330, cooldown: 1150, pattern: 'chase' },
+    ariete: { name: 'Aríete do Abismo', tint: 0xe1a765, hp: 125, speed: 160, atk: 9, reward: 41, radius: 78, mass: 1.85, range: 125, cooldown: 5000, pattern: 'ram' },
+    fragata: { name: 'Fragata Sombria', tint: 0x9177bc, hp: 135, speed: 108, atk: 18, reward: 49, radius: 70, mass: 1.55, range: 510, cooldown: 1750, pattern: 'broadside' },
+    bombardeiro: { name: 'Bombardeiro Élfico', tint: 0xb8b1a7, hp: 90, speed: 82, atk: 23, reward: 57, radius: 64, mass: 1.1, range: 670, cooldown: 2450, pattern: 'sniper' },
+    espectral: { name: 'Nau Espectral', tint: 0x7fd0c2, hp: 115, speed: 133, atk: 20, reward: 62, radius: 62, mass: 1.05, range: 490, cooldown: 1400, pattern: 'flank' },
+    galeao: { name: 'Galeão Uln-Shayr', tint: 0xefb9b8, hp: 205, speed: 89, atk: 27, reward: 95, radius: 86, mass: 2.5, range: 550, cooldown: 1700, pattern: 'broadside' },
+    almirante: { name: 'Almirante das Sombras', tint: 0xffc970, hp: 390, speed: 117, atk: 36, reward: 170, radius: 102, mass: 3.4, range: 670, cooldown: 1150, pattern: 'boss' },
+    cultista: { name: 'Nau do Culto de Daegon', hp: 170, speed: 107, atk: 23, reward: 84, radius: 76, mass: 2.2, range: 530, cooldown: 1750, pattern: 'broadside' },
+    nauabissal: { name: 'Fortaleza Abissal', hp: 470, speed: 74, atk: 43, reward: 210, radius: 118, mass: 4.2, range: 590, cooldown: 1280, pattern: 'boss' },
+    enguia: { name: 'Enguia das Profundezas', hp: 77, speed: 183, atk: 16, reward: 39, radius: 52, mass: .78, range: 168, cooldown: 2500, pattern: 'chase' },
+    afogados: { name: 'Cortejo dos Afogados', hp: 100, speed: 125, atk: 18, reward: 53, radius: 60, mass: .91, range: 335, cooldown: 1900, pattern: 'flank' },
+    coral: { name: 'Horror de Coral', hp: 143, speed: 64, atk: 22, reward: 62, radius: 76, mass: 1.65, range: 480, cooldown: 2250, pattern: 'sniper' },
+    caranguejo: { name: 'Guardião Caranguejo', hp: 196, speed: 92, atk: 22, reward: 75, radius: 84, mass: 2.8, range: 145, cooldown: 5000, pattern: 'ram' },
+    tartaruga: { name: 'Templo-Tartaruga', hp: 268, speed: 58, atk: 28, reward: 109, radius: 102, mass: 3.6, range: 445, cooldown: 2400, pattern: 'broadside' },
+    kraken: { name: 'KRAKEN — O Abismo Desperta', hp: 690, speed: 61, atk: 53, reward: 380, radius: 166, mass: 7.5, range: 380, cooldown: 2750, pattern: 'tentacle' },
+    dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 176, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
 };
 const SeaProfile = {
     defaults() { const levels = {}; for (const x of SEA_UPGRADES) levels[x.id] = 0;
@@ -197,6 +198,31 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('sea-foam', 'assets/tiles/sea_foam.png');
         this.load.image('sea-mist', 'assets/tiles/sea_mist.png');
         this.load.image('player-ship', 'assets/sprites/player_ship.png');
+
+        // Arte do atelier naval: classes por facção e casco que muda com o progresso.
+        this.load.image('player-tier-0', 'assets/sprites/player_tier_0.png');
+        this.load.image('player-tier-1', 'assets/sprites/player_tier_1.png');
+        this.load.image('player-tier-2', 'assets/sprites/player_tier_2.png');
+        this.load.image('player-damaged', 'assets/sprites/player_damaged.png');
+        this.load.image('foe-ivory', 'assets/sprites/enemy_frigate_white.png');
+        // Efeitos navais desenhados em 4 quadros; separados do HUD e da física.
+        this.load.image('v15-cannon-0', 'assets/fx15/cannon_0.png');
+        this.load.image('v15-cannon-1', 'assets/fx15/cannon_1.png');
+        this.load.image('v15-cannon-2', 'assets/fx15/cannon_2.png');
+        this.load.image('v15-cannon-3', 'assets/fx15/cannon_3.png');
+        this.load.image('v15-smoke-0', 'assets/fx15/smoke_0.png');
+        this.load.image('v15-smoke-1', 'assets/fx15/smoke_1.png');
+        this.load.image('v15-smoke-2', 'assets/fx15/smoke_2.png');
+        this.load.image('v15-smoke-3', 'assets/fx15/smoke_3.png');
+        this.load.image('v15-water-0', 'assets/fx15/water_0.png');
+        this.load.image('v15-water-1', 'assets/fx15/water_1.png');
+        this.load.image('v15-water-2', 'assets/fx15/water_2.png');
+        this.load.image('v15-water-3', 'assets/fx15/water_3.png');
+        this.load.image('v15-impact-0', 'assets/fx15/impact_0.png');
+        this.load.image('v15-impact-1', 'assets/fx15/impact_1.png');
+        this.load.image('v15-impact-2', 'assets/fx15/impact_2.png');
+        this.load.image('v15-impact-3', 'assets/fx15/impact_3.png');
+
         this.load.image('foe-sloop', 'assets/sprites/enemy_court_ship.png');
         this.load.image('foe-galleon', 'assets/sprites/enemy_galleon.png');
         this.load.image('foe-ram', 'assets/sprites/enemy_ram.png');
@@ -451,7 +477,7 @@ class Game extends Phaser.Scene {
         this.profile = SeaProfile.load(); this.shipStats = SeaProfile.stats(this.profile);
         this.maxShipHP = this.shipStats.maxHP;
         this.shipHP = this.maxShipHP;
-        this.playerVelocity = { x: 0, y: 0 }; this.hullRadius = 34;
+        this.playerVelocity = { x: 0, y: 0 }; this.hullRadius = 68;
         this.gold = 0; this.kills = 0; this.bossKills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
         this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
         this.elapsed = 0; this.waveElapsed = 0; this.ended = false; this.pausedByCaptain = false;
@@ -460,7 +486,7 @@ class Game extends Phaser.Scene {
         this.lastRockContact = -1000; this.lastShot = -1000;
         this.lastPortShot = -1000; this.lastStarboardShot = -1000; this.lastDamageTime = -1000;
         // Controle independente por dedo: a mão do leme não impede a dos canhões.
-        this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 58, deadzone: .12 };
+        this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 62, deadzone: .12 };
         this.cannonPointers = new Map();
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
@@ -480,12 +506,12 @@ class Game extends Phaser.Scene {
         const start = this.findWaterSpot(this.W / 2, this.H / 2, 400);
         this.player = this.add.container(start.x, start.y).setDepth(20);
         const playerScale = (this.hullRadius * 2.25) / this.textures.get('player-ship').getSourceImage().height;
-        this.playerSprite = this.add.image(0, 0, 'player-ship').setScale(playerScale);
+        this.playerSprite = this.add.image(0, 0, 'player-tier-0').setScale(playerScale);
         this.upgradeLayer = this.add.container(0, 0);
         this.playerVisual = this.add.container(0, 0);
         this.playerVisual.add([this.playerSprite, this.upgradeLayer]);
         this.player.add(this.playerVisual);
-        this.playerWake = this.add.image(start.x,start.y,'fx-foam-0').setDepth(13).setAlpha(0).setScale(1.05);
+        this.playerWake = this.add.image(start.x,start.y,'fx-foam-0').setDepth(13).setAlpha(0).setScale(1.75);
         this.decorateUpgradedShip();
         this.playerHull = {
             ship: this.player, isPlayer: true, radius: this.hullRadius, mass: 1.5,
@@ -545,36 +571,44 @@ class Game extends Phaser.Scene {
         this.updateHUD();
     }
     decorateUpgradedShip() {
-        const lv = this.profile.levels;
-        if (!this.upgradeLayer || !this.playerSprite) return;
-        this.upgradeLayer.removeAll(true);
-        const scale = this.playerSprite.scaleX || 1;
-        const addOverlay = (key, tint = null, alpha = 1, extraScale = 1) => {
-            const img = this.add.image(0, 0, key).setScale(scale * extraScale).setAlpha(alpha);
-            if (tint !== null) img.setTint(tint);
-            this.upgradeLayer.add(img);
-            return img;
-        };
-        const hullScore = (lv.casco || 0) + (lv.blindagem || 0);
-        if (hullScore > 0) {
-            const tint = hullScore >= 24 ? 0xffd08a : hullScore >= 12 ? 0xe6bd82 : 0xcaa27d;
-            addOverlay('upgrade-hull', tint, Math.min(.96, .48 + hullScore * .03));
+        // A progressão do estaleiro agora seleciona CASCOS COMPLETOS da mesma folha,
+        // e não desenha desenhos antigos desalinhados sobre a vela.
+        this.refreshShipArt(true);
+    }
+    refreshShipArt(force = false) {
+        if (!this.playerSprite || !this.profile || !this.textures) return;
+        const lv = this.profile.levels || {};
+        const power = ['casco','blindagem','velas','canhoes','bateria','esporao']
+            .reduce((total,k) => total + Math.max(0,Number(lv[k])||0),0);
+        const ratio = this.shipHP / Math.max(1,this.maxShipHP);
+        const key = ratio < .28 ? 'player-damaged' :
+            power >= 14 ? 'player-tier-2' : power >= 3 ? 'player-tier-1' : 'player-tier-0';
+        if (force || this.shipArtKey !== key) {
+            this.shipArtKey = key;
+            this.playerSprite.setTexture(key);
+            const image = this.textures.get(key).getSourceImage();
+            this.playerSprite.setScale((this.hullRadius * 2.25) / Math.max(1,image.height));
+            // A arte de nível 1/2 inclui canhões e velas detalhados. Overlays antigos
+            // prejudicavam a pixel art e foram intencionalmente removidos.
+            this.upgradeLayer?.removeAll(true);
         }
-        const sailScore = (lv.velas || 0);
-        if (sailScore > 0) {
-            const tint = sailScore >= 18 ? 0xffd37d : sailScore >= 9 ? 0xf1c06e : 0xdca0a8;
-            addOverlay('upgrade-sails', tint, Math.min(.95, .35 + sailScore * .05));
-        }
-        const gunScore = (lv.canhoes || 0) + (lv.bateria || 0);
-        if (gunScore > 0) {
-            const tint = gunScore >= 20 ? 0x1e2632 : 0x111923;
-            addOverlay('upgrade-guns', tint, Math.min(.98, .45 + gunScore * .03));
-        }
-        const ramScore = (lv.esporao || 0);
-        if (ramScore > 0) {
-            const tint = ramScore >= 16 ? 0xffd388 : ramScore >= 8 ? 0xd6dee8 : 0xb3c1cf;
-            addOverlay('upgrade-ram', tint, Math.min(.98, .5 + ramScore * .05));
-        }
+    }
+    // Efeito pequeno, limitado em quantidade para não sobrecarregar o celular.
+    navalFx(kind, x, y, size=.45, rotation=0, fixed=false, total=250) {
+        if (this.effectsActive >= this.effectsLimit || this.ended || !this.textures.exists('v15-'+kind+'-0')) return null;
+        const actor = this.add.image(x,y,'v15-'+kind+'-0').setScale(size)
+            .setRotation(rotation).setDepth(fixed?115:47).setScrollFactor(fixed?0:1);
+        this.effectsActive++;
+        this.tweens.add({targets:actor, alpha:.05,duration:total,
+            onUpdate:t=>{
+                if (!actor.active) return;
+                const frame=Math.min(3,Math.floor(t.progress*4));
+                const texture='v15-'+kind+'-'+frame;
+                if (actor.texture.key!==texture) actor.setTexture(texture);
+            },
+            onComplete:()=>{if(actor.active)actor.destroy();this.effectsActive=Math.max(0,this.effectsActive-1);}
+        });
+        return actor;
     }
     createSeaLayers() {
         this.seaBase = this.add.tileSprite(240, 400, 480, 800, 'sea-base').setScrollFactor(0).setDepth(-110);
@@ -603,7 +637,8 @@ class Game extends Phaser.Scene {
         const keyMap = { reef: 'island-reef', ruin: 'island-ruin', monastery: 'island-monastery', daegon: 'island-daegon', demeter: 'island-demeter', wreck: 'island-wreck' };
         spots.forEach(([x, y, radius, kind], i) => {
             this.islands.push({ x, y, radius, kind });
-            const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale((radius * 2.8) / 256);
+            const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
+            const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
@@ -625,7 +660,7 @@ class Game extends Phaser.Scene {
         for (let i = 0; i < 16; i++) {
             const x = rng.between(120, this.W - 120), y = rng.between(120, this.H - 120);
             if (this.islands.some(isl => Math.hypot(isl.x - x, isl.y - y) < isl.radius + 60)) continue;
-            const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3).setScale(0.42 + (i % 3) * .06);
+            const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3).setScale((0.42 + (i % 3) * .06) * 1.6);
             this.flotsam.push({ sprite: s, y, phase: i*.63 });
         }
         const border = this.add.graphics().setDepth(2).lineStyle(6, 0xba8c77, .36);
@@ -684,15 +719,15 @@ class Game extends Phaser.Scene {
         const elite = ['almirante','nauabissal','kraken','dagon'].includes(type);
         const maxhp = Math.round(f.hp * scaleDifficulty), id = ++this.foeSerial;
         const tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
-            espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
+            espectral:'foe-spectral', fragata:'foe-ivory', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
             enguia:'foe-eel', afogados:'foe-drowned', coral:'foe-coral',
             caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'boss-dagon' })[type] || 'foe-sloop';
         const sourceH = this.textures.get(tex).getSourceImage().height || 160;
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
-        const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
+        const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-ivory','foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
         const ship = this.add.image(pos.x, pos.y, tex)
-            .setScale((f.radius * heightFactor) / sourceH).setDepth(15);
+            .setScale(((f.radius * heightFactor) / sourceH) * 2).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
             speed: f.speed * (1 + Math.min(.85, this.currentDifficulty * .014)),
@@ -705,11 +740,11 @@ class Game extends Phaser.Scene {
         enemy.visualPhase = id * 1.39;
         enemy.isMonster = supernatural;
         enemy.wake = this.add.image(pos.x,pos.y,supernatural ? 'fx-violet-0' : 'fx-foam-0')
-            .setDepth(13).setAlpha(0).setScale(supernatural ? 1.7 : .85);
+            .setDepth(13).setAlpha(0).setScale(supernatural ? 2.2 : 1.35);
         enemy.flashUntil = 0;
         enemy.bar = this.add.graphics().setDepth(22);
-        enemy.label = this.add.text(pos.x, pos.y - f.radius - 38, f.name, {
-            fontFamily: 'monospace', fontSize: '10px', color: elite ? '#ffe2a2' : '#edb6b8',
+        enemy.label = this.add.text(pos.x, pos.y - f.radius - 54, f.name, {
+            fontFamily: 'monospace', fontSize: '12px', color: elite ? '#ffe2a2' : '#edb6b8',
             backgroundColor: '#131720bd', padding: { x: 2, y: 2 }
         }).setOrigin(.5).setDepth(24);
         this.enemies.push(enemy);
@@ -718,9 +753,9 @@ class Game extends Phaser.Scene {
     dropTreasure(x, y, fromEnemy = false, value = 14) {
         const coin=this.add.container(x,y).setDepth(8);
         const kind=fromEnemy?'treasure-chest':((Math.floor(x+y+value)%3===0)?'treasure-crate':'treasure-coin');
-        const scaleMap={'treasure-coin':.34,'treasure-crate':.42,'treasure-chest':.5};
+        const scaleMap={'treasure-coin':.68,'treasure-crate':.84,'treasure-chest':1.0};
         coin.add(this.add.image(0,0,kind).setScale(scaleMap[kind]||.38).setAngle(((x+y)%18)-9));
-        const sparkle=this.add.image(0,-15,'fx-gold-0').setScale(fromEnemy?.62:.36).setAlpha(.65);
+        const sparkle=this.add.image(0,-22,'fx-gold-0').setScale(fromEnemy?1.02:.72).setAlpha(.72);
         coin.add(sparkle);
         this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,sparkle});
     }
@@ -754,23 +789,24 @@ class Game extends Phaser.Scene {
         // Arte e zonas de toque partilham EXATAMENTE as mesmas coordenadas.
         // 480×220 centralizado em (240, 690): joystick (106,702), canhões (342,702)/(432,702).
         this.add.image(240, 690, 'command-console-analog').setScrollFactor(0).setDepth(102);
-        const knobShadow = this.add.circle(108, 706, 26, 0x060c16, .65)
-            .setStrokeStyle(2, 0x263342, .6).setScrollFactor(0).setDepth(110);
-        const knob = this.add.circle(106, 702, 25, 0x87939c, 1)
-            .setStrokeStyle(3, 0xc2c9cc, .92).setScrollFactor(0).setDepth(111);
-        const inner = this.add.circle(106, 702, 12, 0x65737e, .8)
-            .setStrokeStyle(1, 0xd5d9d2, .65).setScrollFactor(0).setDepth(112);
+        const knobShadow = this.add.circle(108, 706, 31, 0x140d0c, .58)
+            .setStrokeStyle(3, 0x4b2d1e, .8).setScrollFactor(0).setDepth(110);
+        const knob = this.add.circle(106, 702, 29, 0x704d2b, 1)
+            .setStrokeStyle(4, 0xc79058, .96).setScrollFactor(0).setDepth(111);
+        const inner = this.add.circle(106, 702, 13, 0x25303d, .92)
+            .setStrokeStyle(2, 0xd8b17a, .8).setScrollFactor(0).setDepth(112);
         this.joystick.knob = knob;
         this.joystick.shadow = knobShadow;
         this.joystick.inner = inner;
         this.cannonHighlights = {
-            port: this.add.circle(342, 702, 39, 0xebcb91, 0).setScrollFactor(0).setDepth(108),
-            starboard: this.add.circle(432, 702, 39, 0xebcb91, 0).setScrollFactor(0).setDepth(108)
+            port: this.add.circle(342, 702, 42, 0xffb35d, 0).setScrollFactor(0).setDepth(108),
+            starboard: this.add.circle(432, 702, 42, 0xffb35d, 0).setScrollFactor(0).setDepth(108)
         };
         // Suporte à depuração automatizada do layout; não interfere com inputs.
-        this.touchLayout = { joystick: { x: 106, y: 702, radius: 76 },
-            port: { x: 342, y: 702, radius: 43 },
-            starboard: { x: 432, y: 702, radius: 43 } };
+        this.touchLayout = { joystick: { x: 106, y: 702, radius: 82 },
+            port: { x: 342, y: 702, radius: 48 },
+            starboard: { x: 432, y: 702, radius: 48 } };
+        this.cannonUiFx = { port: { x: 342, y: 702 }, starboard: { x: 432, y: 702 } };
     }
     isNativeTouchPointer(pointer) {
         const event = pointer?.event;
@@ -887,26 +923,45 @@ class Game extends Phaser.Scene {
             fired = true;
             const count = this.shipStats.balls;
             for (let j = 0; j < count; j++) {
-                const along = (j - (count - 1) / 2) * 12;
-                const x = this.player.x + sign * rightX * 31 + foreX * along;
-                const y = this.player.y + sign * rightY * 31 + foreY * along;
+                const along = (j - (count - 1) / 2) * 18;
+                const x = this.player.x + sign * rightX * 54 + foreX * along;
+                const y = this.player.y + sign * rightY * 54 + foreY * along;
                 const speed = this.shipStats.shotSpeed;
                 const dirX = sign * rightX, dirY = sign * rightY;
                 this.makeShot(x, y, dirX * speed + this.playerVelocity.x * .22,
                     dirY * speed + this.playerVelocity.y * .22, true,
                     this.shipStats.cannonDamage, this.shipStats.shotTTL);
-                this.splash(x, y, 0xffdfab, 4);
-                this.pixelFx('muzzle',x,y,1.2); this.burst(x,y,'smoke',.5);
+                this.splash(x, y, 0xffdfab, 5);
+                this.pixelFx('muzzle',x,y,1.6); this.burst(x,y,'smoke',.7);
             }
+            const muzzleX=this.player.x + sign*rightX*54;
+            const muzzleY=this.player.y + sign*rightY*54;
+            const direction=Math.atan2(sign*rightY,sign*rightX)+Math.PI;
+            this.navalFx('cannon',muzzleX,muzzleY,.36,direction,false,225);
             // Recuo lateral dos canhões: pequeno, mas perceptível em navios leves.
             this.playerVelocity.x -= sign * rightX * 2.5;
             this.playerVelocity.y -= sign * rightY * 2.5;
+            this.triggerCannonUiFx(sign < 0 ? 'port' : 'starboard');
         }
         return fired;
     }
+    triggerCannonUiFx(side) {
+        const pos=this.cannonUiFx?.[side];
+        if(!pos)return;
+        // A sequência de fogo (3 primeiros quadros) cabe dentro da boca de canhão.
+        const actor=this.add.image(pos.x,pos.y,'v15-cannon-0')
+            .setScale(.27).setDepth(117).setScrollFactor(0)
+            .setRotation(side==='starboard'?Math.PI:0);
+        this.time.delayedCall(67,()=>{if(actor.active)actor.setTexture('v15-cannon-1');});
+        this.time.delayedCall(132,()=>{if(actor.active)actor.setTexture('v15-cannon-2');});
+        this.time.delayedCall(214,()=>{if(actor.active)actor.destroy();});
+        const highlight=this.cannonHighlights?.[side];
+        if(highlight){highlight.setAlpha(.22);
+            this.tweens.add({targets:highlight,alpha:0,duration:210});}
+    }
     makeShot(x, y, vx, vy, friendly, damage = 9, ttl = 1.5) {
-        const sprite = this.add.circle(x, y, friendly ? 5 : 6, friendly ? 0xffd6a1 : 0xd78aa5)
-            .setStrokeStyle(2, friendly ? 0xffffff : 0x512a47).setDepth(30);
+        const sprite = this.add.circle(x, y, friendly ? 8 : 9, friendly ? 0xffd6a1 : 0xd78aa5)
+            .setStrokeStyle(2, friendly ? 0xffffff : 0x512a47).setDepth(30).setAlpha(.95);
         this.shots.push({ x, y, px: x, py: y, vx, vy, friendly, object: sprite, ttl, damage });
     }
     burst(x,y,kind='blast',scale=1) {
@@ -921,6 +976,7 @@ class Game extends Phaser.Scene {
             onComplete:()=>{if(spr.active)spr.destroy();this.effectsActive=Math.max(0,this.effectsActive-1);}});
     }
     animateWorldVisuals() {
+        this.refreshShipArt();
         // Throttled visual update. Physics uses unmodified player/enemy positions.
         const t=this.elapsed;
         if(this.playerVisual) {
@@ -929,8 +985,8 @@ class Game extends Phaser.Scene {
         }
         const speed=Math.hypot(this.playerVelocity.x,this.playerVelocity.y);
         if(this.playerWake) {
-            this.playerWake.setPosition(this.player.x - Math.sin(this.player.rotation)*34,
-                this.player.y + Math.cos(this.player.rotation)*34)
+            this.playerWake.setPosition(this.player.x - Math.sin(this.player.rotation)*62,
+                this.player.y + Math.cos(this.player.rotation)*62)
                 .setRotation(this.player.rotation).setTexture(SEA_VISUALS.cyclic('foam',t))
                 .setAlpha(Math.min(.75, speed/175));
         }
@@ -941,7 +997,7 @@ class Game extends Phaser.Scene {
             e.ship.setVisible(true);e.wake?.setVisible(true);if(e.bar)e.bar.setVisible(true);if(e.label)e.label.setVisible(true);
             const pulse=Math.sin(t*(e.boss?2.35:3.4)+e.visualPhase);
             if(e.isMonster) {
-                const dx=(e.type==='enguia'? .045: .012)*pulse;
+                const dx=(e.type==='enguia'? .072 : e.boss ? .025 : .018)*pulse;
                 e.ship.setScale(e.spriteScale*(1+dx),e.spriteScale*(1-dx*.48));
                 e.ship.setAlpha(e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1);
             } else {
@@ -988,6 +1044,7 @@ class Game extends Phaser.Scene {
     }
     splash(x, y, color = 0xe4bbc1, r = 6) {
         this.pixelFx('splash',x,y,Math.max(.6,r/9));
+        if(r>=11) this.navalFx('water',x,y,Math.min(.65,.25+r/60),0,false,420);
         const ring = this.add.circle(x, y, r, 0x000000, 0).setStrokeStyle(2, color, .8).setDepth(11);
         this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
     }
@@ -999,6 +1056,8 @@ class Game extends Phaser.Scene {
         amount = Math.max(1, Math.round(amount * (1 - reduction)));
         this.shipHP = Math.max(0, this.shipHP - amount);
         this.cameras.main.shake(120, .004); this.burst(x,y,'smoke',.75);
+        this.navalFx('smoke',x,y,.45,0,false,420);
+        this.refreshShipArt();
         this.splash(x, y, 0xffd4ad, 11);
         if (this.shipHP <= 0) this.finish(false);
         return true;
@@ -1008,6 +1067,7 @@ class Game extends Phaser.Scene {
         this.pixelFx('splinters',x,y,Math.min(2,magnitude/90+.5)); this.burst(x,y,'blast',Math.min(2.1,magnitude/120+.7));
         const strength = Phaser.Math.Clamp(magnitude / 170, 0.25, 1);
         this.splash(x, y, isRock ? 0xffbdb1 : 0xffd69d, 9 + strength * 15);
+        this.navalFx('impact',x,y,Math.min(.9,.35+strength*.45));
         for (let i = 0; i < 7; i++) {
             const a = Math.PI * 2 * i / 7 + this.elapsed;
             const particle = this.add.circle(x, y, 2 + (i % 3),
@@ -1146,6 +1206,8 @@ class Game extends Phaser.Scene {
         enemy.dead = true;
         if(enemy.wake) enemy.wake.destroy();
         this.burst(enemy.x,enemy.y,enemy.boss?'blast':'smoke',enemy.boss?2.4:1.4);
+        this.navalFx(enemy.isMonster?'water':'impact',enemy.x,enemy.y,enemy.boss?1.1:.7,0,false,410);
+        this.navalFx('smoke',enemy.x,enemy.y,enemy.boss?1.0:.55,0,false,540);
         enemy.ship.destroy();
         enemy.bar.destroy();
         if (enemy.label) enemy.label.destroy();
@@ -1329,6 +1391,7 @@ class Game extends Phaser.Scene {
                 false, e.atk, e.pattern === 'sniper' ? 2.2 : 1.85);
         }
         this.splash(e.x + fireDX * 29, e.y + fireDY * 29, e.boss ? 0xffac83 : 0xc8a8bd, 7);
+        this.navalFx('cannon',e.x+fireDX*e.radius*.65,e.y+fireDY*e.radius*.65,.29,Math.atan2(fireDY,fireDX)+Math.PI,false,225);
     }
     tentacleAttack(e) {
         if (e.dead || this.ended) return;
@@ -1379,10 +1442,10 @@ class Game extends Phaser.Scene {
         for (const e of this.enemies) {
             if (e.dead) continue;
             e.ship.setPosition(e.x, e.y).setRotation(e.heading);
-            if (e.label) e.label.setPosition(e.x, e.y - e.radius - 38);
+            if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
-            e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - width/2-1, e.y - e.radius - 24, width+2, 7);
-            e.bar.fillStyle(e.boss ? 0xf3bb6e : 0xc87c86).fillRect(e.x - width/2, e.y - e.radius - 23, Math.max(0, width * e.hp / e.maxhp), 5);
+            e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - width/2-1, e.y - e.radius - 32, width+2, 8);
+            e.bar.fillStyle(e.boss ? 0xf3bb6e : 0xc87c86).fillRect(e.x - width/2, e.y - e.radius - 31, Math.max(0, width * e.hp / e.maxhp), 6);
         }
     }
     // Colisão contínua de projéteis para não atravessar cascos quando estão rápidos.
@@ -1410,6 +1473,7 @@ class Game extends Phaser.Scene {
                         hit = true; e.hp = Math.max(0, e.hp - p.damage);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
                         this.splash(p.x, p.y, 0xffdfb4, 9);
+                        if(Math.random()<.5) this.navalFx('impact',p.x,p.y,.31,0,false,260);
                         if (e.hp <= 0) this.sinkEnemy(e);
                         break;
                     }
@@ -1427,14 +1491,14 @@ class Game extends Phaser.Scene {
         for (const t of this.treasures) {
             if (t.taken) continue;
             const dist = Math.hypot(this.player.x - t.x, this.player.y - t.y);
-            if (dist < range + 55 && range > 50) {
+            if (dist < range + 90 && range > 50) {
                 // A rede puxa lentamente a carga até o navio.
                 const strength = Math.min(1, dt * (2 + this.profile.levels.ima * .1));
                 t.x += (this.player.x - t.x) * strength;
                 t.y += (this.player.y - t.y) * strength;
                 t.coin.setPosition(t.x, t.y - 5);
             }
-            if (Math.hypot(this.player.x - t.x, this.player.y - t.y) < Math.max(40, range)) {
+            if (Math.hypot(this.player.x - t.x, this.player.y - t.y) < Math.max(72, range + 8)) {
                 t.taken = true; this.gold = SEA_MATH.safe(this.gold + t.value);
                 t.coin.destroy(); this.burst(t.x,t.y,'gold',.75); this.splash(t.x,t.y,0xf9d77b,8);
             }
