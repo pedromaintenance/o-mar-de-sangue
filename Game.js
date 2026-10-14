@@ -327,6 +327,7 @@ class SeaPort extends Phaser.Scene {
         }
         this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
         this.paintBackground();
+        SEA_GOTHIC.backdrop(this);
         SEA_UI.portDecor(this);
         SEA_MUSIC.setMood('crimson');
         SEA_MUSIC.load();
@@ -416,6 +417,7 @@ class SeaPort extends Phaser.Scene {
         g.lineStyle(2, 0xb3956a, .75); g.lineBetween(16, 17, 464, 17); g.lineBetween(16, 783, 464, 783);
     }
     banner(label, subtitle = '') {
+        SEA_GOTHIC.titlePlate(this);
         this.txt(240, 41, 'CRÔNICAS DA CARCAÇA', 11, '#ddc19a', { center: true, bold: true });
         this.txt(240, 95, label, 30, '#f5d49f', { center: true, bold: true });
         if (subtitle) this.txt(240, 141, subtitle, 13, '#dec5bf', { center: true });

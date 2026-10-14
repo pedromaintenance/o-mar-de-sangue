@@ -246,6 +246,7 @@ const SEA_ISLANDS = {
             .setStrokeStyle(3,0xc2a16e));
         root.add(s.add.rectangle(x,top+height/2,width-16,height-16,0x351e2b,.13)
             .setStrokeStyle(1,0xe4c293,.45));
+        SEA_GOTHIC.island(s,root,{x,top,width,height});
         const ornament=s.add.graphics();root.add(ornament);
         ornament.lineStyle(2,0xb89a6c,.77);
         ornament.lineBetween(x-width/2+28,top+99,x+width/2-28,top+99);
