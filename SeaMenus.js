@@ -130,24 +130,12 @@ const SEA_UI = {
             .setInteractive({useHandCursor:true});
         const inset=scene.add.rectangle(x,y,w-8,h-8,0x0f1b29,.095).setDepth(25);
         const left=scene.add.rectangle(x-w/2+5,y,4,h-10,scheme.shine,.92).setDepth(25);
-        // Moldura REAL extraída das ilustrações e esticada por 3 segmentos,
-        // com o centro variável para conservar espaço dos rótulos dinâmicos.
-        const raster = scene.textures.exists('pixel-button')
-            ? scene.add.image(x,y,SEA_RASTER.buttonTexture(scene,
-                style==='gold'?'focus':'button',w,h)).setDepth(25.5) : null;
-        const caption=scene.txt(x,y,label,font,raster?'#f4e3cb':scheme.text,
-            {center:true,mid:true,bold:true,depth:27,width:w-25});
+        const caption=scene.txt(x,y,label,font,scheme.text,{center:true,mid:true,bold:true,depth:27,width:w-25});
         const focus=(active)=>{
             frame.setFillStyle(active?(style==='red'?0x633142:0xd4a672):scheme.bg,1);
             frame.setStrokeStyle(active?3:2,active?0xffedbd:scheme.border,1);
             left.setFillStyle(active?0xffd39b:scheme.shine,.95);
-            if(raster){
-                const key=SEA_RASTER.buttonTexture(scene,
-                    active||style==='gold'?'focus':'button',w,h);
-                if(key)raster.setTexture(key);
-            }
-            caption.setColor(raster?(active?'#fff2cf':'#f4e3cb'):
-                active?'#0c1823':scheme.text);
+            caption.setColor(active?'#0c1823':scheme.text);
         };
         frame.on('pointerover',()=>{
             const index=scene.padOptions.findIndex(o=>o.rect===frame);
@@ -165,8 +153,7 @@ const SEA_UI = {
             }
             onTap();
         });
-        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,
-            objects:[inset,left,caption,...(raster?[raster]:[])]});
+        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,objects:[inset,left,caption]});
         return frame;
     },
     yardCard(scene,y,level,affordable){
