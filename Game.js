@@ -179,6 +179,14 @@ function seaCenterCanvas(game) {
 }
 
 
+// Cosmetic motion is always applied to render objects, never to physics positions.
+const SEA_VISUALS = {
+    distance2(a,b,c,d) { const dx=a-c,dy=b-d; return dx*dx+dy*dy; },
+    frames(name) { return Array.from({length:4},(_,i)=>'fx-'+name+'-'+i); },
+    cyclic(name,sec) { return 'fx-'+name+'-'+(Math.floor(sec*9)%4); },
+    lerp(a,b,t) { return a+(b-a)*t; }
+};
+
 class SeaBoot extends Phaser.Scene {
     constructor() { super('SeaBoot'); }
     preload() {
@@ -219,6 +227,27 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('fx-splinters-1', 'assets/fx/splinters_1.png');
         this.load.image('fx-splinters-2', 'assets/fx/splinters_2.png');
         this.load.image('fx-splinters-3', 'assets/fx/splinters_3.png');
+        this.load.image('fx-foam-0', 'assets/fx/foam_0.png');
+        this.load.image('fx-foam-1', 'assets/fx/foam_1.png');
+        this.load.image('fx-foam-2', 'assets/fx/foam_2.png');
+        this.load.image('fx-foam-3', 'assets/fx/foam_3.png');
+        this.load.image('fx-gold-0', 'assets/fx/gold_0.png');
+        this.load.image('fx-gold-1', 'assets/fx/gold_1.png');
+        this.load.image('fx-gold-2', 'assets/fx/gold_2.png');
+        this.load.image('fx-gold-3', 'assets/fx/gold_3.png');
+        this.load.image('fx-violet-0', 'assets/fx/violet_0.png');
+        this.load.image('fx-violet-1', 'assets/fx/violet_1.png');
+        this.load.image('fx-violet-2', 'assets/fx/violet_2.png');
+        this.load.image('fx-violet-3', 'assets/fx/violet_3.png');
+        this.load.image('fx-blast-0', 'assets/fx/blast_0.png');
+        this.load.image('fx-blast-1', 'assets/fx/blast_1.png');
+        this.load.image('fx-blast-2', 'assets/fx/blast_2.png');
+        this.load.image('fx-blast-3', 'assets/fx/blast_3.png');
+        this.load.image('fx-smoke-0', 'assets/fx/smoke_0.png');
+        this.load.image('fx-smoke-1', 'assets/fx/smoke_1.png');
+        this.load.image('fx-smoke-2', 'assets/fx/smoke_2.png');
+        this.load.image('fx-smoke-3', 'assets/fx/smoke_3.png');
+        this.load.image('fx-shrine-glow', 'assets/fx/shrine_glow.png');
         this.load.image('island-reef', 'assets/islands/island_reef.png');
         this.load.image('island-ruin', 'assets/islands/island_ruin.png');
         this.load.image('island-monastery', 'assets/islands/island_monastery.png');
@@ -426,6 +455,7 @@ class Game extends Phaser.Scene {
         this.gold = 0; this.kills = 0; this.bossKills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
         this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
         this.elapsed = 0; this.waveElapsed = 0; this.ended = false; this.pausedByCaptain = false;
+        this.gracePeriod = 3.0; // tempo para orientar o navio antes do primeiro ataque
         this.resultsBanked = false; this.speed = 0; this.lastImpact = -1000;
         this.lastRockContact = -1000; this.lastShot = -1000;
         this.lastPortShot = -1000; this.lastStarboardShot = -1000; this.lastDamageTime = -1000;
@@ -433,6 +463,7 @@ class Game extends Phaser.Scene {
         this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 58, deadzone: .12 };
         this.cannonPointers = new Map();
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
+        this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
         this.survivalTime = 0; this.goalName = ''; this.bossAlert = '';
         this.currentDifficulty = this.mode === 'mission' ? this.stage : 1;
@@ -451,8 +482,10 @@ class Game extends Phaser.Scene {
         const playerScale = (this.hullRadius * 2.25) / this.textures.get('player-ship').getSourceImage().height;
         this.playerSprite = this.add.image(0, 0, 'player-ship').setScale(playerScale);
         this.upgradeLayer = this.add.container(0, 0);
-        this.player.add(this.playerSprite);
-        this.player.add(this.upgradeLayer);
+        this.playerVisual = this.add.container(0, 0);
+        this.playerVisual.add([this.playerSprite, this.upgradeLayer]);
+        this.player.add(this.playerVisual);
+        this.playerWake = this.add.image(start.x,start.y,'fx-foam-0').setDepth(13).setAlpha(0).setScale(1.05);
         this.decorateUpgradedShip();
         this.playerHull = {
             ship: this.player, isPlayer: true, radius: this.hullRadius, mass: 1.5,
@@ -571,12 +604,11 @@ class Game extends Phaser.Scene {
         spots.forEach(([x, y, radius, kind], i) => {
             this.islands.push({ x, y, radius, kind });
             const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale((radius * 2.8) / 256);
-            if (kind === 'demeter') {
-                const glow = this.add.circle(x, y - radius * .2, Math.max(14, radius * .3), 0xc8e8bd, .14).setDepth(1);
-                this.tweens.add({ targets: glow, alpha: .04, duration: 1800 + i * 35, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-            } else if (kind !== 'reef') {
-                const mist = this.add.circle(x + radius * .12, y - radius * .1, Math.max(12, radius * .24), kind === 'daegon' ? 0xd07684 : 0x8cc7c0, .08).setDepth(1);
-                this.tweens.add({ targets: mist, alpha: .025, duration: 1700 + i * 31, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+            if (kind !== 'reef') {
+                const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
+                const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
+                    .setScale(Math.max(.7,radius/46)).setTint(tint).setAlpha(.28).setDepth(1);
+                this.landmarkGlows.push({ glow, x, y, phase: i*.51, alpha: kind==='demeter'?.52:.30 });
             }
             if (radius > 82 && i % 3 === 0) {
                 this.add.text(x, y + radius + 25, labels[i % labels.length], {
@@ -594,7 +626,7 @@ class Game extends Phaser.Scene {
             const x = rng.between(120, this.W - 120), y = rng.between(120, this.H - 120);
             if (this.islands.some(isl => Math.hypot(isl.x - x, isl.y - y) < isl.radius + 60)) continue;
             const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3).setScale(0.42 + (i % 3) * .06);
-            this.tweens.add({ targets: s, y: y - 5, duration: 1400 + i * 60, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
+            this.flotsam.push({ sprite: s, y, phase: i*.63 });
         }
         const border = this.add.graphics().setDepth(2).lineStyle(6, 0xba8c77, .36);
         border.strokeRect(5, 5, this.W - 10, this.H - 10);
@@ -669,6 +701,12 @@ class Game extends Phaser.Scene {
             vx: 0, vy: 0, radius: f.radius, mass: f.mass,
             lastRockContact: -1000, lastRamming: -1000, specialPhase: 0, dead: false,
             maxRange: f.range, cooldownBase: f.cooldown, pattern: f.pattern, elite, boss: elite, bar: null };
+        enemy.spriteScale = ship.scaleX;
+        enemy.visualPhase = id * 1.39;
+        enemy.isMonster = supernatural;
+        enemy.wake = this.add.image(pos.x,pos.y,supernatural ? 'fx-violet-0' : 'fx-foam-0')
+            .setDepth(13).setAlpha(0).setScale(supernatural ? 1.7 : .85);
+        enemy.flashUntil = 0;
         enemy.bar = this.add.graphics().setDepth(22);
         enemy.label = this.add.text(pos.x, pos.y - f.radius - 38, f.name, {
             fontFamily: 'monospace', fontSize: '10px', color: elite ? '#ffe2a2' : '#edb6b8',
@@ -678,16 +716,18 @@ class Game extends Phaser.Scene {
         return enemy;
     }
     dropTreasure(x, y, fromEnemy = false, value = 14) {
-        const coin = this.add.container(x, y).setDepth(8);
-        const kind = fromEnemy ? 'treasure-chest' : ((Math.floor(x + y + value) % 3 === 0) ? 'treasure-crate' : 'treasure-coin');
-        const scaleMap = { 'treasure-coin': 0.34, 'treasure-crate': 0.42, 'treasure-chest': 0.5 };
-        coin.add(this.add.image(0, 0, kind).setScale(scaleMap[kind] || 0.38).setAngle(((x + y) % 18) - 9));
-        this.tweens.add({ targets: coin, y: y - 7, duration: 950, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-        this.treasures.push({ x, y, coin, value: Math.round(value), taken: false });
+        const coin=this.add.container(x,y).setDepth(8);
+        const kind=fromEnemy?'treasure-chest':((Math.floor(x+y+value)%3===0)?'treasure-crate':'treasure-coin');
+        const scaleMap={'treasure-coin':.34,'treasure-crate':.42,'treasure-chest':.5};
+        coin.add(this.add.image(0,0,kind).setScale(scaleMap[kind]||.38).setAngle(((x+y)%18)-9));
+        const sparkle=this.add.image(0,-15,'fx-gold-0').setScale(fromEnemy?.62:.36).setAlpha(.65);
+        coin.add(sparkle);
+        this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,sparkle});
     }
     createHUD() {
         this.add.rectangle(240, 51, 480, 101, 0x111c28, .94).setScrollFactor(0).setDepth(90);
         this.add.rectangle(240, 51, 472, 93, 0x0f1620, .35).setStrokeStyle(1, 0x9c8267, .7).setScrollFactor(0).setDepth(91);
+        this.statusBars=this.add.graphics().setScrollFactor(0).setDepth(101);
         this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
             fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#f0c58c'
         }).setScrollFactor(0).setDepth(100);
@@ -856,7 +896,7 @@ class Game extends Phaser.Scene {
                     dirY * speed + this.playerVelocity.y * .22, true,
                     this.shipStats.cannonDamage, this.shipStats.shotTTL);
                 this.splash(x, y, 0xffdfab, 4);
-                this.pixelFx('muzzle',x,y,1.2);
+                this.pixelFx('muzzle',x,y,1.2); this.burst(x,y,'smoke',.5);
             }
             // Recuo lateral dos canhões: pequeno, mas perceptível em navios leves.
             this.playerVelocity.x -= sign * rightX * 2.5;
@@ -868,6 +908,76 @@ class Game extends Phaser.Scene {
         const sprite = this.add.circle(x, y, friendly ? 5 : 6, friendly ? 0xffd6a1 : 0xd78aa5)
             .setStrokeStyle(2, friendly ? 0xffffff : 0x512a47).setDepth(30);
         this.shots.push({ x, y, px: x, py: y, vx, vy, friendly, object: sprite, ttl, damage });
+    }
+    burst(x,y,kind='blast',scale=1) {
+        if(this.ended || this.effectsActive >= this.effectsLimit) return;
+        const key = 'fx-'+kind+'-0';
+        if(!this.textures.exists(key))return;
+        const spr=this.add.image(x,y,key).setScale(scale).setDepth(46);
+        this.effectsActive++;
+        const duration=kind==='smoke'?520:kind==='violet'?500:340;
+        this.tweens.add({targets:spr,alpha:0,scale:scale*1.22,duration,
+            onUpdate: tween => { if(spr.active) spr.setTexture('fx-'+kind+'-'+Math.min(3,Math.floor(tween.progress*4))); },
+            onComplete:()=>{if(spr.active)spr.destroy();this.effectsActive=Math.max(0,this.effectsActive-1);}});
+    }
+    animateWorldVisuals() {
+        // Throttled visual update. Physics uses unmodified player/enemy positions.
+        const t=this.elapsed;
+        if(this.playerVisual) {
+            this.playerVisual.y=Math.sin(t*3.5)*1.5;
+            this.playerVisual.rotation=Math.sin(t*2.1)*.025;
+        }
+        const speed=Math.hypot(this.playerVelocity.x,this.playerVelocity.y);
+        if(this.playerWake) {
+            this.playerWake.setPosition(this.player.x - Math.sin(this.player.rotation)*34,
+                this.player.y + Math.cos(this.player.rotation)*34)
+                .setRotation(this.player.rotation).setTexture(SEA_VISUALS.cyclic('foam',t))
+                .setAlpha(Math.min(.75, speed/175));
+        }
+        for(const e of this.enemies) {
+            if(e.dead || !e.ship?.active)continue;
+            const near=SEA_VISUALS.distance2(e.x,e.y,this.player.x,this.player.y)<1100*1100;
+            if(!near) {e.ship.setVisible(false);e.wake?.setVisible(false);if(e.bar)e.bar.setVisible(false);if(e.label)e.label.setVisible(false);continue;}
+            e.ship.setVisible(true);e.wake?.setVisible(true);if(e.bar)e.bar.setVisible(true);if(e.label)e.label.setVisible(true);
+            const pulse=Math.sin(t*(e.boss?2.35:3.4)+e.visualPhase);
+            if(e.isMonster) {
+                const dx=(e.type==='enguia'? .045: .012)*pulse;
+                e.ship.setScale(e.spriteScale*(1+dx),e.spriteScale*(1-dx*.48));
+                e.ship.setAlpha(e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1);
+            } else {
+                e.ship.setScale(e.spriteScale);
+                e.ship.setAlpha(1);
+            }
+            e.ship.setY(e.y+Math.sin(t*2.7+e.visualPhase)*(e.boss?2.5:1.15));
+            if(e.wake) {
+                const sx=Math.sin(e.heading),sy=-Math.cos(e.heading);
+                e.wake.setPosition(e.x-sx*e.radius*.85,e.y-sy*e.radius*.85)
+                    .setRotation(e.heading).setTexture(SEA_VISUALS.cyclic(e.isMonster?'violet':'foam',t+e.visualPhase))
+                    .setAlpha(e.isMonster?.36+Math.abs(pulse)*.28:Math.min(.7,Math.hypot(e.vx,e.vy)/180));
+            }
+            if(e.flashUntil && this.time.now > e.flashUntil){e.ship.clearTint();e.flashUntil=0;}
+        }
+        for(const o of this.landmarkGlows){
+            if(!o.glow.active)continue;
+            const near=SEA_VISUALS.distance2(o.x,o.y,this.player.x,this.player.y)<780*780;
+            o.glow.setVisible(near);
+            if(near)o.glow.setAlpha(o.alpha*(.55+.45*Math.sin(t*1.7+o.phase)**2));
+        }
+        for(const f of this.flotsam){
+            if(!f.sprite.active)continue;
+            const near=SEA_VISUALS.distance2(f.sprite.x,f.y,this.player.x,this.player.y)<750*750;
+            f.sprite.setVisible(near);
+            if(near)f.sprite.y=f.y+Math.sin(t*1.9+f.phase)*2;
+        }
+        for(const loot of this.treasures){
+            if(loot.taken || !loot.coin?.active)continue;
+            const near=SEA_VISUALS.distance2(loot.x,loot.y,this.player.x,this.player.y)<750*750;
+            loot.coin.setVisible(near);
+            if(near){
+                loot.coin.y=loot.y-5+Math.sin(t*2.5+loot.phase)*3;
+                if(loot.sparkle)loot.sparkle.setTexture(SEA_VISUALS.cyclic('gold',t+loot.phase)).setAlpha(.55+.3*Math.sin(t*3+loot.phase)**2);
+            }
+        }
     }
     pixelFx(name,x,y,scale=1) {
         const key='fx-'+name+'-0';
@@ -882,20 +992,20 @@ class Game extends Phaser.Scene {
         this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
     }
     damageShip(amount, x, y, source = 'normal') {
-        if (this.ended || this.time.now - this.lastImpact < 330) return false;
+        if (this.ended || this.elapsed < this.gracePeriod || this.time.now - this.lastImpact < 330) return false;
         this.lastImpact = this.time.now; this.lastDamageTime = this.time.now;
         const reduction = source === 'rock' ? this.shipStats.rockReduction :
             source === 'ram' ? this.shipStats.ramProtection : this.shipStats.armor;
         amount = Math.max(1, Math.round(amount * (1 - reduction)));
         this.shipHP = Math.max(0, this.shipHP - amount);
-        this.cameras.main.shake(120, .004);
+        this.cameras.main.shake(120, .004); this.burst(x,y,'smoke',.75);
         this.splash(x, y, 0xffd4ad, 11);
         if (this.shipHP <= 0) this.finish(false);
         return true;
     }
     // Exibe fragmentos de madeira, espuma e a força do impacto.
     impactFX(x, y, magnitude, label, isRock = false) {
-        this.pixelFx('splinters',x,y,Math.min(2,magnitude/90+.5));
+        this.pixelFx('splinters',x,y,Math.min(2,magnitude/90+.5)); this.burst(x,y,'blast',Math.min(2.1,magnitude/120+.7));
         const strength = Phaser.Math.Clamp(magnitude / 170, 0.25, 1);
         this.splash(x, y, isRock ? 0xffbdb1 : 0xffd69d, 9 + strength * 15);
         for (let i = 0; i < 7; i++) {
@@ -1034,6 +1144,8 @@ class Game extends Phaser.Scene {
     sinkEnemy(enemy, ramming = false) {
         if (enemy.dead) return;
         enemy.dead = true;
+        if(enemy.wake) enemy.wake.destroy();
+        this.burst(enemy.x,enemy.y,enemy.boss?'blast':'smoke',enemy.boss?2.4:1.4);
         enemy.ship.destroy();
         enemy.bar.destroy();
         if (enemy.label) enemy.label.destroy();
@@ -1134,7 +1246,7 @@ class Game extends Phaser.Scene {
         if (this.ended) return;
         this.speed = Math.round(this.playerVelocity.x * faceX + this.playerVelocity.y * faceY);
         this.paintEnemies();
-        this.player.y += Math.sin(this.elapsed * 3.1) * .08;
+        this.animateWorldVisuals();
         this.updateShots(dt); this.collectTreasures(dt);
         this.progressBattle(dt);
         if (this.ended) return;
@@ -1225,7 +1337,7 @@ class Game extends Phaser.Scene {
         // Aviso claro antes do golpe, especialmente em tela de toque.
         const warning=this.add.circle(cx,cy,r,0x922838,.14).setStrokeStyle(3,0xf39d8d,.9).setDepth(36);
         this.tweens.add({ targets:warning,alpha:.52,scale:1.10,duration:470,onComplete:()=>warning.destroy() });
-        this.announce('KRAKEN · TENTÁCULOS À VISTA!');
+        this.announce('KRAKEN · TENTÁCULOS À VISTA!'); this.burst(cx,cy,'violet',1.5);
         this.time.delayedCall(560,()=>{
             if (this.ended || !e.ship.active || e.dead) return;
             const fx=this.add.image(cx,cy,'fx-tentacle').setDepth(36).setScale(.75).setAlpha(.9);
@@ -1248,7 +1360,7 @@ class Game extends Phaser.Scene {
         const dx=(px-e.x)/Math.max(1,distance),dy=(py-e.y)/Math.max(1,distance);
         const eye=this.add.image(e.x+dx*50,e.y+dy*50,'fx-dagon-eye').setDepth(35).setScale(.38).setAlpha(.9);
         this.tweens.add({targets:eye,x:px,y:py,alpha:0,scale:.65,duration:720,onComplete:()=>eye.destroy()});
-        this.announce('DAGON · MARÉ DA COROA!');
+        this.announce('DAGON · MARÉ DA COROA!'); this.burst(e.x,e.y,'violet',2.1);
         this.time.delayedCall(780,()=>{
             if (this.ended || e.dead || !e.ship.active) return;
             this.splash(px,py,0x79d6c4,23);
@@ -1296,6 +1408,7 @@ class Game extends Phaser.Scene {
                     if (e.dead) continue;
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; e.hp = Math.max(0, e.hp - p.damage);
+                        if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
                         this.splash(p.x, p.y, 0xffdfb4, 9);
                         if (e.hp <= 0) this.sinkEnemy(e);
                         break;
@@ -1323,7 +1436,7 @@ class Game extends Phaser.Scene {
             }
             if (Math.hypot(this.player.x - t.x, this.player.y - t.y) < Math.max(40, range)) {
                 t.taken = true; this.gold = SEA_MATH.safe(this.gold + t.value);
-                t.coin.destroy(); this.splash(t.x, t.y, 0xf9d77b, 12);
+                t.coin.destroy(); this.burst(t.x,t.y,'gold',.75); this.splash(t.x,t.y,0xf9d77b,8);
             }
         }
     }
@@ -1376,6 +1489,14 @@ class Game extends Phaser.Scene {
     updateHUD() {
         this.hud.setText(`CASCO ${Math.ceil(this.shipHP)}/${SEA_MATH.nice(this.maxShipHP)}   OURO ${SEA_MATH.nice(this.gold)}   NÓS ${Math.abs(this.speed | 0)}`);
         this.quest.setText(this.objectiveText());
+        if(this.statusBars){
+            const g=this.statusBars;g.clear();
+            const hp=SEA_MATH.clamp(this.shipHP/this.maxShipHP,0,1);
+            const p=SEA_MATH.clamp((this.time.now-this.lastPortShot)/this.shipStats.reload,0,1);
+            const st=SEA_MATH.clamp((this.time.now-this.lastStarboardShot)/this.shipStats.reload,0,1);
+            const parts=[[16,151,hp,hp<.28?0xc94c50:0x8fc2a0],[175,63,p,0xe0bd7b],[249,63,st,0xe0bd7b]];
+            for(const [x,w,value,color] of parts){g.fillStyle(0x18232b,.9).fillRect(x,96,w,3);g.fillStyle(color,.95).fillRect(x,96,Math.max(0,w*value),3);}
+        }
         this.drawRadar();
     }
     drawRadar() {
