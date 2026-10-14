@@ -1,4 +1,4 @@
-// O MAR DE SANGUE v1.7 — combate, áudio procedural e afundamentos
+// O MAR DE SANGUE v1.8 — O Mar Vivo, maldição e trilha sonora dinâmica
 /*
  * O MAR DE SANGUE — Pixel Art & Bestiário Abissal v1.0 — CARCAÇA
  * Aplicação web independente (GitHub Pages/PWA). Usa Phaser e imagens locais.
@@ -327,6 +327,8 @@ class SeaPort extends Phaser.Scene {
         }
         this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
         this.paintBackground();
+        SEA_MUSIC.setMood('crimson');
+        SEA_MUSIC.load();
         SEA_AUDIO.bind(this, 465, 24);
         if (this.page === 'yard') this.showYard();
         else if (this.page === 'help') this.showHelp();
@@ -374,7 +376,8 @@ class SeaPort extends Phaser.Scene {
         }
         if (best >= 0) this.setPadFocus(best);
     }
-    update(time) {
+    update(time, delta) {
+        SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05), 'crimson');
         const pad = SEA_GAMEPAD.poll();
         if (!pad.connected) { this.padHint?.setVisible(false); return; }
         this.padHint?.setText('XBOX · ANALÓGICO / DIRECIONAL: SELECIONAR   A: OK   B: VOLTAR').setVisible(true);
@@ -415,6 +418,7 @@ class SeaPort extends Phaser.Scene {
     showMenu() {
         const p = SeaProfile.load(), s = SeaProfile.stats(p);
         this.banner('O MAR DE SANGUE', 'O ouro compra aço. O oceano cobra cada erro.');
+        SEA_MUSIC.addPortControls(this);
         this.txt(240, 362, `COFRE  ◉ ${SEA_MATH.nice(p.gold)}       VIAGENS  ${p.sorties}`, 16, '#edce9f', { center: true, bold: true });
         this.txt(240, 393, `CASCO ${SEA_MATH.nice(s.maxHP)}   CANHÕES ${SEA_MATH.nice(s.cannonDamage)}   VELAS ${SEA_MATH.nice(s.maxSpeed)}`, 12, '#b9d9dd', { center: true });
         this.txt(240, 437, 'ESCOLHA O MODO DE JOGO', 14, '#e4c68d', { center: true, bold: true });
@@ -459,14 +463,16 @@ class SeaPort extends Phaser.Scene {
             'MISSÕES: etapas de escolta de carga, caça,\nsobrevivência e chefes. A etapa avança ao vencer.',
             'SANDBOX: ondas sem fim. A cada onda surgem\ninimigos mais numerosos, resistentes e perigosos.',
             'ESTALEIRO: 14 melhorias sem teto artificial.\nCada nível custa exponencialmente mais ouro.',
+            'MAR VIVO: correntes, névoa e redemoinhos.\nVencer inimigos desperta a maldição do mar.',
+            'MÚSICA: importe 2 MP3 no porto. O som é\nguardado offline neste aparelho; M liga/desliga.',
             'SALVAMENTO: automático no navegador. O ouro\nda expedição só vira saldo ao retornar ao porto.'
         ];
         lines.forEach((line, i) => {
-            const y = 179 + i * 75;
-            this.add.rectangle(240, y + 18, 439, 65, 0x1c2c39, .95).setStrokeStyle(1, 0x625451).setDepth(8);
+            const y = 161 + i * 64;
+            this.add.rectangle(240, y + 17, 439, 60, 0x1c2c39, .95).setStrokeStyle(1, 0x625451).setDepth(8);
             this.txt(32, y, line, 13, '#e2dbcc');
         });
-        this.button(746, '◀ VOLTAR AO MENU', () => this.scene.start('SeaPort', { page: 'menu' }), 'gold', 240, 400, 43);
+        this.button(754, '◀ VOLTAR AO MENU', () => this.scene.start('SeaPort', { page: 'menu' }), 'gold', 240, 400, 43);
     }
     showReset() {
         this.banner('ESQUECER O MAR?');
@@ -557,6 +563,8 @@ class Game extends Phaser.Scene {
         }
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
         this.createHUD();
+        SEA_WEATHER.init(this);
+        SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
@@ -1241,6 +1249,7 @@ class Game extends Phaser.Scene {
     sinkEnemy(enemy, ramming = false) {
         if (enemy.dead) return;
         enemy.dead = true;
+        SEA_WEATHER.onSink(this, enemy, ramming);
         if(enemy.wake) enemy.wake.destroy();
         this.burst(enemy.x,enemy.y,enemy.boss?'blast':'smoke',enemy.boss?2.4:1.4);
         SEA_COMBAT.sinkEnemy(this, enemy);
@@ -1289,6 +1298,8 @@ class Game extends Phaser.Scene {
 
     update(time, delta) {
         const pad = SEA_GAMEPAD.poll();
+        SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05),
+            this.bossAlert || this.curse >= 65 || ['storm', 'maelstrom'].includes(this.seaEvent) ? 'black' : 'crimson');
         if (this.ended || this.sinking) return;
         if (pad.just[9] || (pad.just[1] && !this.pausedByCaptain)) { this.toggleCaptainMenu(); return; }
         if (this.pausedByCaptain) {
@@ -1334,6 +1345,8 @@ class Game extends Phaser.Scene {
         this.collideWorldBounds(this.player, true);
         for (const isl of this.islands) this.collideRock(this.player, isl, true);
         this.updateEnemies(dt);
+        SEA_WEATHER.update(this, dt);
+        if (this.sinking) return;
         for (let i = 0; i < this.enemies.length; i++) {
             const e = this.enemies[i]; if (e.dead) continue;
             this.collideShips(this.playerHull, e);
@@ -1387,6 +1400,7 @@ class Game extends Phaser.Scene {
                 e.vx += Math.sin(e.heading) * 95 * dt;
                 e.vy -= Math.cos(e.heading) * 95 * dt;
             }
+            SEA_WEATHER.enemyCurrent(this, e, dt);
             const drag = Math.exp(-1.25 * dt);
             e.vx *= drag; e.vy *= drag;
             const speed = Math.hypot(e.vx, e.vy);
