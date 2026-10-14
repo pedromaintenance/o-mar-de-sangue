@@ -94,6 +94,7 @@ const SEA_UI = {
             this.divider(scene,190);
         }
         if(SEA_DESKTOP)this.desktopWings(scene);
+        SEA_PIXEL.menu(scene);
     },
     desktopWings(scene){
         const v=scene.page;
