@@ -1763,7 +1763,8 @@ class Game extends Phaser.Scene {
         let commission = 0;
         if (won && this.mode === 'mission') commission = Math.round(42 * Math.pow(1.25, Math.min(this.stage, 90)));
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
-            collected: SEA_MATH.safe(this.gold + commission), kills: this.kills, rammings: this.rammingSinks });
+            collected: SEA_MATH.safe(this.gold + commission), kills: this.kills,
+            rammings: this.rammingSinks, islands: this.islandVisits?.size || 0 });
         // Ir ao porto garante que todos os efeitos e eventos da cena sejam encerrados.
         this.scene.start('SeaPort', { page: 'result', report });
     }
