@@ -114,7 +114,7 @@ const SEA_UI = {
     button(scene,y,label,onTap,style='dark',x=240,w=416,h=43,font=16){
         // Pixel UI is painted as sprites on a 2px grid; the invisible hitbox
         // remains full-sized so keyboard, controller and touch are forgiving.
-        const selectedColor=style==='gold'?'#1a1d23':style==='red'?'#f7dfc7':'#f4dbb8';
+        const selectedColor=style==='gold'?'#ffdfaf':style==='red'?'#f7dfc7':'#f4dbb8';
         const hit=scene.add.rectangle(x,y,w,h,0x0a131c,.001)
             .setDepth(29).setInteractive({useHandCursor:true});
         const skin=scene.add.graphics().setDepth(24);
