@@ -68,6 +68,14 @@ const SEA_MUSIC = {
             try {
                 const db = await this.db();
                 await Promise.all(ids.map(async id => {
+                    // Escolhas explícitas de agora em diante prevalecem; importações
+                    // antigas (sem versão) são atualizadas automaticamente para FLAC.
+                    const manual = await this.readStored(db, id + ':manual-v2');
+                    if (manual) {
+                        this.use(id, manual);
+                        this.sources[id] = 'manual';
+                        return;
+                    }
                     const bestKey = id + ':' + this.hostedVersion;
                     const cachedFlac = supported ? await this.readStored(db, bestKey) : null;
                     if (cachedFlac) {
@@ -87,7 +95,7 @@ const SEA_MUSIC = {
             // 2) Hospedagem GitHub Pages tem prioridade inclusive sobre
             //    MP3s anteriormente importados. Não exige ação do visitante.
             if (supported && typeof fetch === 'function') {
-                await Promise.all(ids.filter(id => this.sources[id] !== 'flac').map(async id => {
+                await Promise.all(ids.filter(id => this.sources[id] !== 'flac' && this.sources[id] !== 'manual').map(async id => {
                     try {
                         const response = await fetch(this.paths[id]);
                         if (!response.ok) return;
@@ -157,7 +165,7 @@ const SEA_MUSIC = {
             if(db){
                 try{await new Promise((resolve,reject)=>{
                     const tx=db.transaction(this.storeName,'readwrite');
-                    tx.objectStore(this.storeName).put(file,id);
+                    tx.objectStore(this.storeName).put(file,id + ':manual-v2');
                     tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
                 });}catch(_){}
             }
