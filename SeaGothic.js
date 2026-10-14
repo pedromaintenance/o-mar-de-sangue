@@ -68,9 +68,8 @@ const SEA_GOTHIC = {
     g.fillStyle(c.brass,1).fillRect(l+3,t+3,w-6,h-6);
     g.fillStyle(c.iron,1).fillRect(l+6,t+6,w-12,h-12);
     g.fillStyle(fill,1).fillRect(l+10,t+10,w-20,h-20);
-    g.fillStyle(0x3d2930,.28);
     for(let yy=t+24;yy<t+h-16;yy+=30){
-      g.fillRect(l+14,yy,w-28,2);
+      g.fillStyle(0x3d2930,.28).fillRect(l+14,yy,w-28,2);
       g.fillStyle(0x080e16,.38).fillRect(l+14,yy+2,w-28,2);
     }
     g.lineStyle(1,0xd4a66d,.54).strokeRect(l+13,t+13,w-26,h-26);
