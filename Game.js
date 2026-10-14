@@ -312,7 +312,13 @@ class SeaBoot extends Phaser.Scene {
         }).setOrigin(.5);
         this.load.on('progress', (v)=>{ this._bar.width = 4 + 416 * v; });
     }
-    create() { this.scene.start('SeaPort'); }
+    async create() {
+        // A cena de boot aguarda a decodificação das artes pixeladas compactadas.
+        // Em navegadores antigos, mantém os sprites originais sem bloquear o jogo.
+        try { await SEA_RASTER.install(this); }
+        catch (error) { console.warn('Arte pixelada indisponível',error); }
+        this.scene.start('SeaPort');
+    }
 }
 
 class SeaPort extends Phaser.Scene {
@@ -416,6 +422,12 @@ class SeaPort extends Phaser.Scene {
         g.lineStyle(2, 0xb3956a, .75); g.lineBetween(16, 17, 464, 17); g.lineBetween(16, 783, 464, 783);
     }
     banner(label, subtitle = '') {
+        if(this.page==='menu' && this.textures.exists('pixel-title')){
+            // Logo recortado do atlas aprovado, letras já incorporadas ao sprite.
+            this.add.image(240,88,'pixel-title').setDisplaySize(407,188).setDepth(31);
+            if(subtitle)this.txt(240,188,subtitle,13,'#edd6b5',{center:true,depth:34});
+            return;
+        }
         this.txt(240, 41, 'CRÔNICAS DA CARCAÇA', 11, '#ddc19a', { center: true, bold: true });
         this.txt(240, 95, label, 30, '#f5d49f', { center: true, bold: true });
         if (subtitle) this.txt(240, 141, subtitle, 13, '#dec5bf', { center: true });
@@ -680,6 +692,18 @@ class Game extends Phaser.Scene {
         this.seaBlood = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.85);
         this.seaFoam = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.56);
         this.seaMist = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.57);
+        if (this.textures.exists('pixel-blood')) {
+            this.pixelBlood = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2,
+                SEA_VIEW.width, SEA_VIEW.height, 'pixel-blood')
+                .setScrollFactor(0).setDepth(-108.5).setAlpha(.30);
+            this.pixelBlood.tileScaleX=2;this.pixelBlood.tileScaleY=2;
+        }
+        if (this.textures.exists('pixel-dark')) {
+            this.pixelDark = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2,
+                SEA_VIEW.width, SEA_VIEW.height, 'pixel-dark')
+                .setScrollFactor(0).setDepth(-108.25).setAlpha(.1);
+            this.pixelDark.tileScaleX=2;this.pixelDark.tileScaleY=2;
+        }
     }
     drawShipTextures() { return; }
     buildWorld() {
@@ -703,7 +727,14 @@ class Game extends Phaser.Scene {
         spots.forEach(([x, y, radius, kind], i) => {
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
-            const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
+            // A arte nova substitui os recifes, destroços e altares compatíveis.
+            // A colisão permanece governada pelo raio antigo da ilha.
+            const alt = {reef:'pixel-reef', wreck:'pixel-wreck',
+                ruin:'pixel-bone', daegon:'pixel-coral'}[kind];
+            const texture=alt&&this.textures.exists(alt)?alt:(keyMap[kind]||'island-reef');
+            const nativeWidth=this.textures.get(texture).getSourceImage().width||256;
+            const img = this.add.image(x, y, texture).setDepth(0)
+                .setScale(((radius * 2.8)/nativeWidth)*(islandScaleMap[kind]||1));
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
@@ -751,6 +782,15 @@ class Game extends Phaser.Scene {
         this.seaFoam.tilePositionY = sy * .28 + t * 15;
         this.seaMist.tilePositionX = sx * .08 - t * 3;
         this.seaMist.tilePositionY = sy * .05 - t * 2;
+        if(this.pixelBlood){
+            this.pixelBlood.tilePositionX=sx*.20+t*9;
+            this.pixelBlood.tilePositionY=sy*.14+t*5;
+        }
+        if(this.pixelDark){
+            this.pixelDark.tilePositionX=sx*.16-t*7;
+            this.pixelDark.tilePositionY=sy*.20+t*4;
+            this.pixelDark.setAlpha(this.curse>=65?.23:this.seaEvent==='storm'?.17:.075);
+        }
     }
     chooseFoe(seed = 0) {
         const rank = this.currentDifficulty;
