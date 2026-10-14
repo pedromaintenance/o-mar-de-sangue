@@ -1,12 +1,13 @@
-/* O MAR DE SANGUE v1.8 — O Mar Vivo, maldição e trilha sonora dinâmica.
- * Trilhas opcionais importadas pelo jogador e persistidas no IndexedDB.
- * Ninguém precisa instalar bibliotecas ou usar serviços externos.
+/* O MAR DE SANGUE v1.8.1 — Mar Vivo + FLAC lossless hospedado.
+ * O navegador recebe automaticamente os FLACs publicados em assets/audio/.
+ * Cópias locais antigas MP3 servem como alternativa, nunca substituem o FLAC.
  */
 const SEA_MUSIC = {
     dbName: 'carcaca-mar-de-sangue-music', storeName: 'tracks',
     names: { crimson: 'Beneath The Crimson Tide', black: 'Beneath the Black Tide' },
-    paths: { crimson: './assets/audio/Beneath_The_Crimson_Tide.mp3',
-        black: './assets/audio/Beneath_the_Black_Tide.mp3' },
+    paths: { crimson: './assets/audio/Beneath%20The%20Crimson%20Tide.flac',
+        black: './assets/audio/Beneath%20The%20Black%20Tide.flac' },
+    hostedVersion: 'flac-20261014-v1', sources: {}, flacCapability: null,
     tracks: {}, players: {}, objectUrls: {}, ready: false, loading: null,
     wanted: 'crimson', started: false, gestureSeen: false,
     volume: (() => { try { return Math.max(0,Math.min(.6, Number(localStorage.getItem('carcaca.mar.music.volume') ?? '.25'))); }
@@ -20,42 +21,98 @@ const SEA_MUSIC = {
             req.onerror=()=>reject(req.error);
         });
     },
+    supportsFlac() {
+        if (this.flacCapability !== null) return this.flacCapability;
+        try {
+            const probe = new Audio();
+            // Chrome, Firefox e Safari modernos suportam FLAC nativamente.
+            // Browsers que não suportam ainda podem usar MP3 importado.
+            this.flacCapability = !!(
+                probe.canPlayType?.('audio/flac') ||
+                probe.canPlayType?.('audio/x-flac')
+            );
+        } catch (_) { this.flacCapability = false; }
+        return this.flacCapability;
+    },
+    async readStored(db, key) {
+        return new Promise(resolve => {
+            try {
+                const request = db.transaction(this.storeName, 'readonly')
+                    .objectStore(this.storeName).get(key);
+                request.onsuccess = () => resolve(request.result instanceof Blob ? request.result : null);
+                request.onerror = () => resolve(null);
+            } catch (_) { resolve(null); }
+        });
+    },
+    async writeStored(key, blob) {
+        try {
+            const db = await this.db();
+            await new Promise(resolve => {
+                try {
+                    const tx = db.transaction(this.storeName, 'readwrite');
+                    tx.objectStore(this.storeName).put(blob, key);
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => resolve();
+                    tx.onabort = () => resolve();
+                } catch (_) { resolve(); }
+            });
+            db.close();
+        } catch (_) { /* Falha no cache nunca impede reprodução. */ }
+    },
     async load() {
         if (this.loading) return this.loading;
-        this.loading=(async()=>{
+        this.loading = (async () => {
+            const ids = ['crimson', 'black'];
+            const supported = this.supportsFlac();
+            // 1) Primeiro usa FLAC já salvo; se não houver, aceita MP3 antigo.
             try {
-                const db=await this.db();
-                await Promise.all(['crimson','black'].map(id=>new Promise(resolve=>{
-                    const tx=db.transaction(this.storeName,'readonly');
-                    const req=tx.objectStore(this.storeName).get(id);
-                    req.onsuccess=()=>{if(req.result instanceof Blob)this.use(id,req.result);resolve();};
-                    req.onerror=()=>resolve();
-                })));
+                const db = await this.db();
+                await Promise.all(ids.map(async id => {
+                    // Escolhas explícitas de agora em diante prevalecem; importações
+                    // antigas (sem versão) são atualizadas automaticamente para FLAC.
+                    const manual = await this.readStored(db, id + ':manual-v2');
+                    if (manual) {
+                        this.use(id, manual);
+                        this.sources[id] = 'manual';
+                        return;
+                    }
+                    const bestKey = id + ':' + this.hostedVersion;
+                    const cachedFlac = supported ? await this.readStored(db, bestKey) : null;
+                    if (cachedFlac) {
+                        this.use(id, cachedFlac);
+                        this.sources[id] = 'flac';
+                    } else {
+                        const legacy = await this.readStored(db, id);
+                        if (legacy) {
+                            this.use(id, legacy);
+                            this.sources[id] = 'local';
+                        }
+                    }
+                }));
                 db.close();
-            } catch (_) { /* Modo temporário funciona mesmo sem armazenamento. */ }
-            // Quando as faixas forem enviadas ao GitHub, reconhecê-las e salvá-las
-            // automaticamente. Até lá, a importação local continua disponível.
-            if (typeof fetch === 'function') {
-                await Promise.all(['crimson','black'].filter(id=>!this.tracks[id]).map(async id=>{
+            } catch (_) { /* Reprodução continua online sem IndexedDB. */ }
+
+            // 2) Hospedagem GitHub Pages tem prioridade inclusive sobre
+            //    MP3s anteriormente importados. Não exige ação do visitante.
+            if (supported && typeof fetch === 'function') {
+                await Promise.all(ids.filter(id => this.sources[id] !== 'flac' && this.sources[id] !== 'manual').map(async id => {
                     try {
-                        const response=await fetch(this.paths[id]);
-                        if(!response.ok || !response.headers.get('content-type')?.includes('audio'))return;
-                        const blob=await response.blob();
-                        if(!blob.size)return;
-                        this.use(id,blob);
-                        try{
-                            const db=await this.db();
-                            await new Promise((resolve,reject)=>{
-                                const tx=db.transaction(this.storeName,'readwrite');
-                                tx.objectStore(this.storeName).put(blob,id);
-                                tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
-                            });
-                            db.close();
-                        }catch(_){}
-                    }catch(_){}
+                        const response = await fetch(this.paths[id]);
+                        if (!response.ok) return;
+                        const raw = await response.blob();
+                        if (!raw.size) return;
+                        // Evita aceitar páginas de erro HTML e servidores com MIME genérico.
+                        const header = new Uint8Array(await raw.slice(0, 4).arrayBuffer());
+                        if (header.length !== 4 || String.fromCharCode(...header) !== 'fLaC') return;
+                        const audio = raw.type === 'audio/flac' ? raw :
+                            new Blob([raw], { type: 'audio/flac' });
+                        this.use(id, audio);
+                        this.sources[id] = 'flac';
+                        await this.writeStored(id + ':' + this.hostedVersion, audio);
+                    } catch (_) { /* Mantém a versão local como alternativa. */ }
                 }));
             }
-            this.ready=true;
+            this.ready = true;
         })();
         return this.loading;
     },
@@ -83,10 +140,15 @@ const SEA_MUSIC = {
         return this.volume;
     },
     setMood(mood) { this.wanted=mood==='black'?'black':'crimson'; },
-    status() {return '♫ '+this.count()+'/2 TRILHAS  ·  VOL '+Math.round(this.volume*100)+'%';},
+    status() {
+        const quality = this.sources.crimson === 'flac' && this.sources.black === 'flac' ? 'FLAC' : 'TRILHAS';
+        if (this.ready && !this.supportsFlac() && !this.count())
+            return '♫ FLAC NÃO SUPORTADO · IMPORTE MP3';
+        return '♫ '+this.count()+'/2 '+quality+'  ·  VOL '+Math.round(this.volume*100)+'%';
+    },
     async importFiles(files) {
         const arr=Array.from(files||[]).filter(f=>f&&f.size&&
-            (/\.mp3$/i.test(f.name)||f.type.startsWith('audio/')));
+            (/\.(mp3|flac)$/i.test(f.name)||f.type.startsWith('audio/')));
         if (!arr.length) return 0;
         const chosen={};
         for (const file of arr) {
@@ -99,10 +161,11 @@ const SEA_MUSIC = {
         let db=null;try{db=await this.db();}catch(_){}
         for(const [id,file] of Object.entries(chosen)){
             this.use(id,file);
+            this.sources[id]='local';
             if(db){
                 try{await new Promise((resolve,reject)=>{
                     const tx=db.transaction(this.storeName,'readwrite');
-                    tx.objectStore(this.storeName).put(file,id);
+                    tx.objectStore(this.storeName).put(file,id + ':manual-v2');
                     tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
                 });}catch(_){}
             }
@@ -113,7 +176,7 @@ const SEA_MUSIC = {
     selectFiles(scene) {
         if (typeof document==='undefined')return;
         const file=document.createElement('input');
-        file.type='file';file.accept='.mp3,audio/mpeg,audio/*';file.multiple=true;
+        file.type='file';file.accept='.flac,audio/flac,.mp3,audio/mpeg,audio/*';file.multiple=true;
         file.style.display='none';
         document.body.appendChild(file);
         const cleanup=()=>{setTimeout(()=>file.remove(),150);};
@@ -128,7 +191,7 @@ const SEA_MUSIC = {
     addPortControls(scene) {
         scene.button(318,'−',()=>{this.setVolume(this.volume-.05);scene.musicNote?.setText(this.status());},
             'dark',55,43,31,17);
-        scene.button(318,'♫ IMPORTAR TRILHAS',()=>this.selectFiles(scene),
+        scene.button(318,'♫ TROCAR TRILHAS',()=>this.selectFiles(scene),
             'dark',241,310,32,12);
         scene.button(318,'+',()=>{this.setVolume(this.volume+.05);scene.musicNote?.setText(this.status());},
             'dark',425,43,31,17);
