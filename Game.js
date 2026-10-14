@@ -537,6 +537,7 @@ class Game extends Phaser.Scene {
         } else { this.objective = 'endless'; }
         this.cameras.main.setBackgroundColor('#2b1929'); this.cameras.main.setBounds(0, 0, this.W, this.H);
         this.createSeaLayers();
+        SEA_PIXEL.seaInit(this);
         this.buildWorld();
         const start = this.findWaterSpot(this.W / 2, this.H / 2, 400);
         this.player = this.add.container(start.x, start.y).setDepth(20);
@@ -1373,6 +1374,7 @@ class Game extends Phaser.Scene {
         const dt = Math.min(delta / 1000, .05);
         this.elapsed += dt; this.waveElapsed += dt;
         if (this.waveElapsed > .065) { this.waveElapsed = 0; this.drawSea(this.elapsed); }
+        SEA_PIXEL.seaUpdate(this,dt);
         const keyboardTurn = Number(this.keys.RIGHT.isDown || this.keys.D.isDown) -
             Number(this.keys.LEFT.isDown || this.keys.A.isDown);
         const keyboardThrottle = Number(this.keys.UP.isDown || this.keys.W.isDown) -
