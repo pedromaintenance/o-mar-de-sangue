@@ -1,27 +1,25 @@
-# O Mar de Sangue — Carcaça / Pixel Art Edition
+# O Mar de Sangue — Pixel Art v1.5
 
-Jogo de combate naval top-down, PWA offline com Phaser 4 local, missões e sandbox, abalroamento físico, tiros laterais e estaleiro com melhorias de custo exponencial.
+**PWA offline, independente do editor Phaser.** Abra por GitHub Pages ou servidor local.
+
+## Conteúdo da v1.5
+- 10 sprites navais gerados das folhas aprovadas, dos quais 4 formam a progressão visual do jogador.
+- 6 sprites abissais: Kraken, Dagon, Tentáculo, Cortejo dos Afogados, Enguia e Horror de Coral.
+- 16 quadros PNG de animação: clarão naval, fumaça, impacto na água, destroços/tesouro.
+- Navio muda para velas nobres e reforço de canhões por progresso (total de níveis das melhorias de casco, blindagem, velas, canhões, bateria e esporão). Ao ficar muito danificado, muda o casco; ao consertar, retorna à aparência normal.
+- Colisões, matemática de disparo, multitoque e Xbox mantidos da v1.4.
 
 ## Publicação
-Os arquivos deste diretório devem ficar na raiz de um repositório público servido pelo GitHub Pages. O manifesto, Service Worker e dependências (incluindo `phaser.min.js`) estão incluídos localmente. Abra com HTTPS e aguarde o primeiro carregamento/cache antes de tentar offline. O navegador oferece a instalação quando disponível.
+1. Extraia os arquivos diretamente na raiz do seu repositório GitHub Pages.
+2. Mantenha as pastas `assets` e `icons`.
+3. Instale/reabra depois de uma atualização online para renovar o Service Worker v1.5.
 
-## Controles
-W/↑ acelerar, S/↓ desacelerar/ré, A/← e D/→ girar, Q bombordo, E estibordo, espaço ambos, Esc pausa/porto. Controles virtuais aparecem no celular.
+## Testes mínimos no celular
+- [ ] Jornada normal, coleta de ouro e danos
+- [ ] Analógico + canhão com dois dedos
+- [ ] Recompra no estaleiro e mudança de casco (três estágios)
+- [ ] Kraken e Dagon em missão de chefe
+- [ ] Segunda viagem na mesma sessão
+- [ ] Reabrir em modo avião após primeiro carregamento online
 
-## Direção visual
-Pixel art medieval sombria, vista superior. O mar é vermelho e amaldiçoado. Portomonte evoca um refúgio e a proteção de Deméter; a Corte Sombria possui navios élficos elegantes; os recifes de Daegon trazem ruínas cultuais. Os conceitos e sprites foram produzidos para este projeto e refinados em PNGs com transparência e múltiplos quadros de efeitos. Não há assets remotos.
-
-## Arquivos
-- `Game.js`: cenas do Phaser, progressão, física naval, desenho do cenário e efeitos.
-- `assets/sprites/`: navios humanos, élficos e especiais.
-- `assets/tiles/`: camadas do Mar de Sangue.
-- `assets/islands/`: ruínas, santuários, recifes e destroços.
-- `assets/items/`: itens recolhíveis.
-- `assets/fx/`: PNGs por quadro de animação.
-- `manifest.webmanifest` / `sw.js`: instalação e cache PWA.
-
-## Desenvolvimento
-Branch de assets: `develop/assets-pixel-art`. Histórico e critérios: `docs/PLANO-ASSETS.md` e `docs/ASSET-REVIEW.md`. A história da Carcaça e as inspirações foram fornecidas pelo criador do projeto; a arte procedural antiga e a nova arte pertencem a diferentes versões do mesmo protótipo.
-
-## Testes
-A integração foi testada no Chromium em ambiente simulado usando Phaser local e as imagens reais; modo Missões, Sandbox, compra de upgrades, disparos laterais, inimigos e efeitos. O cache do Service Worker foi checado estaticamente; instalação real no celular precisa de avaliação no navegador publicado.
+**Nota técnica:** os novos sprites têm arte embutida; overlays vetoriais de upgrades foram removidos. A progressão mecânica NÃO foi alterada.

@@ -1,0 +1,162 @@
+[
+  {
+    "path": "assets/sprites/enemy_court_ship.png",
+    "width": 187,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/enemy_corsair.png",
+    "width": 317,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/enemy_frigate_white.png",
+    "width": 275,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/enemy_ram.png",
+    "width": 287,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/enemy_spectral.png",
+    "width": 345,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/enemy_admiral.png",
+    "width": 397,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/player_tier_0.png",
+    "width": 227,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/player_tier_1.png",
+    "width": 239,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/player_tier_2.png",
+    "width": 300,
+    "height": 480
+  },
+  {
+    "path": "assets/sprites/player_damaged.png",
+    "width": 281,
+    "height": 480
+  },
+  {
+    "path": "assets/abyss/kraken.png",
+    "width": 497,
+    "height": 499
+  },
+  {
+    "path": "assets/abyss/dagon.png",
+    "width": 500,
+    "height": 496
+  },
+  {
+    "path": "assets/abyss/kraken_tentacle.png",
+    "width": 481,
+    "height": 500
+  },
+  {
+    "path": "assets/abyss/drowned_choir.png",
+    "width": 482,
+    "height": 500
+  },
+  {
+    "path": "assets/abyss/abyss_eel.png",
+    "width": 500,
+    "height": 491
+  },
+  {
+    "path": "assets/abyss/coral_horror.png",
+    "width": 490,
+    "height": 500
+  },
+  {
+    "path": "assets/fx15/cannon_0.png",
+    "width": 239,
+    "height": 165
+  },
+  {
+    "path": "assets/fx15/cannon_1.png",
+    "width": 240,
+    "height": 162
+  },
+  {
+    "path": "assets/fx15/cannon_2.png",
+    "width": 240,
+    "height": 209
+  },
+  {
+    "path": "assets/fx15/cannon_3.png",
+    "width": 240,
+    "height": 165
+  },
+  {
+    "path": "assets/fx15/smoke_0.png",
+    "width": 240,
+    "height": 215
+  },
+  {
+    "path": "assets/fx15/smoke_1.png",
+    "width": 240,
+    "height": 179
+  },
+  {
+    "path": "assets/fx15/smoke_2.png",
+    "width": 240,
+    "height": 165
+  },
+  {
+    "path": "assets/fx15/smoke_3.png",
+    "width": 235,
+    "height": 168
+  },
+  {
+    "path": "assets/fx15/water_0.png",
+    "width": 240,
+    "height": 230
+  },
+  {
+    "path": "assets/fx15/water_1.png",
+    "width": 240,
+    "height": 236
+  },
+  {
+    "path": "assets/fx15/water_2.png",
+    "width": 240,
+    "height": 225
+  },
+  {
+    "path": "assets/fx15/water_3.png",
+    "width": 240,
+    "height": 187
+  },
+  {
+    "path": "assets/fx15/impact_0.png",
+    "width": 240,
+    "height": 238
+  },
+  {
+    "path": "assets/fx15/impact_1.png",
+    "width": 240,
+    "height": 236
+  },
+  {
+    "path": "assets/fx15/impact_2.png",
+    "width": 236,
+    "height": 240
+  },
+  {
+    "path": "assets/fx15/impact_3.png",
+    "width": 231,
+    "height": 240
+  }
+]
