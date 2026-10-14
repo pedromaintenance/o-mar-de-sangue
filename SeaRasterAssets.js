@@ -35,11 +35,30 @@ const SEA_RASTER = {
         ctx.putImageData(pixels,0,0);
         scene.textures.addCanvas(key,canvas);
         const texture=scene.textures.get(key);
-        if(texture)texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+        if(texture?.setFilter && Phaser.Textures?.FilterMode)texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
         loaded++;
       }catch(err){console.warn('Pixel atlas',name,err);}
     }
     return loaded>0;
+  },
+  buttonCache:{},
+  buttonTexture(scene,state,w,h){
+    const base=scene.textures.exists('pixel-'+state)?state:'button';
+    const name='pixel-btn-'+base+'-'+w+'x'+h;
+    if(scene.textures.exists(name))return name;
+    if(!scene.textures.exists('pixel-'+base))return null;
+    const source=scene.textures.get('pixel-'+base).getSourceImage();
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;
+    const sw=source.width,sh=source.height;
+    const edge=Math.min(10,Math.floor(sw/4));
+    const destEdge=Math.min(Math.max(15,Math.round(h*.42)),Math.floor(w/3));
+    ctx.drawImage(source,0,0,edge,sh,0,0,destEdge,h);
+    ctx.drawImage(source,edge,0,sw-edge*2,sh,destEdge,0,w-destEdge*2,h);
+    ctx.drawImage(source,sw-edge,0,edge,sh,w-destEdge,0,destEdge,h);
+    scene.textures.addCanvas(name,c);
+    scene.textures.get(name)?.setFilter?.(Phaser.Textures.FilterMode.NEAREST);
+    return name;
   },
   pixels: []
 };
