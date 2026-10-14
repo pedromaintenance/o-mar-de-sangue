@@ -148,6 +148,17 @@ const SEA_ISLANDS = {
             this.render(s);
             return false;
         }
+        if(choice.hp<0 && s.shipHP<=Math.abs(choice.hp)){
+            s.islandError='O CASCO NÃO SUPORTARIA ESSE SACRIFÍCIO';
+            this.render(s);
+            return false;
+        }
+        if(choice.cost && (choice.heal||choice.healPercent) &&
+            !choice.curse && s.shipHP>=s.maxShipHP){
+            s.islandError='O CASCO JÁ ESTÁ TOTALMENTE REPARADO';
+            this.render(s);
+            return false;
+        }
         const changes=[];
         if(choice.cost) {
             s.gold-=choice.cost;changes.push('-'+choice.cost+' ouro');
@@ -273,7 +284,9 @@ const SEA_ISLANDS = {
             for(let i=0;i<actions.length;i++){
                 const choice=actions[i];
                 this.screenButton(s,root,x,top+385+i*72,width-48,63,
-                    choice.name,choice.hint,i,!!(choice.cost&&s.gold<choice.cost));
+                    choice.name,choice.hint,i,!!(
+                        (choice.cost&&s.gold<choice.cost)||
+                        (choice.hp<0&&s.shipHP<=Math.abs(choice.hp))));
             }
         }
         this.screenButton(s,root,x,top+height-44,width-56,49,
