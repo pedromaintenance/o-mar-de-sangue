@@ -735,6 +735,14 @@ class Game extends Phaser.Scene {
             const nativeWidth=this.textures.get(texture).getSourceImage().width||256;
             const img = this.add.image(x, y, texture).setDepth(0)
                 .setScale(((radius * 2.8)/nativeWidth)*(islandScaleMap[kind]||1));
+            if((kind==='demeter'||kind==='monastery') && this.textures.exists('pixel-beacon') && i%2===0){
+                this.add.image(x+radius*.78,y+radius*.54,'pixel-beacon')
+                    .setDepth(1).setScale(Math.max(.9,radius/48)).setAlpha(.9);
+            }
+            if(kind==='daegon' && this.textures.exists('pixel-tentacle') && i%2===1){
+                this.add.image(x-radius*.70,y+radius*.34,'pixel-tentacle')
+                    .setDepth(1).setScale(Math.max(.9,radius/48)).setAlpha(.88);
+            }
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
