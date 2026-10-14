@@ -1,4 +1,4 @@
-// O MAR DE SANGUE v1.8 — O Mar Vivo, maldição e trilha sonora dinâmica
+// O MAR DE SANGUE v1.9.0 — o arquipélago dos condenados e encontros de costa
 /*
  * O MAR DE SANGUE — Pixel Art & Bestiário Abissal v1.0 — CARCAÇA
  * Aplicação web independente (GitHub Pages/PWA). Usa Phaser e imagens locais.
@@ -468,7 +468,7 @@ class SeaPort extends Phaser.Scene {
             'MISSÕES: etapas de escolta de carga, caça,\nsobrevivência e chefes. A etapa avança ao vencer.',
             'SANDBOX: ondas sem fim. A cada onda surgem\ninimigos mais numerosos, resistentes e perigosos.',
             'ESTALEIRO: 14 melhorias sem teto artificial.\nCada nível custa exponencialmente mais ouro.',
-            'MAR VIVO: correntes, névoa e redemoinhos.\nVencer inimigos desperta a maldição do mar.',
+            'ATRACAR: aproxime-se, diminua a velocidade.\nF / A / toque; afaste os inimigos primeiro.',
             'ÁUDIO: trilhas FLAC carregam sozinhas.\nM silencia; volume ajustável no porto.',
             'SALVAMENTO: automático no navegador. O ouro\nda expedição só vira saldo ao retornar ao porto.'
         ];
@@ -569,19 +569,32 @@ class Game extends Phaser.Scene {
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
         this.createHUD();
         SEA_WEATHER.init(this);
+        SEA_ISLANDS.init(this);
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
-        this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER');
+        this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER,F');
         this.onBoth = () => this.fire('both'); this.onPort = () => this.fire('port'); this.onStarboard = () => this.fire('starboard');
-        this.onPause = () => { if (!this.ended) this.toggleCaptainMenu(); };
+        this.onPause = () => {
+            if (this.islandDocked) SEA_ISLANDS.close(this);
+            else if (!this.ended) this.toggleCaptainMenu();
+        };
+        this.onDock = e => { if (!e?.repeat) SEA_ISLANDS.tryDock(this); };
         this.input.keyboard.on('keydown-SPACE', this.onBoth);
         this.input.keyboard.on('keydown-Q', this.onPort);
         this.input.keyboard.on('keydown-E', this.onStarboard);
         this.input.keyboard.on('keydown-ESC', this.onPause);
         this.input.keyboard.on('keydown-P', this.onPause);
+        this.input.keyboard.on('keydown-F', this.onDock);
         this.onPauseMenuKey = e => {
+            if (this.islandDocked) {
+                if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
+                    e.preventDefault?.();
+                    SEA_ISLANDS.navigate(this,e.code==='ArrowDown'?1:-1);
+                } else if (e.code === 'Enter') SEA_ISLANDS.select(this);
+                return;
+            }
             if (!this.pausedByCaptain || !this.pausePadOptions?.length) return;
             if (e.code === 'ArrowDown') {
                 e.preventDefault?.(); this.setPausePadFocus((this.pausePadIndex + 1) % this.pausePadOptions.length);
@@ -596,6 +609,7 @@ class Game extends Phaser.Scene {
             this.input.keyboard.off('keydown-E', this.onStarboard);
             this.input.keyboard.off('keydown-ESC', this.onPause);
             this.input.keyboard.off('keydown-P', this.onPause);
+            this.input.keyboard.off('keydown-F', this.onDock);
             this.input.keyboard.off('keydown', this.onPauseMenuKey);
         });
         // Eventos por pointer: soltar um dedo NÃO cancela o movimento dos demais.
@@ -686,7 +700,7 @@ class Game extends Phaser.Scene {
         const labels = ['COSTA SUL', 'DENTES DE DAEGON', 'ILHA DAS TARTARUGAS', 'FAROL VERMELHO', 'RECIFES TABAXI', 'RUÍNAS DE TETRA', 'PORTO DE SAL', 'ILHA DO TEMPLO'];
         const keyMap = { reef: 'island-reef', ruin: 'island-ruin', monastery: 'island-monastery', daegon: 'island-daegon', demeter: 'island-demeter', wreck: 'island-wreck' };
         spots.forEach(([x, y, radius, kind], i) => {
-            this.islands.push({ x, y, radius, kind });
+            this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
             const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
             if (kind !== 'reef') {
@@ -915,7 +929,7 @@ class Game extends Phaser.Scene {
         this.nativeTouchHandlers = null;
     }
     touchStart(pointer) {
-        if (this.ended || this.pausedByCaptain || !pointer) return;
+        if (this.ended || this.pausedByCaptain || this.islandDocked || !pointer) return;
         if (!this.touchLayout) return; // mouse no desktop não é um joystick virtual
         const { joystick, port, starboard } = this.touchLayout;
         const near = (area) => Math.hypot(pointer.x - area.x, pointer.y - area.y) <= area.radius;
@@ -978,7 +992,7 @@ class Game extends Phaser.Scene {
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
     fire(side = 'both') {
-        if (!this.player || this.ended || this.sinking || this.pausedByCaptain) return false;
+        if (!this.player || this.ended || this.sinking || this.pausedByCaptain || this.islandDocked) return false;
         let fired = false;
         const rot = this.player.rotation;
         const rightX = Math.cos(rot), rightY = Math.sin(rot);
@@ -1120,7 +1134,7 @@ class Game extends Phaser.Scene {
         this.tweens.add({ targets: ring, scale: 3, alpha: 0, duration: 380, onComplete: () => ring.destroy() });
     }
     damageShip(amount, x, y, source = 'normal') {
-        if (this.ended || this.sinking || this.elapsed < this.gracePeriod || this.time.now - this.lastImpact < 330) return false;
+        if (this.ended || this.sinking || this.islandDocked || this.elapsed < this.gracePeriod || this.time.now - this.lastImpact < 330) return false;
         this.lastImpact = this.time.now; this.lastDamageTime = this.time.now;
         const reduction = source === 'rock' ? this.shipStats.rockReduction :
             source === 'ram' ? this.shipStats.ramProtection : this.shipStats.armor;
@@ -1327,6 +1341,23 @@ class Game extends Phaser.Scene {
         SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05),
             this.bossAlert || this.curse >= 65 || ['storm', 'maelstrom'].includes(this.seaEvent) ? 'black' : 'crimson');
         if (this.ended || this.sinking) return;
+        if (this.islandDocked) {
+            if (pad.just[1] || pad.just[9]) SEA_ISLANDS.close(this);
+            else if (pad.just[0]) SEA_ISLANDS.select(this);
+            else {
+                const dir=pad.up?-1:pad.down?1:0;
+                if (!dir) this.islandNavAt=0;
+                else if(time>=(this.islandNavAt||0)){
+                    SEA_ISLANDS.navigate(this,dir);
+                    this.islandNavAt=time+230;
+                }
+            }
+            return;
+        }
+        if (pad.just[0] && this.islandCandidate?.allowed) {
+            SEA_ISLANDS.tryDock(this);
+            return;
+        }
         if (pad.just[9] || (pad.just[1] && !this.pausedByCaptain)) { this.toggleCaptainMenu(); return; }
         if (this.pausedByCaptain) {
             if (pad.just[1]) { this.toggleCaptainMenu(); return; }
@@ -1373,6 +1404,7 @@ class Game extends Phaser.Scene {
         this.updateEnemies(dt);
         SEA_WEATHER.update(this, dt);
         if (this.sinking) return;
+        SEA_ISLANDS.update(this,dt);
         for (let i = 0; i < this.enemies.length; i++) {
             const e = this.enemies[i]; if (e.dead) continue;
             this.collideShips(this.playerHull, e);
@@ -1651,7 +1683,7 @@ class Game extends Phaser.Scene {
         for (const isl of this.islands) {
             const dx = (isl.x - this.player.x) / range * (size / 2), dy = (isl.y - this.player.y) / range * (size / 2);
             if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) {
-                const col = isl.kind === 'demeter' ? 0xbad7b5 : isl.kind === 'daegon' ? 0xc66f7d : 0x926f6d;
+                const col = this.islandVisits?.has(isl.id) ? 0x5f717d : isl.kind === 'demeter' ? 0xbad7b5 : isl.kind === 'daegon' ? 0xc66f7d : 0x926f6d;
                 g.fillStyle(col, .85); g.fillCircle(x + dx, y + 5 + dy, isl.radius > 70 ? 3.2 : 2.3);
             }
         }
@@ -1685,10 +1717,15 @@ class Game extends Phaser.Scene {
     handleCaptainPointer(x,y) {
         if (this.ended || this.sinking) return false;
         const inside=(h)=>h&&Math.abs(x-h.x)<=h.w/2&&Math.abs(y-h.y)<=h.h/2;
+        if (this.islandDocked) return SEA_ISLANDS.pointer(this,x,y);
         if (this.pausedByCaptain) {
             const option=this.pausePadOptions?.find(o=>inside(o.hit));
             if (option) option.onTap();
             // Pausa cobre toda a tela; jamais transfere o toque para os canhões.
+            return true;
+        }
+        if (this.islandCandidate && inside(this.anchorHitbox)) {
+            SEA_ISLANDS.tryDock(this);
             return true;
         }
         if (inside(this.pauseButtonHitbox)) {
@@ -1698,7 +1735,7 @@ class Game extends Phaser.Scene {
         return false;
     }
     toggleCaptainMenu() {
-        if (this.ended || this.sinking) return;
+        if (this.ended || this.sinking || this.islandDocked) return;
         if (this.pausedByCaptain) {
             this.pauseElements?.destroy(true);
             this.pauseElements=null;
