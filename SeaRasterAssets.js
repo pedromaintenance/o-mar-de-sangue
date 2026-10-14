@@ -57,7 +57,8 @@ const SEA_RASTER = {
     ctx.drawImage(source,edge,0,sw-edge*2,sh,destEdge,0,w-destEdge*2,h);
     ctx.drawImage(source,sw-edge,0,edge,sh,w-destEdge,0,destEdge,h);
     scene.textures.addCanvas(name,c);
-    scene.textures.get(name)?.setFilter?.(Phaser.Textures.FilterMode.NEAREST);
+    if(Phaser.Textures?.FilterMode)
+      scene.textures.get(name)?.setFilter?.(Phaser.Textures.FilterMode.NEAREST);
     return name;
   },
   pixels: []
