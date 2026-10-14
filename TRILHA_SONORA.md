@@ -1,34 +1,28 @@
-# O Mar de Sangue — Trilha sonora (v1.8)
+# O Mar de Sangue — Trilha sonora FLAC (v1.8.1)
 
-## Músicas
-- **Beneath The Crimson Tide** (`Beneath_The_Crimson_Tide.mp3`) — porto, navegação tranquila e exploração.
-- **Beneath the Black Tide** (`Beneath_the_Black_Tide.mp3`) — tempestades, redemoinhos, chefes e corrupção elevada.
+## Reprodução automática para qualquer jogador
 
-Ambas têm cerca de três minutos e são reproduzidas em loop, com *crossfade* para evitar cortes bruscos.
+As versões aprimoradas e sem perdas são públicas, na branch `main`:
 
-## Usando as músicas agora
-1. Abra a PWA, entre no **Porto**.
-2. Clique em **♫ IMPORTAR TRILHAS** e escolha os dois arquivos MP3 originais.
-3. Confira **2/2 TRILHAS** no menu.
-4. Use **− / +** para ajustar o volume. O botão de som original (ou a tecla **M**) controla a música e os efeitos sonoros.
-5. Entre em uma missão ou no sandbox. As trilhas são alternadas conforme o estado do oceano.
+- **Beneath The Crimson Tide** — `assets/audio/Beneath The Crimson Tide.flac` — exploração, porto e águas calmas.
+- **Beneath The Black Tide** — `assets/audio/Beneath The Black Tide.flac` — tempestades, redemoinhos, chefes e maldição elevada.
 
-Os áudios são guardados no IndexedDB local do navegador e funcionam offline. Cada navegador/dispositivo tem armazenamento próprio; limpar os dados do site apaga as músicas importadas e os saves locais.
+O jogo usa esses **nomes exatos**, incluindo espaços e letras maiúsculas. Não são necessários MP3s nem importação manual. Depois de abrir o jogo, os FLACs são obtidos automaticamente do GitHub Pages e armazenados no IndexedDB para uso offline. Por política dos navegadores, a reprodução com som só começa após a primeira interação do jogador (toque, clique ou tecla).
 
-## Para distribuir as músicas automaticamente a todos os jogadores
-Coloque os arquivos originais, com estes nomes **exatos**, nos caminhos:
+No porto, **♫ TROCAR TRILHAS** permanece como opção avançada para substituir manualmente os arquivos ou importar MP3 caso o navegador não suporte FLAC. O volume é controlado por **−/+**, e o botão de som ou a tecla **M** silencia/reabilita os efeitos e a música.
 
-```text
-assets/audio/Beneath_The_Crimson_Tide.mp3
-assets/audio/Beneath_the_Black_Tide.mp3
-```
+## Atualização de versão e compatibilidade
 
-A versão 1.8 detecta automaticamente esses arquivos quando online, armazena-os no IndexedDB e os reproduz também offline. O código funciona mesmo sem esses caminhos: o botão de importar arquivos locais permanece disponível.
+A v1.8.1 **prioriza os FLACs hospedados** sobre MP3s importados anteriormente. As faixas FLAC ficam salvas sob chaves versionadas no IndexedDB, separadas das importações locais e dos saves de campanha.
 
-**Importante:** confirme as licenças/direitos antes de publicar os MP3s em um repositório público.
+Em navegadores sem FLAC nativo, a importação opcional de MP3 funciona como alternativa. Para cobertura universal nesse caso, publique também MP3s de fallback e ajuste o código em uma próxima versão.
 
-## Notas técnicas
-- Música usa HTMLAudioElement, com transição gradual de volume e preferência salva.
-- Os efeitos de combate continuam no módulo `SeaEffects.js`.
-- Chaves do save de campanha não foram alteradas.
-- Código da trilha e do clima: `SeaWeather.js`.
+O download inicial soma aproximadamente **15,3 MB**; o sistema guarda os arquivos localmente quando possível. Limpar os dados do navegador remove o áudio e os saves guardados naquele dispositivo.
+
+## Arquivos e componentes
+
+- `SeaWeather.js`: URL e seleção de faixas, cache local, crossfade, integração com clima.
+- `SeaEffects.js`: sons gerados proceduralmente durante o combate.
+- `sw.js`: cache da PWA, com versão renovada para atualizar o código do carregador de música.
+
+**Licenciamento:** o repositório é público; mantenha apenas gravações que você possa distribuir.
