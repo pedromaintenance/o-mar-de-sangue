@@ -218,7 +218,9 @@ const SEA_ISLANDS = {
             (s.islandOutcome?s.islandChoiceIndex===0:s.islandChoiceIndex===3);
         const bg=disabled?0x252b30:selected?0x806140:0x233c45;
         const edge=disabled?0x6a5b5a:selected?0xf0d09d:0x91a7a2;
-        root.add(s.add.rectangle(x,y,w,h,bg,.97).setStrokeStyle(selected?3:2,edge,.95));
+        const art=s.add.graphics();
+        SEA_PIXELS.button(art,x,y,w,h,disabled?'red':'dark',selected);
+        root.add(art);
         root.add(s.add.text(x,y-10,name,{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',fontStyle:'bold',
             color:disabled?'#ab9c93':'#f5e4c6',align:'center',wordWrap:{width:w-25}
@@ -242,10 +244,10 @@ const SEA_ISLANDS = {
         const root=s.add.container(0,0).setScrollFactor(0).setDepth(430);
         s.islandOverlay=root;s.islandOptions=[];
         root.add(s.add.rectangle(x,ymid,SEA_VIEW.width,SEA_VIEW.height,0x060d16,.91));
-        root.add(s.add.rectangle(x,top+height/2,width,height,0x182632,.98)
-            .setStrokeStyle(3,0xc2a16e));
-        root.add(s.add.rectangle(x,top+height/2,width-16,height-16,0x351e2b,.13)
-            .setStrokeStyle(1,0xe4c293,.45));
+        root.add(SEA_PIXELS.panel(s,x,top+height/2,width,height,
+            {fill:0x172332,depth:1}));
+        root.add(s.add.rectangle(x,top+122,width-48,3,0xb78653,.78));
+        root.add(SEA_PIXELS.flourish(s,x,top+height-78,4,.84));
         const ornament=s.add.graphics();root.add(ornament);
         ornament.lineStyle(2,0xb89a6c,.77);
         ornament.lineBetween(x-width/2+28,top+99,x+width/2-28,top+99);
