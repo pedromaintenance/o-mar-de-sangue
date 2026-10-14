@@ -10,6 +10,14 @@
 // Xbox/USB/Bluetooth gamepads, via the native Gamepad API (no CDN or add-ons).
 // Standard mapping: left stick axes 0/1, LT/RT 6/7, LB/RB 4/5,
 // A 0, B 1, Menu/Start 9, D-pad 12-15.
+// Modo desktop: canvas horizontal real, sem controles móveis sobrepostos.
+// Usa o dispositivo (mouse/teclado), não só a proporção da janela,
+// para evitar esconder os comandos num celular em paisagem.
+const SEA_DESKTOP = typeof window !== 'undefined' &&
+    !(typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '')) &&
+    !!window.matchMedia?.('(pointer: fine)').matches;
+const SEA_VIEW = SEA_DESKTOP ? { width: 1280, height: 720 } : { width: 480, height: 800 };
+
 const SEA_GAMEPAD = {
     previous: [], lastId: null,
     poll() {
@@ -312,6 +320,11 @@ class SeaPort extends Phaser.Scene {
     init(data) { this.page = data?.page || 'menu'; this.mode = data?.mode || SeaProfile.load().mode; this.yardGroup = data?.group || 'armas'; this.report = data?.report || null; }
     create() {
         seaCenterCanvas(this.game);
+        if (SEA_DESKTOP) {
+            // UI vertical original fica centralizada numa tela 16:9, sem esticar botões.
+            this.cameras.main.setZoom(0.86);
+            this.cameras.main.centerOn(240, 400);
+        }
         this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
         this.paintBackground();
         if (this.page === 'yard') this.showYard();
@@ -379,6 +392,10 @@ class SeaPort extends Phaser.Scene {
         }
     }
     paintBackground() {
+        if (SEA_DESKTOP) {
+            // Prolonga o cenário até as margens da tela widescreen.
+            this.add.tileSprite(240, 400, 1900, 1050, 'sea-base').setDepth(-90).setTint(0x68434e).setAlpha(.82);
+        }
         if (this.textures.exists('menu-bg')) {
             this.add.image(240, 400, 'menu-bg').setDepth(-60);
         } else {
@@ -537,7 +554,8 @@ class Game extends Phaser.Scene {
             this.bossAlert = `ALERTA · ${SEA_FOES[this.missionBoss].name}`;
         }
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
-        this.createHUD(); this.createTouchControls();
+        this.createHUD();
+        if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
         this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC');
         this.onBoth = () => this.fire('both'); this.onPort = () => this.fire('port'); this.onStarboard = () => this.fire('starboard');
@@ -559,7 +577,7 @@ class Game extends Phaser.Scene {
         this.input.on('pointermove', p => { if (!this.isNativeTouchPointer(p)) this.touchMove(p); });
         this.input.on('pointerup', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
         this.input.on('pointerupoutside', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
-        this.installNativeTouch();
+        if (!SEA_DESKTOP) this.installNativeTouch();
         this.onLoseFocus = () => this.touchReset();
         window.addEventListener('blur', this.onLoseFocus);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -567,9 +585,11 @@ class Game extends Phaser.Scene {
             this.removeNativeTouch();
             window.removeEventListener('blur', this.onLoseFocus);
         });
-        const tip = this.add.text(240, 137,
+        const tip = this.add.text(SEA_VIEW.width / 2, 137,
             (this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
-            '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE O CANHÃO PARA DISPARAR\nDOIS DEDOS FUNCIONAM JUNTOS.', {
+            (SEA_DESKTOP
+                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS  ·  ESC: DIÁRIO DE BORDO'
+                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE O CANHÃO PARA DISPARAR\nDOIS DEDOS FUNCIONAM JUNTOS.'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
@@ -609,10 +629,10 @@ class Game extends Phaser.Scene {
         }
     }
     createSeaLayers() {
-        this.seaBase = this.add.tileSprite(240, 400, 480, 800, 'sea-base').setScrollFactor(0).setDepth(-110);
-        this.seaBlood = this.add.tileSprite(240, 400, 480, 800, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.85);
-        this.seaFoam = this.add.tileSprite(240, 400, 480, 800, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.56);
-        this.seaMist = this.add.tileSprite(240, 400, 480, 800, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.57);
+        this.seaBase = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-base').setScrollFactor(0).setDepth(-110);
+        this.seaBlood = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.85);
+        this.seaFoam = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.56);
+        this.seaMist = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.57);
     }
     drawShipTextures() { return; }
     buildWorld() {
@@ -766,8 +786,8 @@ class Game extends Phaser.Scene {
         this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,sparkle});
     }
     createHUD() {
-        this.add.rectangle(240, 51, 480, 101, 0x111c28, .94).setScrollFactor(0).setDepth(90);
-        this.add.rectangle(240, 51, 472, 93, 0x0f1620, .35).setStrokeStyle(1, 0x9c8267, .7).setScrollFactor(0).setDepth(91);
+        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 532 : 480, 101, 0x111c28, .94).setScrollFactor(0).setDepth(90);
+        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 524 : 472, 93, 0x0f1620, .35).setStrokeStyle(1, 0x9c8267, .7).setScrollFactor(0).setDepth(91);
         this.statusBars=this.add.graphics().setScrollFactor(0).setDepth(101);
         this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
             fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#f0c58c'
@@ -780,15 +800,15 @@ class Game extends Phaser.Scene {
             .setScrollFactor(0).setInteractive().on('pointerdown', () => this.toggleCaptainMenu());
         this.add.text(424, 79, '⚓ PORTO', { fontFamily: 'monospace', fontSize: '12px', color: '#ffe4b6' })
             .setOrigin(.5).setDepth(111).setScrollFactor(0);
-        this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
+        if (!SEA_DESKTOP) this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
             fontFamily: 'monospace', fontSize: '10px', color: '#dbbc98',
             stroke: '#101720', strokeThickness: 3
         }).setOrigin(.5).setScrollFactor(0).setDepth(103);
-        this.impactMessage = this.add.text(240, 125, '', { fontFamily: 'monospace', fontSize: '16px',
+        this.impactMessage = this.add.text(SEA_VIEW.width / 2, 125, '', { fontFamily: 'monospace', fontSize: '16px',
             color: '#ffe1b2', align: 'center', backgroundColor: '#171a29b0', padding: { x: 7, y: 4 }
         }).setOrigin(.5).setScrollFactor(0).setDepth(140).setAlpha(0);
         this.radar = this.add.graphics().setScrollFactor(0).setDepth(110);
-        this.add.text(390, 144, 'CARTA', { fontFamily: 'monospace', fontSize: '10px', color: '#e0c7aa' })
+        this.add.text(SEA_DESKTOP ? SEA_VIEW.width - 112 : 390, 144, 'CARTA', { fontFamily: 'monospace', fontSize: '10px', color: '#e0c7aa' })
             .setScrollFactor(0).setDepth(112);
     }
     createTouchControls() {
@@ -855,6 +875,7 @@ class Game extends Phaser.Scene {
     }
     touchStart(pointer) {
         if (this.ended || this.pausedByCaptain || !pointer) return;
+        if (!this.touchLayout) return; // mouse no desktop não é um joystick virtual
         const { joystick, port, starboard } = this.touchLayout;
         const near = (area) => Math.hypot(pointer.x - area.x, pointer.y - area.y) <= area.radius;
         if (near(joystick) && this.joystick.id === null) {
@@ -1565,7 +1586,7 @@ class Game extends Phaser.Scene {
     }
     drawRadar() {
         if (!this.radar || !this.player) return;
-        const x = 390, y = 187, size = 74, range = this.shipStats.radar, g = this.radar;
+        const x = SEA_DESKTOP ? SEA_VIEW.width - 82 : 390, y = 187, size = 74, range = this.shipStats.radar, g = this.radar;
         g.clear(); g.fillStyle(0x0c1822, .91); g.fillRoundedRect(x - 40, y - 35, 80, 80, 4);
         g.lineStyle(1, 0x9b866c, .85); g.strokeRect(x - 40, y - 35, 80, 80);
         g.lineStyle(1, 0x58727c, .35); g.strokeCircle(x, y + 5, 24);
@@ -1611,19 +1632,21 @@ class Game extends Phaser.Scene {
         this.pausedByCaptain = true; this.touchReset(); this.pausePadOptions = []; this.pausePadIndex = 0; this.pauseNavAt = 0;
         this.pauseElements = this.add.container(0, 0).setScrollFactor(0).setDepth(240);
         const c = this.pauseElements;
-        c.add(this.add.rectangle(240, 400, 480, 800, 0x08111b, .92));
-        c.add(this.add.text(240, 252, 'DIÁRIO DE BORDO', { fontFamily: 'Georgia', fontSize: '31px', color: '#f6d59b' }).setOrigin(.5));
-        c.add(this.add.text(240, 340, `${this.objectiveText()}\n\nOuro encontrado: ${SEA_MATH.nice(this.gold)}\nAfundados: ${this.kills} · Casco: ${Math.ceil(this.shipHP)}/${this.maxShipHP}`, {
+        const pauseX = SEA_VIEW.width / 2;
+        const pauseShift = SEA_DESKTOP ? -40 : 0;
+        c.add(this.add.rectangle(pauseX, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 0x08111b, .92));
+        c.add(this.add.text(pauseX, 252 + pauseShift, 'DIÁRIO DE BORDO', { fontFamily: 'Georgia', fontSize: '31px', color: '#f6d59b' }).setOrigin(.5));
+        c.add(this.add.text(pauseX, 340 + pauseShift, `${this.objectiveText()}\n\nOuro encontrado: ${SEA_MATH.nice(this.gold)}\nAfundados: ${this.kills} · Casco: ${Math.ceil(this.shipHP)}/${this.maxShipHP}`, {
             fontFamily: 'Georgia', fontSize: '17px', color: '#e9d6c8', align: 'center', lineSpacing: 5
         }).setOrigin(.5));
         const mk = (y, txt, cb) => {
-            const box = this.add.rectangle(240, y, 390, 51, 0x9d774e).setStrokeStyle(2, 0xe5c894).setInteractive();
-            c.add(box); c.add(this.add.text(240, y, txt, { fontFamily: 'Georgia', fontSize: '16px', color: '#142029' }).setOrigin(.5));
+            const box = this.add.rectangle(pauseX, y, 390, 51, 0x9d774e).setStrokeStyle(2, 0xe5c894).setInteractive();
+            c.add(box); c.add(this.add.text(pauseX, y, txt, { fontFamily: 'Georgia', fontSize: '16px', color: '#142029' }).setOrigin(.5));
             box.on('pointerdown', cb);
             this.pausePadOptions.push({ box, onTap: cb });
         };
-        mk(491, 'CONTINUAR NAVEGAÇÃO', () => this.toggleCaptainMenu());
-        mk(558, 'RETORNAR AO PORTO (75% DO OURO)', () => this.finish(false, true));
+        mk(491 + pauseShift, 'CONTINUAR NAVEGAÇÃO', () => this.toggleCaptainMenu());
+        mk(558 + pauseShift, 'RETORNAR AO PORTO (75% DO OURO)', () => this.finish(false, true));
         if (SEA_GAMEPAD.lastId) this.setPausePadFocus(0);
     }
     finish(won, withdrawn = false) {
@@ -1641,8 +1664,8 @@ class Game extends Phaser.Scene {
 }
 const config = {
     type: Phaser.AUTO,
-    width: 480,
-    height: 800,
+    width: SEA_VIEW.width,
+    height: SEA_VIEW.height,
     parent: 'game-container',
     backgroundColor: '#251423',
     pixelArt: true,
