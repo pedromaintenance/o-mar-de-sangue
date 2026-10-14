@@ -200,6 +200,7 @@ class SeaBoot extends Phaser.Scene {
     preload() {
         this.load.setPath('');
         this.load.image('menu-bg', 'assets/menu_bg.png');
+        SEA_ART_PILOT.preload(this);
         this.load.image('sea-base', 'assets/tiles/sea_base.png');
         this.load.image('sea-blood', 'assets/tiles/sea_blood.png');
         this.load.image('sea-foam', 'assets/tiles/sea_foam.png');
@@ -416,6 +417,10 @@ class SeaPort extends Phaser.Scene {
         g.lineStyle(2, 0xb3956a, .75); g.lineBetween(16, 17, 464, 17); g.lineBetween(16, 783, 464, 783);
     }
     banner(label, subtitle = '') {
+        if(SEA_ART_PILOT.logo(this)){
+            if(subtitle)this.txt(240,198,subtitle,13,'#e6ceb7',{center:true});
+            return;
+        }
         this.txt(240, 41, 'CRÔNICAS DA CARCAÇA', 11, '#ddc19a', { center: true, bold: true });
         this.txt(240, 95, label, 30, '#f5d49f', { center: true, bold: true });
         if (subtitle) this.txt(240, 141, subtitle, 13, '#dec5bf', { center: true });
@@ -703,7 +708,10 @@ class Game extends Phaser.Scene {
         spots.forEach(([x, y, radius, kind], i) => {
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
-            const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
+            const tex=SEA_ART_PILOT.islandTexture(this,kind,keyMap[kind]||'island-reef');
+            const originalWidth=this.textures.get(tex).getSourceImage().width||256;
+            const img = this.add.image(x, y, tex).setDepth(0)
+                .setScale(((radius * 2.8) / originalWidth) * (islandScaleMap[kind] || 1));
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
