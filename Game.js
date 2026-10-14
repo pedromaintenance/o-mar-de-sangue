@@ -327,6 +327,7 @@ class SeaPort extends Phaser.Scene {
         }
         this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
         this.paintBackground();
+        SEA_UI.portDecor(this);
         SEA_MUSIC.setMood('crimson');
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, 465, 24);
@@ -337,6 +338,16 @@ class SeaPort extends Phaser.Scene {
         else this.showMenu();
         this.padHint = this.add.text(240, 778, '', { fontFamily: 'monospace', fontSize: '10px', color: '#f0dbb8', backgroundColor: '#15202bcb' })
             .setOrigin(.5).setDepth(40).setVisible(false);
+        const missionIndex = this.page === 'menu' ? this.padOptions.findIndex(o => o.label.includes('MISSÕES')) : -1;
+        this.setPadFocus(missionIndex >= 0 ? missionIndex : 0);
+        this.portKeyInput = e => {
+            if (e.code === 'ArrowDown') this.setPadFocus((this.padIndex + 1) % this.padOptions.length);
+            else if (e.code === 'ArrowUp') this.setPadFocus((this.padIndex - 1 + this.padOptions.length) % this.padOptions.length);
+            else if (e.code === 'Enter' && this.padOptions.length) this.padOptions[this.padIndex].onTap();
+            else if (e.code === 'Escape' && this.page !== 'menu') this.scene.start('SeaPort', { page: 'menu' });
+        };
+        this.input.keyboard.on('keydown', this.portKeyInput);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.input.keyboard.off('keydown', this.portKeyInput));
     }
     txt(x, y, value, size = 14, color = '#e9d6c4', opt = {}) {
         return this.add.text(x, y, String(value), { fontFamily: 'Georgia, serif', fontSize: size + 'px', color,
@@ -344,22 +355,16 @@ class SeaPort extends Phaser.Scene {
             fontStyle: opt.bold ? 'bold' : 'normal' }).setOrigin(opt.center ? .5 : 0, opt.mid ? .5 : 0).setDepth(opt.depth || 20);
     }
     button(y, label, onTap, style = 'dark', x = 240, w = 416, h = 43, font = 16) {
-        const colors = style === 'gold' ? [0xb9915c, 0xefcd90, '#17212b'] : style === 'red' ? [0x513042, 0xb67980, '#f4e0d6'] : [0x1a303f, 0x718d95, '#dfddce'];
-        const rect = this.add.rectangle(x, y, w, h, colors[0], 1).setStrokeStyle(1.5, colors[1])
-            .setDepth(24).setInteractive({ useHandCursor: true });
-        this.txt(x, y, label, font, colors[2], { center: true, mid: true, bold: true, depth: 25, width: w - 15 });
-        rect.on('pointerdown', () => onTap());
-        this.padOptions?.push({ rect, x, y, label, onTap, color: colors[1] });
-        return rect;
+        return SEA_UI.button(this, y, label, onTap, style, x, w, h, font);
     }
     setPadFocus(index) {
         if (!this.padOptions?.length) return;
-        this.padIndex = SEA_MATH.clamp(index, 0, this.padOptions.length - 1);
-        for (let i = 0; i < this.padOptions.length; i++) {
-            const opt = this.padOptions[i];
-            opt.rect.setStrokeStyle(i === this.padIndex ? 3 : 1.5,
-                i === this.padIndex ? 0xffe7a5 : opt.color);
-        }
+        this.padIndex = ((index % this.padOptions.length) + this.padOptions.length) % this.padOptions.length;
+        this.padOptions.forEach((option, i) => {
+            if (option.focus) option.focus(i === this.padIndex);
+            else option.rect.setStrokeStyle(i === this.padIndex ? 3 : 2,
+                i === this.padIndex ? 0xffe7a5 : option.color);
+        });
     }
     padDirection(direction) {
         const current = this.padOptions[this.padIndex];
@@ -441,7 +446,7 @@ class SeaPort extends Phaser.Scene {
         const upgrades = SEA_UPGRADES.filter(x => x.group === this.yardGroup);
         upgrades.forEach((u, i) => {
             const lv = p.levels[u.id] || 0, cost = SeaProfile.price(u, lv), y = 271 + i * 108;
-            this.add.rectangle(240, y + 20, 441, 97, 0x202e39, .97).setStrokeStyle(1, 0x705a4b).setDepth(10);
+            SEA_UI.yardCard(this, y, lv, p.gold >= cost);
             this.txt(31, y - 19, `${u.icon}  ${u.name}`, 18, '#f4d2a2', { bold: true });
             this.txt(31, y + 9, u.desc, 12, '#bdd0d0');
             this.txt(31, y + 39, `NÍVEL ${SEA_MATH.nice(lv)}  ·  PRÓXIMO: ${SEA_MATH.nice(cost)} ◉`, 13, '#d5bc99');
@@ -457,19 +462,19 @@ class SeaPort extends Phaser.Scene {
     showHelp() {
         this.banner('DIÁRIO DE BORDO', 'Regras do mar, da guerra e do estaleiro');
         const lines = [
-            '↑/W acelerar   ↓/S ré/freio   ←→/AD virar\nQ / E canhões   ·   ESPAÇO: ambos · M: som',
+            '↑/W acelerar   ↓/S ré/freio   ←→/AD virar\nQ / E canhões · ESPAÇO: ambos · ESC/P: pausa',
             'XBOX: analógico esquerdo; LT/LB = bombordo;\nRT/RB = estibordo; Menu pausa; A OK; B volta.',
             'ABALROAR: proa e velocidade amplificam o impacto.\nRochas são sólidas e danificam o casco.',
             'MISSÕES: etapas de escolta de carga, caça,\nsobrevivência e chefes. A etapa avança ao vencer.',
             'SANDBOX: ondas sem fim. A cada onda surgem\ninimigos mais numerosos, resistentes e perigosos.',
             'ESTALEIRO: 14 melhorias sem teto artificial.\nCada nível custa exponencialmente mais ouro.',
             'MAR VIVO: correntes, névoa e redemoinhos.\nVencer inimigos desperta a maldição do mar.',
-            'MÚSICA: importe 2 MP3 no porto. O som é\nguardado offline neste aparelho; M liga/desliga.',
+            'ÁUDIO: trilhas FLAC carregam sozinhas.\nM silencia; volume ajustável no porto.',
             'SALVAMENTO: automático no navegador. O ouro\nda expedição só vira saldo ao retornar ao porto.'
         ];
         lines.forEach((line, i) => {
             const y = 161 + i * 64;
-            this.add.rectangle(240, y + 17, 439, 60, 0x1c2c39, .95).setStrokeStyle(1, 0x625451).setDepth(8);
+            SEA_UI.helpEntry(this, i, y);
             this.txt(32, y, line, 13, '#e2dbcc');
         });
         this.button(754, '◀ VOLTAR AO MENU', () => this.scene.start('SeaPort', { page: 'menu' }), 'gold', 240, 400, 43);
@@ -484,7 +489,7 @@ class SeaPort extends Phaser.Scene {
         const r = this.report;
         if (!r) { this.showMenu(); return; }
         this.banner(r.won ? 'MISSÃO CUMPRIDA' : r.withdrawn ? 'DE VOLTA AO PORTO' : 'O MAR TE RECLAMOU');
-        this.txt(240, 284, `Modo: ${r.mode === 'mission' ? 'MISSÕES · Etapa ' + r.stage : 'SANDBOX · Onda ' + r.wave}\n\nNavios afundados: ${r.kills}\nAbalroamentos: ${r.rammings}\nOuro encontrado: ${SEA_MATH.nice(r.collected)}\nOuro depositado: ${SEA_MATH.nice(r.reward)}\nCofre atual: ${SEA_MATH.nice(r.bank)}`, 20, '#f0dec4', { center: true, mid: true, spacing: 9 });
+        SEA_UI.resultSummary(this, r);
         this.button(502, '⚒ ESTALEIRO E MELHORIAS', () => this.scene.start('SeaPort', { page: 'yard', group: 'armas' }), 'gold');
         this.button(566, '⚓ MENU PRINCIPAL', () => this.scene.start('SeaPort', { page: 'menu' }));
         this.button(630, r.mode === 'mission' ? '✦ PRÓXIMA MISSÃO' : '♾ NOVA JORNADA SANDBOX', () => {
@@ -568,23 +573,39 @@ class Game extends Phaser.Scene {
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
-        this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC');
+        this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER');
         this.onBoth = () => this.fire('both'); this.onPort = () => this.fire('port'); this.onStarboard = () => this.fire('starboard');
         this.onPause = () => { if (!this.ended) this.toggleCaptainMenu(); };
         this.input.keyboard.on('keydown-SPACE', this.onBoth);
         this.input.keyboard.on('keydown-Q', this.onPort);
         this.input.keyboard.on('keydown-E', this.onStarboard);
         this.input.keyboard.on('keydown-ESC', this.onPause);
+        this.input.keyboard.on('keydown-P', this.onPause);
+        this.onPauseMenuKey = e => {
+            if (!this.pausedByCaptain || !this.pausePadOptions?.length) return;
+            if (e.code === 'ArrowDown') {
+                e.preventDefault?.(); this.setPausePadFocus((this.pausePadIndex + 1) % this.pausePadOptions.length);
+            } else if (e.code === 'ArrowUp') {
+                e.preventDefault?.(); this.setPausePadFocus((this.pausePadIndex - 1 + this.pausePadOptions.length) % this.pausePadOptions.length);
+            } else if (e.code === 'Enter') this.pausePadOptions[this.pausePadIndex].onTap();
+        };
+        this.input.keyboard.on('keydown', this.onPauseMenuKey);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             this.input.keyboard.off('keydown-SPACE', this.onBoth);
             this.input.keyboard.off('keydown-Q', this.onPort);
             this.input.keyboard.off('keydown-E', this.onStarboard);
             this.input.keyboard.off('keydown-ESC', this.onPause);
+            this.input.keyboard.off('keydown-P', this.onPause);
+            this.input.keyboard.off('keydown', this.onPauseMenuKey);
         });
         // Eventos por pointer: soltar um dedo NÃO cancela o movimento dos demais.
         // Mouse (desktop) usa Phaser. Touch (celular) usa changedTouches diretamente:
         // Phaser pode reciclar a atribuição de pointers quando um de dois dedos sai.
-        this.input.on('pointerdown', p => { if (!this.isNativeTouchPointer(p)) this.touchStart(p); });
+        this.input.on('pointerdown', p => {
+            if (!this.isNativeTouchPointer(p)) {
+                if (!this.handleCaptainPointer(p.x, p.y)) this.touchStart(p);
+            }
+        });
         this.input.on('pointermove', p => { if (!this.isNativeTouchPointer(p)) this.touchMove(p); });
         this.input.on('pointerup', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
         this.input.on('pointerupoutside', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
@@ -599,7 +620,7 @@ class Game extends Phaser.Scene {
         const tip = this.add.text(SEA_VIEW.width / 2, 137,
             (this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
-                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS  ·  ESC: DIÁRIO DE BORDO'
+                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS  ·  ESC/P: PAUSA'
                 : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE O CANHÃO PARA DISPARAR\nDOIS DEDOS FUNCIONAM JUNTOS.'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
@@ -811,10 +832,15 @@ class Game extends Phaser.Scene {
         this.quest = this.add.text(15, 63, '', {
             fontFamily: 'monospace', fontSize: '12px', color: '#ffce95'
         }).setScrollFactor(0).setDepth(100);
-        this.add.rectangle(424, 79, 98, 29, 0x324453, .98).setStrokeStyle(1, 0xbe9a7a).setDepth(110)
-            .setScrollFactor(0).setInteractive().on('pointerdown', () => this.toggleCaptainMenu());
-        this.add.text(424, 79, '⚓ PORTO', { fontFamily: 'monospace', fontSize: '12px', color: '#ffe4b6' })
-            .setOrigin(.5).setDepth(111).setScrollFactor(0);
+        // Botão visível em desktop e celular; clique e toque passam pelo mesmo
+        // roteador, evitando disputas entre Phaser e o joystick nativo.
+        this.pauseButtonHitbox = {x: SEA_DESKTOP ? 454 : 412, y: 78, w: 120, h: 40};
+        const ph=this.pauseButtonHitbox;
+        this.add.rectangle(ph.x,ph.y,ph.w,ph.h,0x61402d,.98)
+            .setStrokeStyle(2,0xedca96).setDepth(111).setScrollFactor(0);
+        this.add.text(ph.x,ph.y,'☰ PAUSA',{
+            fontFamily:'Georgia',fontSize:'16px',fontStyle:'bold',color:'#ffdfad'
+        }).setOrigin(.5).setDepth(112).setScrollFactor(0);
         if (!SEA_DESKTOP) this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
             fontFamily: 'monospace', fontSize: '10px', color: '#dbbc98',
             stroke: '#101720', strokeThickness: 3
@@ -868,7 +894,7 @@ class Game extends Phaser.Scene {
                 const point = { id: `touch-${touch.identifier}`,
                     x: (touch.clientX - rect.left) * xScale,
                     y: (touch.clientY - rect.top) * yScale };
-                if (kind === 'start') this.touchStart(point);
+                if (kind === 'start' && !this.handleCaptainPointer(point.x,point.y)) this.touchStart(point);
                 if (kind === 'move') this.touchMove(point);
                 if (kind === 'end') this.touchEnd(point);
             }
@@ -1650,35 +1676,44 @@ class Game extends Phaser.Scene {
     }
     setPausePadFocus(index) {
         if (!this.pausePadOptions?.length) return;
-        this.pausePadIndex = SEA_MATH.clamp(index, 0, this.pausePadOptions.length - 1);
-        this.pausePadOptions.forEach((o, i) => o.box.setStrokeStyle(i === this.pausePadIndex ? 4 : 2,
-            i === this.pausePadIndex ? 0xffeea4 : 0xe5c894));
+        this.pausePadIndex = ((index % this.pausePadOptions.length) + this.pausePadOptions.length) % this.pausePadOptions.length;
+        this.pausePadOptions.forEach((item,i)=>{
+            item.box.setStrokeStyle(i===this.pausePadIndex?4:2,
+                i===this.pausePadIndex?0xffe2a0:item.base);
+        });
+    }
+    handleCaptainPointer(x,y) {
+        if (this.ended || this.sinking) return false;
+        const inside=(h)=>h&&Math.abs(x-h.x)<=h.w/2&&Math.abs(y-h.y)<=h.h/2;
+        if (this.pausedByCaptain) {
+            const option=this.pausePadOptions?.find(o=>inside(o.hit));
+            if (option) option.onTap();
+            // Pausa cobre toda a tela; jamais transfere o toque para os canhões.
+            return true;
+        }
+        if (inside(this.pauseButtonHitbox)) {
+            this.toggleCaptainMenu();
+            return true;
+        }
+        return false;
     }
     toggleCaptainMenu() {
         if (this.ended || this.sinking) return;
-        if (this.pauseElements) {
-            this.pauseElements.destroy(true); this.pauseElements = null; this.pausedByCaptain = false;
-            this.pausePadOptions = null; this.pauseNavAt = 0; this.touchReset(); return;
+        if (this.pausedByCaptain) {
+            this.pauseElements?.destroy(true);
+            this.pauseElements=null;
+            this.pausedByCaptain=false;
+            this.pausePadOptions=null;
+            this.pauseNavAt=0;
+            this.touchReset();
+            return;
         }
-        this.pausedByCaptain = true; this.touchReset(); this.pausePadOptions = []; this.pausePadIndex = 0; this.pauseNavAt = 0;
-        this.pauseElements = this.add.container(0, 0).setScrollFactor(0).setDepth(240);
-        const c = this.pauseElements;
-        const pauseX = SEA_VIEW.width / 2;
-        const pauseShift = SEA_DESKTOP ? -40 : 0;
-        c.add(this.add.rectangle(pauseX, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 0x08111b, .92));
-        c.add(this.add.text(pauseX, 252 + pauseShift, 'DIÁRIO DE BORDO', { fontFamily: 'Georgia', fontSize: '31px', color: '#f6d59b' }).setOrigin(.5));
-        c.add(this.add.text(pauseX, 340 + pauseShift, `${this.objectiveText()}\n\nOuro encontrado: ${SEA_MATH.nice(this.gold)}\nAfundados: ${this.kills} · Casco: ${Math.ceil(this.shipHP)}/${this.maxShipHP}`, {
-            fontFamily: 'Georgia', fontSize: '17px', color: '#e9d6c8', align: 'center', lineSpacing: 5
-        }).setOrigin(.5));
-        const mk = (y, txt, cb) => {
-            const box = this.add.rectangle(pauseX, y, 390, 51, 0x9d774e).setStrokeStyle(2, 0xe5c894).setInteractive();
-            c.add(box); c.add(this.add.text(pauseX, y, txt, { fontFamily: 'Georgia', fontSize: '16px', color: '#142029' }).setOrigin(.5));
-            box.on('pointerdown', cb);
-            this.pausePadOptions.push({ box, onTap: cb });
-        };
-        mk(491 + pauseShift, 'CONTINUAR NAVEGAÇÃO', () => this.toggleCaptainMenu());
-        mk(558 + pauseShift, 'RETORNAR AO PORTO (75% DO OURO)', () => this.finish(false, true));
-        if (SEA_GAMEPAD.lastId) this.setPausePadFocus(0);
+        this.pausedByCaptain=true;
+        this.touchReset();
+        this.pausePadOptions=[];
+        this.pausePadIndex=0;
+        this.pauseNavAt=0;
+        SEA_UI.pause(this);
     }
     finish(won, withdrawn = false) {
         if (this.ended || this.resultsBanked) return;
