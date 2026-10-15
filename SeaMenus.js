@@ -71,7 +71,7 @@ const SEA_UI = {
                 .setStrokeStyle(1,0xc29966,.48);
             scene.tweens.add({targets:glow,alpha:.14,scale:1.075,duration:2800,yoyo:true,repeat:-1});
             this.compass(scene,240,235,82,.29);
-            if(scene.textures.exists('player-ship') && !SEA_GOTHIC.enabled){
+            if(scene.textures.exists('player-ship')){
                 const h=scene.textures.get('player-ship').getSourceImage().height||160;
                 const ship=scene.add.image(240,233,'player-ship').setDepth(9)
                     .setScale(132/h).setRotation(-.08);
@@ -95,7 +95,6 @@ const SEA_UI = {
         }
         if(SEA_DESKTOP)this.desktopWings(scene);
         SEA_PIXEL.menu(scene);
-        SEA_GOTHIC.decoratePort(scene);
     },
     desktopWings(scene){
         const v=scene.page;
@@ -131,18 +130,12 @@ const SEA_UI = {
             .setInteractive({useHandCursor:true});
         const inset=scene.add.rectangle(x,y,w-8,h-8,0x0f1b29,.095).setDepth(25);
         const left=scene.add.rectangle(x-w/2+5,y,4,h-10,scheme.shine,.92).setDepth(25);
-        const gothic=SEA_GOTHIC.button(scene,x,y,w,h,style);
-        const caption=scene.txt(x,y,label,font,gothic?
-            (style==='gold'?'#1b1411':'#f1e0c4'):scheme.text,
-            {center:true,mid:true,bold:true,depth:27,width:w-25});
+        const caption=scene.txt(x,y,label,font,scheme.text,{center:true,mid:true,bold:true,depth:27,width:w-25});
         const focus=(active)=>{
             frame.setFillStyle(active?(style==='red'?0x633142:0xd4a672):scheme.bg,1);
             frame.setStrokeStyle(active?3:2,active?0xffedbd:scheme.border,1);
             left.setFillStyle(active?0xffd39b:scheme.shine,.95);
-            SEA_GOTHIC.repaintButton(gothic,active);
-            caption.setColor(gothic?
-                (active||style==='gold'?'#1b1411':'#f1e0c4'):
-                (active?'#0c1823':scheme.text));
+            caption.setColor(active?'#0c1823':scheme.text);
         };
         frame.on('pointerover',()=>{
             const index=scene.padOptions.findIndex(o=>o.rect===frame);
@@ -160,7 +153,7 @@ const SEA_UI = {
             }
             onTap();
         });
-        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,objects:[inset,left,caption,...(gothic?[gothic.g]:[])]});
+        scene.padOptions.push({rect:frame,x,y,label,onTap,color:scheme.border,focus,objects:[inset,left,caption]});
         return frame;
     },
     yardCard(scene,y,level,affordable){
@@ -226,7 +219,6 @@ const SEA_UI = {
             .setInteractive());
         add(scene.add.rectangle(x,y,w,h,0x111d29,.985).setStrokeStyle(3,0xb28b5c));
         add(scene.add.rectangle(x,y,w-15,h-15,0x341e2d,.2).setStrokeStyle(1,0xddbd88,.53));
-        SEA_GOTHIC.pause(scene,root,{x,y,w,h,top});
         const ornament=scene.add.graphics();
         add(ornament);
         ornament.lineStyle(2,0xd3b07e,.84);
