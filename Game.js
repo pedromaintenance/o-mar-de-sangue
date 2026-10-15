@@ -320,6 +320,10 @@ class SeaPort extends Phaser.Scene {
     init(data) { this.page = data?.page || 'menu'; this.mode = data?.mode || SeaProfile.load().mode; this.yardGroup = data?.group || 'armas'; this.report = data?.report || null; }
     create() {
         seaCenterCanvas(this.game);
+        // O porto é HTML responsivo; o canvas Phaser permanece reservado ao combate.
+        // Não executamos NENHUMA moldura procedural no menu reconstruído.
+        SEA_MUSIC.setMood('crimson');
+        if (SEA_PORT_UI.mount(this)) return;
         if (SEA_DESKTOP) {
             // UI vertical original fica centralizada numa tela 16:9, sem esticar botões.
             this.cameras.main.setZoom(0.86);
@@ -384,6 +388,10 @@ class SeaPort extends Phaser.Scene {
     }
     update(time, delta) {
         SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05), 'crimson');
+        if (SEA_PORT_UI.scene === this && SEA_PORT_UI.root) {
+            SEA_PORT_UI.update(time);
+            return;
+        }
         const pad = SEA_GAMEPAD.poll();
         if (!pad.connected) { this.padHint?.setVisible(false); return; }
         this.padHint?.setText('XBOX · ANALÓGICO / DIRECIONAL: SELECIONAR   A: OK   B: VOLTAR').setVisible(true);
