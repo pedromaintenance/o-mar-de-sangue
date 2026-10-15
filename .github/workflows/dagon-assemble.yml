@@ -1,0 +1,33 @@
+name: Build Dagon full artwork
+on:
+  push:
+    branches:
+      - fix/dagon-emerging-full-art
+    paths:
+      - '.dagon-upload/**'
+      - '.github/workflows/dagon-assemble.yml'
+permissions:
+  contents: write
+jobs:
+  build-artwork:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reassemble, validate and commit full-size Dagon
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find .dagon-upload -name 'chunk_*.txt' | wc -l)" -eq 12
+          cat .dagon-upload/chunk_*.txt | base64 --decode > assets/v15/dagon_emerging.webp
+          echo "2aef0c84d227cd9e51dd381b7c27f1cd19ab835779f659a26a5effb015bd7232  assets/v15/dagon_emerging.webp" | sha256sum -c -
+          test "$(stat -c %s assets/v15/dagon_emerging.webp)" -eq 847270
+          file assets/v15/dagon_emerging.webp
+          git add assets/v15/dagon_emerging.webp
+          git rm -r .dagon-upload
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "asset(dagon): publish full emerging-from-water sprite [skip ci]"
+          git push origin HEAD:fix/dagon-emerging-full-art
