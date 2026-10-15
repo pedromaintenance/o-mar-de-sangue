@@ -220,7 +220,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
         this.load.image('foe-turtle', 'assets/abyss/temple_turtle.png');
         this.load.image('boss-kraken', 'assets/abyss/kraken.png');
-        this.load.image('boss-dagon', 'assets/abyss/dagon.png');
+        this.load.image('boss-dagon', 'assets/v15/dagon_emerging.webp');
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
         this.load.image('fx-dagon-eye', 'assets/abyss/dagon_eye.png');
         this.load.image('fx-splash-0', 'assets/fx/splash_0.png');
@@ -238,7 +238,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('v15-flagship', 'assets/v15/ship_flagship.png');
         this.load.image('v15-wrecked', 'assets/v15/ship_wrecked.png');
         this.load.image('v15-kraken', 'assets/v15/beast_kraken.png');
-        this.load.image('v15-dagon', 'assets/v15/beast_dagon.png');
+        this.load.image('v15-dagon', 'assets/v15/dagon_emerging.webp');
         this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
         this.load.image('v15-drowned', 'assets/v15/beast_drowned.png');
         this.load.image('v15-eel', 'assets/v15/beast_eel.png');
@@ -1411,7 +1411,9 @@ class Game extends Phaser.Scene {
     paintEnemies() {
         for (const e of this.enemies) {
             if (e.dead) continue;
-            e.ship.setPosition(e.x, e.y).setRotation(e.heading);
+            // O Dagon emerge da água: seu horizonte permanece horizontal.
+            // A direção de ataque e a física continuam usando e.heading.
+            e.ship.setPosition(e.x, e.y).setRotation(e.type==='dagon'?0:e.heading);
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
             e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - width/2-1, e.y - e.radius - 32, width+2, 8);
