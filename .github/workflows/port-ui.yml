@@ -1,0 +1,56 @@
+name: Port UI smoke and visual tests
+on:
+  push:
+    paths:
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'Game.js'
+      - 'SeaMenus.js'
+      - 'SeaIslands.js'
+      - 'tests/port-ui-rebuild.test.cjs'
+      - 'tests/port-visual.test.cjs'
+      - '.github/workflows/port-ui.yml'
+  pull_request:
+    paths:
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'Game.js'
+      - 'tests/port-ui-rebuild.test.cjs'
+      - 'tests/port-visual.test.cjs'
+jobs:
+  port-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate syntax and menu action contracts
+        run: |
+          node --check PortUI.js
+          node --check Game.js
+          node --check SeaMenus.js
+          node --check SeaIslands.js
+          node tests/port-ui-rebuild.test.cjs
+  port-visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Render screenshots and validate screen widths
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/port-ui-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/port-visual.test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: port-ui-screenshots
+          path: port-artifacts/*.png
+          if-no-files-found: ignore

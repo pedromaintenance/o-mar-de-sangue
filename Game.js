@@ -317,186 +317,43 @@ class SeaBoot extends Phaser.Scene {
 
 class SeaPort extends Phaser.Scene {
     constructor() { super('SeaPort'); }
-    init(data) { this.page = data?.page || 'menu'; this.mode = data?.mode || SeaProfile.load().mode; this.yardGroup = data?.group || 'armas'; this.report = data?.report || null; }
+    init(data) {
+        this.page=data?.page||'menu';
+        this.mode=data?.mode||SeaProfile.load().mode;
+        this.yardGroup=data?.group||'armas';
+        this.report=data?.report||null;
+    }
     create() {
         seaCenterCanvas(this.game);
-        if (SEA_DESKTOP) {
-            // UI vertical original fica centralizada numa tela 16:9, sem esticar botões.
-            this.cameras.main.setZoom(0.86);
-            this.cameras.main.centerOn(240, 400);
-        }
-        this.padOptions = []; this.padIndex = 0; this.padNavAt = 0; this.padLastNav = '';
-        this.paintBackground();
-        SEA_GOTHIC.backdrop(this);
-        SEA_UI.portDecor(this);
         SEA_MUSIC.setMood('crimson');
         SEA_MUSIC.load();
-        SEA_AUDIO.bind(this, 465, 24);
-        if (this.page === 'yard') this.showYard();
-        else if (this.page === 'help') this.showHelp();
-        else if (this.page === 'reset') this.showReset();
-        else if (this.page === 'result') this.showResult();
-        else this.showMenu();
-        this.padHint = this.add.text(240, 778, '', { fontFamily: 'monospace', fontSize: '10px', color: '#f0dbb8', backgroundColor: '#15202bcb' })
-            .setOrigin(.5).setDepth(40).setVisible(false);
-        const missionIndex = this.page === 'menu' ? this.padOptions.findIndex(o => o.label.includes('MISSÕES')) : -1;
-        this.setPadFocus(missionIndex >= 0 ? missionIndex : 0);
-        this.portKeyInput = e => {
-            if (e.code === 'ArrowDown') this.setPadFocus((this.padIndex + 1) % this.padOptions.length);
-            else if (e.code === 'ArrowUp') this.setPadFocus((this.padIndex - 1 + this.padOptions.length) % this.padOptions.length);
-            else if (e.code === 'Enter' && this.padOptions.length) this.padOptions[this.padIndex].onTap();
-            else if (e.code === 'Escape' && this.page !== 'menu') this.scene.start('SeaPort', { page: 'menu' });
+        // O porto é completamente independente da renderização procedimental
+        // do Phaser. O jogo começa somente ao pressionar um botão de ação.
+        if (typeof SEA_PORT_UI !== 'undefined' && SEA_PORT_UI.mount(this))return;
+        console.error('A interface do porto não carregou. Exibindo acesso emergencial.');
+        const center=SEA_VIEW.width/2;
+        this.add.rectangle(center,SEA_VIEW.height/2,SEA_VIEW.width,SEA_VIEW.height,0x10151e);
+        this.add.text(center,SEA_VIEW.height*.28,'O MAR DE SANGUE',{
+            fontFamily:'Georgia',fontSize:'30px',color:'#f4d3a0'}).setOrigin(.5);
+        const addFallback=(label,y,handler)=>{
+            const t=this.add.text(center,y,label,{fontFamily:'Georgia',
+                fontSize:'20px',color:'#ffdfab',
+                backgroundColor:'#362630',padding:{x:20,y:13}})
+                .setOrigin(.5).setInteractive({useHandCursor:true});
+            t.on('pointerdown',handler);
         };
-        this.input.keyboard.on('keydown', this.portKeyInput);
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.input.keyboard.off('keydown', this.portKeyInput));
-    }
-    txt(x, y, value, size = 14, color = '#e9d6c4', opt = {}) {
-        return this.add.text(x, y, String(value), { fontFamily: 'Georgia, serif', fontSize: size + 'px', color,
-            wordWrap: { width: opt.width || 430 }, align: opt.align || 'left', lineSpacing: opt.spacing || 4,
-            fontStyle: opt.bold ? 'bold' : 'normal' }).setOrigin(opt.center ? .5 : 0, opt.mid ? .5 : 0).setDepth(opt.depth || 20);
-    }
-    button(y, label, onTap, style = 'dark', x = 240, w = 416, h = 43, font = 16) {
-        return SEA_UI.button(this, y, label, onTap, style, x, w, h, font);
-    }
-    setPadFocus(index) {
-        if (!this.padOptions?.length) return;
-        this.padIndex = ((index % this.padOptions.length) + this.padOptions.length) % this.padOptions.length;
-        this.padOptions.forEach((option, i) => {
-            if (option.focus) option.focus(i === this.padIndex);
-            else option.rect.setStrokeStyle(i === this.padIndex ? 3 : 2,
-                i === this.padIndex ? 0xffe7a5 : option.color);
+        addFallback('MISSÕES',SEA_VIEW.height*.47,()=>{
+            const p=SeaProfile.load();SeaProfile.selectMode('mission');
+            this.scene.start('Game',{mode:'mission',stage:p.mission});
+        });
+        addFallback('SANDBOX',SEA_VIEW.height*.59,()=>{
+            SeaProfile.selectMode('sandbox');this.scene.start('Game',{mode:'sandbox'});
         });
     }
-    padDirection(direction) {
-        const current = this.padOptions[this.padIndex];
-        if (!current) return;
-        let best = -1, lowest = Infinity;
-        for (let i = 0; i < this.padOptions.length; i++) {
-            if (i === this.padIndex) continue;
-            const p = this.padOptions[i], dx = p.x - current.x, dy = p.y - current.y;
-            const along = direction === 'down' ? dy : direction === 'up' ? -dy : direction === 'right' ? dx : -dx;
-            const across = direction === 'up' || direction === 'down' ? dx : dy;
-            if (along <= 6 || Math.abs(across) > Math.max(80, along * 2.5)) continue;
-            const score = along + Math.abs(across) * .8;
-            if (score < lowest) { lowest = score; best = i; }
-        }
-        if (best >= 0) this.setPadFocus(best);
-    }
-    update(time, delta) {
-        SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05), 'crimson');
-        const pad = SEA_GAMEPAD.poll();
-        if (!pad.connected) { this.padHint?.setVisible(false); return; }
-        this.padHint?.setText('XBOX · ANALÓGICO / DIRECIONAL: SELECIONAR   A: OK   B: VOLTAR').setVisible(true);
-        if (!this.padOptions?.length) return;
-        if (pad.just[1] || pad.just[9]) {
-            if (this.page !== 'menu') this.scene.start('SeaPort', { page: 'menu' });
-            return;
-        }
-        if (pad.just[0]) { this.padOptions[this.padIndex]?.onTap(); return; }
-        const direction = pad.up ? 'up' : pad.down ? 'down' : pad.left ? 'left' : pad.right ? 'right' : '';
-        if (!direction) { this.padLastNav = ''; return; }
-        if (direction !== this.padLastNav || time >= this.padNavAt) {
-            this.padDirection(direction);
-            this.padNavAt = time + (direction === this.padLastNav ? 165 : 300);
-            this.padLastNav = direction;
-        }
-    }
-    paintBackground() {
-        if (SEA_DESKTOP) {
-            // Prolonga o cenário até as margens da tela widescreen.
-            this.add.tileSprite(240, 400, 1900, 1050, 'sea-base').setDepth(-90).setTint(0x68434e).setAlpha(.82);
-        }
-        if (this.textures.exists('menu-bg')) {
-            this.add.image(240, 400, 'menu-bg').setDepth(-60);
-        } else {
-            const fallback = this.add.graphics().setDepth(-60);
-            fallback.fillStyle(0x172434, 1).fillRect(0,0,480,800);
-        }
-        const g = this.add.graphics().setDepth(-50);
-        g.fillStyle(0x0e1924, .35); g.fillRect(0, 0, 480, 800);
-        g.lineStyle(2, 0xb3956a, .75); g.lineBetween(16, 17, 464, 17); g.lineBetween(16, 783, 464, 783);
-    }
-    banner(label, subtitle = '') {
-        SEA_GOTHIC.titlePlate(this);
-        this.txt(240, 41, 'CRÔNICAS DA CARCAÇA', 11, '#ddc19a', { center: true, bold: true });
-        this.txt(240, 95, label, 30, '#f5d49f', { center: true, bold: true });
-        if (subtitle) this.txt(240, 141, subtitle, 13, '#dec5bf', { center: true });
-    }
-    showMenu() {
-        const p = SeaProfile.load(), s = SeaProfile.stats(p);
-        this.banner('O MAR DE SANGUE', 'O ouro compra aço. O oceano cobra cada erro.');
-        SEA_MUSIC.addPortControls(this);
-        this.txt(240, 362, `COFRE  ◉ ${SEA_MATH.nice(p.gold)}       VIAGENS  ${p.sorties}`, 16, '#edce9f', { center: true, bold: true });
-        this.txt(240, 393, `CASCO ${SEA_MATH.nice(s.maxHP)}   CANHÕES ${SEA_MATH.nice(s.cannonDamage)}   VELAS ${SEA_MATH.nice(s.maxSpeed)}`, 12, '#b9d9dd', { center: true });
-        this.txt(240, 437, 'ESCOLHA O MODO DE JOGO', 14, '#e4c68d', { center: true, bold: true });
-        this.button(480, `✦ MISSÕES  ·  ETAPA ${p.mission}`, () => {
-            SeaProfile.selectMode('mission'); this.scene.start('Game', { mode: 'mission', stage: p.mission });
-        }, 'gold');
-        this.button(537, `♾ SANDBOX  ·  RECORDE ONDA ${p.bestWave}`, () => {
-            SeaProfile.selectMode('sandbox'); this.scene.start('Game', { mode: 'sandbox' });
-        });
-        this.button(594, '⚒  ESTALEIRO INFINITO', () => this.scene.start('SeaPort', { page: 'yard', group: 'armas' }));
-        this.button(651, '◈  MANUAL / COMANDOS', () => this.scene.start('SeaPort', { page: 'help' }));
-        this.button(709, 'REINICIAR PROGRESSO', () => this.scene.start('SeaPort', { page: 'reset' }), 'red', 240, 320, 36, 13);
-        this.txt(240, 753, `Vitórias ${p.wins}   ·   Navios afundados ${p.kills}   ·   Abalroamentos ${p.rammings}`, 11, '#bec3c1', { center: true });
-    }
-    showYard() {
-        const p = SeaProfile.load(); this.banner('ESTALEIRO', `◉ ${SEA_MATH.nice(p.gold)} moedas  ·  melhorias sem limite de nível`);
-        const groups = [['casco', 'CASCO'], ['motor', 'NAVEGAÇÃO'], ['armas', 'ARMAMENTO'], ['apoio', 'APOIO']];
-        groups.forEach(([id, name], i) => this.button(206, name, () => this.scene.start('SeaPort', { page: 'yard', group: id }),
-            this.yardGroup === id ? 'gold' : 'dark', 66 + i * 116, 112, 34, 11));
-        const upgrades = SEA_UPGRADES.filter(x => x.group === this.yardGroup);
-        upgrades.forEach((u, i) => {
-            const lv = p.levels[u.id] || 0, cost = SeaProfile.price(u, lv), y = 271 + i * 108;
-            SEA_UI.yardCard(this, y, lv, p.gold >= cost);
-            this.txt(31, y - 19, `${u.icon}  ${u.name}`, 18, '#f4d2a2', { bold: true });
-            this.txt(31, y + 9, u.desc, 12, '#bdd0d0');
-            this.txt(31, y + 39, `NÍVEL ${SEA_MATH.nice(lv)}  ·  PRÓXIMO: ${SEA_MATH.nice(cost)} ◉`, 13, '#d5bc99');
-            const can = p.gold >= cost;
-            this.button(y + 22, can ? 'COMPRAR' : 'SEM OURO', () => {
-                const res = SeaProfile.buy(u.id);
-                if (res.ok) this.scene.start('SeaPort', { page: 'yard', group: this.yardGroup });
-            }, can ? 'gold' : 'dark', 392, 104, 35, 12);
-            // Bloqueio de compra é feito pela rotina SeaProfile.buy, também para clicks antigos.
-        });
-        this.button(750, '◀ VOLTAR AO PORTO', () => this.scene.start('SeaPort', { page: 'menu' }), 'dark', 240, 407, 43, 16);
-    }
-    showHelp() {
-        this.banner('DIÁRIO DE BORDO', 'Regras do mar, da guerra e do estaleiro');
-        const lines = [
-            '↑/W acelerar   ↓/S ré/freio   ←→/AD virar\nQ / E canhões · ESPAÇO: ambos · ESC/P: pausa',
-            'XBOX: analógico esquerdo; LT/LB = bombordo;\nRT/RB = estibordo; Menu pausa; A OK; B volta.',
-            'ABALROAR: proa e velocidade amplificam o impacto.\nRochas são sólidas e danificam o casco.',
-            'MISSÕES: etapas de escolta de carga, caça,\nsobrevivência e chefes. A etapa avança ao vencer.',
-            'SANDBOX: ondas sem fim. A cada onda surgem\ninimigos mais numerosos, resistentes e perigosos.',
-            'ESTALEIRO: 14 melhorias sem teto artificial.\nCada nível custa exponencialmente mais ouro.',
-            'ATRACAR: aproxime-se, diminua a velocidade.\nF / A / toque; afaste os inimigos primeiro.',
-            'ÁUDIO: trilhas FLAC carregam sozinhas.\nM silencia; volume ajustável no porto.',
-            'SALVAMENTO: automático no navegador. O ouro\nda expedição só vira saldo ao retornar ao porto.'
-        ];
-        lines.forEach((line, i) => {
-            const y = 161 + i * 64;
-            SEA_UI.helpEntry(this, i, y);
-            this.txt(32, y, line, 13, '#e2dbcc');
-        });
-        this.button(754, '◀ VOLTAR AO MENU', () => this.scene.start('SeaPort', { page: 'menu' }), 'gold', 240, 400, 43);
-    }
-    showReset() {
-        this.banner('ESQUECER O MAR?');
-        this.txt(240, 234, 'Isso apaga ouro, melhorias, missões, ondas e\no histórico de expedições guardado neste aparelho.', 17, '#ead7cb', { center: true });
-        this.button(467, 'NÃO, VOLTAR AO PORTO', () => this.scene.start('SeaPort'), 'gold');
-        this.button(532, 'SIM, APAGAR PROGRESSO', () => { SeaProfile.reset(); this.scene.start('SeaPort'); }, 'red');
-    }
-    showResult() {
-        const r = this.report;
-        if (!r) { this.showMenu(); return; }
-        this.banner(r.won ? 'MISSÃO CUMPRIDA' : r.withdrawn ? 'DE VOLTA AO PORTO' : 'O MAR TE RECLAMOU');
-        SEA_UI.resultSummary(this, r);
-        this.button(502, '⚒ ESTALEIRO E MELHORIAS', () => this.scene.start('SeaPort', { page: 'yard', group: 'armas' }), 'gold');
-        this.button(566, '⚓ MENU PRINCIPAL', () => this.scene.start('SeaPort', { page: 'menu' }));
-        this.button(630, r.mode === 'mission' ? '✦ PRÓXIMA MISSÃO' : '♾ NOVA JORNADA SANDBOX', () => {
-            const p = SeaProfile.load(); this.scene.start('Game', { mode: r.mode, stage: p.mission });
-        });
+    update(time,delta) {
+        SEA_MUSIC.tick(Math.min((delta||16)/1000,.05),'crimson');
+        if (typeof SEA_PORT_UI !== 'undefined' && SEA_PORT_UI.scene===this)
+            SEA_PORT_UI.update(time);
     }
 }
 
