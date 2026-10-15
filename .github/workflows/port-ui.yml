@@ -1,0 +1,32 @@
+name: Port UI smoke test
+on:
+  push:
+    paths:
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'Game.js'
+      - 'SeaMenus.js'
+      - 'SeaIslands.js'
+      - 'tests/port-ui-rebuild.test.cjs'
+      - '.github/workflows/port-ui.yml'
+  pull_request:
+    paths:
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'Game.js'
+      - 'tests/port-ui-rebuild.test.cjs'
+jobs:
+  port-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate port UI interaction contracts
+        run: |
+          node --check PortUI.js
+          node --check Game.js
+          node --check SeaMenus.js
+          node --check SeaIslands.js
+          node tests/port-ui-rebuild.test.cjs
