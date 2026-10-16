@@ -2,7 +2,7 @@
 
 **Identidade:** horror naval, horror cósmico e conflito político no universo da **Carcaça**.  
 **Plataforma atual:** jogo web estático (GitHub Pages), PWA offline, Phaser + porto HTML/CSS.  
-**Atualização:** 15 de outubro de 2026.  
+**Atualização:** 16 de outubro de 2026.  
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
 
 > **Princípio de desenvolvimento:** evoluir a experiência sem reescrever subsistemas que já funcionam. Separar apresentação de regras; preservar saves, acessibilidade básica, funcionamento offline, mouse/toque, teclado e controle Xbox. Toda interface nova deve passar por testes de regressão antes do merge.
@@ -16,7 +16,7 @@
 | **2.3–2.5 — Navegação Xbox** | ✅ Concluído | Direcional espacial, foco em compras e troca de abas com LB/RB e Q/E; [PRs #23–#26](https://github.com/pedromaintenance/o-mar-de-sangue/pull/26) |
 | **3.0 — A Maré Negra** | ✅ Concluído | Identidade sombria dos menus; [PR #27](https://github.com/pedromaintenance/o-mar-de-sangue/pull/27), oficialização [PR #28](https://github.com/pedromaintenance/o-mar-de-sangue/pull/28) |
 | **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
-| **3.2 — HUD de combate** | 🟡 Em validação | Casco/recarga com contraste, estado do mar, maldição e alertas; implementação no PR desta etapa, pendente de QA |
+| **3.2 — HUD de combate** | ✅ Implementado; CI aprovado | Casco e recarga legíveis, maldição crítica e estado do mar; [PR #30](https://github.com/pedromaintenance/o-mar-de-sangue/pull/30) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -43,10 +43,10 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 - [x] Aplicar a paleta Maré Negra ao HUD (casco, ouro, objetivos, velocidade, maldição, condições do mar e alertas).
 - [x] Separar indicadores críticos (casco abaixo de 28% e maldição acima de 65%) de informações secundárias, preservando as três barras de recarga/casco.
-- [ ] Validar capturas e contraste em 1600×900, 1280×720 e 390×844 no navegador real.
+- [x] Validar capturas e contraste em 1600×900, 1280×720 e 390×844 no Chromium (incluindo emulação Android e estados críticos).
 - [x] Preservar geometria de hitboxes, posição da carta, joystick, canhões, pausa e valores de jogo; adicionar testes de contrato.
 
-**Pronto quando:** leitura clara em 390 px e desktop, alertas reconhecíveis, screenshots comparativas e regressão de toque/canhões aprovada.
+**QA automatizada concluída:** estados normal/crítico do HUD em 1600×900, 1280×720 e emulação Android 390×844, com screenshots; contrato das hitboxes de pausa, joystick e canhões validado. **Teste manual em controle/dispositivo físico ainda recomendado.**
 
 ### P1 — 3.3: Eventos narrativos e política do Mar de Sangue
 
@@ -100,6 +100,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Concluir a validação e a publicação do **HUD 3.2**. Em seguida, avançar para o desenho de **eventos políticos/narrativos 3.3**, que exigirá decisões explícitas de lore, consequências e persistência.
+Avançar para o desenho de **eventos políticos/narrativos 3.3**, preservando os marcos 3.0–3.2 e exigindo decisões explícitas de lore, consequências e persistência. Registrar o primeiro protótipo em um PR isolado antes de modificar saves ou regras.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
