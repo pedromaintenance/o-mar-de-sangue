@@ -49,7 +49,7 @@ for(const desktop of [false,true]){
  const SEA_MATH={nice:v=>String(v),clamp:(v,a,b)=>Math.max(a,Math.min(b,v))};
  const SEA_WEATHER={names:{calm:'MAR SERENO',storm:'TEMPESTADE RUBRA'}};
  const build=new Function('SEA_DESKTOP','SEA_VIEW','SEA_MISSION_TITLES','SEA_MATH',
-   'SEA_WEATHER','return ({'+createHUD+updateHUD+'});');
+   'SEA_WEATHER','return ({'+createHUD+','+updateHUD+'});');
  const ui=build(SEA_DESKTOP,SEA_VIEW,SEA_MISSION_TITLES,SEA_MATH,SEA_WEATHER);
  ui.createHUD.call(s);
  assert.deepEqual(s.pauseButtonHitbox,{x:desktop?454:412,y:78,w:120,h:40});
