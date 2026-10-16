@@ -93,7 +93,7 @@ for(const desktop of [true,false]){
    'island modal must cover gameplay');
  assert(all.slice(renderedBefore).filter(o=>o.kind==='text')
    .some(o=>String(o.text).includes('RECIFES TABAXI')));
- assert.deepEqual(scene.islandOptions.slice(0,3).map(o=>o.hit.h),
+ assert.deepEqual(Array.from(scene.islandOptions.slice(0,3),o=>o.hit.h),
    [63,63,63]);
  assert.equal(scene.islandOptions[3].hit.h,49);
  // Keep the original effect data; the callback must still dispatch choice #2.
