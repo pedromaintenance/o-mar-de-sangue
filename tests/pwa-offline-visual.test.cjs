@@ -19,7 +19,13 @@ const {chromium}=require('playwright-core');
      page.on('pageerror',e=>errors.push(e.message));
      await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
      await page.locator('#sea-port-ui .port-hero').waitFor({timeout:45000});
-     await page.evaluate(()=>navigator.serviceWorker.ready);
+     // A broken precache previously left this promise pending forever.
+     // Fail explicitly instead of locking the visual CI runner indefinitely.
+     await page.evaluate(()=>Promise.race([
+       navigator.serviceWorker.ready,
+       new Promise((_,reject)=>setTimeout(
+         ()=>reject(new Error('Service worker não ativou em 30s; verificar precache')),30000))
+     ]));
      await page.waitForFunction(()=>!!navigator.serviceWorker.controller,{timeout:60000});
      const online=await page.evaluate(()=>{
         const profile=SeaProfile.load();
