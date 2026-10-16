@@ -245,7 +245,10 @@ const SEA_PORT_UI = {
       const purchaseNav=this.scene?.page==='yard'&&!horizontal&&
         candidate.dataset?.action?.startsWith('buy:')&&
         (current.dataset?.action?.startsWith('buy:')||current.dataset?.action==='menu');
-      if(!purchaseNav&&!overlap&&Math.abs(across)>Math.max(55,along*1.12))continue;
+      const returnNav=this.scene?.page==='yard'&&direction==='down'&&
+        current.dataset?.action?.startsWith('buy:')&&candidate.dataset?.action==='menu'&&
+        this.navigationZone(candidate)==='main';
+      if(!purchaseNav&&!returnNav&&!overlap&&Math.abs(across)>Math.max(55,along*1.12))continue;
       const mainGap=horizontal?
         sign>0?Math.max(0,b.left-a.right):Math.max(0,a.left-b.right):
         sign>0?Math.max(0,b.top-a.bottom):Math.max(0,a.top-b.bottom);
