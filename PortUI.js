@@ -140,8 +140,10 @@ const SEA_PORT_UI = {
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='menu'){this.goto('menu');return;}
     if(name==='yard'){
-      if(scene.page==='yard')this.changeYardTab(id||'armas');
-      else this.goto('yard',id||'armas');
+      if(scene.page==='yard'){
+        if(!this.changeYardTab(id||'armas'))
+          this.focusByAction(this.lastYardFocus);
+      }else this.goto('yard',id||'armas');
       return;
     }
     if(name==='help'||name==='reset'){this.goto(name);return;}
