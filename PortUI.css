@@ -136,6 +136,9 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
 .port-footer__version{color:#927b69}
 .port-sound{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
  letter-spacing:0}
+.port-sound__group{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:nowrap;
+ border:1px solid rgba(151,112,78,.38);border-radius:3px;padding:4px 6px;min-height:37px}
+.port-sound__group .port-sound__label{font-size:10px;letter-spacing:.08em}
 .port-sound__label{font-size:10px;font-weight:800;color:#d0ae80;letter-spacing:.13em;white-space:nowrap}
 .port-sound button{border:1px solid #775c46;background:#19222bc7;color:#edc994;min-width:30px;min-height:29px;
  font-size:10px;font-weight:800;padding:5px 9px;letter-spacing:.04em}
@@ -241,6 +244,8 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
  .port-footer{flex-direction:column;gap:9px;text-align:center}
  .port-footer>span:first-child{display:none}
  .port-sound{gap:6px}
+ .port-sound__group{max-width:100%;flex:1 1 210px}
+ .port-sound__group .port-sound__label{flex:1;min-width:55px}
  .port-sound small{flex-basis:100%;max-width:none}
  .port-page__header{padding:16px}
  .port-page h1{font-size:32px}
