@@ -47,7 +47,7 @@ const {chromium}=require('playwright-core');
     const text=s.islandOverlay.list.filter(v=>v.type==='Text').map(v=>v.text);
     return {id:spot.id,text,options:s.islandOptions.length,
       factions:s.politicalLedger,
-      originalSave:localStorage.getItem('mar-de-sangue-save-v4')};
+      originalSave:localStorage.getItem('carcaca.mar-de-sangue.v4')};
    });
    assert.equal(before.options,4,'3 faction choices + return');
    assert(before.text.some(s=>s.includes('TRÊS BANDEIRAS')));
@@ -55,6 +55,10 @@ const {chromium}=require('playwright-core');
    assert(before.text.some(s=>s.includes('VENDER OS NOMES')));
    assert(before.text.some(s=>s.includes('ABRIGAR OS SOBREVIVENTES')));
    assert(before.text.some(s=>s.includes('PÓLVORA DE DAEGON')));
+   assert(before.text.some(s=>s.includes('[SOBREVIVENTES]')),
+     'Political choice must disclose beneficiary before it is selected');
+   assert(before.text.some(s=>s.includes('[CORTE FEÉRICA]')));
+   assert(before.text.some(s=>s.includes('[CULTO DE DAEGON]')));
    await page.screenshot({path:path.join('port-artifacts',
     'mare-negra-3-3-'+label+'-choice.png'),fullPage:true});
    const after=await page.evaluate(()=>{
@@ -68,7 +72,7 @@ const {chromium}=require('playwright-core');
       deltaCurse:s.curse-before.curse,ledger:{...s.politicalLedger},
       outcome:s.islandOutcome,options:s.islandOptions.length,
       visited:s.islandVisits.has(s.islandSelected.id),
-      save:localStorage.getItem('mar-de-sangue-save-v4')};
+      save:localStorage.getItem('carcaca.mar-de-sangue.v4')};
    });
    assert.equal(after.deltaGold,60);
    assert(after.deltaCurse>=0&&after.deltaCurse<=15);
