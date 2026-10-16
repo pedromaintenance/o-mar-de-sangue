@@ -14,7 +14,11 @@ const {chromium}=require('playwright-core');
    ['wide-1600',1600,900,false],
    ['desktop-1280',1280,720,false],
    ['mobile-390',390,844,true]]){
-   const page=await browser.newPage({viewport:{width,height},deviceScaleFactor:1,isMobile});
+   const mobileUserAgent='Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Mobile Safari/537.36';
+   const page=await browser.newPage({
+     viewport:{width,height},deviceScaleFactor:1,isMobile,
+     hasTouch:isMobile,userAgent:isMobile?mobileUserAgent:undefined
+   });
    const errors=[];page.on('pageerror',e=>errors.push(String(e)));
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
    await page.locator('#sea-port-ui [data-action="mission"]').waitFor({timeout:40000});
@@ -22,6 +26,8 @@ const {chromium}=require('playwright-core');
    await page.locator('#sea-port-ui').waitFor({state:'detached',timeout:20000});
    await page.waitForFunction(()=>game.scene.isActive('Game')&&
      !!game.scene.getScene('Game').player,{timeout:20000});
+   const mode=await page.evaluate(()=>SEA_DESKTOP);
+   assert.equal(mode,!isMobile,label+': device mode must match the simulated hardware');
    const before=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');
     s.updateHUD();
