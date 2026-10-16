@@ -18,6 +18,8 @@ on:
       - 'tests/mare-negra-overlays-visual.test.cjs'
       - 'tests/mare-negra-hud.test.cjs'
       - 'tests/mare-negra-hud-visual.test.cjs'
+      - 'tests/political-parley.test.cjs'
+      - 'tests/political-parley-visual.test.cjs'
       - '.github/workflows/port-ui.yml'
   pull_request:
     paths:
@@ -38,6 +40,8 @@ on:
       - 'tests/mare-negra-overlays-visual.test.cjs'
       - 'tests/mare-negra-hud.test.cjs'
       - 'tests/mare-negra-hud-visual.test.cjs'
+      - 'tests/political-parley.test.cjs'
+      - 'tests/political-parley-visual.test.cjs'
 jobs:
   port-smoke:
     runs-on: ubuntu-latest
@@ -56,6 +60,7 @@ jobs:
           node tests/port-controller-navigation.test.cjs
           node tests/mare-negra-overlays.test.cjs
           node tests/mare-negra-hud.test.cjs
+          node tests/political-parley.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
@@ -75,6 +80,7 @@ jobs:
           node tests/port-theme-abyss.test.cjs
           node tests/mare-negra-overlays-visual.test.cjs
           node tests/mare-negra-hud-visual.test.cjs
+          node tests/political-parley-visual.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
