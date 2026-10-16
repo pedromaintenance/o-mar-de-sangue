@@ -1,4 +1,4 @@
-/* The Maré Negra skin is an opt-in presentation, not a parallel game UI.
+/* The Maré Negra skin is the official default presentation, not a parallel game UI.
  * Run with a local server on port 8765 and playwright-core installed.
  */
 const assert=require('node:assert/strict');
@@ -18,20 +18,25 @@ const {chromium}=require('playwright-core');
    ['phone-390',390,844,true]]){
    const page=await browser.newPage({viewport:{width,height},isMobile,deviceScaleFactor:1});
    const errors=[];page.on('pageerror',e=>errors.push(String(e)));
-   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
+   await page.goto('http://127.0.0.1:8765/?theme=classic',{waitUntil:'domcontentloaded'});
    await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
    const original=await page.locator('.port-ui').evaluate(el=>getComputedStyle(el).backgroundColor);
    const oldButtons=await page.locator('#port-main button[data-action]').count();
    assert(!await page.locator('html').evaluate(el=>el.classList.contains('theme-mare-negra')),
-    'The original link must still render the classic skin');
+    'Only ?theme=classic should render the old skin');
+   await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
+   await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
+   assert(await page.locator('html').evaluate(el=>el.classList.contains('theme-mare-negra')),
+    'The normal game URL must activate Maré Negra by default');
+   const dark=await page.locator('.port-ui').evaluate(el=>getComputedStyle(el).backgroundColor);
+   assert.notEqual(dark,original,'Default Maré Negra skin not visually independent from classic');
+   assert.equal(await page.locator('#port-main button[data-action]').count(),oldButtons,
+    'Default skin must not replace or remove the original actions');
+   // The old preview URL remains a valid alias for the new default.
    await page.goto('http://127.0.0.1:8765/?theme=abyss',{waitUntil:'domcontentloaded'});
    await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
    assert(await page.locator('html').evaluate(el=>el.classList.contains('theme-mare-negra')),
-    'Preview flag failed to activate skin');
-   const dark=await page.locator('.port-ui').evaluate(el=>getComputedStyle(el).backgroundColor);
-   assert.notEqual(dark,original,'Abyss skin not visually independent from classic');
-   assert.equal(await page.locator('#port-main button[data-action]').count(),oldButtons,
-    'Skin must not replace or remove the original actions');
+    'The old preview URL must continue to activate Maré Negra');
    const geometry=await page.evaluate(()=>{
     const el=document.querySelector('#sea-port-ui');
     return {scroll:el.scrollWidth,client:el.clientWidth};
