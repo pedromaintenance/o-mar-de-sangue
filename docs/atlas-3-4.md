@@ -11,6 +11,8 @@ O Atlas apresenta **somente informações já descobertas na expedição** e é 
 | Abrir Atlas | `M` ou clicar na carta/radar | **View** (botão central esquerdo, índice padrão 8) | Tocar na carta/radar |
 | Fechar Atlas | `M`, `Esc` ou `P`; clicar na carta | **B**, **View** ou **Menu/Start** | Tocar no painel para retornar |
 | Pilotar/atirar enquanto aberto | Bloqueado | Bloqueado | Bloqueado |
+| Navegar pelos marcos conhecidos | Setas | Direcional | Toque nos símbolos |
+| Marcar/desmarcar destino | Enter ou clique no símbolo | A | Tocar no símbolo |
 
 O botão View é *convencional* no mapeamento padrão da Gamepad API; não existe garantia de que todo controle exponha esse botão. A pausa original continua em Menu/Start. A verificação em controle físico permanece recomendada.
 
@@ -43,9 +45,19 @@ O botão View é *convencional* no mapeamento padrão da Gamepad API; não exist
 - [ ] CI verde, PR publicado e inspeção na versão Pages.
 - [ ] Teste manual recomendado com controle Xbox real e PWA instalada.
 
-## Próximos passos — Atlas 3.4b (não implementados)
+## 3.4b — Rumos da Carta (implementado, validação em curso)
 
-1. Eventuais **rumos/waypoints** precisam de limites de mapa, remoção, foco no controle e decisões de design para impedir navegação automática.
+A carta agora aceita **um waypoint manual por expedição**, restrito aos marcos descobertos. Ao abrir a carta, o primeiro marco conhecido recebe foco. Setas/Enter, direcional/A ou clique/toque sobre o símbolo selecionam o destino; a mesma seleção desmarca. Toque fora dos símbolos continua fechando o modal.
+
+A bússola é geográfica: **0° norte, 90° leste, 180° sul e 270° oeste**. A distância é dada em **unidades do mundo** (não milhas náuticas). O indicador de correção refere-se à proa do navio: positivo a estibordo, negativo a bombordo. A carta desenha uma linha direta, que **não é rota segura, piloto automático nem fast travel**.
+
+O destino continua visível como indicação no radar/HUD quando o Atlas fecha. Se estiver além do alcance do radar, a marca fica na **borda** indicando só direção, não proximidade. Seleção e foco são estados transitórios da cena (`chartWaypointId`, `atlasFocusedId`, `atlasPoints`): não há mudança em `SeaProfile` v4, persistência, progressão, combate ou custos.
+
+**QA:** testes Node cobrindo a restrição de descoberta, rumos cardeais, foco, marcação/desmarcação, retorno ao jogo e reset por expedição; testes de navegador com screenshots em 1600×900, 1280×720 e Android 390×844, HUD e save intacto. A revisão do CI, o teste físico no Xbox/PWA e a verificação do Pages permanecem pendentes até execução.
+
+## Próximos passos posteriores — Atlas (não implementados)
+
+1. Refinar cartas com escala gráfica, identificação contextual dos locais e alertas de obstáculos sem interferir na pilotagem manual.
 2. **Rotas e domínio de facções** podem aparecer apenas após introdução do sistema de reputação 3.3b; não inventar domínio de ilhas não estabelecido pela lore.
 3. Implementar descoberta persistente só depois de definir versão de save, migração, vínculo entre mapas e política de reset de campanha.
 4. Melhorar símbolos e texturas com assets autorais sem transformar o mapa num painel pesado em dispositivos móveis.

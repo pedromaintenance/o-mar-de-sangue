@@ -452,6 +452,16 @@ class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-F', this.onDock);
         this.input.keyboard.on('keydown-M', this.onAtlas);
         this.onPauseMenuKey = e => {
+            if (this.atlasOpen) {
+                if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
+                    e.preventDefault?.(); SEA_ATLAS.focus(this,1);
+                } else if (e.code === 'ArrowUp' || e.code === 'ArrowLeft') {
+                    e.preventDefault?.(); SEA_ATLAS.focus(this,-1);
+                } else if (e.code === 'Enter') {
+                    e.preventDefault?.(); SEA_ATLAS.mark(this);
+                }
+                return;
+            }
             if (this.islandDocked) {
                 if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
                     e.preventDefault?.();
@@ -1223,7 +1233,12 @@ class Game extends Phaser.Scene {
         // Xbox View (button 8) opens/returns the voyage atlas. Pause and
         // island dialogs take precedence; no fire or ship physics under it.
         if (this.atlasOpen) {
-            if(pad.just?.[8] || pad.just?.[1] || pad.just?.[9]) SEA_ATLAS.close(this);
+            if(pad.just?.[8] || pad.just?.[1] || pad.just?.[9]) {
+                SEA_ATLAS.close(this); return;
+            }
+            if(pad.just?.[12] || pad.just?.[14]) SEA_ATLAS.focus(this,-1);
+            else if(pad.just?.[13] || pad.just?.[15]) SEA_ATLAS.focus(this,1);
+            if(pad.just?.[0]) SEA_ATLAS.mark(this);
             return;
         }
         if (pad.just?.[8] && !this.islandDocked && !this.pausedByCaptain) {
@@ -1561,7 +1576,9 @@ class Game extends Phaser.Scene {
         // Keep unusually long mission text away from the fixed pause button.
         this.quest.setScale(Math.max(.78,Math.min(1,(SEA_DESKTOP?370:320)/Math.max(1,this.quest.width))));
         const curse=Math.round(this.curse||0);
-        this.hudConditions.setText((SEA_WEATHER.names?.[this.seaEvent]||'MAR SERENO')+'\nMALDIÇÃO '+curse+'%');
+        const nav=SEA_ATLAS.navigation(this);
+        this.hudConditions.setText((SEA_WEATHER.names?.[this.seaEvent]||'MAR SERENO')+
+            '\nMALDIÇÃO '+curse+'%'+(nav?'\nDESTINO '+nav.bearing+'° · '+nav.distance+'u':''));
         this.hudConditions.setColor(curse>=65?'#f0a3a3':'#c8b2a0');
         if(this.statusBars){
             const g=this.statusBars;g.clear();
@@ -1602,6 +1619,17 @@ class Game extends Phaser.Scene {
             if (t.taken) continue;
             const dx = (t.x - this.player.x) / range * (size / 2), dy = (t.y - this.player.y) / range * (size / 2);
             if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) { g.fillStyle(0xddba82, 1); g.fillCircle(x + dx, y + 5 + dy, 1.8); }
+        }
+        // Waypoint is a manual navigation aid, never autopilot. A target
+        // beyond radar reach is pinned to the rim, not falsely shown nearby.
+        const nav=SEA_ATLAS.navigation(this);
+        if(nav) {
+            const dx=(nav.island.x-this.player.x)/range*(size/2);
+            const dy=(nav.island.y-this.player.y)/range*(size/2);
+            const edge=Math.max(1,Math.abs(dx)/32,Math.abs(dy)/32);
+            const mx=x+dx/edge,my=y+5+dy/edge;
+            g.lineStyle(2,0xf6d19b,.98).strokeCircle(mx,my,4.5);
+            g.fillStyle(0xf6d19b,.94).fillCircle(mx,my,1.7);
         }
         // marcador do jogador com rumo
         g.fillStyle(0xd7edca); g.fillCircle(x, y + 5, 3);
