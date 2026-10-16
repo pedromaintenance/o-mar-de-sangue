@@ -17,6 +17,7 @@
 | **3.0 — A Maré Negra** | ✅ Concluído | Identidade sombria dos menus; [PR #27](https://github.com/pedromaintenance/o-mar-de-sangue/pull/27), oficialização [PR #28](https://github.com/pedromaintenance/o-mar-de-sangue/pull/28) |
 | **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
 | **3.2 — HUD de combate** | ✅ Implementado; CI aprovado | Casco e recarga legíveis, maldição crítica e estado do mar; [PR #30](https://github.com/pedromaintenance/o-mar-de-sangue/pull/30) |
+| **3.3a — Três Bandeiras na Maré** | ✅ Testes aprovados | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos apenas nesta viagem, sem migração de saves; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -52,12 +53,18 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 **Objetivo:** fazer a viagem expressar conflitos entre **cultistas, feéricos e sobreviventes**, não apenas combate.
 
-- [ ] Desenhar a estrutura de eventos com **apresentação, decisão e consequência**, respeitando a lore canônica da Carcaça.
-- [ ] Propor facções, barganhas, reputação e custos das decisões antes de codificar suas regras.
-- [ ] Implementar primeiro um pequeno encontro vertical (protótipo) e validar a escrita e os efeitos.
-- [ ] Registrar o modelo de dados e prever a migração dos saves, se novos campos forem necessários.
+- [x] Definir uma cena com **apresentação, três decisões e consequências**, baseada na Costa Sul, Portomonte, Corte Feérica Sombria e devotos de Daegon.
+- [x] Documentar facções e custos/recompensas em [docs/political-events-3-3.md](docs/political-events-3-3.md).
+- [x] Implementar protótipo vertical de uma negociação em uma ilha de naufrágio determinística, com efeitos na viagem.
+- [x] Preservar o save v4 sem campos novos; especificar previamente a **migração necessária** para reputações persistentes (3.3b).
+- [x] Aprovar testes Node e Chromium: escolhas, consequências, retorno por B, layout Android/desktop e ausência de alteração do save.
+- [ ] Confirmar merge e disponibilização no GitHub Pages (verificação após integração).
 
-**Pronto quando:** evento testável com escolhas significativas, estado persistido sem corromper o save anterior e retorno seguro à navegação.
+**3.3a é deliberadamente um protótipo jogável**, não um sistema completo de reputação. `politicalLedger` e `politicalChoice` vivem apenas na cena. `SeaProfile` e seus saves não mudam.
+
+**3.3b — Planejado:** reputação persistente da Corte, sobreviventes e cultistas somente após discutir valores, impactos de campanha e migração segura de saves.
+
+**Pronto para 3.3a quando:** evento testável com escolhas significativas e efeitos na viagem, **sem persistência nova**, retorno seguro à navegação e testes de regressão aprovados. A persistência e reputação fazem parte da 3.3b, após definição do esquema de migração.
 
 ### P2 — 3.4: Atlas e orientação
 
@@ -100,6 +107,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Avançar para o desenho de **eventos políticos/narrativos 3.3**, preservando os marcos 3.0–3.2 e exigindo decisões explícitas de lore, consequências e persistência. Registrar o primeiro protótipo em um PR isolado antes de modificar saves ou regras.
+Após disponibilizar **3.3a — Três Bandeiras na Maré**, especificar 3.3b (reputação, impactos e migração de save) antes de codificá-la. O próximo trabalho visual independente segue sendo **3.4 — Atlas e orientação**.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
