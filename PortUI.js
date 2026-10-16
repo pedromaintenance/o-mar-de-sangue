@@ -164,6 +164,10 @@ const SEA_PORT_UI = {
       SEA_MUSIC.setVolume(SEA_MUSIC.volume+(id==='up'?.05:-.05));
       this.render('volume:'+id);return;
     }
+    if(name==='fx-volume'){
+      SEA_AUDIO.setEffectsVolume(SEA_AUDIO.effectsVolume+(id==='up'?.1:-.1));
+      this.render('fx-volume:'+id);return;
+    }
     if(name==='import'){
       this.root.querySelector('#sea-port-tracks')?.click();return;
     }
@@ -362,13 +366,23 @@ const SEA_PORT_UI = {
       '</div></header>';
   },
   music() {
-    const percent=Math.round(SEA_MUSIC.volume*100);
+    const musicPercent=Math.round(SEA_MUSIC.volume*100);
+    const effectsPercent=Math.round(SEA_AUDIO.effectsVolume*100);
     return '<div class="port-sound" aria-label="Controles de áudio">'+
-      '<span class="port-sound__label">♫ MARÉ SONORA</span>'+
-      '<button data-action="volume:down" type="button" aria-label="Diminuir volume">−</button>'+
-      '<span class="port-sound__volume">'+percent+'%</span>'+
-      '<button data-action="volume:up" type="button" aria-label="Aumentar volume">+</button>'+
-      '<button data-action="mute" type="button">'+(SEA_AUDIO.enabled?'SILENCIAR':'ATIVAR')+'</button>'+
+      '<div class="port-sound__group" aria-label="Volume da música">'+
+        '<span class="port-sound__label">♫ MÚSICA</span>'+
+        '<button data-action="volume:down" type="button" aria-label="Diminuir volume da música">−</button>'+
+        '<span class="port-sound__volume" aria-label="Volume da música: '+musicPercent+'%">'+musicPercent+'%</span>'+
+        '<button data-action="volume:up" type="button" aria-label="Aumentar volume da música">+</button>'+
+      '</div>'+
+      '<div class="port-sound__group" aria-label="Volume dos efeitos">'+
+        '<span class="port-sound__label">✹ EFEITOS</span>'+
+        '<button data-action="fx-volume:down" type="button" aria-label="Diminuir volume dos efeitos">−</button>'+
+        '<span class="port-sound__volume" aria-label="Volume dos efeitos: '+effectsPercent+'%">'+effectsPercent+'%</span>'+
+        '<button data-action="fx-volume:up" type="button" aria-label="Aumentar volume dos efeitos">+</button>'+
+      '</div>'+
+      '<button data-action="mute" type="button" aria-label="Ligar ou desligar todo o áudio">'+
+        (SEA_AUDIO.enabled?'SILENCIAR TUDO':'ATIVAR SOM')+'</button>'+
       '<button data-action="import" type="button">TROCAR TRILHAS</button>'+
       '<small data-music-status>'+this.text(SEA_MUSIC.status())+'</small>'+
       '</div>';
