@@ -1,4 +1,8 @@
 name: Port UI smoke and visual tests
+# Avoid queues of obsolete visual runs during active UI iteration.
+concurrency:
+  group: port-ui-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 on:
   push:
     paths:
@@ -20,6 +24,9 @@ on:
       - 'tests/mare-negra-hud-visual.test.cjs'
       - 'tests/political-parley.test.cjs'
       - 'tests/political-parley-visual.test.cjs'
+      - 'SeaAtlas.js'
+      - 'tests/atlas-chart.test.cjs'
+      - 'tests/atlas-chart-visual.test.cjs'
       - '.github/workflows/port-ui.yml'
   pull_request:
     paths:
@@ -42,6 +49,9 @@ on:
       - 'tests/mare-negra-hud-visual.test.cjs'
       - 'tests/political-parley.test.cjs'
       - 'tests/political-parley-visual.test.cjs'
+      - 'SeaAtlas.js'
+      - 'tests/atlas-chart.test.cjs'
+      - 'tests/atlas-chart-visual.test.cjs'
 jobs:
   port-smoke:
     runs-on: ubuntu-latest
@@ -61,6 +71,8 @@ jobs:
           node tests/mare-negra-overlays.test.cjs
           node tests/mare-negra-hud.test.cjs
           node tests/political-parley.test.cjs
+          node --check SeaAtlas.js
+          node tests/atlas-chart.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
@@ -81,6 +93,7 @@ jobs:
           node tests/mare-negra-overlays-visual.test.cjs
           node tests/mare-negra-hud-visual.test.cjs
           node tests/political-parley-visual.test.cjs
+          node tests/atlas-chart-visual.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

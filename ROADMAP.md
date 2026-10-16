@@ -17,7 +17,8 @@
 | **3.0 — A Maré Negra** | ✅ Concluído | Identidade sombria dos menus; [PR #27](https://github.com/pedromaintenance/o-mar-de-sangue/pull/27), oficialização [PR #28](https://github.com/pedromaintenance/o-mar-de-sangue/pull/28) |
 | **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
 | **3.2 — HUD de combate** | ✅ Implementado; CI aprovado | Casco e recarga legíveis, maldição crítica e estado do mar; [PR #30](https://github.com/pedromaintenance/o-mar-de-sangue/pull/30) |
-| **3.3a — Três Bandeiras na Maré** | ✅ Testes aprovados | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos apenas nesta viagem, sem migração de saves; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
+| **3.3a — Três Bandeiras na Maré** | ✅ Concluído | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos temporários; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
+| **3.4a — Carta dos Náufragos** | 🟡 Em validação | Atlas acessível por M/View/toque na carta, descoberta progressiva, ilhas visitadas e posição do navio sem mexer nos saves |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -62,15 +63,23 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 **3.3a é deliberadamente um protótipo jogável**, não um sistema completo de reputação. `politicalLedger` e `politicalChoice` vivem apenas na cena. `SeaProfile` e seus saves não mudam.
 
-**3.3b — Planejado:** reputação persistente da Corte, sobreviventes e cultistas somente após discutir valores, impactos de campanha e migração segura de saves.
+**3.3b — Especificação preparada:** [docs/reputation-3-3b-design.md](docs/reputation-3-3b-design.md) descreve proposta de reputação e migração v4→v5. **Ainda não implementada.**
 
 **Pronto para 3.3a quando:** evento testável com escolhas significativas e efeitos na viagem, **sem persistência nova**, retorno seguro à navegação e testes de regressão aprovados. A persistência e reputação fazem parte da 3.3b, após definição do esquema de migração.
 
-### P2 — 3.4: Atlas e orientação
+### P1 — 3.4: Atlas e orientação
 
-- [ ] Revisar radar/mapa, descoberta de ilhas e sinalização de perigos.
-- [ ] Distinguir rotas, áreas conhecidas e zonas de risco usando a iconografia do universo.
-- [ ] Testar clareza no controle e em dispositivos de toque antes de adicionar navegação nova.
+**3.4a — Carta dos Náufragos (protótipo implementado, em validação)**
+
+- [x] Criar Atlas modal com posição real, rumo do navio e coordenadas das ilhas, sem viagem rápida.
+- [x] Descobrir apenas ilhas ao alcance do radar existente; ilhas ocultas não aparecem.
+- [x] Diferenciar ilhas visitadas, santuários, altares e a negociação política descoberta.
+- [x] Abrir/fechar com M/ESC no teclado, View/B no Xbox ou toque no radar; congelar controles de navegação e canhões sob a carta.
+- [x] Manter `SeaProfile` v4 e saves existentes intactos; observações são somente por expedição.
+- [ ] Testar no Chromium 1600×900, 1280×720 e Android 390×844 com capturas de mapa e navegação.
+- [ ] Integrar e conferir manualmente no Pages em dispositivo real.
+
+**3.4b — Futuro:** mapa com waypoints opcionais, direção até destinos conhecidos, símbolos/arte autoral e persistência de descoberta apenas após planejamento de save. [Especificação e limitações](docs/atlas-3-4.md).
 
 ### P2 — 3.5: Áudio, efeitos e atmosfera
 
@@ -107,6 +116,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Após disponibilizar **3.3a — Três Bandeiras na Maré**, especificar 3.3b (reputação, impactos e migração de save) antes de codificá-la. O próximo trabalho visual independente segue sendo **3.4 — Atlas e orientação**.
+Validar e publicar **3.4a — Carta dos Náufragos**. Após a publicação, considerar **3.4b** (rumos/waypoints) ou implementar **3.3b** somente depois da aprovação de regras e migração v4→v5. A sequência posterior mantém 3.5 Áudio e 3.6 Robustez.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.

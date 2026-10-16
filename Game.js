@@ -430,23 +430,27 @@ class Game extends Phaser.Scene {
         this.createHUD();
         SEA_WEATHER.init(this);
         SEA_ISLANDS.init(this);
+        SEA_ATLAS.init(this);
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
-        this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER,F');
+        this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER,F,M');
         this.onBoth = () => this.fire('both'); this.onPort = () => this.fire('port'); this.onStarboard = () => this.fire('starboard');
         this.onPause = () => {
+            if (this.atlasOpen) { SEA_ATLAS.close(this); return; }
             if (this.islandDocked) SEA_ISLANDS.close(this);
             else if (!this.ended) this.toggleCaptainMenu();
         };
-        this.onDock = e => { if (!e?.repeat) SEA_ISLANDS.tryDock(this); };
+        this.onDock = e => { if (!e?.repeat && !this.atlasOpen) SEA_ISLANDS.tryDock(this); };
+        this.onAtlas = e => { if(!e?.repeat) SEA_ATLAS.toggle(this); };
         this.input.keyboard.on('keydown-SPACE', this.onBoth);
         this.input.keyboard.on('keydown-Q', this.onPort);
         this.input.keyboard.on('keydown-E', this.onStarboard);
         this.input.keyboard.on('keydown-ESC', this.onPause);
         this.input.keyboard.on('keydown-P', this.onPause);
         this.input.keyboard.on('keydown-F', this.onDock);
+        this.input.keyboard.on('keydown-M', this.onAtlas);
         this.onPauseMenuKey = e => {
             if (this.islandDocked) {
                 if (e.code === 'ArrowDown' || e.code === 'ArrowUp') {
@@ -470,6 +474,7 @@ class Game extends Phaser.Scene {
             this.input.keyboard.off('keydown-ESC', this.onPause);
             this.input.keyboard.off('keydown-P', this.onPause);
             this.input.keyboard.off('keydown-F', this.onDock);
+            this.input.keyboard.off('keydown-M', this.onAtlas);
             this.input.keyboard.off('keydown', this.onPauseMenuKey);
         });
         // Eventos por pointer: soltar um dedo NÃO cancela o movimento dos demais.
@@ -494,8 +499,8 @@ class Game extends Phaser.Scene {
         const tip = this.add.text(SEA_VIEW.width / 2, 137,
             (this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
-                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS  ·  ESC/P: PAUSA'
-                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE O CANHÃO PARA DISPARAR\nDOIS DEDOS FUNCIONAM JUNTOS.'), {
+                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS · M: CARTA · ESC/P: PAUSA'
+                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nTOQUE NA CARTA PARA ABRIR O ATLAS\nSEGURE O CANHÃO PARA DISPARAR'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
@@ -731,7 +736,7 @@ class Game extends Phaser.Scene {
             color: '#f3d8b1', align: 'center', backgroundColor: '#241419df', padding: { x: 8, y: 5 }
         }).setOrigin(.5).setScrollFactor(0).setDepth(140).setAlpha(0);
         this.radar = this.add.graphics().setScrollFactor(0).setDepth(110);
-        this.add.text(SEA_DESKTOP ? SEA_VIEW.width - 112 : 390, 144, 'CARTA', { fontFamily: 'monospace', fontSize: '10px', color: '#c3ae8c' })
+        this.add.text(SEA_DESKTOP ? SEA_VIEW.width - 112 : 390, 144, 'CARTA · M', { fontFamily: 'monospace', fontSize: '10px', color: '#c3ae8c' })
             .setScrollFactor(0).setDepth(112);
         // A small two-line sea/curse badge sits BELOW the unchanged radar.
         this.hudConditions=this.add.text(SEA_DESKTOP?SEA_VIEW.width-126:338,239,'',{
@@ -803,7 +808,7 @@ class Game extends Phaser.Scene {
         this.nativeTouchHandlers = null;
     }
     touchStart(pointer) {
-        if (this.ended || this.pausedByCaptain || this.islandDocked || !pointer) return;
+        if (this.ended || this.pausedByCaptain || this.islandDocked || this.atlasOpen || !pointer) return;
         if (!this.touchLayout) return; // mouse no desktop não é um joystick virtual
         const { joystick, port, starboard } = this.touchLayout;
         const near = (area) => Math.hypot(pointer.x - area.x, pointer.y - area.y) <= area.radius;
@@ -866,7 +871,7 @@ class Game extends Phaser.Scene {
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
     fire(side = 'both') {
-        if (!this.player || this.ended || this.sinking || this.pausedByCaptain || this.islandDocked) return false;
+        if (!this.player || this.ended || this.sinking || this.pausedByCaptain || this.islandDocked || this.atlasOpen) return false;
         let fired = false;
         const rot = this.player.rotation;
         const rightX = Math.cos(rot), rightY = Math.sin(rot);
@@ -1215,6 +1220,15 @@ class Game extends Phaser.Scene {
         SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05),
             this.bossAlert || this.curse >= 65 || ['storm', 'maelstrom'].includes(this.seaEvent) ? 'black' : 'crimson');
         if (this.ended || this.sinking) return;
+        // Xbox View (button 8) opens/returns the voyage atlas. Pause and
+        // island dialogs take precedence; no fire or ship physics under it.
+        if (this.atlasOpen) {
+            if(pad.just?.[8] || pad.just?.[1] || pad.just?.[9]) SEA_ATLAS.close(this);
+            return;
+        }
+        if (pad.just?.[8] && !this.islandDocked && !this.pausedByCaptain) {
+            SEA_ATLAS.toggle(this); return;
+        }
         if (this.islandDocked) {
             if (pad.just[1] || pad.just[9]) SEA_ISLANDS.close(this);
             else if (pad.just[0]) SEA_ISLANDS.select(this);
@@ -1246,6 +1260,10 @@ class Game extends Phaser.Scene {
         }
         const dt = Math.min(delta / 1000, .05);
         this.elapsed += dt; this.waveElapsed += dt;
+        // Discovery is only recorded while sailing; no persistent save writes.
+        if(this.chartDiscovered && this.elapsed >= (this.chartScanAt||0)) {
+            SEA_ATLAS.discover(this);this.chartScanAt=this.elapsed+.5;
+        }
         if (this.waveElapsed > .065) { this.waveElapsed = 0; this.drawSea(this.elapsed); }
         SEA_PIXEL.seaUpdate(this,dt);
         const keyboardTurn = Number(this.keys.RIGHT.isDown || this.keys.D.isDown) -
@@ -1605,12 +1623,16 @@ class Game extends Phaser.Scene {
     handleCaptainPointer(x,y) {
         if (this.ended || this.sinking) return false;
         const inside=(h)=>h&&Math.abs(x-h.x)<=h.w/2&&Math.abs(y-h.y)<=h.h/2;
+        if (this.atlasOpen) return SEA_ATLAS.pointer(this,x,y);
         if (this.islandDocked) return SEA_ISLANDS.pointer(this,x,y);
         if (this.pausedByCaptain) {
             const option=this.pausePadOptions?.find(o=>inside(o.hit));
             if (option) option.onTap();
             // Pausa cobre toda a tela; jamais transfere o toque para os canhões.
             return true;
+        }
+        if (this.chartHitbox && inside(this.chartHitbox)) {
+            SEA_ATLAS.toggle(this);return true;
         }
         if (this.islandCandidate && inside(this.anchorHitbox)) {
             SEA_ISLANDS.tryDock(this);
@@ -1623,7 +1645,7 @@ class Game extends Phaser.Scene {
         return false;
     }
     toggleCaptainMenu() {
-        if (this.ended || this.sinking || this.islandDocked) return;
+        if (this.ended || this.sinking || this.islandDocked || this.atlasOpen) return;
         if (this.pausedByCaptain) {
             this.pauseElements?.destroy(true);
             this.pauseElements=null;
@@ -1648,6 +1670,7 @@ class Game extends Phaser.Scene {
         this.ended = true; this.resultsBanked = true; this.pausedByCaptain = false;
         this.playerVelocity.x = this.playerVelocity.y = 0;
         if (this.pauseElements) { this.pauseElements.destroy(true); this.pauseElements = null; }
+        if (this.atlasOpen) SEA_ATLAS.close(this);
         let commission = 0;
         if (won && this.mode === 'mission') commission = Math.round(42 * Math.pow(1.25, Math.min(this.stage, 90)));
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
