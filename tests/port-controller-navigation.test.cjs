@@ -57,7 +57,7 @@ buttons.length=0;scene.page='yard';scene.yardGroup='armas';
 const activeTab=button('yard:armas',90,185,170,44,'main',{pointer:true});
 const otherTab=button('yard:apoio',300,185,170,44,'main',{pointer:true});
 const buy0=button('buy:canhoes',330,320,120,45);
-const buy1=button('buy:bateria',330,485,120,45);
+const buy1=button('buy:bateria',630,485,120,45);
 const footerReturn=button('menu',180,720,320,55);
 const headerReturn=button('menu',1080,25,150,40,'header');
 const disabled=button('buy:disabled',330,610,120,45,'main',{disabled:true});
@@ -67,6 +67,8 @@ assert(!ui.navigableButtons().includes(activeTab));
 assert(!ui.navigableButtons().includes(otherTab));
 assert(!ui.navigableButtons().includes(disabled));
 assert(!activeTab.classList.contains('is-controller-focused'));
+// Even with a wide gap between affordable upgrade columns, down must
+// visit the next purchase instead of skipping to the bottom Return button.
 ui.moveFocus('down');focused('buy:bateria');
 ui.moveFocus('down');focused('menu');
 assert.equal(document.activeElement,footerReturn);
