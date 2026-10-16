@@ -24,6 +24,18 @@ const {chromium}=require('playwright-core');
    await page.locator('#sea-port-ui').waitFor({state:'detached',timeout:20000});
    await page.waitForFunction(()=>game.scene.isActive('Game')&&
       !!game.scene.getScene('Game').player,{timeout:20000});
+   const neutral=await page.evaluate(()=>{
+     const sc=game.scene.getScene('Game');
+     sc.toggleCaptainMenu();
+     const labels=sc.pauseElements.list.filter(o=>o.type==='Text').map(o=>o.text);
+     const options=sc.pausePadOptions.length;
+     sc.toggleCaptainMenu();
+     return {labels,options};
+   });
+   assert.equal(neutral.options,3,'Unchanged pause actions before parley');
+   assert(neutral.labels.some(t=>t.includes('REGISTRO POLÍTICO · NENHUM ACORDO')));
+   assert(!neutral.labels.some(t=>t.includes('NOMES ENTREGUES')),
+     'Journal must not spoil the undiscovered parley');
    const before=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');
     const candidates=s.islands.filter(i=>i.kind==='parley');
@@ -80,6 +92,24 @@ const {chromium}=require('playwright-core');
    });
    assert(result.closed&&result.overlayCleared&&result.goldSame);
    assert.equal(result.choice,'tribute');
+   const journal=await page.evaluate(()=>{
+     const sc=game.scene.getScene('Game');
+     const saved=localStorage.getItem('carcaca.mar-de-sangue.v4');
+     sc.toggleCaptainMenu();
+     const labels=sc.pauseElements.list.filter(o=>o.type==='Text').map(o=>o.text);
+     const options=sc.pausePadOptions.length;
+     return {labels,options,save:saved,
+       choice:sc.politicalChoice,paused:sc.pausedByCaptain};
+   });
+   assert(journal.paused&&journal.options===3,
+     'Captain journal must keep three original actions');
+   assert(journal.labels.some(t=>t.includes('NOMES ENTREGUES · CORTE FEÉRICA')));
+   assert(journal.labels.some(t=>t.includes('Termos: ouro +60 · maldição +15')));
+   assert.equal(journal.choice,'tribute','Diary cannot erase the political decision');
+   assert.equal(journal.save,before.originalSave,'Diary must not alter save');
+   await page.screenshot({path:path.join('port-artifacts',
+      'mare-negra-3-3b0-'+label+'-political-journal.png'),fullPage:true});
+   await page.evaluate(()=>game.scene.getScene('Game').toggleCaptainMenu());
    if(errors.length)throw Error(label+' JS errors: '+errors.join(' | '));
    console.log('PASS political choice '+label,result);
    await page.close();
