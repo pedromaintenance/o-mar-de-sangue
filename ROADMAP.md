@@ -18,7 +18,8 @@
 | **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
 | **3.2 — HUD de combate** | ✅ Implementado; CI aprovado | Casco e recarga legíveis, maldição crítica e estado do mar; [PR #30](https://github.com/pedromaintenance/o-mar-de-sangue/pull/30) |
 | **3.3a — Três Bandeiras na Maré** | ✅ Concluído | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos temporários; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
-| **3.4a — Carta dos Náufragos** | 🟡 Em validação | Atlas acessível por M/View/toque na carta, descoberta progressiva, ilhas visitadas e posição do navio sem mexer nos saves |
+| **3.4a — Carta dos Náufragos** | ✅ Integrado; teste físico pendente | Atlas M/View/toque e descoberta progressiva sem alterar saves; [PR #32](https://github.com/pedromaintenance/o-mar-de-sangue/pull/32) |
+| **3.4b — Rumos da Carta** | 🟡 Implementado; QA pendente | Waypoints manuais descobertos, rumo, distância e radar, sem autopiloto ou migração de save |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -79,7 +80,17 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Testar no Chromium 1600×900, 1280×720 e Android 390×844 com capturas de mapa e navegação.
 - [ ] Integrar e conferir manualmente no Pages em dispositivo real.
 
-**3.4b — Futuro:** mapa com waypoints opcionais, direção até destinos conhecidos, símbolos/arte autoral e persistência de descoberta apenas após planejamento de save. [Especificação e limitações](docs/atlas-3-4.md).
+**3.4b — Rumos da Carta (implementação concluída na branch, publicação sujeita ao CI)**
+
+- [x] Marcar e desmarcar um único destino já descoberto por toque/clique no marcador, setas + Enter ou direcional Xbox + A.
+- [x] Exibir rumo absoluto (norte 0°), distância em unidades de mundo e correção relativa à proa.
+- [x] Mostrar waypoint no radar/HUD durante a navegação, inclusive além do raio do radar (marcado na borda).
+- [x] Conservar o waypoint apenas durante a expedição; negar seleção de ilhas ocultas; não alterar SeaProfile v4.
+- [x] Ampliar QA Node e Chromium para seleção, rumo, HUD e integridade do save.
+- [ ] CI verde, screenshots verificadas, merge e funcionamento em Pages.
+- [ ] Testes manuais em Xbox real e PWA instalada.
+
+**Posteriormente:** arte e símbolos autorais, escala mais detalhada e eventual persistência de descoberta apenas após migração planejada. [Especificação do Atlas](docs/atlas-3-4.md).
 
 ### P2 — 3.5: Áudio, efeitos e atmosfera
 
@@ -116,6 +127,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e publicar **3.4a — Carta dos Náufragos**. Após a publicação, considerar **3.4b** (rumos/waypoints) ou implementar **3.3b** somente depois da aprovação de regras e migração v4→v5. A sequência posterior mantém 3.5 Áudio e 3.6 Robustez.
+Validar e publicar **3.4b — Rumos da Carta**. Em seguida definir regras da **3.3b — Reputação** antes de qualquer migração v4→v5. Continuam planejadas 3.5 Áudio e 3.6 Robustez.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
