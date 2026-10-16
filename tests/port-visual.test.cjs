@@ -63,7 +63,7 @@ const {chromium}=require('playwright-core');
         page.waitForEvent('download',{timeout:12000}),
         page.locator('[data-action="export-backup"]').click()
       ]);
-      assert(/^mar-de-sangue-save-v4-\\d{4}-\\d{2}-\\d{2}\\.json$/.test(
+      assert(/^mar-de-sangue-save-v4-\d{4}-\d{2}-\d{2}\.json$/.test(
         captainDownload.suggestedFilename()),label+': filename must be portable');
       const captainData=JSON.parse(fs.readFileSync(await captainDownload.path(),'utf8'));
       assert.equal(captainData.schema,4,label+': backup schema');
