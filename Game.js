@@ -351,7 +351,7 @@ class SeaPort extends Phaser.Scene {
         });
     }
     update(time,delta) {
-        SEA_MUSIC.tick(Math.min((delta||16)/1000,.05),'crimson');
+        SEA_MUSIC.tick(Math.min((delta||16)/1000,.05),'port');
         if (typeof SEA_PORT_UI !== 'undefined' && SEA_PORT_UI.scene===this)
             SEA_PORT_UI.update(time);
     }
@@ -509,7 +509,7 @@ class Game extends Phaser.Scene {
         const tip = this.add.text(SEA_VIEW.width / 2, 137,
             (this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
-                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS · M: CARTA · ESC/P: PAUSA'
+                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS · M: CARTA · N: SOM · ESC/P: PAUSA'
                 : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nTOQUE NA CARTA PARA ABRIR O ATLAS\nSEGURE O CANHÃO PARA DISPARAR'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
@@ -1228,7 +1228,7 @@ class Game extends Phaser.Scene {
     update(time, delta) {
         const pad = SEA_GAMEPAD.poll();
         SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05),
-            this.bossAlert || this.curse >= 65 || ['storm', 'maelstrom'].includes(this.seaEvent) ? 'black' : 'crimson');
+            SEA_MUSIC.resolveMood(this));
         if (this.ended || this.sinking) return;
         // Xbox View (button 8) opens/returns the voyage atlas. Pause and
         // island dialogs take precedence; no fire or ship physics under it.
