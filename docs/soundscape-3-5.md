@@ -1,6 +1,6 @@
 # Mar de Sangue 3.5a — Paisagem Sonora Reativa
 
-**Estado:** implementada na branch, sujeita a CI e revisão antes de publicação.
+**Estado:** integrada à `main` pelo PR #34 em 16/10/2026; CI smoke/Chromium verde. Testes auditivos e PWA física pendentes.
 
 ## Problema resolvido
 
@@ -34,7 +34,7 @@ O motor mantém as duas trilhas existentes, **Beneath The Crimson Tide** (`crims
 - [x] Novo teste `tests/soundscape-3-5.test.cjs`: seis estados, prioridade narrativa, proporção de volume, fade, mute, compatibilidade de importação, atalhos `M`/`N` e encerramento de listeners.
 - [x] Teste de navegador do Atlas ampliado para verificar que `M` abre a carta sem alternar o áudio, e `N` silencia/restaura sem abrir carta.
 - [x] CI `port-ui.yml` agora observa `SeaEffects.js`, `SeaWeather.js` e o novo teste.
-- [ ] Smoke/Chromium completos verdes no PR.
+- [x] Smoke e Chromium completos verdes no [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34); merge squash `20e85a0`.
 - [ ] Revisão manual no GitHub Pages com música ativada: porto → navegar → tormenta → ilha → negociação → chefe.
 - [ ] Xbox físico, Android real e PWA offline.
 
