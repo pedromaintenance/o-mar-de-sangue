@@ -31,7 +31,7 @@ const {chromium}=require('playwright-core');
     return {open:s.atlasOpen,count:s.chartDiscovered.size,
       total:s.islands.length,hit:{...s.chartHitbox},
       radar:{x:s.radar.x,y:s.radar.y},
-      velocity:{...s.playerVelocity},gold:s.gold,profile:localStorage.getItem('mar-de-sangue-save-v4')};
+      velocity:{...s.playerVelocity},gold:s.gold,profile:localStorage.getItem('carcaca.mar-de-sangue.v4')};
    });
    assert.equal(before.open,false);
    assert(before.count<before.total,'Fog of discovery should initially conceal some islands');
@@ -81,7 +81,7 @@ const {chromium}=require('playwright-core');
     SEA_ATLAS.discover(s);
     SEA_ATLAS.toggle(s);
     const visible=s.chartDiscovered.has(parley.id);
-    const save=localStorage.getItem('mar-de-sangue-save-v4');
+    const save=localStorage.getItem('carcaca.mar-de-sangue.v4');
     return {visible,open:s.atlasOpen,save,kind:parley.kind};
    });
    assert(discovered.visible&&discovered.open);
