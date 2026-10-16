@@ -1,4 +1,8 @@
 name: Port UI smoke and visual tests
+# Avoid queues of obsolete visual runs during active UI iteration.
+concurrency:
+  group: port-ui-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 on:
   push:
     paths:
