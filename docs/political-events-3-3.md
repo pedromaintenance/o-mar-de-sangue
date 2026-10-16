@@ -44,5 +44,5 @@ A escolha é feita na tela padrão de atracação, com três opções e o botão
 - [x] Consequência narrativa visível, com um único retorno após a decisão.
 - [x] Proteção contra aplicação duplicada e contra morte por sacrifício.
 - [x] Estado temporário, sem edição de Save/SeaProfile.
-- [ ] Testes automatizados Node e Chromium aprovados para esta revisão.
+- [x] Testes automatizados Node e Chromium aprovados, incluindo desktop e Android emulado, em GitHub Actions.
 - [ ] Merge da entrega e verificação no site publicado.
