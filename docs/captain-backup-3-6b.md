@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.6b — Cópia de Segurança do Capitão
 
-**Situação:** implementação pronta na branch, publicação condicionada a testes.
+**Situação:** integrada à `main` em 16/10/2026 pelo [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38), com smoke e Chromium aprovados. Verificação física no Pages pendente.
 
 ## Para o jogador
 
@@ -29,7 +29,7 @@ A exportação é **somente leitura**: usa `SeaProfile.load()` e `Blob` + `URL.c
 
 - [x] Contratos Node em `tests/port-ui-rebuild.test.cjs`: botão visível, arquivo JSON e nome, metadados de versão, perfil idêntico ao original, ação de reset preservada, nenhum efeito na economia.
 - [x] Navegador real em `tests/port-visual.test.cjs`: interceptar download, ler JSON, comparar perfil com `SeaProfile.load()`, comparar `localStorage` antes/depois, screenshot nas resoluções 1600×900, 1280×720 e Android 390×844.
-- [ ] CI smoke e visual verdes antes do merge.
+- [x] CI smoke e visual aprovados; squash merge `f1f4e60`.
 - [ ] Verificar no Pages se Chrome desktop/Android geram um arquivo válido e íntegro.
 
 ## Horizonte
