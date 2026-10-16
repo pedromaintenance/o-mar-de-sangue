@@ -58,7 +58,8 @@ for(const desktop of [false,true]){
  assert.equal(s.hudConditions.args[0],desktop?1154:338);
  assert.equal(s.hudConditions.args[1],239);
  assert.equal(s.hudConditions.args[3].fontSize,'10px');
- assert(texts.find(e=>e.args[2]==='CARTA'));
+ assert(texts.find(e=>String(e.args[2]).startsWith('CARTA')),
+  'Radar label may include new Atlas hotkey but must remain present');
  ui.updateHUD.call(s);
  assert(s.hud.value.includes('CASCO 100/120')&&s.hud.value.includes('OURO 45'));
  assert(s.hud.value.includes('NÓS 21'));
