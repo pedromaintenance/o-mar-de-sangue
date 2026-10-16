@@ -24,6 +24,22 @@ const {chromium}=require('playwright-core');
       await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
       await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
       await page.screenshot({path:path.join('port-artifacts',label+'-menu.png'),fullPage:true});
+      // Real keyboard arrows must follow the layout, not DOM order.
+      const focused=()=>page.evaluate(()=>document.activeElement?.dataset?.action);
+      assert.equal(await focused(),'mission',label+': initial focus');
+      if(isMobile){
+        await page.keyboard.press('ArrowDown');
+        assert.equal(await focused(),'sandbox',label+': vertical mobile focus');
+        await page.keyboard.press('ArrowUp');
+        assert.equal(await focused(),'mission',label+': vertical mobile return');
+      }else{
+        for(const [key,expected] of [
+          ['ArrowRight','sandbox'],['ArrowDown','help'],
+          ['ArrowLeft','yard:armas'],['ArrowUp','mission']]){
+          await page.keyboard.press(key);
+          assert.equal(await focused(),expected,label+': spatial '+key);
+        }
+      }
       const ui=page.locator('#sea-port-ui');
       assert.equal(await ui.locator('[data-action="mission"]').count(),1);
       assert.equal(await ui.locator('[data-action="sandbox"]').count(),1);
@@ -42,6 +58,12 @@ const {chromium}=require('playwright-core');
       await page.locator('.port-upgrades').waitFor({timeout:10000});
       await page.screenshot({path:path.join('port-artifacts',label+'-yard.png'),fullPage:true});
       assert.equal(await page.locator('.port-upgrade').count(),4);
+      await page.keyboard.press('PageDown'); // RB equivalent: armas -> apoio
+      await page.waitForFunction(()=>document.querySelector('.port-tabs button.is-active')?.dataset.action==='yard:apoio');
+      assert.equal(await page.locator('.port-tabs button.is-active').getAttribute('data-action'),'yard:apoio');
+      await page.keyboard.press('PageUp'); // LB equivalent: apoio -> armas
+      await page.waitForFunction(()=>document.querySelector('.port-tabs button.is-active')?.dataset.action==='yard:armas');
+      assert.equal(await page.locator('.port-tabs button.is-active').getAttribute('data-action'),'yard:armas');
       await page.locator('[data-action="menu"]').first().click();
       await page.locator('.port-hero').waitFor({timeout:10000});
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));

@@ -9,6 +9,7 @@ on:
       - 'SeaIslands.js'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
+      - 'tests/port-controller-navigation.test.cjs'
       - '.github/workflows/port-ui.yml'
   pull_request:
     paths:
@@ -17,6 +18,7 @@ on:
       - 'Game.js'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
+      - 'tests/port-controller-navigation.test.cjs'
 jobs:
   port-smoke:
     runs-on: ubuntu-latest
@@ -32,6 +34,7 @@ jobs:
           node --check SeaMenus.js
           node --check SeaIslands.js
           node tests/port-ui-rebuild.test.cjs
+          node tests/port-controller-navigation.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
