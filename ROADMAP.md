@@ -18,6 +18,7 @@
 | **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
 | **3.2 — HUD de combate** | ✅ Implementado; CI aprovado | Casco e recarga legíveis, maldição crítica e estado do mar; [PR #30](https://github.com/pedromaintenance/o-mar-de-sangue/pull/30) |
 | **3.3a — Três Bandeiras na Maré** | ✅ Concluído | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos temporários; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
+| **3.3b.0 — Registro Político** | 🟡 Implementado; CI pendente | Mostra no Diário os acordos desta expedição, identifica facções antes da escolha e preserva save v4; [documentação](docs/political-ledger-3-3b0.md) |
 | **3.4a — Carta dos Náufragos** | ✅ Integrado; teste físico pendente | Atlas M/View/toque e descoberta progressiva sem alterar saves; [PR #32](https://github.com/pedromaintenance/o-mar-de-sangue/pull/32) |
 | **3.4b — Rumos da Carta** | ✅ Integrado; CI verde | Waypoints manuais para marcos descobertos, rumo, distância e radar; [PR #33](https://github.com/pedromaintenance/o-mar-de-sangue/pull/33); verificação física/Pages pendente |
 | **3.5a — Paisagem Sonora Reativa** | ✅ Integrada; CI verde | 6 contextos de trilha e teclas M (Atlas) / N (som); [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) e [documentação](docs/soundscape-3-5.md). Validação auditiva no Pages pendente |
@@ -65,7 +66,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 **3.3a é deliberadamente um protótipo jogável**, não um sistema completo de reputação. `politicalLedger` e `politicalChoice` vivem apenas na cena. `SeaProfile` e seus saves não mudam.
 
-**3.3b — Especificação preparada:** [docs/reputation-3-3b-design.md](docs/reputation-3-3b-design.md) descreve proposta de reputação e migração v4→v5. **Ainda não implementada.**
+**3.3b.0 — Registro das Três Bandeiras (implementado na branch, sob CI):**
+
+- [x] Exibir no Diário do Capitão o acordo político da viagem, inclusive ausência de acordo, sem revelar encontro oculto antes da decisão.
+- [x] Identificar o interlocutor de cada escolha (sobreviventes, Corte Feérica, culto de Daegon) antes de confirmar.
+- [x] Exibir os termos materiais do pacto separadamente de reputação, sem criar pontos, bônus ou penalidades políticos ocultos.
+- [x] Manter os três botões da pausa, todas as áreas de toque, navegação do controle e retirada com 75% do ouro.
+- [x] Ampliar testes Node/Chromium e capturas do registro, com verificação de save v4.
+- [ ] Validar CI, fazer merge e conferir no Pages. [Documentação e escopo](docs/political-ledger-3-3b0.md).
+
+**3.3b persistente — Especificação preparada:** [docs/reputation-3-3b-design.md](docs/reputation-3-3b-design.md) descreve proposta de reputação e migração v4→v5. **Ainda não implementada nem aprovada.**
 
 **Pronto para 3.3a quando:** evento testável com escolhas significativas e efeitos na viagem, **sem persistência nova**, retorno seguro à navegação e testes de regressão aprovados. A persistência e reputação fazem parte da 3.3b, após definição do esquema de migração.
 
@@ -137,6 +147,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Conferir a **3.5a — Paisagem Sonora Reativa** no Pages (áudio com fones/alto-falantes, M/N, PWA offline) e os controles físicos do Atlas 3.4b. Depois seguir para **3.3b — Reputação** (definir regras e migração v4→v5 antes de implementar), **3.5b — Volumes separados** e **3.6 — Robustez**.
+Validar e publicar **3.3b.0 — Registro Político** no Diário do Capitão; conferir no Pages após concluir o encontro Três Bandeiras. Depois definir regras e migração v4→v5 da **reputação persistente 3.3b**, sem alterar saves antes do planejamento e aprovação. Também continuam pendentes testes físicos do Atlas 3.4b, da 3.5a de áudio, e melhorias 3.5b/3.6.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
