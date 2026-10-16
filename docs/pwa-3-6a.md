@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.6a — Atualização segura e navegação offline
 
-**Situação:** implementação na branch, CI pendente. Sem mudança de saves.
+**Situação:** correção do cache implementada e CI novamente pendente; sem alteração de saves. A instalação era bloqueada por dois manifests JSON antigos que não existiam no repositório.
 
 ## Problema observado
 O jogo já oferecia instalação PWA e precache de scripts, sprites e UI, porém a interface não explicava quando a conexão caía nem quando um novo service worker estava pronto. Como o worker atual usa `skipWaiting()` e `clients.claim()`, a atualização da camada de cache pode acontecer enquanto o jogador está navegando; **não é seguro reiniciar a página automaticamente em plena expedição**.
@@ -11,7 +11,7 @@ O jogo já oferecia instalação PWA e precache de scripts, sprites e UI, porém
 - **Instalação original mantida:** o botão de instalar continua ligado a `beforeinstallprompt`, e desaparece após `appinstalled`. Plataformas que não expõem `beforeinstallprompt` dependem das opções do próprio navegador.
 - **Checagem de versão ao retomar o foco:** `registration.update()` é chamado ao registrar/voltar à aba; sem polling constante nem timers.
 - O shell é HTML/CSS independente do canvas Phaser, com `role=status`, `aria-live=polite`, botões com foco de teclado e largura responsiva; só aparece quando necessário.
-- O novo `PwaStatus.js` entra na lista de precache. O cache é versionado para **v40**, enquanto áudio FLAC grande continua fora do precache, como nas versões anteriores.
+- O novo `PwaStatus.js` entra na lista de precache. O cache é versionado para **v42**, enquanto áudio FLAC grande continua fora do precache, como nas versões anteriores.
 
 ## Proteções
 - **Não altera** `SeaProfile` v4, moedas, upgrades, vitórias, missões, `politicalLedger`, eventos, controles, navegação ou efeitos.
@@ -22,7 +22,7 @@ O jogo já oferecia instalação PWA e precache de scripts, sprites e UI, porém
 
 ## Testes
 - [x] `tests/pwa-status-3-6.test.cjs`: eventos online/offline, primeira instalação vs. atualização, botão de recarga opt-in, fluxo de instalação e ausência de acesso ao save.
-- [x] `tests/pwa-offline-visual.test.cjs`: instala SW em loopback seguro; espera controle, verifica precache v40, escreve um save v4 de teste, interrompe rede, recarrega offline, abre o porto e inicia a viagem, confere save intacto, reconecta, simula notificação de atualização e comprova que a viagem não reinicia.
+- [x] `tests/pwa-offline-visual.test.cjs`: instala SW em loopback seguro; espera controle, verifica precache v42, escreve um save v4 de teste, interrompe rede, recarrega offline, abre o porto e inicia a viagem, confere save intacto, reconecta, simula notificação de atualização e comprova que a viagem não reinicia.
 - [x] Workflow passa a executar ambos os testes, com Chrome desktop 1280×720 e Android emulado 390×844 na checagem offline.
 - [ ] CI Node/Chromium verde e merge na `main`.
 - [ ] Teste manual no GitHub Pages em PWA instalada, Android real e Xbox.

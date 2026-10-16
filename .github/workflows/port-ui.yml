@@ -14,6 +14,7 @@ on:
       - 'PwaStatus.js'
       - 'style.css'
       - 'tests/pwa-status-3-6.test.cjs'
+      - 'tests/pwa-cache-contract.test.cjs'
       - 'tests/pwa-offline-visual.test.cjs'
       - 'Game.js'
       - 'SeaMenus.js'
@@ -53,6 +54,7 @@ on:
       - 'PwaStatus.js'
       - 'style.css'
       - 'tests/pwa-status-3-6.test.cjs'
+      - 'tests/pwa-cache-contract.test.cjs'
       - 'tests/pwa-offline-visual.test.cjs'
       - 'Game.js'
       - 'tests/port-ui-rebuild.test.cjs'
@@ -82,6 +84,7 @@ jobs:
           node --check Game.js
           node --check PwaStatus.js
           node tests/pwa-status-3-6.test.cjs
+          node tests/pwa-cache-contract.test.cjs
           node --check SeaEffects.js
           node --check SeaWeather.js
           node tests/soundscape-3-5.test.cjs

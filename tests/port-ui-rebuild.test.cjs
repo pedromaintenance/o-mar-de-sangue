@@ -5,6 +5,11 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
+let lastBackup=null;
+const downloads=[];
+const URLStub={createObjectURL(blob){lastBackup=blob;return 'blob:test-save';},revokeObjectURL(){}};
+class BlobStub{constructor(parts,options){this.content=parts.join('');this.type=options.type;}}
+
 
 const script=fs.readFileSync('PortUI.js','utf8');
 const css=fs.readFileSync('PortUI.css','utf8');
@@ -12,11 +17,12 @@ const game=fs.readFileSync('Game.js','utf8');
 const html=fs.readFileSync('index.html','utf8');
 
 class Element {
-  constructor(tag){this.tag=tag;this.innerHTML='';this.dataset={};
+  constructor(tag){this.tag=tag;this.innerHTML='';this.dataset={};this.style={};
     this.listeners={};this.children=[];this.scrollTop=0;}
   setAttribute(k,v){this[k]=v;}
   append(c){this.children.push(c);}
   remove(){this.removed=true;}
+  click(){if(this.tag==='a')downloads.push({file:this.download,href:this.href});}
   addEventListener(k,h){this.listeners[k]=h;}
   removeEventListener(k){delete this.listeners[k];}
   querySelector(s){
@@ -30,7 +36,7 @@ const app=new Element('div'),classes=new Set();
 const doc={
   activeElement:null,createElement:(tag)=>new Element(tag),
   getElementById:id=>id==='app-shell'?app:null,
-  body:{classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}}
+  body:{append(){},classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)}}
 };
 const win={listeners:{},addEventListener(k,h){this.listeners[k]=h},
  removeEventListener(k){delete this.listeners[k]}};
@@ -62,7 +68,7 @@ const SEA_AUDIO={enabled:true,effectsVolume:1,
  toggle(){this.enabled=!this.enabled},
  setEffectsVolume(n){this.effectsVolume=Math.max(0,Math.min(1,Math.round(n*100)/100));}};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
-const context={document:doc,window:win,Phaser,
+const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
  SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_UPGRADES:upgrades};
 vm.createContext(context);
 vm.runInContext(script+'\nthis.ui=SEA_PORT_UI;',context);
@@ -74,6 +80,7 @@ for(const action of ['mission','sandbox','yard:armas','help','reset']){
 }
 assert(ui.root.innerHTML.includes('ship_flagship.png'));
 assert(ui.root.innerHTML.includes('700'));
+assert(ui.root.innerHTML.includes('export-backup'),'Backup should be visible from port');
 ui.action('mission');assert.equal(starts.at(-1)[0],'Game');
 assert.equal(starts.at(-1)[1].stage,5);
 ui.action('sandbox');assert.equal(starts.at(-1)[1].mode,'sandbox');
@@ -81,6 +88,19 @@ scene.page='yard';ui.render();assert(ui.root.innerHTML.includes('buy:canhoes'));
 ui.action('buy:canhoes');assert.equal(p.levels.canhoes,2);
 scene.page='help';ui.render();assert(ui.root.innerHTML.includes('DIÁRIO DE BORDO'));
 scene.page='reset';ui.render();assert(ui.root.innerHTML.includes('reset-confirm'));
+assert(ui.root.innerHTML.includes('GUARDAR CÓPIA DO SAVE'));
+const previous=JSON.stringify(p);
+ui.action('export-backup');
+assert.equal(downloads.length,1,'Export must invoke file download once');
+assert(downloads[0].file.startsWith('mar-de-sangue-save-v4-'));
+const backup=JSON.parse(lastBackup.content);
+assert.equal(backup.format,'mar-de-sangue-captain-backup');
+assert.equal(backup.schema,4);
+assert.equal(backup.profile.gold,p.gold);
+assert.deepEqual(backup.profile,p,'Export should contain the normalized profile');
+assert.equal(JSON.stringify(p),previous,'Export cannot change player progress');
+assert(ui.root.innerHTML.includes('reset-confirm'),'Export must not confirm the reset');
+
 scene.page='result';scene.report={won:true,mode:'mission',collected:200,reward:150,
  bank:850,kills:8,rammings:3,stage:4,islands:2};
 ui.render();assert(ui.root.innerHTML.includes('OURO RECUPERADO'));
