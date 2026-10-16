@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.5b — Mesa de Som
 
-**Estado:** código implementado na branch; merge/publicação dependem dos testes de CI.
+**Estado:** integrado à `main` em 16/10/2026 via [PR #36](https://github.com/pedromaintenance/o-mar-de-sangue/pull/36); smoke e testes Chromium verdes. Teste auditivo em dispositivos reais e confirmação no Pages pendentes.
 
 ## Resultado jogável
 
@@ -30,7 +30,8 @@ Os controles são botões HTML com rótulos de acessibilidade e agrupamento resp
 - [x] `tests/audio-mixer-3-5b.test.cjs`: compatibilidade retroativa, ganho Web Audio, zero efeitos, mute mestre, valores inválidos, persistência e reinício de contexto.
 - [x] `tests/port-ui-rebuild.test.cjs`: ações independentes do porto, rótulos e preservação do estado de música quando efeitos mudam.
 - [x] `tests/port-visual.test.cjs`: botões reais em 1600×900, 1280×720 e 390×844 Android emulado; controle das duas porcentagens, mute, save e recarregamento; screenshots adicionadas aos artefatos da Action.
-- [ ] CI Node/Chromium verde, merge aprovado e teste manual no Pages.
+- [x] CI Node e Chromium verdes; PR #36 integrado por squash merge `326225a`.
+- [ ] Conferência pública no Pages e teste auditivo em dispositivos reais.
 - [ ] Teste auditivo real no Chrome/Android, PWA offline e controle físico Xbox. Em dispositivos específicos, Web Audio/autoplay pode requerer interação inicial do usuário.
 
 ## Como testar no GitHub Pages
