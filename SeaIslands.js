@@ -69,6 +69,36 @@ const SEA_ISLANDS = {
               outcome:'O acordo é selado em sangue. Os devotos somem sob as águas rubras.' }
         ]
     },
+    // The ledger is an account of this voyage's decision, NOT standing or
+    // persistent faction reputation. No new balance or save schema.
+    factionLabels: {
+        sobreviventes:'SOBREVIVENTES',corte:'CORTE FEÉRICA',
+        culto:'CULTO DE DAEGON'
+    },
+    politicalNotes: {
+        refuge: {
+            title:'NÁUFRAGOS PROTEGIDOS · SOBREVIVENTES',
+            detail:'Termos: casco +22 (limite) · maldição -8'
+        },
+        tribute: {
+            title:'NOMES ENTREGUES · CORTE FEÉRICA',
+            detail:'Termos: ouro +60 · maldição +15'
+        },
+        bloodpowder: {
+            title:'PÓLVORA RITUAL · CULTO DE DAEGON',
+            detail:'Termos: casco -12 · canhões +6 · maldição +18'
+        }
+    },
+    politicalRecord(s) {
+        // Before an encounter there is deliberately no hint of the hidden
+        // Three Banners site. Never treat the temporary ledger as reputation.
+        const note=this.politicalNotes[s?.politicalChoice];
+        return note ? { ...note, agreed:true } : {
+            title:'REGISTRO POLÍTICO · NENHUM ACORDO',
+            detail:'Nenhum compromisso registrado nesta viagem.',
+            agreed:false
+        };
+    },
     init(s) {
         s.islandVisits = new Set();
         s.islandDocked = false;
@@ -299,6 +329,11 @@ const SEA_ISLANDS = {
         }).setOrigin(.5));
         const visited=s.islandVisits.has(island.id);
         if(s.islandOutcome){
+            if(type==='parley') root.add(s.add.text(
+                x,top+324,'ACORDO DESTA EXPEDIÇÃO · NÃO É REPUTAÇÃO PERMANENTE',{
+                fontFamily:'monospace',fontSize:SEA_DESKTOP?'11px':'10px',
+                color:'#be9d83',align:'center',wordWrap:{width:width-45}
+            }).setOrigin(.5));
             root.add(s.add.text(x,top+360,'ESCOLHA REGISTRADA',{
                 fontFamily:'Georgia',fontSize:'21px',fontStyle:'bold',color:'#d9bc95'
             }).setOrigin(.5));
@@ -313,8 +348,11 @@ const SEA_ISLANDS = {
             }).setOrigin(.5));
             for(let i=0;i<actions.length;i++){
                 const choice=actions[i];
+                const hint=type==='parley'&&choice.faction
+                    ? '['+this.factionLabels[choice.faction]+'] '+choice.hint
+                    : choice.hint;
                 this.screenButton(s,root,x,top+385+i*72,width-48,63,
-                    choice.name,choice.hint,i,!!(
+                    choice.name,hint,i,!!(
                         (choice.cost&&s.gold<choice.cost)||
                         (choice.hp<0&&s.shipHP<=Math.abs(choice.hp))));
             }
