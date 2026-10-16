@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.6a — Atualização segura e navegação offline
 
-**Situação:** correção do cache implementada e CI novamente pendente; sem alteração de saves. A instalação era bloqueada por dois manifests JSON antigos que não existiam no repositório.
+**Situação:** integrada à `main` em 16/10/2026 pelo [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37), com smoke e Chromium aprovados; save v4 intacto. A instalação era bloqueada por dois manifests JSON antigos ausentes, removidos do precache v42. Teste físico do Pages/PWA ainda pendente.
 
 ## Problema observado
 O jogo já oferecia instalação PWA e precache de scripts, sprites e UI, porém a interface não explicava quando a conexão caía nem quando um novo service worker estava pronto. Como o worker atual usa `skipWaiting()` e `clients.claim()`, a atualização da camada de cache pode acontecer enquanto o jogador está navegando; **não é seguro reiniciar a página automaticamente em plena expedição**.
@@ -24,7 +24,7 @@ O jogo já oferecia instalação PWA e precache de scripts, sprites e UI, porém
 - [x] `tests/pwa-status-3-6.test.cjs`: eventos online/offline, primeira instalação vs. atualização, botão de recarga opt-in, fluxo de instalação e ausência de acesso ao save.
 - [x] `tests/pwa-offline-visual.test.cjs`: instala SW em loopback seguro; espera controle, verifica precache v42, escreve um save v4 de teste, interrompe rede, recarrega offline, abre o porto e inicia a viagem, confere save intacto, reconecta, simula notificação de atualização e comprova que a viagem não reinicia.
 - [x] Workflow passa a executar ambos os testes, com Chrome desktop 1280×720 e Android emulado 390×844 na checagem offline.
-- [ ] CI Node/Chromium verde e merge na `main`.
+- [x] CI Node/Chromium verde, inclusive viagem offline real e validação estática de todos os recursos do precache; squash merge `b4f5956`.
 - [ ] Teste manual no GitHub Pages em PWA instalada, Android real e Xbox.
 
 ## Como testar no Pages
