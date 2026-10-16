@@ -11,6 +11,10 @@ on:
       - 'PortThemeAbyss.css'
       - 'index.html'
       - 'sw.js'
+      - 'PwaStatus.js'
+      - 'style.css'
+      - 'tests/pwa-status-3-6.test.cjs'
+      - 'tests/pwa-offline-visual.test.cjs'
       - 'Game.js'
       - 'SeaMenus.js'
       - 'SeaIslands.js'
@@ -46,6 +50,10 @@ on:
       - 'PortThemeAbyss.css'
       - 'index.html'
       - 'sw.js'
+      - 'PwaStatus.js'
+      - 'style.css'
+      - 'tests/pwa-status-3-6.test.cjs'
+      - 'tests/pwa-offline-visual.test.cjs'
       - 'Game.js'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
@@ -72,6 +80,8 @@ jobs:
         run: |
           node --check PortUI.js
           node --check Game.js
+          node --check PwaStatus.js
+          node tests/pwa-status-3-6.test.cjs
           node --check SeaEffects.js
           node --check SeaWeather.js
           node tests/soundscape-3-5.test.cjs
@@ -106,6 +116,7 @@ jobs:
           node tests/mare-negra-hud-visual.test.cjs
           node tests/political-parley-visual.test.cjs
           node tests/atlas-chart-visual.test.cjs
+          node tests/pwa-offline-visual.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
