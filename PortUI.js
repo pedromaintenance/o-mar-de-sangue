@@ -272,7 +272,9 @@ const SEA_PORT_UI = {
       // diagonal; use vertical movement to reach secondary controls.
       (horizontal&&zone==='main'?[]:choices);
     if(!candidates.length)return false;
-    candidates.sort((a,b)=>a.score-b.score||a.along-b.along);
+    candidates.sort(buyCandidates.length?
+      ((a,b)=>a.along-b.along||a.score-b.score):
+      ((a,b)=>a.score-b.score||a.along-b.along));
     return this.focusTarget(candidates[0].candidate);
   },
   changeYardTab(target) {
