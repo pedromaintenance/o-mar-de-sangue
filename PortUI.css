@@ -200,6 +200,23 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
 .port-warning p{font:19px/1.6 Georgia,serif;color:#c9c4bd;max-width:520px}
 .port-warning>strong{font-size:12px;color:#ffc59d;letter-spacing:.16em}
 .port-warning__actions{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.port-restore{gap:11px}
+.port-restore .port-warning__sigil{font-size:43px}
+.port-restore .port-warning p{font-size:13px;line-height:1.5;margin:0}
+.port-restore__grid{width:100%;border:1px solid rgba(180,135,92,.48);padding:8px;background:rgba(12,17,22,.65)}
+.port-restore__row{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(2,minmax(0,.8fr));
+  align-items:center;gap:7px;padding:8px 5px;border-bottom:1px solid rgba(196,145,91,.2);
+  color:#d9c7b0;font-size:12px}
+.port-restore__row:last-child{border:0}
+.port-restore__row span:nth-child(2),.port-restore__row span:nth-child(3),
+.port-restore__row strong{text-align:right}
+.port-restore__row--head{font-size:10px;font-weight:800;letter-spacing:.08em;color:#d9b783}
+.port-restore__notice{font-size:12px!important}
+.port-restore__actions{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.port-restore__actions .port-choice{min-height:66px}
+.port-bottom__actions [data-action="restore-file"],
+.port-bottom__actions [data-action="restore-rollback"]{border:1px solid #87704f;background:rgba(21,30,35,.8)}
+
 .port-result-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
 .port-result-grid>div{background:#17252a;border:1px solid #9f7b50;padding:20px 10px;
  text-align:center;display:grid;gap:7px}
@@ -266,6 +283,8 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
  .port-bottom{align-items:flex-start;flex-direction:column}
  .port-bottom__actions{width:100%;justify-content:space-between}
  .port-warning__actions{grid-template-columns:1fr}
+ .port-restore__actions{grid-template-columns:1fr}
+ .port-restore__row{font-size:11px;gap:4px}
  .port-upgrade{padding:13px;grid-template-columns:48px 1fr}
  .port-upgrade__symbol{width:43px;height:43px}
  .port-upgrade__foot{flex-wrap:wrap}
