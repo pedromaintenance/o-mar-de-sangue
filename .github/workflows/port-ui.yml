@@ -4,20 +4,24 @@ on:
     paths:
       - 'PortUI.js'
       - 'PortUI.css'
+      - 'PortThemeAbyss.css'
       - 'Game.js'
       - 'SeaMenus.js'
       - 'SeaIslands.js'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
+      - 'tests/port-theme-abyss.test.cjs'
       - 'tests/port-controller-navigation.test.cjs'
       - '.github/workflows/port-ui.yml'
   pull_request:
     paths:
       - 'PortUI.js'
       - 'PortUI.css'
+      - 'PortThemeAbyss.css'
       - 'Game.js'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
+      - 'tests/port-theme-abyss.test.cjs'
       - 'tests/port-controller-navigation.test.cjs'
 jobs:
   port-smoke:
@@ -51,6 +55,7 @@ jobs:
           trap 'kill $SERVER_PID' EXIT
           sleep 2
           node tests/port-visual.test.cjs
+          node tests/port-theme-abyss.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
