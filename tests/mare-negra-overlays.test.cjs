@@ -76,6 +76,32 @@ for(const desktop of [true,false]){
  assert(labels.some(s=>String(s).includes('DIÁRIO DO CAPITÃO')));
  assert(labels.some(s=>String(s).includes('MALDIÇÃO 23%')));
  assert(labels.some(s=>String(s).includes('Derrotar o arauto')));
+ assert(labels.some(s=>String(s).includes('REGISTRO POLÍTICO · NENHUM ACORDO')),
+    'the captain should see a neutral political ledger before any parley');
+ assert(!labels.some(s=>String(s).includes('PÓLVORA RITUAL')||
+    String(s).includes('NOMES ENTREGUES')||
+    String(s).includes('NÁUFRAGOS PROTEGIDOS')),
+    'unvisited political encounters must not be spoiled');
+ for(const [choiceId,expected] of [
+    ['refuge','SOBREVIVENTES'],
+    ['tribute','CORTE FEÉRICA'],
+    ['bloodpowder','CULTO DE DAEGON']
+ ]){
+    scene.politicalChoice=choiceId;
+    scene.pausePadOptions=[];
+    const from=all.length;
+    ctx.pause(scene);
+    const political=all.slice(from).filter(o=>o.kind==='text').map(o=>o.text);
+    assert(political.some(t=>String(t).includes(expected)),
+      'diary must reflect recorded '+expected+' decision');
+    assert(political.some(t=>String(t).startsWith('Termos:')),
+      'diary must distinguish resource terms from political reputation');
+    assert.equal(scene.pausePadOptions.length,3,
+      'political notes must not add pause button/hitbox');
+ }
+ scene.politicalChoice=null;
+ scene.pausePadOptions=[];
+ ctx.pause(scene);
  const [resume,audio,withdraw]=scene.pausePadOptions;
  resume.onTap();assert.equal(scene.continued,1);
  audio.onTap();assert.equal(ctx.SEA_AUDIO.enabled,false);
