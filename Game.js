@@ -558,8 +558,13 @@ class Game extends Phaser.Scene {
             spots.push([x, y, radius, radius < 34 ? 'reef' : kinds[rng.between(0, kinds.length - 1)]]);
         }
         const labels = ['COSTA SUL', 'DENTES DE DAEGON', 'ILHA DAS TARTARUGAS', 'FAROL VERMELHO', 'RECIFES TABAXI', 'RUÍNAS DE TETRA', 'PORTO DE SAL', 'ILHA DO TEMPLO'];
-        const keyMap = { reef: 'island-reef', ruin: 'island-ruin', monastery: 'island-monastery', daegon: 'island-daegon', demeter: 'island-demeter', wreck: 'island-wreck' };
-        spots.forEach(([x, y, radius, kind], i) => {
+        const keyMap = { reef: 'island-reef', ruin: 'island-ruin', monastery: 'island-monastery', daegon: 'island-daegon', demeter: 'island-demeter', wreck: 'island-wreck', parley: 'island-wreck' };
+        // Exactly one of the existing wreck landmarks hosts the political
+        // encounter per voyage; position, dimensions and RNG are unchanged.
+        let parleyPlaced = false;
+        spots.forEach(([x, y, radius, baseKind], i) => {
+            const kind = baseKind === 'wreck' && !parleyPlaced ? 'parley' : baseKind;
+            if(kind === 'parley') parleyPlaced = true;
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
             const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
