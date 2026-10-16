@@ -1,50 +1,50 @@
-# Porto 3.0 — A Maré Negra (prévia isolada)
+# Porto 3.0 — A Maré Negra | Identidade visual oficial
 
-O Mar de Sangue passa a oferecer uma **nova direção artística experimental**
-que não substitui a aparência clássica até aprovação da equipe.
+A **Maré Negra** foi aprovada como identidade visual padrão do Porto
+de *O Mar de Sangue*. O estilo clássico continua disponível para comparação
+ou reversão, sem alteração das regras ou do progresso.
 
-## Como comparar
+## Links
 
-- **Clássico:** https://pedromaintenance.github.io/o-mar-de-sangue/
-- **Maré Negra:** https://pedromaintenance.github.io/o-mar-de-sangue/?theme=abyss
+- **Maré Negra (padrão):** https://pedromaintenance.github.io/o-mar-de-sangue/
+- **Clássico (alternativo):** https://pedromaintenance.github.io/o-mar-de-sangue/?theme=classic
+- **Link anterior da prévia (compatível):** https://pedromaintenance.github.io/o-mar-de-sangue/?theme=abyss
 
-A seleção é feita pela URL, sem modificar `SeaProfile`, saves, regras,
-navegação, callbacks, hitboxes ou o motor de jogo.
+A seleção é feita pela URL, não é gravada no perfil do jogador
+e não toca no progresso existente.
 
-## Limites de implementação
+## Arquitetura e restrições
 
-- `PortThemeAbyss.css` é o único arquivo de estilo com mudanças estéticas.
-- `index.html` lê somente o parâmetro `?theme=abyss` e acrescenta a classe
-  `html.theme-mare-negra`, antes do CSS ser carregado.
-- `PortUI.css` e `PortUI.js` são mantidos **inalterados**.
-- `Game.js`, `SeaMenus.js`, `SeaIslands.js` e as regras de progresso
-  também permanecem intactos.
-- O tema atua somente dentro da interface do porto (`.port-ui`).
-  O canvas Phaser reaparece normalmente durante o combate.
-- Imagens originais de navios/mares existentes no repositório são reutilizadas.
-  Nenhuma textura/sprite é quantizada ou sobrescrita.
-- `sw.js` atualiza a versão do cache e inclui o novo CSS para a PWA.
+- O arquivo `PortThemeAbyss.css` implementa apenas a identidade visual.
+- `index.html` aplica `html.theme-mare-negra` por padrão antes da
+  leitura de CSS. Somente `?theme=classic` deixa de aplicar essa classe.
+- `PortUI.css` permanece como base comum e como tema clássico;
+  as regras opcionais de Maré Negra são prefixadas pela classe.
+- `PortUI.js`, `Game.js`, `SeaMenus.js`, `SeaIslands.js`, compras,
+  saves, eventos, navegação por controle e combate **não mudam**.
+- O novo tema atua exclusivamente em `.port-ui`.
+  A cena Phaser permanece com os sprites originais.
+- `sw.js` inclui ambos os estilos e invalida o cache para que a
+  atualização chegue a instalações PWA.
 
-## Direção visual
+## Direção artística
 
-Ferro oxidado quase preto, madeiras carbonizadas e tinta envelhecida; vermelho
-usado como sinal de perigo, não como cor dominante dos cartões; contraste de
-texto em marfim fosco e bronze velho. Sem redesenhar botões, preços, navegação,
-categorias ou fichas. A melhoria cobre menu, estaleiro, manual, resultado e reset.
+Tons de ferro oxidado quase preto, madeira carbonizada e tinta envelhecida,
+sangue seco para alertas, bronze antigo e marfim para textos. Todos os
+painéis do menu, estaleiro, diário, resultados e confirmação de reset
+compartilham essa linguagem.
 
-## QA obrigatória
+## Garantias de regressão
 
-CI de navegador real nas resoluções 1600×900, 1280×720 e 390×844,
-cobrindo clássico e tema escuro:
+Os testes da versão oficial exercitam em navegador Chromium nas resoluções
+1600×900, 1280×720 e 390×844:
 
-- A página clássica não recebe a classe nem a aparência alternativa.
-- O tema `?theme=abyss` altera os estilos sem remover ações.
-- Nenhum overflow horizontal nos três tamanhos.
-- Setas e foco visual permanecem funcionais.
-- Abas do estaleiro continuam mouse/toque somente; Q/E e LB/RB mantém trocas.
-- O controle B volta ao porto.
-- Iniciar missão desmonta o DOM e libera o canvas Phaser.
-- Screenshots geradas para ambos os menus e estaleiro.
+- Maré Negra está ativa na URL principal e também em `?theme=abyss`.
+- Tema clássico aparece apenas em `?theme=classic`.
+- Ambas as opções preservam a mesma quantidade de ações de menu.
+- Layout não tem overflow horizontal.
+- Foco, setas, Q/E, abas só com mouse/toque e o botão B continuam operando.
+- A entrada no combate desmonta o DOM de porto e libera o canvas.
 
-**Regra de publicação:** por enquanto, publicar somente com opt-in pelo link.
-Só mudar o tema padrão após avaliação visual real pelo usuário.
+O visual padrão pode ser revertido alterando unicamente o script
+de seleção de classe em `index.html`, sem restaurar arquivos de gameplay.
