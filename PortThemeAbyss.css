@@ -1,7 +1,7 @@
 /*
  * PORTO 3.0 — A MARÉ NEGRA
- * A visual-only, opt-in CSS skin. No changes to PortUI.js, Game.js or state.
- * Activate with ?theme=abyss. The port's default skin stays untouched.
+ * The game's official, default visual skin; only the legacy comparison link
+ * ?theme=classic opts out. No changes to PortUI.js, Game.js or state.
  * Existing original naval sprites/sea textures are reused, never quantized.
  * Keep pointer hitboxes, focus, responsive grid and tab navigation intact.
  */
