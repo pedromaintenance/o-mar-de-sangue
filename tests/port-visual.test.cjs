@@ -58,13 +58,36 @@ const {chromium}=require('playwright-core');
       await page.locator('.port-upgrades').waitFor({timeout:10000});
       await page.screenshot({path:path.join('port-artifacts',label+'-yard.png'),fullPage:true});
       assert.equal(await page.locator('.port-upgrade').count(),4);
+      // The category tab is visible but is NOT a selectable gamepad/keyboard button.
+      assert.equal(await page.locator('.port-tabs button[tabindex="-1"]').count(),4);
+      assert.equal(await focused(),'buy:canhoes',label+': first affordable upgrade has initial focus');
+      assert.equal(await page.locator('.port-tabs .is-controller-focused').count(),0);
+      await page.keyboard.press('ArrowDown');
+      assert.equal(await focused(),'buy:alcance',label+': ↓ reaches next affordable upgrade, not Return');
+      await page.keyboard.press('ArrowDown');
+      assert.equal(await focused(),'menu',label+': ↓ from last buy reaches Return');
+      await page.keyboard.press('ArrowUp');
+      assert.equal(await focused(),'buy:alcance',label+': ↑ from Return reaches upgrade');
+      // Q/E mirror the shoulder buttons without putting focus on a tab.
+      await page.keyboard.press('e');
+      await page.waitForFunction(()=>document.querySelector('.port-tabs button.is-active')?.dataset.action==='yard:apoio');
+      assert.notEqual((await focused()||'').slice(0,5),'yard:',label+': E did not select tab');
+      assert.equal(await page.locator('.port-tabs .is-controller-focused').count(),0);
+      await page.keyboard.press('q');
+      await page.waitForFunction(()=>document.querySelector('.port-tabs button.is-active')?.dataset.action==='yard:armas');
       await page.keyboard.press('PageDown'); // RB equivalent: armas -> apoio
       await page.waitForFunction(()=>document.querySelector('.port-tabs button.is-active')?.dataset.action==='yard:apoio');
       assert.equal(await page.locator('.port-tabs button.is-active').getAttribute('data-action'),'yard:apoio');
       await page.keyboard.press('PageUp'); // LB equivalent: apoio -> armas
       await page.waitForFunction(()=>document.querySelector('.port-tabs button.is-active')?.dataset.action==='yard:armas');
       assert.equal(await page.locator('.port-tabs button.is-active').getAttribute('data-action'),'yard:armas');
-      await page.locator('[data-action="menu"]').first().click();
+      // Actual gamepad B is processed through the same Gamepad API code.
+      await page.evaluate(()=>{
+        const original=SEA_GAMEPAD.poll;
+        SEA_GAMEPAD.poll=()=>({connected:true,just:{1:true}});
+        try{SEA_PORT_UI.update(99999);}
+        finally{SEA_GAMEPAD.poll=original;}
+      });
       await page.locator('.port-hero').waitFor({timeout:10000});
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));
       console.log('PASS visual '+label,measure);
