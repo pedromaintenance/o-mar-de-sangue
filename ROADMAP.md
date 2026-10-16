@@ -20,7 +20,7 @@
 | **3.3a — Três Bandeiras na Maré** | ✅ Concluído | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos temporários; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
 | **3.4a — Carta dos Náufragos** | ✅ Integrado; teste físico pendente | Atlas M/View/toque e descoberta progressiva sem alterar saves; [PR #32](https://github.com/pedromaintenance/o-mar-de-sangue/pull/32) |
 | **3.4b — Rumos da Carta** | ✅ Integrado; CI verde | Waypoints manuais para marcos descobertos, rumo, distância e radar; [PR #33](https://github.com/pedromaintenance/o-mar-de-sangue/pull/33); verificação física/Pages pendente |
-| **3.5a — Paisagem Sonora Reativa** | 🟡 Implementada; aguardando CI | Música contextual em 6 estados e correção do conflito M/áudio; [especificação](docs/soundscape-3-5.md) |
+| **3.5a — Paisagem Sonora Reativa** | ✅ Integrada; CI verde | 6 contextos de trilha e teclas M (Atlas) / N (som); [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) e [documentação](docs/soundscape-3-5.md). Validação auditiva no Pages pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -96,13 +96,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ### P2 — 3.5: Áudio, efeitos e atmosfera
 
-**3.5a — Paisagem Sonora Reativa (código implementado; QA de publicação pendente)**
+**3.5a — Paisagem Sonora Reativa (integrada à `main`; CI aprovado em 16/10/2026)**
 
 - [x] Corrigir conflito entre `M` (Carta dos Náufragos) e áudio: `N` passa a silenciar/restaurar; botões do porto e Diário preservados.
 - [x] Reutilizar as duas faixas existentes em seis contextos: porto, mar, ilha, negociação política, perigo e chefe.
 - [x] Reaproveitar crossfade e preferências anteriores de volume; não introduzir áudio de terceiros nem alterar importação manual FLAC/MP3.
 - [x] Adicionar testes de contexto, fades e atalhos, além de browser test M/N e CI.
-- [ ] Confirmar smoke e browser CI, merge e teste auditivo no GitHub Pages.
+- [x] Smoke, testes Node de áudio e testes Chromium de teclado/Atlas concluídos; [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) integrado à `main` (`20e85a0`).
+- [ ] Confirmar publicação e testar as transições **ouvindo** no GitHub Pages.
 - [ ] Testar PWA offline e som com Xbox/Android físicos.
 
 **3.5b — Planejado:** controles independentes de volume para música e efeitos. **3.5c — Planejado:** ampliar trilhas por contexto após seleção de arquivos. A prioridade também inclui efeitos moderados e FPS estável. [Design e QA](docs/soundscape-3-5.md).
@@ -136,6 +137,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar a **3.5a — Paisagem Sonora Reativa** por CI e publicar para teste no Pages. Seguem pendentes os testes físicos do Atlas 3.4b e os trabalhos de **3.3b — Reputação** (antes é necessário aprovar regras e migração v4→v5), **3.5b — Volumes separados** e **3.6 — Robustez**.
+Conferir a **3.5a — Paisagem Sonora Reativa** no Pages (áudio com fones/alto-falantes, M/N, PWA offline) e os controles físicos do Atlas 3.4b. Depois seguir para **3.3b — Reputação** (definir regras e migração v4→v5 antes de implementar), **3.5b — Volumes separados** e **3.6 — Robustez**.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
