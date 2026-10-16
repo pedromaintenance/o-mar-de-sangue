@@ -26,7 +26,7 @@ assert.equal(sfx.unlock().master?.gain,undefined);
 assert.equal(sfx.master.gain.value,.4,'Legacy original amplifier remains 0.4');
 assert.equal(sfx.setEffectsVolume(.37),.37);
 assert(Math.abs(sfx.master.gain.value-.148)<1e-8);
-assert.equal(values.get('carcaca.mar.sfx.volume'),'.37');
+assert.equal(values.get('carcaca.mar.sfx.volume'),'0.37');
 assert.equal(sfx.setEffectsVolume(-10),0);
 assert.equal(sfx.master.gain.value,0);
 assert.equal(sfx.setEffectsVolume(999),1);
