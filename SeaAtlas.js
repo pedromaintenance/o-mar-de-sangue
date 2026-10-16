@@ -100,9 +100,15 @@ const SEA_ATLAS = {
             if(isl.kind==='parley'&&!visited){
                 g.lineStyle(1,0xe5b780,.95).strokeCircle(mx,my,7);
                 g.fillStyle(color,1).fillRect(mx-3,my-3,6,6);
+            }else if(isl.kind==='daegon'&&!visited) {
+                // A dangerous altar is square: distinguish by shape and hue.
+                g.fillStyle(color,1).fillRect(mx-4,my-4,8,8);
+            }else if(isl.kind==='demeter'&&!visited) {
+                // Sanctuary cross remains recognizable without color vision.
+                g.lineStyle(2,color,1).lineBetween(mx-5,my,mx+5,my);
+                g.lineBetween(mx,my-5,mx,my+5);
             }else{
-                g.fillStyle(color,visited?.55:1).fillCircle(mx,my,
-                    isl.kind==='daegon'?4.5:3.5);
+                g.fillStyle(color,visited?.55:1).fillCircle(mx,my,3.5);
                 if(visited)g.lineStyle(1,0x748384,.55).strokeCircle(mx,my,5);
             }
         }
@@ -122,7 +128,7 @@ const SEA_ATLAS = {
             '  ·  OUTRAS AINDA OCULTAS',
             desktop?12:10,'#c2ae95',{mono:true});
         txt(cx,top+(desktop?574:540),
-            '✦ NÁUFRAGOS   ✚ SANTUÁRIOS   ● ILHAS   ○ JÁ VISITADAS',
+            '▣ NEGOCIAÇÃO   ■ ALTAR   ✚ SANTUÁRIO   ○ VISITADA',
             desktop?12:10,'#bfaa8c',{mono:true});
         const closeY=top+h-40,closeW=desktop?300:322,closeH=48;
         add(s.add.rectangle(cx,closeY,closeW,closeH,0x362128,.98)
