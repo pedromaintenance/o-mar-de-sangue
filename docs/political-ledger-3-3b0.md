@@ -1,6 +1,6 @@
 # 3.3b.0 — Registro das Três Bandeiras no Diário do Capitão
 
-**Estado da implementação:** protótipo de registro **por expedição**, sem migração de save ou reputação persistente.
+**Estado da implementação:** registro **por expedição** integrado à `main` pelo [PR #35](https://github.com/pedromaintenance/o-mar-de-sangue/pull/35), com smoke/Chromium verdes em 16/10/2026. Sem migração de save ou reputação persistente. Testes manuais em dispositivo físico e Pages pendentes.
 
 ## Por que existe
 
@@ -33,7 +33,7 @@ O Diário não revela o nome ou a existência do encontro antes de o jogador tom
 
 - [x] Teste Node de overlay preserva 3 botões, hitboxes, callbacks e retorno a 75% do ouro; verifica registro vazio e as três variantes.
 - [x] Teste Chromium de negociação ampliado para capturar Diário após o acordo em 1600×900, 1280×720 e Android 390×844; verifica save v4 inalterado, 3 opções de pausa e proteção contra spoiler.
-- [ ] CI deve aprovar todas as suites antes do merge.
+- [x] CI smoke/Chromium verde; PR #35 integrado com squash merge `c21d318`.
 - [ ] Revisão do Pages e PWA instalada por dispositivo real permanece pendente.
 
 ## Próximo passo: 3.3b persistente (ainda NÃO implementado)
