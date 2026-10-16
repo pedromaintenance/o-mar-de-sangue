@@ -4,7 +4,7 @@
  * Não desenha, redimensiona nem quantiza sprites existentes.
  */
 const SEA_PORT_UI = {
-  root:null, scene:null, lastPadAt:0, lastPadDir:'',
+  root:null, scene:null, lastPadAt:0, lastPadDir:'', lastYardFocus:null,
   // A ordem das abas é uma regra de navegação, não depende da posição no DOM.
   yardTabs:['casco','motor','armas','apoio'],
   text(value) {
@@ -36,19 +36,38 @@ const SEA_PORT_UI = {
       const target=e.target.closest('[data-action]');
       if(!target||!root.contains(target)||target.disabled)return;
       e.preventDefault();
-      this.focusTarget(target);
+      if(target.dataset.nav==='pointer'){
+        // Mouse/touch may change tabs, but tabs never enter keyboard/gamepad focus.
+        this.paintFocus(null);
+        target.blur?.();
+      }else this.focusTarget(target);
       this.action(target.dataset.action);
     };
     this.onFocusIn=e=>{
       const button=e.target?.closest?.('button[data-action]:not(:disabled)');
-      if(button&&root.contains(button))this.paintFocus(button);
+      if(button&&root.contains(button)){
+        if(button.dataset.nav==='pointer'){
+          this.paintFocus(null);
+          return;
+        }
+        this.paintFocus(button);
+      }
     };
     root.addEventListener('focusin',this.onFocusIn);
     this.onKey=e=>{
       if(!this.root||!this.scene)return;
-      if(e.key==='Escape'){
+      if(e.key==='Escape'||e.key==='Backspace'){
         if(this.scene.page!=='menu'){e.preventDefault();this.goto('menu');}
         return;
+      }
+      // At the port only: Q/E mirror LB/RB. A held key must not spin tabs.
+      if(this.scene.page==='yard'&&!e.repeat&&!e.altKey&&!e.ctrlKey&&!e.metaKey){
+        const key=e.key.toLowerCase();
+        if(key==='q'||key==='e'){
+          e.preventDefault();
+          this.switchYardTab(key==='q'?-1:1);
+          return;
+        }
       }
       const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
       if(directions[e.key]){
@@ -76,8 +95,8 @@ const SEA_PORT_UI = {
     this.render();
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>this.unmount(scene));
     this.lastPadAt=0;this.lastPadDir='';
-    this.focusByAction(scene.page==='menu'?'mission':
-      scene.page==='yard'?'yard:'+(scene.yardGroup||'armas'):null);
+    this.lastYardFocus=null;
+    this.focusByAction(scene.page==='menu'?'mission':null);
     SEA_MUSIC.load().then(()=>{
       if(this.root&&this.scene===scene){
         const status=this.root.querySelector('[data-music-status]');
@@ -97,6 +116,7 @@ const SEA_PORT_UI = {
     if(this.onKey&&typeof window!=='undefined')window.removeEventListener('keydown',this.onKey);
     if(typeof document!=='undefined')document.body.classList.remove('port-ui-open');
     this.root=null;this.scene=null;
+    this.lastYardFocus=null;
   },
   goto(page,group) {
     const scene=this.scene;if(!scene)return;
@@ -120,10 +140,8 @@ const SEA_PORT_UI = {
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='menu'){this.goto('menu');return;}
     if(name==='yard'){
-      if(scene.page==='yard'){
-        scene.yardGroup=id||'armas';
-        this.render('yard:'+scene.yardGroup);
-      }else this.goto('yard',id||'armas');
+      if(scene.page==='yard')this.changeYardTab(id||'armas');
+      else this.goto('yard',id||'armas');
       return;
     }
     if(name==='help'||name==='reset'){this.goto(name);return;}
@@ -151,6 +169,8 @@ const SEA_PORT_UI = {
   navigableButtons() {
     return Array.from(this.root?.querySelectorAll('button[data-action]:not(:disabled)')||[])
       .filter(b=>{
+        // Tabs are mouse/touch targets only. LB/RB and Q/E switch tabs.
+        if(b.dataset.nav==='pointer')return false;
         const r=b.getBoundingClientRect?.();
         if(!r||r.width<=1||r.height<=1)return false;
         // Avoid buttons hidden by responsive layouts or any ancestor.
@@ -170,6 +190,9 @@ const SEA_PORT_UI = {
     for(const previous of this.root.querySelectorAll('.is-controller-focused'))
       previous.classList.remove('is-controller-focused');
     target?.classList.add('is-controller-focused');
+    if(this.scene?.page==='yard'&&target&&this.navigationZone(target)==='main'){
+      this.lastYardFocus=target.dataset.action||null;
+    }
   },
   focusTarget(target) {
     if(!target||!this.root)return false;
@@ -180,8 +203,9 @@ const SEA_PORT_UI = {
   },
   focusByAction(action) {
     const buttons=this.navigableButtons();
-    const target=(action&&buttons.find(b=>b.dataset.action===action))||
-      (this.scene?.page==='yard'&&buttons.find(b=>b.dataset.action==='yard:'+this.scene.yardGroup))||
+    const target=(action&&buttons.find(b=>b.dataset.action===action&&this.navigationZone(b)==='main'))||
+      (action&&buttons.find(b=>b.dataset.action===action))||
+      (this.scene?.page==='yard'&&buttons.find(b=>b.dataset.action?.startsWith('buy:')))||
       buttons.find(b=>b.dataset.action==='mission')||
       buttons.find(b=>this.navigationZone(b)==='main')||buttons[0];
     if(target)this.focusTarget(target);
@@ -238,34 +262,41 @@ const SEA_PORT_UI = {
     candidates.sort((a,b)=>a.score-b.score||a.along-b.along);
     return this.focusTarget(candidates[0].candidate);
   },
-  switchYardTab(step) {
-    if(!this.scene||this.scene.page!=='yard'||!step)return false;
-    const tabs=this.yardTabs,index=tabs.indexOf(this.scene.yardGroup);
-    const target=tabs[((index<0?2:index)+step+tabs.length)%tabs.length];
-    const focused=document.activeElement?.dataset?.action||'';
-    let nextFocus='yard:'+target;
-    if(focused.startsWith('buy:')){
-      // Maintain approximately the same upgrade card slot across tabs.
-      // If the target card cannot be purchased, focus the selected tab
-      // rather than moving the controller to a disabled element.
-      const source=SEA_UPGRADES.filter(u=>u.group===this.scene.yardGroup);
-      const destination=SEA_UPGRADES.filter(u=>u.group===target);
-      const index=source.findIndex(u=>'buy:'+u.id===focused);
-      if(index>=0&&destination.length){
-        const pick=destination[Math.min(index,destination.length-1)];
+  changeYardTab(target) {
+    if(!this.scene||this.scene.page!=='yard'||!this.yardTabs.includes(target))return false;
+    if(target===this.scene.yardGroup)return false;
+    // Remember the gameplay selection even after a mouse click focused a
+    // pointer-only tab. Never store a tab itself as a focus destination.
+    const active=document.activeElement;
+    const current=active?.dataset?.nav==='pointer'?
+      this.lastYardFocus:(active?.dataset?.action||this.lastYardFocus||'');
+    const source=SEA_UPGRADES.filter(u=>u.group===this.scene.yardGroup);
+    const dest=SEA_UPGRADES.filter(u=>u.group===target);
+    let nextFocus=null;
+    if(current.startsWith('buy:')){
+      const index=source.findIndex(u=>'buy:'+u.id===current);
+      if(index>=0&&dest.length){
         const p=SeaProfile.load();
-        if(p.gold>=SeaProfile.price(pick,p.levels[pick.id]||0))
-          nextFocus='buy:'+pick.id;
+        const indexes=[Math.min(index,dest.length-1),...dest.map((_,i)=>i)];
+        for(const i of indexes){
+          const u=dest[i];
+          if(p.gold>=SeaProfile.price(u,p.levels[u.id]||0)){
+            nextFocus='buy:'+u.id;break;
+          }
+        }
       }
-    }else if(focused&&!focused.startsWith('yard:')){
-      nextFocus=focused;
-    }
-    // This is an in-place render, NOT scene.start('SeaPort'): avoids flicker,
-    // gamepad state resets and loss of scroll/focus on each bumper press.
+    }else if(current==='menu')nextFocus='menu';
     this.scene.yardGroup=target;
+    // Default picks the first affordable purchase or the in-page return,
+    // never a tab. Avoid scene.start() and preserve scroll/focus.
     this.render(nextFocus);
     this.lastPadAt=0;this.lastPadDir='';
     return true;
+  },
+  switchYardTab(step) {
+    if(!this.scene||this.scene.page!=='yard'||!step)return false;
+    const tabs=this.yardTabs,index=tabs.indexOf(this.scene.yardGroup);
+    return this.changeYardTab(tabs[((index<0?2:index)+step+tabs.length)%tabs.length]);
   },
   update(time) {
     const pad=SEA_GAMEPAD.poll();
@@ -384,8 +415,8 @@ const SEA_PORT_UI = {
         '<h1>O ESTALEIRO</h1><p>Não existe teto para a ambição. Apenas um preço crescente.</p>'+
         '<div class="port-page__balance">◈ COFRE DO CAPITÃO <strong>'+this.num(p.gold)+'</strong></div></div>'+
       '<nav class="port-tabs" aria-label="Grupos de melhorias">'+
-        '<span class="port-tabs__hint" aria-hidden="true">LB ◀ TROCAR ABA ▶ RB</span>'+
-        tabs.map(([id,label])=>'<button type="button" data-action="yard:'+id+'" '+
+        '<span class="port-tabs__hint" aria-hidden="true">LB / Q ◀ TROCAR ABA ▶ RB / E</span>'+
+        tabs.map(([id,label])=>'<button type="button" tabindex="-1" data-nav="pointer" data-action="yard:'+id+'" '+
           'class="'+(id===group?'is-active':'')+'">'+label+'</button>').join('')+'</nav>'+
       '<section class="port-upgrades">'+
         list.map(u=>{
@@ -411,7 +442,7 @@ const SEA_PORT_UI = {
       ['MISSÕES','Escolta, caçada, sobrevivência e chefes. A campanha avança após vitórias.'],
       ['SANDBOX','Ondas sucessivas, frota hostil crescente e recompensas acumuladas.'],
       ['ATRACAÇÃO','Aproxime-se devagar e afaste inimigos. F, botão A ou toque para atracar.'],
-      ['ESTALEIRO','Catorze melhorias sem limite artificial; cada nível aumenta o preço.'],
+      ['ESTALEIRO','Catorze melhorias sem limite artificial; cada nível aumenta o preço. LB/RB ou Q/E trocam as abas.'],
       ['ÁUDIO E PROGRESSO','ESC/P pausa. M silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
