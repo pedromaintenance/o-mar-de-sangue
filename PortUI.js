@@ -5,6 +5,8 @@
  */
 const SEA_PORT_UI = {
   root:null, scene:null, lastPadAt:0, lastPadDir:'',
+  // A ordem das abas é uma regra de navegação, não depende da posição no DOM.
+  yardTabs:['casco','motor','armas','apoio'],
   text(value) {
     return String(value??'').replace(/[&<>"']/g,
       ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -33,7 +35,9 @@ const SEA_PORT_UI = {
     this.onClick=e=>{
       const target=e.target.closest('[data-action]');
       if(!target||!root.contains(target)||target.disabled)return;
-      e.preventDefault();this.action(target.dataset.action);
+      e.preventDefault();
+      this.focusTarget(target);
+      this.action(target.dataset.action);
     };
     this.onKey=e=>{
       if(!this.root||!this.scene)return;
@@ -41,9 +45,16 @@ const SEA_PORT_UI = {
         if(this.scene.page!=='menu'){e.preventDefault();this.goto('menu');}
         return;
       }
-      if(e.key==='ArrowUp'||e.key==='ArrowDown'){
+      const directions={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+      if(directions[e.key]){
         e.preventDefault();
-        this.moveFocus(e.key==='ArrowUp'?-1:1);
+        this.moveFocus(directions[e.key]);
+        return;
+      }
+      // Atalho equivalente aos bumpers quando o usuário está no teclado.
+      if(this.scene.page==='yard'&&(e.key==='PageUp'||e.key==='PageDown')){
+        e.preventDefault();
+        this.switchYardTab(e.key==='PageDown'?1:-1);
       }
     };
     this.onChange=async e=>{
@@ -60,7 +71,8 @@ const SEA_PORT_UI = {
     this.render();
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN,()=>this.unmount(scene));
     this.lastPadAt=0;this.lastPadDir='';
-    this.focusByAction(scene.page==='menu'?'mission':null);
+    this.focusByAction(scene.page==='menu'?'mission':
+      scene.page==='yard'?'yard:'+(scene.yardGroup||'armas'):null);
     SEA_MUSIC.load().then(()=>{
       if(this.root&&this.scene===scene){
         const status=this.root.querySelector('[data-music-status]');
@@ -124,30 +136,106 @@ const SEA_PORT_UI = {
       this.root.querySelector('#sea-port-tracks')?.click();return;
     }
   },
-  focusByAction(action) {
-    const buttons=Array.from(this.root?.querySelectorAll('button[data-action]:not(:disabled)')||[]);
-    const target=(action&&buttons.find(b=>b.dataset.action===action))||
-      buttons.find(b=>b.dataset.action==='mission')||buttons[0];
-    if(target){target.focus({preventScroll:true});}
+  navigableButtons() {
+    // São só os botões acionáveis e realmente visíveis; nunca focar um
+    // botão desabilitado ou um painel oculto pelos breakpoints de layout.
+    return Array.from(this.root?.querySelectorAll('button[data-action]:not(:disabled)')||[])
+      .filter(b=>{
+        const r=b.getBoundingClientRect?.();
+        return !!r&&r.width>1&&r.height>1;
+      });
   },
-  moveFocus(delta) {
-    const buttons=Array.from(this.root?.querySelectorAll('button[data-action]:not(:disabled)')||[]);
-    if(!buttons.length)return;
-    const current=buttons.indexOf(document.activeElement);
-    const next=buttons[(current<0?0:current+delta+buttons.length)%buttons.length];
-    next.focus({preventScroll:true});next.scrollIntoView({block:'nearest',behavior:'auto'});
+  focusTarget(target) {
+    if(!target||!this.root)return false;
+    for(const previous of this.root.querySelectorAll('.is-controller-focused'))
+      previous.classList.remove('is-controller-focused');
+    target.classList.add('is-controller-focused');
+    target.focus({preventScroll:true});
+    target.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+    return true;
+  },
+  focusByAction(action) {
+    const buttons=this.navigableButtons();
+    const target=(action&&buttons.find(b=>b.dataset.action===action))||
+      (this.scene?.page==='yard'&&buttons.find(b=>b.dataset.action==='yard:'+this.scene.yardGroup))||
+      buttons.find(b=>b.dataset.action==='mission')||buttons[0];
+    if(target)this.focusTarget(target);
+  },
+  moveFocus(direction) {
+    const buttons=this.navigableButtons();
+    if(!buttons.length)return false;
+    let current=document.activeElement;
+    if(!buttons.includes(current)){
+      this.focusByAction(this.scene?.page==='menu'?'mission':
+        this.scene?.page==='yard'?'yard:'+this.scene.yardGroup:null);
+      return true;
+    }
+    const box=current.getBoundingClientRect();
+    const cx=box.left+box.width/2,cy=box.top+box.height/2;
+    let best=null,bestTier=Infinity,bestScore=Infinity;
+    for(const candidate of buttons){
+      if(candidate===current)continue;
+      const r=candidate.getBoundingClientRect();
+      const dx=r.left+r.width/2-cx,dy=r.top+r.height/2-cy;
+      const along=direction==='right'?dx:direction==='left'?-dx:
+        direction==='down'?dy:-dy;
+      if(along<=6)continue;
+      const across=(direction==='left'||direction==='right')?dy:dx;
+      // Um botão da mesma linha/coluna vence uma alternativa diagonal.
+      const tier=Math.abs(across)<=Math.max(32,along*0.88)?0:1;
+      const score=along+Math.abs(across)*1.65;
+      if(tier<bestTier||(tier===bestTier&&score<bestScore)){
+        best=candidate;bestTier=tier;bestScore=score;
+      }
+    }
+    // Nas bordas, manter o foco é preferível a saltar para um botão aleatório.
+    return best?this.focusTarget(best):false;
+  },
+  switchYardTab(step) {
+    if(!this.scene||this.scene.page!=='yard'||!step)return false;
+    const tabs=this.yardTabs;
+    const index=tabs.indexOf(this.scene.yardGroup);
+    const target=tabs[((index<0?2:index)+step+tabs.length)%tabs.length];
+    this.lastPadAt=0;this.lastPadDir='';
+    this.goto('yard',target);
+    return true;
   },
   update(time) {
-    const pad=SEA_GAMEPAD.poll();if(!pad.connected||!this.root)return;
-    if(pad.just[1]||pad.just[9]){
-      if(this.scene?.page!=='menu')this.goto('menu');return;
+    const pad=SEA_GAMEPAD.poll();
+    if(!pad.connected||!this.root)return;
+    if(pad.just?.[1]||pad.just?.[9]){
+      if(this.scene?.page!=='menu')this.goto('menu');
+      return;
     }
-    if(pad.just[0]){document.activeElement?.click?.();return;}
-    const direction=pad.down||pad.right?'next':pad.up||pad.left?'previous':'';
+    // Apenas os bumpers LB(4)/RB(5): gatilhos LT/RT não mudam abas.
+    if(this.scene?.page==='yard'){
+      if(pad.just?.[4]&&!pad.just?.[5]){this.switchYardTab(-1);return;}
+      if(pad.just?.[5]&&!pad.just?.[4]){this.switchYardTab(1);return;}
+    }
+    if(pad.just?.[0]){
+      let current=document.activeElement;
+      if(!this.navigableButtons().includes(current)){
+        this.focusByAction(this.scene?.page==='menu'?'mission':
+          this.scene?.page==='yard'?'yard:'+this.scene.yardGroup:null);
+        current=document.activeElement;
+      }
+      if(current&&this.root.contains(current)&&!current.disabled)current.click();
+      return;
+    }
+    // D-pad e analógico são traduzidos para direções espaciais reais.
+    // Não converter direita em "próximo" nem cima em "anterior".
+    let direction='';
+    if((pad.left||pad.right)&&(pad.up||pad.down)){
+      direction=Math.abs(pad.x||0)>=Math.abs(pad.y||0)?
+        (pad.left?'left':'right'):(pad.up?'up':'down');
+    }else if(pad.left)direction='left';
+    else if(pad.right)direction='right';
+    else if(pad.up)direction='up';
+    else if(pad.down)direction='down';
     if(!direction){this.lastPadDir='';return;}
     if(direction!==this.lastPadDir||time>=this.lastPadAt){
-      this.moveFocus(direction==='next'?1:-1);
-      this.lastPadAt=time+(direction===this.lastPadDir?170:275);
+      this.moveFocus(direction);
+      this.lastPadAt=time+(direction===this.lastPadDir?165:300);
       this.lastPadDir=direction;
     }
   },
@@ -232,6 +320,7 @@ const SEA_PORT_UI = {
         '<h1>O ESTALEIRO</h1><p>Não existe teto para a ambição. Apenas um preço crescente.</p>'+
         '<div class="port-page__balance">◈ COFRE DO CAPITÃO <strong>'+this.num(p.gold)+'</strong></div></div>'+
       '<nav class="port-tabs" aria-label="Grupos de melhorias">'+
+        '<span class="port-tabs__hint" aria-hidden="true">LB ◀ TROCAR ABA ▶ RB</span>'+
         tabs.map(([id,label])=>'<button type="button" data-action="yard:'+id+'" '+
           'class="'+(id===group?'is-active':'')+'">'+label+'</button>').join('')+'</nav>'+
       '<section class="port-upgrades">'+
@@ -317,6 +406,7 @@ const SEA_PORT_UI = {
       '<span class="port-background__vignette"></span></div>'+
       '<div class="port-container">'+this.header(page,p)+body+
       '<footer class="port-footer"><span>O MAR DE SANGUE · CARCAÇA</span>'+
+      '<span class="port-pad-hint">✥ DIRECIONAL: NAVEGAR · A: CONFIRMAR · B: VOLTAR</span>'+
       this.music()+'<span class="port-footer__version">PORTO RECONSTRUÍDO</span></footer>'+
       '</div><div class="port-toast" hidden role="status"></div>'+
       '<input id="sea-port-tracks" hidden type="file" multiple accept=".flac,.mp3,audio/*">';
