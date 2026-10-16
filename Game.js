@@ -694,37 +694,46 @@ class Game extends Phaser.Scene {
         this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,sparkle});
     }
     createHUD() {
-        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 532 : 480, 101, 0x111c28, .94).setScrollFactor(0).setDepth(90);
-        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 524 : 472, 93, 0x0f1620, .35).setStrokeStyle(1, 0x9c8267, .7).setScrollFactor(0).setDepth(91);
+        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 532 : 480, 101, 0x080e12, .97).setScrollFactor(0).setDepth(90);
+        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 524 : 472, 93, 0x11171a, .92).setStrokeStyle(1, 0x715b45, .9).setScrollFactor(0).setDepth(91);
+        // Maré Negra 3.2: graphic trim never intercepts gameplay pointers.
+        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 3, SEA_DESKTOP ? 518 : 466, 3, 0x8e3940, .8).setScrollFactor(0).setDepth(92);
+        this.add.rectangle(SEA_DESKTOP ? 266 : 240, 30, SEA_DESKTOP ? 502 : 458, 1, 0x534337, .8).setScrollFactor(0).setDepth(92);
         this.damageFlash = this.add.rectangle(SEA_VIEW.width / 2, SEA_VIEW.height / 2,
             SEA_VIEW.width, SEA_VIEW.height, 0x99283a, 0).setScrollFactor(0).setDepth(82);
         this.statusBars=this.add.graphics().setScrollFactor(0).setDepth(101);
         this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
-            fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#f0c58c'
+            fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#ddc5a4'
         }).setScrollFactor(0).setDepth(100);
-        this.hud = this.add.text(14, 37, '', { fontFamily: 'monospace', fontSize: '12px', color: '#f5e6d3' }).setScrollFactor(0).setDepth(100);
+        this.hud = this.add.text(14, 37, '', { fontFamily: 'monospace', fontSize: '12px', color: '#e8d9c4' }).setScrollFactor(0).setDepth(100);
         this.quest = this.add.text(15, 63, '', {
-            fontFamily: 'monospace', fontSize: '12px', color: '#ffce95'
+            fontFamily: 'monospace', fontSize: '12px', color: '#d2b58f'
         }).setScrollFactor(0).setDepth(100);
         // Botão visível em desktop e celular; clique e toque passam pelo mesmo
         // roteador, evitando disputas entre Phaser e o joystick nativo.
         this.pauseButtonHitbox = {x: SEA_DESKTOP ? 454 : 412, y: 78, w: 120, h: 40};
         const ph=this.pauseButtonHitbox;
-        this.add.rectangle(ph.x,ph.y,ph.w,ph.h,0x61402d,.98)
-            .setStrokeStyle(2,0xedca96).setDepth(111).setScrollFactor(0);
+        this.add.rectangle(ph.x,ph.y,ph.w,ph.h,0x301d22,.99)
+            .setStrokeStyle(2,0xb98e72).setDepth(111).setScrollFactor(0);
         this.add.text(ph.x,ph.y,'☰ PAUSA',{
-            fontFamily:'Georgia',fontSize:'16px',fontStyle:'bold',color:'#ffdfad'
+            fontFamily:'Georgia',fontSize:'16px',fontStyle:'bold',color:'#f3d6b5'
         }).setOrigin(.5).setDepth(112).setScrollFactor(0);
         if (!SEA_DESKTOP) this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
-            fontFamily: 'monospace', fontSize: '10px', color: '#dbbc98',
+            fontFamily: 'monospace', fontSize: '10px', color: '#bbab93',
             stroke: '#101720', strokeThickness: 3
         }).setOrigin(.5).setScrollFactor(0).setDepth(103);
         this.impactMessage = this.add.text(SEA_VIEW.width / 2, 125, '', { fontFamily: 'monospace', fontSize: '16px',
-            color: '#ffe1b2', align: 'center', backgroundColor: '#171a29b0', padding: { x: 7, y: 4 }
+            color: '#f3d8b1', align: 'center', backgroundColor: '#241419df', padding: { x: 8, y: 5 }
         }).setOrigin(.5).setScrollFactor(0).setDepth(140).setAlpha(0);
         this.radar = this.add.graphics().setScrollFactor(0).setDepth(110);
-        this.add.text(SEA_DESKTOP ? SEA_VIEW.width - 112 : 390, 144, 'CARTA', { fontFamily: 'monospace', fontSize: '10px', color: '#e0c7aa' })
+        this.add.text(SEA_DESKTOP ? SEA_VIEW.width - 112 : 390, 144, 'CARTA', { fontFamily: 'monospace', fontSize: '10px', color: '#c3ae8c' })
             .setScrollFactor(0).setDepth(112);
+        // A small two-line sea/curse badge sits BELOW the unchanged radar.
+        this.hudConditions=this.add.text(SEA_DESKTOP?SEA_VIEW.width-126:338,239,'',{
+            fontFamily:'monospace',fontSize:'10px',fontStyle:'bold',color:'#c8b2a0',
+            lineSpacing:2,backgroundColor:'#091014d9',padding:{x:5,y:4},
+            wordWrap:{width:132}
+        }).setScrollFactor(0).setDepth(112);
     }
     createTouchControls() {
         // Arte e zonas de toque partilham EXATAMENTE as mesmas coordenadas.
@@ -1526,23 +1535,34 @@ class Game extends Phaser.Scene {
     updateHUD() {
         this.hud.setText(`CASCO ${Math.ceil(this.shipHP)}/${SEA_MATH.nice(this.maxShipHP)}   OURO ${SEA_MATH.nice(this.gold)}   NÓS ${Math.abs(this.speed | 0)}`);
         this.quest.setText(this.objectiveText());
+        // Keep unusually long mission text away from the fixed pause button.
+        this.quest.setScale(Math.max(.78,Math.min(1,(SEA_DESKTOP?370:320)/Math.max(1,this.quest.width))));
+        const curse=Math.round(this.curse||0);
+        this.hudConditions.setText((SEA_WEATHER.names?.[this.seaEvent]||'MAR SERENO')+'\nMALDIÇÃO '+curse+'%');
+        this.hudConditions.setColor(curse>=65?'#f0a3a3':'#c8b2a0');
         if(this.statusBars){
             const g=this.statusBars;g.clear();
             const hp=SEA_MATH.clamp(this.shipHP/this.maxShipHP,0,1);
+            this.hud.setColor(hp<.28?'#f2a5a0':'#e8d9c4');
             const p=SEA_MATH.clamp((this.time.now-this.lastPortShot)/this.shipStats.reload,0,1);
             const st=SEA_MATH.clamp((this.time.now-this.lastStarboardShot)/this.shipStats.reload,0,1);
-            const parts=[[16,151,hp,hp<.28?0xc94c50:0x8fc2a0],[175,63,p,0xe0bd7b],[249,63,st,0xe0bd7b]];
-            for(const [x,w,value,color] of parts){g.fillStyle(0x18232b,.9).fillRect(x,96,w,3);g.fillStyle(color,.95).fillRect(x,96,Math.max(0,w*value),3);}
+            const parts=[[16,151,hp,hp<.28?0xc14c55:hp<.55?0xc4a26c:0x91b3a4],[175,63,p,0xc3a273],[249,63,st,0xc3a273]];
+            for(const [x,w,value,color] of parts){
+                // Original x and width preserved; thicker contrast at y=92.
+                g.fillStyle(0x04090c,.96).fillRect(x,92,w,7);
+                g.fillStyle(0x534438,.8).fillRect(x+1,93,w-2,5);
+                if(value>0)g.fillStyle(color,.98).fillRect(x+1,93,Math.max(0,(w-2)*value),5);
+            }
         }
         this.drawRadar();
     }
     drawRadar() {
         if (!this.radar || !this.player) return;
         const x = SEA_DESKTOP ? SEA_VIEW.width - 82 : 390, y = 187, size = 74, range = this.shipStats.radar, g = this.radar;
-        g.clear(); g.fillStyle(0x0c1822, .91); g.fillRoundedRect(x - 40, y - 35, 80, 80, 4);
-        g.lineStyle(1, 0x9b866c, .85); g.strokeRect(x - 40, y - 35, 80, 80);
-        g.lineStyle(1, 0x58727c, .35); g.strokeCircle(x, y + 5, 24);
-        g.lineStyle(1, 0x58727c, .22); g.lineBetween(x - 32, y + 5, x + 32, y + 5); g.lineBetween(x, y - 27, x, y + 37);
+        g.clear(); g.fillStyle(0x091216, .96); g.fillRoundedRect(x - 40, y - 35, 80, 80, 4);
+        g.lineStyle(1, 0x977658, .91); g.strokeRect(x - 40, y - 35, 80, 80);
+        g.lineStyle(1, 0x6b716c, .29); g.strokeCircle(x, y + 5, 24);
+        g.lineStyle(1, 0x6b716c, .17); g.lineBetween(x - 32, y + 5, x + 32, y + 5); g.lineBetween(x, y - 27, x, y + 37);
         for (const isl of this.islands) {
             const dx = (isl.x - this.player.x) / range * (size / 2), dy = (isl.y - this.player.y) / range * (size / 2);
             if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) {
@@ -1553,12 +1573,12 @@ class Game extends Phaser.Scene {
         for (const e of this.enemies) {
             if (e.dead) continue;
             const dx = (e.x - this.player.x) / range * (size / 2), dy = (e.y - this.player.y) / range * (size / 2);
-            if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) { g.fillStyle(e.boss ? 0xffd18d : 0xe18091, 1); g.fillCircle(x + dx, y + 5 + dy, e.boss ? 4 : 2.6); }
+            if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) { g.fillStyle(e.boss ? 0xf1c48e : 0xd67680, 1); g.fillCircle(x + dx, y + 5 + dy, e.boss ? 4 : 2.6); }
         }
         for (const t of this.treasures) {
             if (t.taken) continue;
             const dx = (t.x - this.player.x) / range * (size / 2), dy = (t.y - this.player.y) / range * (size / 2);
-            if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) { g.fillStyle(0xf4d18b, 1); g.fillCircle(x + dx, y + 5 + dy, 1.8); }
+            if (Math.abs(dx) <= 37 && Math.abs(dy) <= 37) { g.fillStyle(0xddba82, 1); g.fillCircle(x + dx, y + 5 + dy, 1.8); }
         }
         // marcador do jogador com rumo
         g.fillStyle(0xd7edca); g.fillCircle(x, y + 5, 3);
