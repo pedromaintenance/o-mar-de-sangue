@@ -23,7 +23,7 @@
 | **3.4b — Rumos da Carta** | ✅ Integrado; CI verde | Waypoints manuais para marcos descobertos, rumo, distância e radar; [PR #33](https://github.com/pedromaintenance/o-mar-de-sangue/pull/33); verificação física/Pages pendente |
 | **3.5a — Paisagem Sonora Reativa** | ✅ Integrada; CI verde | 6 contextos de trilha e teclas M (Atlas) / N (som); [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) e [documentação](docs/soundscape-3-5.md). Validação auditiva no Pages pendente |
 | **3.5b — Mixagem Separada** | ✅ Integrada; CI verde | Música/efeitos independentes, mute mestre, persistência isolada e PWA v39; [PR #36](https://github.com/pedromaintenance/o-mar-de-sangue/pull/36) e [documentação](docs/audio-mixer-3-5b.md). QA auditivo físico pendente |
-| **3.6a — PWA Resiliente** | 🟡 PR #37 em CI | Aviso offline, recarga opt-in e correção de dois assets inexistentes que bloqueavam o precache; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) |
+| **3.6a — PWA Resiliente** | ✅ Integrada; CI verde | Modo offline, atualização voluntária e precache v42 reparado; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) e [documentação](docs/pwa-3-6a.md). Testes físicos no Pages/PWA pendentes |
 | **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
@@ -134,12 +134,13 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ### P2 — 3.6: Acessibilidade e robustez
 
-**3.6a — PWA Resiliente (em validação no PR #37):**
+**3.6a — PWA Resiliente (integrada à `main`; CI aprovado em 16/10/2026):**
 - [x] Aviso de conexão offline e atualização do service worker com recarga somente por ação do jogador.
 - [x] Identificar e eliminar duas referências inexistentes que impediam o `cache.addAll()`: `assets/abyss/manifest.json` e `assets/asset_pack_manifest.json`.
 - [x] Acrescentar contrato do precache: todos os caminhos precached devem existir no repositório.
 - [x] Testar instalação do service worker, recarga offline e expedição com save v4 intacto em Chrome desktop e Android emulado.
-- [ ] Confirmar smoke/Chromium verdes, integrar a [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37), testar no Pages e em dispositivo físico. [Especificação](docs/pwa-3-6a.md).
+- [x] Smoke/Chromium verdes, incluindo viagem offline e verificação de 124 entradas válidas no precache; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) integrada (`b4f5956`). [Especificação](docs/pwa-3-6a.md).
+- [ ] Conferir instalação real, troca offline/online e botão de atualização no Pages e em dispositivo físico.
 
 **3.6b — Backup do Capitão (integrada à `main`; CI aprovado em 16/10/2026):**
 
@@ -176,6 +177,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e integrar a PWA 3.6a corrigida (PR #37), manter o Backup do Capitão 3.6b já publicado e testar ambos no Pages. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
+Conferir no GitHub Pages a PWA 3.6a (cache corrigido, offline e atualização consentida) e o Backup do Capitão 3.6b. Ambas estão integradas à `main` com CI verde. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
