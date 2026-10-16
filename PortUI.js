@@ -242,7 +242,9 @@ const SEA_PORT_UI = {
         Math.max(0,b.left-a.right,a.left-b.right);
       // Respect cardinal intent. Large diagonals, e.g. a faraway footer
       // button off to the right, should not hijack ↓ from the main grid.
-      if(!overlap && Math.abs(across)>Math.max(55,along*1.12))continue;
+      const purchaseNav=this.scene?.page==='yard'&&!horizontal&&
+        current.dataset?.action?.startsWith('buy:')&&candidate.dataset?.action?.startsWith('buy:');
+      if(!purchaseNav&&!overlap&&Math.abs(across)>Math.max(55,along*1.12))continue;
       const mainGap=horizontal?
         sign>0?Math.max(0,b.left-a.right):Math.max(0,a.left-b.right):
         sign>0?Math.max(0,b.top-a.bottom):Math.max(0,a.top-b.bottom);
@@ -256,7 +258,12 @@ const SEA_PORT_UI = {
     }
     if(!choices.length)return false;
     const sameZone=choices.filter(c=>c.same);
-    const candidates=sameZone.length?sameZone:
+    // In the yard, moving vertically among upgrade cards must not jump
+    // straight to "VOLTAR" while another affordable purchase lies below.
+    const buyCandidates=this.scene?.page==='yard'&&!horizontal&&
+      (current.dataset?.action?.startsWith('buy:')||current.dataset?.action==='menu')?
+      sameZone.filter(c=>c.candidate.dataset?.action?.startsWith('buy:')):[];
+    const candidates=buyCandidates.length?buyCandidates:sameZone.length?sameZone:
       // Leaving the main page horizontally is usually an accidental
       // diagonal; use vertical movement to reach secondary controls.
       (horizontal&&zone==='main'?[]:choices);
