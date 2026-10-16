@@ -243,7 +243,8 @@ const SEA_PORT_UI = {
       // Respect cardinal intent. Large diagonals, e.g. a faraway footer
       // button off to the right, should not hijack ↓ from the main grid.
       const purchaseNav=this.scene?.page==='yard'&&!horizontal&&
-        current.dataset?.action?.startsWith('buy:')&&candidate.dataset?.action?.startsWith('buy:');
+        candidate.dataset?.action?.startsWith('buy:')&&
+        (current.dataset?.action?.startsWith('buy:')||current.dataset?.action==='menu');
       if(!purchaseNav&&!overlap&&Math.abs(across)>Math.max(55,along*1.12))continue;
       const mainGap=horizontal?
         sign>0?Math.max(0,b.left-a.right):Math.max(0,a.left-b.right):
