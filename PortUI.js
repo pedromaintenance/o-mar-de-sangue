@@ -39,6 +39,11 @@ const SEA_PORT_UI = {
       this.focusTarget(target);
       this.action(target.dataset.action);
     };
+    this.onFocusIn=e=>{
+      const button=e.target?.closest?.('button[data-action]:not(:disabled)');
+      if(button&&root.contains(button))this.paintFocus(button);
+    };
+    root.addEventListener('focusin',this.onFocusIn);
     this.onKey=e=>{
       if(!this.root||!this.scene)return;
       if(e.key==='Escape'){
@@ -86,6 +91,7 @@ const SEA_PORT_UI = {
     if(this.root){
       this.root.removeEventListener('click',this.onClick);
       this.root.removeEventListener('change',this.onChange);
+      this.root.removeEventListener('focusin',this.onFocusIn);
       this.root.remove();
     }
     if(this.onKey&&typeof window!=='undefined')window.removeEventListener('keydown',this.onKey);
@@ -113,7 +119,13 @@ const SEA_PORT_UI = {
     const [name,id]=value.split(':');
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='menu'){this.goto('menu');return;}
-    if(name==='yard'){this.goto('yard',id||'armas');return;}
+    if(name==='yard'){
+      if(scene.page==='yard'){
+        scene.yardGroup=id||'armas';
+        this.render('yard:'+scene.yardGroup);
+      }else this.goto('yard',id||'armas');
+      return;
+    }
     if(name==='help'||name==='reset'){this.goto(name);return;}
     if(name==='buy'){
       const result=SeaProfile.buy(id);
@@ -137,19 +149,31 @@ const SEA_PORT_UI = {
     }
   },
   navigableButtons() {
-    // São só os botões acionáveis e realmente visíveis; nunca focar um
-    // botão desabilitado ou um painel oculto pelos breakpoints de layout.
     return Array.from(this.root?.querySelectorAll('button[data-action]:not(:disabled)')||[])
       .filter(b=>{
         const r=b.getBoundingClientRect?.();
-        return !!r&&r.width>1&&r.height>1;
+        if(!r||r.width<=1||r.height<=1)return false;
+        // Avoid buttons hidden by responsive layouts or any ancestor.
+        return typeof b.getClientRects!=='function'||b.getClientRects().length>0;
       });
+  },
+  navigationZone(button) {
+    // Keep primary screen controls together; audio and header controls are
+    // intentionally secondary, accessible when navigating beyond the page.
+    if(button.closest?.('#port-main'))return 'main';
+    if(button.closest?.('.port-footer'))return 'footer';
+    if(button.closest?.('.port-top'))return 'header';
+    return 'other';
+  },
+  paintFocus(target) {
+    if(!this.root)return;
+    for(const previous of this.root.querySelectorAll('.is-controller-focused'))
+      previous.classList.remove('is-controller-focused');
+    target?.classList.add('is-controller-focused');
   },
   focusTarget(target) {
     if(!target||!this.root)return false;
-    for(const previous of this.root.querySelectorAll('.is-controller-focused'))
-      previous.classList.remove('is-controller-focused');
-    target.classList.add('is-controller-focused');
+    this.paintFocus(target);
     target.focus({preventScroll:true});
     target.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
     return true;
@@ -158,46 +182,89 @@ const SEA_PORT_UI = {
     const buttons=this.navigableButtons();
     const target=(action&&buttons.find(b=>b.dataset.action===action))||
       (this.scene?.page==='yard'&&buttons.find(b=>b.dataset.action==='yard:'+this.scene.yardGroup))||
-      buttons.find(b=>b.dataset.action==='mission')||buttons[0];
+      buttons.find(b=>b.dataset.action==='mission')||
+      buttons.find(b=>this.navigationZone(b)==='main')||buttons[0];
     if(target)this.focusTarget(target);
   },
   moveFocus(direction) {
     const buttons=this.navigableButtons();
     if(!buttons.length)return false;
-    let current=document.activeElement;
+    const current=document.activeElement;
     if(!buttons.includes(current)){
       this.focusByAction(this.scene?.page==='menu'?'mission':
         this.scene?.page==='yard'?'yard:'+this.scene.yardGroup:null);
       return true;
     }
-    const box=current.getBoundingClientRect();
-    const cx=box.left+box.width/2,cy=box.top+box.height/2;
-    let best=null,bestTier=Infinity,bestScore=Infinity;
+    const a=current.getBoundingClientRect();
+    const ax=a.left+a.width/2,ay=a.top+a.height/2;
+    const horizontal=direction==='left'||direction==='right';
+    const sign=direction==='left'||direction==='up'?-1:1;
+    const zone=this.navigationZone(current);
+    const choices=[];
     for(const candidate of buttons){
       if(candidate===current)continue;
-      const r=candidate.getBoundingClientRect();
-      const dx=r.left+r.width/2-cx,dy=r.top+r.height/2-cy;
-      const along=direction==='right'?dx:direction==='left'?-dx:
-        direction==='down'?dy:-dy;
-      if(along<=6)continue;
-      const across=(direction==='left'||direction==='right')?dy:dx;
-      // Um botão da mesma linha/coluna vence uma alternativa diagonal.
-      const tier=Math.abs(across)<=Math.max(32,along*0.88)?0:1;
-      const score=along+Math.abs(across)*1.65;
-      if(tier<bestTier||(tier===bestTier&&score<bestScore)){
-        best=candidate;bestTier=tier;bestScore=score;
-      }
+      const b=candidate.getBoundingClientRect();
+      const bx=b.left+b.width/2,by=b.top+b.height/2;
+      const along=sign*(horizontal?bx-ax:by-ay);
+      if(along<=5)continue;
+      const across=horizontal?by-ay:bx-ax;
+      const overlap=horizontal?
+        Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)):
+        Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left));
+      const crossGap=horizontal?
+        Math.max(0,b.top-a.bottom,a.top-b.bottom):
+        Math.max(0,b.left-a.right,a.left-b.right);
+      // Respect cardinal intent. Large diagonals, e.g. a faraway footer
+      // button off to the right, should not hijack ↓ from the main grid.
+      if(!overlap && Math.abs(across)>Math.max(55,along*1.12))continue;
+      const mainGap=horizontal?
+        sign>0?Math.max(0,b.left-a.right):Math.max(0,a.left-b.right):
+        sign>0?Math.max(0,b.top-a.bottom):Math.max(0,a.top-b.bottom);
+      const category=this.navigationZone(candidate);
+      const same=category===zone;
+      // A straight line wins, then distance. Page controls take priority
+      // over header/footer even when DOM positions happen to be closer.
+      const score=mainGap+crossGap*3+Math.abs(across)*.12+
+        (overlap?0:25);
+      choices.push({candidate,same,score,along});
     }
-    // Nas bordas, manter o foco é preferível a saltar para um botão aleatório.
-    return best?this.focusTarget(best):false;
+    if(!choices.length)return false;
+    const sameZone=choices.filter(c=>c.same);
+    const candidates=sameZone.length?sameZone:
+      // Leaving the main page horizontally is usually an accidental
+      // diagonal; use vertical movement to reach secondary controls.
+      (horizontal&&zone==='main'?[]:choices);
+    if(!candidates.length)return false;
+    candidates.sort((a,b)=>a.score-b.score||a.along-b.along);
+    return this.focusTarget(candidates[0].candidate);
   },
   switchYardTab(step) {
     if(!this.scene||this.scene.page!=='yard'||!step)return false;
-    const tabs=this.yardTabs;
-    const index=tabs.indexOf(this.scene.yardGroup);
+    const tabs=this.yardTabs,index=tabs.indexOf(this.scene.yardGroup);
     const target=tabs[((index<0?2:index)+step+tabs.length)%tabs.length];
+    const focused=document.activeElement?.dataset?.action||'';
+    let nextFocus='yard:'+target;
+    if(focused.startsWith('buy:')){
+      // Maintain approximately the same upgrade card slot across tabs.
+      // If the target card cannot be purchased, focus the selected tab
+      // rather than moving the controller to a disabled element.
+      const source=SEA_UPGRADES.filter(u=>u.group===this.scene.yardGroup);
+      const destination=SEA_UPGRADES.filter(u=>u.group===target);
+      const index=source.findIndex(u=>'buy:'+u.id===focused);
+      if(index>=0&&destination.length){
+        const pick=destination[Math.min(index,destination.length-1)];
+        const p=SeaProfile.load();
+        if(p.gold>=SeaProfile.price(pick,p.levels[pick.id]||0))
+          nextFocus='buy:'+pick.id;
+      }
+    }else if(focused&&!focused.startsWith('yard:')){
+      nextFocus=focused;
+    }
+    // This is an in-place render, NOT scene.start('SeaPort'): avoids flicker,
+    // gamepad state resets and loss of scroll/focus on each bumper press.
+    this.scene.yardGroup=target;
+    this.render(nextFocus);
     this.lastPadAt=0;this.lastPadDir='';
-    this.goto('yard',target);
     return true;
   },
   update(time) {
@@ -207,7 +274,6 @@ const SEA_PORT_UI = {
       if(this.scene?.page!=='menu')this.goto('menu');
       return;
     }
-    // Apenas os bumpers LB(4)/RB(5): gatilhos LT/RT não mudam abas.
     if(this.scene?.page==='yard'){
       if(pad.just?.[4]&&!pad.just?.[5]){this.switchYardTab(-1);return;}
       if(pad.just?.[5]&&!pad.just?.[4]){this.switchYardTab(1);return;}
@@ -222,11 +288,9 @@ const SEA_PORT_UI = {
       if(current&&this.root.contains(current)&&!current.disabled)current.click();
       return;
     }
-    // D-pad e analógico são traduzidos para direções espaciais reais.
-    // Não converter direita em "próximo" nem cima em "anterior".
     let direction='';
     if((pad.left||pad.right)&&(pad.up||pad.down)){
-      direction=Math.abs(pad.x||0)>=Math.abs(pad.y||0)?
+      direction=Math.abs(pad.x||0)>Math.abs(pad.y||0)?
         (pad.left?'left':'right'):(pad.up?'up':'down');
     }else if(pad.left)direction='left';
     else if(pad.right)direction='right';
