@@ -29,6 +29,10 @@
   <div id="app-shell">
     <div id="game-container"></div>
     <button id="install-btn" hidden>Instalar app</button>
+    <div id="pwa-status" role="status" aria-live="polite" hidden>
+      <span id="pwa-offline" hidden>SEM CONEXÃO · MODO OFFLINE</span>
+      <button type="button" id="pwa-update" hidden>ATUALIZAÇÃO DISPONÍVEL · RECARREGAR</button>
+    </div>
   </div>
   <script src="phaser.min.js"></script>
   <script src="SeaEffects.js"></script>
@@ -39,31 +43,6 @@
   <script src="SeaPixelPolish.js"></script>
   <script src="PortUI.js"></script>
   <script src="Game.js"></script>
-  <script>
-    let deferredPrompt = null;
-    const installBtn = document.getElementById('install-btn');
-
-    window.addEventListener('beforeinstallprompt', (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      installBtn.hidden = false;
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.hidden = true;
-    });
-
-    window.addEventListener('appinstalled', () => {
-      installBtn.hidden = true;
-    });
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
-    }
-  </script>
+  <script src="PwaStatus.js"></script>
 </body>
 </html>
