@@ -45,7 +45,7 @@ O botão View é *convencional* no mapeamento padrão da Gamepad API; não exist
 - [ ] CI verde, PR publicado e inspeção na versão Pages.
 - [ ] Teste manual recomendado com controle Xbox real e PWA instalada.
 
-## 3.4b — Rumos da Carta (implementado, validação em curso)
+## 3.4b — Rumos da Carta (integrado à main; CI verde em 16/10/2026)
 
 A carta agora aceita **um waypoint manual por expedição**, restrito aos marcos descobertos. Ao abrir a carta, o primeiro marco conhecido recebe foco. Setas/Enter, direcional/A ou clique/toque sobre o símbolo selecionam o destino; a mesma seleção desmarca. Toque fora dos símbolos continua fechando o modal.
 
@@ -53,7 +53,7 @@ A bússola é geográfica: **0° norte, 90° leste, 180° sul e 270° oeste**. A
 
 O destino continua visível como indicação no radar/HUD quando o Atlas fecha. Se estiver além do alcance do radar, a marca fica na **borda** indicando só direção, não proximidade. Seleção e foco são estados transitórios da cena (`chartWaypointId`, `atlasFocusedId`, `atlasPoints`): não há mudança em `SeaProfile` v4, persistência, progressão, combate ou custos.
 
-**QA:** testes Node cobrindo a restrição de descoberta, rumos cardeais, foco, marcação/desmarcação, retorno ao jogo e reset por expedição; testes de navegador com screenshots em 1600×900, 1280×720 e Android 390×844, HUD e save intacto. A revisão do CI, o teste físico no Xbox/PWA e a verificação do Pages permanecem pendentes até execução.
+**QA:** testes Node cobrindo a restrição de descoberta, rumos cardeais, foco, marcação/desmarcação, retorno ao jogo e reset por expedição; testes de navegador com screenshots em 1600×900, 1280×720 e Android 390×844, HUD e save intacto. O CI Node e Chromium passou (PR #33). Permanecem pendentes os testes físicos com Xbox/PWA e a conferência da URL pública no Pages.
 
 ## Próximos passos posteriores — Atlas (não implementados)
 
