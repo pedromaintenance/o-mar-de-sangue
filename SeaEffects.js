@@ -3,6 +3,23 @@ const SEA_AUDIO = {
     key: 'carcaca.mar-de-sangue.audio.v1',
     enabled: (() => { try { return localStorage.getItem('carcaca.mar-de-sangue.audio.v1') !== 'off'; } catch (_) { return true; } })(),
     ctx: null, master: null, noise: null, last: {},
+    effectsKey: 'carcaca.mar.sfx.volume',
+    effectsVolume: (() => {
+        try {
+            const raw=localStorage.getItem('carcaca.mar.sfx.volume');
+            if(raw===null)return 1; // old players keep exactly the old gain
+            const n=Number(raw);
+            return Number.isFinite(n)?Math.max(0,Math.min(1,n)):1;
+        } catch (_) { return 1; }
+    })(),
+    setEffectsVolume(n) {
+        const value=Number(n);
+        if(!Number.isFinite(value))return this.effectsVolume;
+        this.effectsVolume=Math.max(0,Math.min(1,Math.round(value*100)/100));
+        if(this.master)this.master.gain.value=.4*this.effectsVolume;
+        try{localStorage.setItem(this.effectsKey,String(this.effectsVolume));}catch(_){}
+        return this.effectsVolume;
+    },
     unlock() {
         if (!this.enabled || typeof window === 'undefined') return null;
         try {
@@ -11,7 +28,7 @@ const SEA_AUDIO = {
                 if (!Ctor) return null;
                 this.ctx = new Ctor();
                 this.master = this.ctx.createGain();
-                this.master.gain.value = .4;
+                this.master.gain.value = .4*this.effectsVolume;
                 this.master.connect(this.ctx.destination);
                 const n = Math.floor(this.ctx.sampleRate * .85);
                 this.noise = this.ctx.createBuffer(1, n, this.ctx.sampleRate);
@@ -47,6 +64,8 @@ const SEA_AUDIO = {
         return btn;
     },
     play(kind, power = 1, distance = 0) {
+        // A zero effect volume means no oscillator or noise work at all.
+        if(this.effectsVolume<=0)return;
         const ctx = this.unlock();
         if (!ctx || ctx.state !== 'running') return;
         const now = ctx.currentTime;
