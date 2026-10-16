@@ -9,6 +9,39 @@ const SEA_ATLAS = {
         daegon:0xbc6672, demeter:0x91b8a0, wreck:0xa38a75,
         parley:0xe0aa71
     },
+    kindNames: {reef:'RECIFE',ruin:'RUÍNAS',monastery:'MOSTEIRO',
+        daegon:'ALTAR DE DAEGON',demeter:'SANTUÁRIO',
+        wreck:'NAUFRÁGIO',parley:'TRÊS BANDEIRAS'},
+    // Only discovered places can be waypoints. Entirely voyage-local.
+    landmarks(s) {return (s.islands||[]).filter(i=>s.chartDiscovered?.has(i.id));},
+    destination(s) {return this.landmarks(s).find(i=>i.id===s.chartWaypointId)||null;},
+    navigation(s) {
+        const island=this.destination(s);
+        if(!island||!s.player)return null;
+        const dx=island.x-s.player.x,dy=island.y-s.player.y;
+        const bearing=(Math.atan2(dx,-dy)*180/Math.PI+360)%360;
+        const head=((s.player.rotation||0)*180/Math.PI%360+360)%360;
+        const turn=((bearing-head+540)%360)-180;
+        const cardinal=['N','NE','L','SE','S','SO','O','NO'][Math.round(bearing/45)%8];
+        return {island,distance:Math.round(Math.hypot(dx,dy)),
+            bearing:Math.round(bearing)%360,turn:Math.round(turn),cardinal};
+    },
+    focus(s,step) {
+        const known=this.landmarks(s);
+        if(!known.length)return false;
+        const at=known.findIndex(i=>i.id===s.atlasFocusedId);
+        const index=at<0?(step<0?known.length-1:0):(at+step+known.length)%known.length;
+        s.atlasFocusedId=known[index].id;
+        if(s.atlasOpen)this.render(s);
+        return true;
+    },
+    mark(s,id=s.atlasFocusedId) {
+        if(!this.landmarks(s).some(i=>i.id===id))return false;
+        s.chartWaypointId=s.chartWaypointId===id?null:id;
+        s.atlasFocusedId=id;
+        if(s.atlasOpen)this.render(s);
+        return true;
+    },
     discover(s) {
         if(!s.chartDiscovered||!s.player||!s.islands)return;
         // Sight radius is derived from the existing radar upgrade.
@@ -23,6 +56,9 @@ const SEA_ATLAS = {
         s.chartDiscovered=new Set();
         s.atlasOpen=false;
         s.atlasElements=null;
+        s.chartWaypointId=null;
+        s.atlasFocusedId=null;
+        s.atlasPoints=[];
         // Same footprint as the existing 80x80 radar, now tappable.
         s.chartHitbox={
             x:SEA_DESKTOP?SEA_VIEW.width-82:390,
@@ -43,6 +79,8 @@ const SEA_ATLAS = {
         if(s.ended||s.sinking||s.pausedByCaptain||s.islandDocked)return false;
         s.touchReset();
         this.discover(s);
+        if(!this.landmarks(s).some(i=>i.id===s.atlasFocusedId))
+            s.atlasFocusedId=this.landmarks(s)[0]?.id??null;
         this.render(s);
         s.atlasOpen=true;
         return true;
@@ -51,8 +89,8 @@ const SEA_ATLAS = {
         if(s.atlasElements)s.atlasElements.destroy(true);
         const desktop=SEA_DESKTOP,V=SEA_VIEW;
         const cx=V.width/2,cy=V.height/2;
-        const top=desktop?35:65,w=desktop?680:444,h=desktop?645:662;
-        const mapW=desktop?568:362,mapH=desktop?405:288;
+        const top=desktop?15:65,w=desktop?680:444,h=desktop?690:662;
+        const mapW=desktop?568:362,mapH=desktop?360:268;
         const mapX=cx,mapY=top+(desktop?323:308);
         const root=s.add.container(0,0).setScrollFactor(0).setDepth(460);
         s.atlasElements=root;
@@ -82,6 +120,11 @@ const SEA_ATLAS = {
         const g=add(s.add.graphics());
         const L=mapX-mapW/2,T=mapY-mapH/2;
         const scaleX=mapW/s.W,scaleY=mapH/s.H;
+        const known=this.landmarks(s),nav=this.navigation(s);
+        s.atlasPoints=known.map(i=>({id:i.id,x:L+i.x*scaleX,y:T+i.y*scaleY}));
+        if(nav)g.lineStyle(2,0xd2aa78,.64).lineBetween(
+            L+s.player.x*scaleX,T+s.player.y*scaleY,
+            L+nav.island.x*scaleX,T+nav.island.y*scaleY);
         g.lineStyle(1,0x53636a,.19);
         for(let k=1;k<6;k++){
             const vx=L+mapW*k/6,vy=T+mapH*k/6;
@@ -90,8 +133,7 @@ const SEA_ATLAS = {
         }
         // Unvisited locations need discovery; visited ones are desaturated.
         let visible=0;
-        for(const isl of s.islands) {
-            if(!s.chartDiscovered.has(isl.id))continue;
+        for(const isl of known) {
             visible++;
             const mx=L+isl.x*scaleX,my=T+isl.y*scaleY;
             const visited=s.islandVisits?.has(isl.id);
@@ -111,6 +153,10 @@ const SEA_ATLAS = {
                 g.fillStyle(color,visited?.55:1).fillCircle(mx,my,3.5);
                 if(visited)g.lineStyle(1,0x748384,.55).strokeCircle(mx,my,5);
             }
+            if(isl.id===s.atlasFocusedId)
+                g.lineStyle(1,0xeed6b2,.95).strokeCircle(mx,my,10);
+            if(isl.id===s.chartWaypointId)
+                g.lineStyle(2,0xf2b86d,1).strokeCircle(mx,my,14);
         }
         const px=L+s.player.x*scaleX,py=T+s.player.y*scaleY;
         // The sailor's green arrow uses the actual heading; no route
@@ -123,14 +169,31 @@ const SEA_ATLAS = {
         // Real world map cardinal orientation, not camera orientation.
         txt(L+14,T+13,'N',12,'#e1c99f',{bold:true});
         const visitedCount=Array.from(s.chartDiscovered).filter(id=>s.islandVisits?.has(id)).length;
-        txt(cx,top+(desktop?548:506),
+        const focused=known.find(i=>i.id===s.atlasFocusedId);
+        const title=nav?this.kindNames[nav.island.kind]||'ILHA':
+            focused?this.kindNames[focused.kind]||'ILHA':null;
+        txt(cx,top+(desktop?525:463),
+            nav?'◆ DESTINO MARCADO: '+title+' #'+nav.island.id:
+                focused?'MARCO EM FOCO: '+title+' #'+focused.id:
+                    'NENHUM MARCO CONHECIDO',
+            desktop?13:11,nav?'#e4bf8b':'#d4c0a0',{bold:!!nav});
+        txt(cx,top+(desktop?550:485),
+            nav?'DIST '+nav.distance+' UNID. · RUMO '+nav.bearing+'° '+nav.cardinal+
+                ' · '+(Math.abs(nav.turn)<=1?'PROA ALINHADA':
+                    Math.abs(nav.turn)+'° '+(nav.turn>0?'ESTIB.':'BOMB.')):
+                'ESCOLHA UM MARCO PARA TRAÇAR O RUMO',
+            desktop?12:10,'#c5b5a3',{mono:true});
+        txt(cx,top+(desktop?574:516),
             'CONHECIDAS '+visible+'  ·  VISITADAS '+visitedCount+
             '  ·  OUTRAS AINDA OCULTAS',
             desktop?12:10,'#c2ae95',{mono:true});
-        txt(cx,top+(desktop?574:540),
+        txt(cx,top+(desktop?598:546),
             '▣ NEGOCIAÇÃO   ■ ALTAR   ✚ SANTUÁRIO   ○ VISITADA',
             desktop?12:10,'#bfaa8c',{mono:true});
-        const closeY=top+h-40,closeW=desktop?300:322,closeH=48;
+        txt(cx,top+(desktop?622:574),
+            'TOQUE UM MARCO · SETAS + ENTER · DIRECIONAL + A',
+            desktop?11:10,'#b4a08a',{mono:true});
+        const closeY=top+h-(desktop?30:40),closeW=desktop?300:322,closeH=48;
         add(s.add.rectangle(cx,closeY,closeW,closeH,0x362128,.98)
             .setStrokeStyle(2,0xa47d60,.95));
         txt(cx,closeY,'◀  RETORNAR À NAVEGAÇÃO',desktop?17:15,'#e5ceb4',{bold:true});
@@ -139,8 +202,10 @@ const SEA_ATLAS = {
         // backdrop prevents any shot or ship movement through the atlas.
         return root;
     },
-    pointer(s) {
+    pointer(s,x,y) {
         if(!s.atlasOpen)return false;
+        const point=(s.atlasPoints||[]).find(p=>Math.hypot(p.x-x,p.y-y)<=12);
+        if(point){this.mark(s,point.id);return true;}
         this.close(s);
         return true;
     }
