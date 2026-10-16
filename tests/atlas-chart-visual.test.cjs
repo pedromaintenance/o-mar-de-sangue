@@ -87,6 +87,22 @@ const {chromium}=require('playwright-core');
    assert(discovered.visible&&discovered.open);
    assert.equal(discovered.save,before.profile,'Atlas cannot write to save');
    await page.screenshot({path:path.join('port-artifacts','mare-negra-3-4-'+label+'-parley.png'),fullPage:true});
+   // 3.4b: route only to a truly discovered marker; retained in HUD.
+   const route=await page.evaluate(()=>{
+    const s=game.scene.getScene('Game');
+    const parley=s.islands.find(i=>i.kind==='parley');
+    const marker=s.atlasPoints.find(p=>p.id===parley.id);
+    if(!marker)throw Error('Discovered parley marker missing');
+    const consumed=s.handleCaptainPointer(marker.x,marker.y);
+    const nav=SEA_ATLAS.navigation(s);
+    return {consumed,open:s.atlasOpen,selected:s.chartWaypointId,
+      id:parley.id,distance:nav?.distance,bearing:nav?.bearing,
+      save:localStorage.getItem('carcaca.mar-de-sangue.v4')};
+   });
+   assert(route.consumed&&route.open&&route.selected===route.id);
+   assert.equal(route.distance,0,'Voyage waypoint must use world position');
+   assert.equal(route.save,before.profile,'Selecting a marker cannot write a save');
+   await page.screenshot({path:path.join('port-artifacts','mare-negra-3-4b-'+label+'-waypoint.png'),fullPage:true});
    // All touches on the overlay should be consumed and close it.
    const tap=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');
@@ -94,6 +110,16 @@ const {chromium}=require('playwright-core');
     return {was,clicked,open:s.atlasOpen};
    });
    assert(tap.was&&tap.clicked&&!tap.open);
+   const navHUD=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     s.updateHUD();
+     return {waypoint:s.chartWaypointId,nav:SEA_ATLAS.navigation(s),
+       hud:s.hudConditions.text,
+       profile:localStorage.getItem('carcaca.mar-de-sangue.v4')};
+   });
+   assert.equal(navHUD.waypoint,route.id,'Waypoint must survive closing the map');
+   assert(navHUD.hud.includes('DESTINO'),'HUD should keep bearing while sailing');
+   assert.equal(navHUD.profile,before.profile,'HUD should not modify stored progress');
    assert(!errors.length,label+' JS runtime errors '+errors.join(' | '));
    console.log('PASS 3.4 Atlas '+label,{hidden:before.total-before.count,after:discovered.kind});
    await page.close();
