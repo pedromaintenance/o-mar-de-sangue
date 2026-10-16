@@ -6,7 +6,8 @@ const SEA_ISLANDS = {
     titles: {
         reef:'RECIFES TABAXI', ruin:'RUÍNAS DA COSTA SUL',
         monastery:'MOSTEIRO TORTLE', daegon:'ALTAR DE DAEGON',
-        demeter:'SANTUÁRIO DE DEMÉTER', wreck:'CEMITÉRIO DE NAUS'
+        demeter:'SANTUÁRIO DE DEMÉTER', wreck:'CEMITÉRIO DE NAUS',
+        parley:'TRÊS BANDEIRAS NA MARÉ'
     },
     lore: {
         reef: 'Águas rasas guardam pérolas e ossos. Entre os corais, uma passagem estreita conduz a um ancoradouro escondido.',
@@ -14,7 +15,8 @@ const SEA_ISLANDS = {
         monastery:'O sino de um mosteiro ressoa sobre o vermelho das águas. Monges tortle observam a embarcação em silêncio.',
         daegon:'Um ídolo coberto por sal e sangue se ergue sobre o rochedo. Alguém deixou oferendas muito recentes.',
         demeter:'A vegetação rompe as pedras de um pequeno templo. O ar cheira a folhas novas, mesmo sobre o mar rubro.',
-        wreck:'Cascos abandonados rangem na maré. Um velho barqueiro recolhe aquilo que os afogados não reivindicaram.'
+        wreck:'Cascos abandonados rangem na maré. Um velho barqueiro recolhe aquilo que os afogados não reivindicaram.',
+        parley:'Ao largo de Portomonte, náufragos pedem passagem. Um emissário da Corte oferece ouro pelos seus nomes; devotos kuo-toa de Daegon oferecem pólvora por sangue.'
     },
     choices: {
         reef: [
@@ -46,6 +48,25 @@ const SEA_ISLANDS = {
             { id:'salvage', name:'RECOLHER OS COFRES PERDIDOS', hint:'+58 ouro · +7 maldição', gold:58, curse:7 },
             { id:'patch', name:'COMPRAR MADEIRA E CORDAME', hint:'20 ouro · +32 casco', cost:20, heal:32 },
             { id:'funeral', name:'HONRAR OS AFOGADOS', hint:'-18 maldição · +12 casco', curse:-18, heal:12 }
+        ],
+        // 3.3: vertical slice of Coast politics. These three consequences
+        // use the pre-existing voyage stats: NO Save/Profile migration.
+        parley: [
+            { id:'refuge', faction:'sobreviventes',
+              name:'ABRIGAR OS SOBREVIVENTES',
+              hint:'+22 casco · -8 maldição',
+              heal:22, curse:-8,
+              outcome:'Os náufragos seguem protegidos até a costa. Portomonte ganha testemunhas.' },
+            { id:'tribute', faction:'corte',
+              name:'VENDER OS NOMES À CORTE',
+              hint:'+60 ouro · +15 maldição',
+              gold:60, curse:15,
+              outcome:'Um agente feérico recolhe a lista. A travessia ficou mais cara para outros.' },
+            { id:'bloodpowder', faction:'culto',
+              name:'ACEITAR A PÓLVORA DE DAEGON',
+              hint:'-12 casco · +6 dano · +18 maldição',
+              hp:-12, cannon:6, curse:18,
+              outcome:'O acordo é selado em sangue. Os devotos somem sob as águas rubras.' }
         ]
     },
     init(s) {
@@ -58,6 +79,9 @@ const SEA_ISLANDS = {
         s.islandSelected = null;
         s.islandOverlay = null;
         s.islandNavAt = 0;
+        // Voyage-only narrative decision: intentionally not stored in SeaProfile.
+        s.politicalLedger = { sobreviventes:0, corte:0, culto:0 };
+        s.politicalChoice = null;
         s.anchorButton = s.add.rectangle(SEA_DESKTOP ? SEA_VIEW.width-123 : 240,
             SEA_DESKTOP ? 296 : 517,190,42,0x182321,.97)
             .setStrokeStyle(2,0xa58b64,.92).setScrollFactor(0).setDepth(190).setVisible(false);
@@ -204,7 +228,12 @@ const SEA_ISLANDS = {
         s.islandVisits.add(s.islandSelected.id);
         s.islandError='';
         s.islandChoiceIndex=0;
-        s.islandOutcome=changes.join('  ·  ')||'Os ventos mudaram.';
+        if(s.islandSelected.kind==='parley' && choice.faction){
+            s.politicalLedger[choice.faction]=1;
+            s.politicalChoice=choice.id;
+        }
+        const result=changes.join('  ·  ')||'Os ventos mudaram.';
+        s.islandOutcome=choice.outcome?choice.outcome+'\n'+result:result;
         s.lastDamageTime=s.time.now;
         s.updateHUD();
         if(s.drawHullScars)s.drawHullScars();
@@ -259,7 +288,7 @@ const SEA_ISLANDS = {
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'29px':'22px',
             fontStyle:'bold',color:'#e6d0b2',align:'center',wordWrap:{width:width-35}
         }).setOrigin(.5));
-        const asset=type==='reef'?'island-reef':'island-'+type;
+        const asset=type==='reef'?'island-reef':type==='parley'?'island-wreck':'island-'+type;
         if(s.textures.exists(asset)){
             const sourceHeight=s.textures.get(asset).getSourceImage().height||256;
             root.add(s.add.image(x,top+161,asset).setScale((SEA_DESKTOP?146:129)/sourceHeight));
