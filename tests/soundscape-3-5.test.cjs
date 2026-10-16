@@ -60,7 +60,7 @@ assert(gameSrc.includes("'port'"),'Port must have its own music mood');
 assert(gameSrc.includes("this.input.keyboard.on('keydown-M', this.onAtlas)"));
 assert(portSrc.includes('M abre a carta. N silencia.'),'Help should describe correct keys');
 // Bind audio on a dummy scene, confirm M cannot toggle audio.
-const audioContext={localStorage:storage,console};
+const audioContext={localStorage:storage,console,Phaser:{Scenes:{Events:{SHUTDOWN:'shutdown'}}}};
 vm.createContext(audioContext);
 vm.runInContext(audioSrc+';this.audio=SEA_AUDIO;',audioContext);
 const audio=audioContext.audio;
