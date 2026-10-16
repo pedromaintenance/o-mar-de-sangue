@@ -12,7 +12,16 @@
   <link rel="icon" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Porto 3.0 is an opt-in skin. Never mutate game state or menu logic.
+    try {
+      if (new URLSearchParams(location.search).get('theme') === 'abyss') {
+        document.documentElement.classList.add('theme-mare-negra');
+      }
+    } catch (_) { /* unsupported environment: keep the classic theme */ }
+  </script>
   <link rel="stylesheet" href="PortUI.css" />
+  <link rel="stylesheet" href="PortThemeAbyss.css" />
 </head>
 <body>
   <div id="app-shell">

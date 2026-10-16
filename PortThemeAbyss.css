@@ -1,0 +1,379 @@
+/*
+ * PORTO 3.0 — A MARÉ NEGRA
+ * A visual-only, opt-in CSS skin. No changes to PortUI.js, Game.js or state.
+ * Activate with ?theme=abyss. The port's default skin stays untouched.
+ * Existing original naval sprites/sea textures are reused, never quantized.
+ * Keep pointer hitboxes, focus, responsive grid and tab navigation intact.
+ */
+html.theme-mare-negra{
+  --port-ink:#080b0e;
+  --port-deep:#10161a;
+  --port-panel:#11171b;
+  --port-plank:#201b1b;
+  --port-brass:#9b8060;
+  --port-gold:#d6b78b;
+  --port-fog:#e0dbd0;
+  --port-muted:#a7a9a5;
+  --port-red:#91343b;
+  --port-line:rgba(168,126,85,.29);
+}
+.theme-mare-negra .port-ui{
+  color:#d5d0c4;
+  background:#070b0d;
+  font-family:Georgia,"Times New Roman",serif;
+  letter-spacing:.006em;
+}
+.theme-mare-negra .port-background{
+  background:
+    linear-gradient(180deg,rgba(3,7,10,.83) 0%,rgba(7,12,16,.87) 40%,#07090b 100%),
+    url('./assets/tiles/sea_base.png') center / 420px repeat;
+}
+.theme-mare-negra .port-background__moon{
+  width:min(31vw,400px);height:min(31vw,400px);left:70%;top:-15%;
+  opacity:.17;filter:blur(35px);
+  background:radial-gradient(circle,#ad4348 0%,#53202b 51%,transparent 74%);
+}
+.theme-mare-negra .port-background__sea{
+  opacity:.25;top:30%;
+  background:
+    linear-gradient(0deg,#160d12 0%,transparent 85%),
+    url('./assets/tiles/sea_foam.png') center bottom / 540px repeat;
+  filter:grayscale(.62);
+}
+.theme-mare-negra .port-background__vignette{
+  box-shadow:inset 0 0 105px 35px rgba(0,0,0,.8);
+}
+.theme-mare-negra .port-container{
+  max-width:1520px;
+}
+.theme-mare-negra .port-top{
+  background:linear-gradient(90deg,rgba(7,12,15,.74),rgba(12,17,20,.2),rgba(7,12,15,.74));
+  border-bottom:1px solid #69513b;
+}
+.theme-mare-negra .port-top:after{
+  width:210px;height:1px;bottom:-2px;
+  background:linear-gradient(90deg,#ac3441,rgba(147,102,67,.4),transparent);
+}
+.theme-mare-negra .port-top__sigil{
+  color:#d2ad85;
+  background:#111315;
+  border:1px solid #76634c;
+  box-shadow:0 0 0 3px #070a0b,inset 0 0 18px rgba(130,42,45,.35);
+  transform:rotate(0);
+  font-size:27px;
+}
+.theme-mare-negra .port-eyebrow{
+  color:#a88868;
+  font-weight:700;letter-spacing:.2em;
+}
+.theme-mare-negra .port-top__title{
+  color:#ded3be;
+  font-size:clamp(16px,2vw,24px);
+  letter-spacing:.16em;
+  text-shadow:0 2px 0 #000;
+}
+.theme-mare-negra .port-top__tag{color:#7d8583}
+.theme-mare-negra .port-top__coins{color:#e1c49b}
+.theme-mare-negra .port-top__coins span{color:#a24f46}
+.theme-mare-negra .port-mini{
+  border:1px solid #5a4a40;color:#cbb59b;
+  background:linear-gradient(145deg,#191e21,#0a1012);
+  box-shadow:inset 0 0 0 1px #090d0f;
+}
+.theme-mare-negra .port-mini:hover{background:#302322;color:#f0d3ab}
+/* Vast dark harbor: illustration comes from the game's original nautical
+   sprite and painted sea textures, not from procedural faux-art panels. */
+.theme-mare-negra .port-hero{
+  border:1px solid #5f4b3c;
+  background:
+    linear-gradient(90deg,#080d13 0%,rgba(9,12,16,.97) 25%,rgba(13,15,21,.72) 55%,rgba(10,12,16,.31) 100%),
+    url('./assets/pixel/tiles/sea_base.png') center 58% / 450px repeat;
+  box-shadow:
+    inset 0 0 0 4px #060b0e,
+    inset 0 0 0 5px rgba(155,115,80,.45),
+    0 16px 30px rgba(0,0,0,.7);
+}
+.theme-mare-negra .port-hero::before{
+  content:"";z-index:1;
+  width:100%;height:100%;left:0;top:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(44,12,21,.35) 73%,rgba(5,10,14,.78) 100%);
+  pointer-events:none;
+}
+.theme-mare-negra .port-hero::after{
+  content:"✥";right:12px;bottom:11px;top:auto;
+  color:#9c7560;font-size:19px;transform:none;
+}
+.theme-mare-negra .port-hero__haze{
+  opacity:.42;
+  background:
+    linear-gradient(107deg,transparent 52%,rgba(148,34,44,.22) 76%,rgba(5,8,12,.15)),
+    linear-gradient(180deg,rgba(7,10,13,.4),transparent 42%,rgba(2,6,9,.63));
+}
+.theme-mare-negra .port-hero__copy{
+  z-index:4;
+  text-shadow:0 2px 5px #000,0 0 18px #050709;
+}
+.theme-mare-negra .port-hero h1{
+  color:#ece0c7;
+  font-size:clamp(41px,5.1vw,77px);
+  letter-spacing:.07em;
+  line-height:.93;
+}
+.theme-mare-negra .port-hero h1 em{
+  color:#b8474b;
+  text-shadow:0 3px 8px rgba(0,0,0,.95);
+}
+.theme-mare-negra .port-hero p{color:#c3beb6;font-size:clamp(14px,1.5vw,18px)}
+.theme-mare-negra .port-hero__ship{
+  height:100%;width:49%;right:0;top:-1%;
+  opacity:.93;
+  transform:rotate(-3deg);
+  filter:brightness(.73) saturate(.73)
+    drop-shadow(0 0 27px rgba(114,30,38,.44))
+    drop-shadow(0 13px 10px rgba(0,0,0,.9));
+}
+.theme-mare-negra .port-hero__seal{
+  top:10px;right:15px;color:#866c54;font-size:15px;
+}
+/* Side panels become a restrained pair of weathered maritime reliquaries. */
+.theme-mare-negra .port-aside__frame{
+  border:1px solid #564739;
+  background:
+    linear-gradient(180deg,rgba(8,12,15,.91),rgba(16,15,16,.96) 58%,rgba(8,12,14,.98)),
+    url('./assets/tiles/sea_base.png') center / 400px repeat;
+  box-shadow:inset 0 0 0 3px #0a1012,
+    inset 0 0 0 4px rgba(120,89,62,.3),0 13px 28px rgba(0,0,0,.56);
+}
+.theme-mare-negra .port-aside__frame::before,
+.theme-mare-negra .port-aside__frame::after{
+  color:#755d47;top:8px;font-size:16px;content:"✦";
+}
+.theme-mare-negra .port-aside h2{
+  color:#d2b99b;
+  font-size:clamp(18px,1.6vw,23px);
+  line-height:1.2;
+}
+.theme-mare-negra .port-aside p{color:#aaa8a4;font-size:14px}
+.theme-mare-negra .port-aside__ship{
+  opacity:.87;
+  filter:brightness(.73) saturate(.54)
+    drop-shadow(0 8px 18px #000)
+    drop-shadow(0 0 13px rgba(125,46,57,.22));
+  transform:rotate(-3deg);
+}
+.theme-mare-negra .port-aside__ship--right{
+  transform:rotate(4deg);
+  filter:brightness(.74) saturate(.64) drop-shadow(0 8px 15px #000);
+}
+.theme-mare-negra .port-aside__line{
+  color:#967b60;border-top-color:#42382e;
+}
+.theme-mare-negra .port-tally{border-top-color:#45372e}
+.theme-mare-negra .port-tally>div{
+  border-bottom-color:#3c302a;color:#aaa59b;
+}
+.theme-mare-negra .port-tally strong{color:#d9c3a4}
+/* Navigation resembles engraved iron/charred oak rather than app cards. */
+.theme-mare-negra .port-section-label{
+  color:#a78867;border-bottom:1px solid #4d3c31;
+  padding-bottom:8px;
+}
+.theme-mare-negra .port-section-label span:last-child{color:#723e3b}
+.theme-mare-negra .port-choice{
+  min-height:80px;
+  color:#ded2be;
+  border:1px solid #51483e;
+  border-left:3px solid #765d48;
+  background:
+    linear-gradient(110deg,rgba(13,20,22,.96),rgba(25,24,25,.98) 62%,rgba(16,17,21,.97)),
+    url('./assets/tiles/sea_base.png') center / 340px repeat;
+  box-shadow:inset 0 0 0 3px #0b1012,0 7px 18px #0007;
+  transform:none;
+  transition:background-color .12s,border-color .12s,color .12s;
+}
+.theme-mare-negra .port-choice::before{
+  inset:6px;border:1px solid rgba(145,120,88,.19);
+}
+.theme-mare-negra .port-choice__icon{
+  background:#0b1013;border:1px solid #59473a;color:#b59771;
+  box-shadow:inset 0 0 0 2px #14191a;
+}
+.theme-mare-negra .port-choice__copy strong{
+  font-size:clamp(14px,1.27vw,18px);
+  letter-spacing:.09em;
+}
+.theme-mare-negra .port-choice__copy small{
+  color:#a8a59c;font-size:11px;
+}
+.theme-mare-negra .port-choice__arrow{color:#775d4a;font-size:18px}
+.theme-mare-negra .port-choice--primary{
+  border-left-color:#a7464a;
+  background:linear-gradient(115deg,#27181c,#1e1a1c 57%,#10181b);
+  color:#ead6bc;
+}
+.theme-mare-negra .port-choice--danger{
+  border-left-color:#9c343d;background:#251216;
+}
+.theme-mare-negra .port-choice:hover,
+.theme-mare-negra .port-choice:focus-visible,
+.theme-mare-negra .port-choice.is-controller-focused{
+  background:linear-gradient(110deg,#3e2427,#201d20 67%,#111a20);
+  border-color:#ab7e66;border-left-color:#c04b50;
+  color:#fff2df;transform:none;
+  outline:2px solid #b58d6b;outline-offset:2px;
+  box-shadow:inset 0 0 0 3px #080f11,0 0 0 3px rgba(0,0,0,.84),
+    0 0 18px rgba(129,37,46,.28);
+}
+.theme-mare-negra .port-choice:hover .port-choice__arrow,
+.theme-mare-negra .port-choice.is-controller-focused .port-choice__arrow{color:#d6ac82}
+.theme-mare-negra .port-statbar{
+  border:1px solid #504239;
+  background:#0d1518;
+  box-shadow:inset 0 0 0 3px #0a0d10;
+}
+.theme-mare-negra .port-statbar>div{border-right-color:#38312c}
+.theme-mare-negra .port-statbar span{color:#989791}
+.theme-mare-negra .port-statbar strong{color:#d5c1a3}
+.theme-mare-negra .port-bottom{color:#797f7e}
+.theme-mare-negra .port-text-button{color:#ab817a}
+.theme-mare-negra .port-text-button:hover{color:#e9bbb4}
+/* Estaleiro: engraved catalogs, not blue app cards. */
+.theme-mare-negra .port-page__header{
+  border:1px solid #584536;
+  background:
+    linear-gradient(90deg,#0b1317,rgba(35,21,24,.96),#0a1215);
+  box-shadow:inset 0 0 0 4px #080e10;
+}
+.theme-mare-negra .port-page__header::before,
+.theme-mare-negra .port-page__header::after{
+  content:"✥";color:#76553f;font-size:17px;
+}
+.theme-mare-negra .port-page h1{color:#e3d6be;letter-spacing:.12em}
+.theme-mare-negra .port-page__header p{color:#a7a8a5}
+.theme-mare-negra .port-page__balance{color:#aa9577}
+.theme-mare-negra .port-page__balance strong{color:#e2c39b}
+.theme-mare-negra .port-tabs{
+  border:1px solid #514437;background:#0b1012;
+  gap:5px;
+}
+.theme-mare-negra .port-tabs button{
+  border:1px solid #393630;
+  background:linear-gradient(180deg,#191b1b,#101515);
+  color:#a6a197;
+}
+.theme-mare-negra .port-tabs button.is-active{
+  border-color:#86574c;
+  background:linear-gradient(180deg,#3a1f23,#20171a);
+  box-shadow:inset 0 -3px 0 #a74046;
+  color:#e8ccaa;
+}
+.theme-mare-negra .port-tabs button:hover{background:#322222;color:#ead6be}
+.theme-mare-negra .port-tabs__hint{color:#ad8067}
+.theme-mare-negra .port-upgrade{
+  border:1px solid #5a473a;
+  background:
+    linear-gradient(135deg,rgba(20,22,24,.98),rgba(12,19,21,.99)),
+    url('./assets/tiles/sea_base.png') center / 350px repeat;
+  box-shadow:inset 0 0 0 4px #0b1011,0 12px 24px #0008;
+}
+.theme-mare-negra .port-upgrade::after{
+  content:"✥";color:#70533d;font-size:14px;
+}
+.theme-mare-negra .port-upgrade__symbol{
+  border:1px solid #70513f;background:#281b20;
+  color:#d0ac81;box-shadow:inset 0 0 0 3px #13161a;
+}
+.theme-mare-negra .port-upgrade__head span{color:#977e65}
+.theme-mare-negra .port-upgrade h2{color:#e0cfb4}
+.theme-mare-negra .port-upgrade p{color:#b0b3ad}
+.theme-mare-negra .port-upgrade__foot{border-top:1px solid #413830}
+.theme-mare-negra .port-upgrade__foot>span{color:#928a7e}
+.theme-mare-negra .port-upgrade__foot strong{color:#d7b98f}
+.theme-mare-negra .port-upgrade__foot button{
+  border:1px solid #8a6152;
+  background:linear-gradient(180deg,#372529,#281a1e);
+  color:#f0d6bc;
+}
+.theme-mare-negra .port-upgrade__foot button:not(:disabled):hover,
+.theme-mare-negra .port-upgrade__foot button.is-controller-focused{
+  background:linear-gradient(180deg,#713840,#452229);
+  border-color:#b78568;color:#fff0d8;
+}
+.theme-mare-negra .port-upgrade__foot button:disabled{
+  color:#777d78;background:#111719;border-color:#393837;opacity:.7;
+}
+/* Diário / resultados / pacto reuse the same visual hierarchy. */
+.theme-mare-negra .port-help{
+  background:linear-gradient(135deg,#141a1c,#10171a);
+  border:1px solid #544638;
+}
+.theme-mare-negra .port-help__number{
+  background:#23171a;border-color:#604737;color:#c4a17e;
+}
+.theme-mare-negra .port-help h2{color:#dac6a7}
+.theme-mare-negra .port-help p{color:#aeb3af}
+.theme-mare-negra .port-warning{
+  background:linear-gradient(145deg,#27141a,#0e1115);
+  border-color:#76383b;
+  box-shadow:inset 0 0 0 6px #11151a,0 22px 45px #000b;
+}
+.theme-mare-negra .port-warning__sigil{color:#a64449}
+.theme-mare-negra .port-warning p{color:#bcb4aa}
+.theme-mare-negra .port-warning>strong{color:#d5a492}
+.theme-mare-negra .port-result-grid>div{
+  background:#10191d;border:1px solid #594735;
+}
+.theme-mare-negra .port-result-grid span{color:#969d9a}
+.theme-mare-negra .port-result-grid strong{color:#d8c3a2}
+.theme-mare-negra .port-footer{
+  border-top-color:#594634;color:#7f8582;
+}
+.theme-mare-negra .port-footer__version{color:#936857}
+.theme-mare-negra .port-sound__label{color:#aa8568}
+.theme-mare-negra .port-sound__volume{color:#d2b495}
+.theme-mare-negra .port-sound button{
+  border:1px solid #514336;background:#101619;color:#bca181;
+}
+.theme-mare-negra .port-sound button:hover{background:#352123;color:#e7c8a5}
+.theme-mare-negra .port-sound small{color:#758481}
+.theme-mare-negra .port-pad-hint{color:#9c886e}
+.theme-mare-negra .port-toast{
+  background:#1b1b1d;border:1px solid #98725c;
+  color:#e3cda9;
+}
+/* Equivalent keyboard/Xbox focus state is vital: preserve the controller
+   highlight and don't accidentally re-enable tabs as selectable buttons. */
+.theme-mare-negra .port-ui button[data-action].is-controller-focused{
+  outline:2px solid #b58d6b;
+  outline-offset:3px;border-color:#b58d6b;
+  box-shadow:0 0 0 3px #050809,0 0 14px rgba(154,51,61,.42);
+}
+.theme-mare-negra .port-ui .port-tabs button.is-active{
+  outline:none;
+}
+@media(max-width:1150px){
+  .theme-mare-negra .port-hero__ship{width:47%;right:-3%}
+}
+@media(max-width:780px){
+  .theme-mare-negra .port-hero{height:225px}
+  .theme-mare-negra .port-hero__ship{
+    height:94%;width:48%;top:2%;right:-7%;
+    opacity:.77;
+  }
+  .theme-mare-negra .port-hero h1{
+    font-size:clamp(36px,8.4vw,58px);
+  }
+  .theme-mare-negra .port-hero__copy{margin-left:21px;width:69%}
+  .theme-mare-negra .port-aside{display:none}
+  .theme-mare-negra .port-choice{min-height:72px}
+}
+@media(max-width:410px){
+  .theme-mare-negra .port-hero{height:198px}
+  .theme-mare-negra .port-hero__ship{width:41%;opacity:.57}
+  .theme-mare-negra .port-hero h1{font-size:36px}
+}
+@media(prefers-reduced-motion:reduce){
+  .theme-mare-negra .port-ui *,
+  .theme-mare-negra .port-ui *::before,
+  .theme-mare-negra .port-ui *::after{transition:none!important;animation:none!important}
+}
