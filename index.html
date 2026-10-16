@@ -13,12 +13,14 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="stylesheet" href="style.css" />
   <script>
-    // Porto 3.0 is an opt-in skin. Never mutate game state or menu logic.
+    // Porto 3.0 — A Maré Negra is the official visual identity.
+    // Legacy skin remains available by URL only: ?theme=classic.
+    // This switch affects presentation exclusively, never game state.
+    let classic = false;
     try {
-      if (new URLSearchParams(location.search).get('theme') === 'abyss') {
-        document.documentElement.classList.add('theme-mare-negra');
-      }
-    } catch (_) { /* unsupported environment: keep the classic theme */ }
+      classic = new URLSearchParams(location.search).get('theme') === 'classic';
+    } catch (_) { /* Default remains Maré Negra. */ }
+    if (!classic) document.documentElement.classList.add('theme-mare-negra');
   </script>
   <link rel="stylesheet" href="PortUI.css" />
   <link rel="stylesheet" href="PortThemeAbyss.css" />
