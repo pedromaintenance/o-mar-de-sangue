@@ -1,45 +1,57 @@
-/* O MAR DE SANGUE — Combat pause only.
- * The port was rebuilt in PortUI.js/PortUI.css. The legacy procedural
- * port methods have been removed; only the combat pause is preserved.
+/* O MAR DE SANGUE — Porto 3.1 | Diário do Capitão — A Maré Negra
+ * Modal Phaser during combat. Palette and ornaments only: all three
+ * actions, hit boxes, focus contract, save/withdrawal and controls stay put.
+ * The HTML port and the combat engine are intentionally untouched.
  */
 const SEA_UI = {
     pause(scene){
         const x=SEA_VIEW.width/2, y=SEA_VIEW.height/2,desktop=SEA_DESKTOP;
-        const w=desktop?630:454,h=desktop?612:612,top=y-h/2;
+        const w=desktop?630:454,h=612,top=y-h/2;
+        const edge=0x8b6b50,red=0x87333e,ink=0x0a1013;
         const root=scene.add.container(0,0).setScrollFactor(0).setDepth(360);
         scene.pauseElements=root;
         const add=o=>{root.add(o);return o};
-        // Máscara interativa impede clicar em controles do jogo atrás do diário.
-        add(scene.add.rectangle(x,y,SEA_VIEW.width,SEA_VIEW.height,0x070d14,.90)
+        // Modal interception is vital: never send clicks to cannons underneath.
+        add(scene.add.rectangle(x,y,SEA_VIEW.width,SEA_VIEW.height,0x05080b,.94)
             .setInteractive());
-        add(scene.add.rectangle(x,y,w,h,0x111d29,.985).setStrokeStyle(3,0xb28b5c));
-        add(scene.add.rectangle(x,y,w-15,h-15,0x341e2d,.2).setStrokeStyle(1,0xddbd88,.53));
-        const ornament=scene.add.graphics();
-        add(ornament);
-        ornament.lineStyle(2,0xd3b07e,.84);
-        ornament.lineBetween(x-w/2+27,top+116,x+w/2-27,top+116);
-        ornament.lineBetween(x-w/2+27,top+h-77,x+w/2-27,top+h-77);
-        for(const cx of [x-w/2+18,x+w/2-18]){
-            for(const cy of [top+18,top+h-18]){
-                ornament.fillStyle(0xe5c38b,.84);
-                ornament.fillCircle(cx,cy,3.5);
+        // Iron frame, scorched timber and an inlaid dark-red ledger.
+        add(scene.add.rectangle(x,y,w+6,h+6,0x080b0d,.99)
+            .setStrokeStyle(2,0x49382e,.95));
+        add(scene.add.rectangle(x,y,w,h,0x101719,.995)
+            .setStrokeStyle(2,edge,.83));
+        add(scene.add.rectangle(x,y,w-13,h-13,0x161619,.79)
+            .setStrokeStyle(1,0x4d3a31,.85));
+        add(scene.add.rectangle(x,top+68,w-26,117,0x20171b,.86));
+        add(scene.add.rectangle(x,top+115,w-27,2,red,.75));
+        add(scene.add.rectangle(x,top+h-86,w-27,2,red,.55));
+        const ornament=scene.add.graphics();add(ornament);
+        ornament.lineStyle(1,0xa58262,.7);
+        ornament.lineBetween(x-w/2+28,top+120,x+w/2-28,top+120);
+        ornament.lineBetween(x-w/2+28,top+h-80,x+w/2-28,top+h-80);
+        ornament.lineStyle(1,0x55463b,.9);
+        ornament.lineBetween(x-w/2+20,top+22,x-w/2+20,top+h-22);
+        ornament.lineBetween(x+w/2-20,top+22,x+w/2-20,top+h-22);
+        for(const cx of [x-w/2+13,x+w/2-13]){
+            for(const cy of [top+13,top+h-13]){
+                ornament.fillStyle(0x8b654b,.9);ornament.fillCircle(cx,cy,3);
+                ornament.fillStyle(0x171317,1);ornament.fillCircle(cx,cy,1);
             }
         }
-        const stamp=scene.add.image(x,top+58,'player-ship').setAlpha(.11);
+        const stamp=scene.add.image(x,top+62,'player-ship').setAlpha(.095);
         const hi=scene.textures.get('player-ship').getSourceImage().height||160;
-        stamp.setScale(125/hi);
-        add(stamp);
-        const label=(yy,value,size=16,color='#ead4b2',bold=false,wrap=w-65)=>{
-            return add(scene.add.text(x,yy,value,{fontFamily:'Georgia',fontSize:size+'px',fontStyle:bold?'bold':'normal',
-                color,align:'center',lineSpacing:7,wordWrap:{width:wrap}}).setOrigin(.5));
+        stamp.setScale(125/hi);add(stamp);
+        const label=(yy,value,size=16,color='#d7ccba',bold=false,wrap=w-65)=>{
+            return add(scene.add.text(x,yy,value,{
+                fontFamily:'Georgia',fontSize:size+'px',
+                fontStyle:bold?'bold':'normal',color,align:'center',
+                lineSpacing:7,wordWrap:{width:wrap}
+            }).setOrigin(.5));
         };
-        label(top+48,'✥  DIÁRIO DO CAPITÃO  ✥',desktop?28:24,'#f4cf97',true);
+        label(top+48,'✥  DIÁRIO DO CAPITÃO  ✥',desktop?27:23,'#e4ccb0',true);
         label(top+88,scene.mode==='mission'? `MISSÃO ${scene.stage}` : `SANDBOX · ONDA ${scene.wave}`,
-            15,'#9ebbb9',true);
-        const mission=scene.objectiveText();
-        label(top+153,mission,desktop?18:16,'#f3dfbf',true);
-        const width=w-76;
-        const colW=width/3;
+            14,'#ad8871',true);
+        label(top+153,scene.objectiveText(),desktop?18:16,'#e7d5bd',true);
+        const width=w-76,colW=width/3;
         const metrics=[
             [`${Math.ceil(scene.shipHP)}/${SEA_MATH.nice(scene.maxShipHP)}`,'CASCO'],
             [SEA_MATH.nice(scene.gold),'OURO'],
@@ -47,25 +59,36 @@ const SEA_UI = {
         ];
         for(let i=0;i<3;i++){
             const mx=x+(i-1)*colW;
-            add(scene.add.rectangle(mx,top+233,colW-8,82,0x192c39,.95)
-                .setStrokeStyle(1,0x987550,.8));
-            add(scene.add.text(mx,top+216,metrics[i][0],{fontFamily:'Georgia',fontSize:desktop?'21px':'18px',
-                fontStyle:'bold',color:'#f6d599'}).setOrigin(.5));
-            add(scene.add.text(mx,top+251,metrics[i][1],{fontFamily:'monospace',fontSize:'10px',
-                color:'#9eb9ba'}).setOrigin(.5));
+            add(scene.add.rectangle(mx,top+233,colW-8,82,0x0c1518,.98)
+                .setStrokeStyle(1,0x57463b,.95));
+            add(scene.add.rectangle(mx,top+194,colW-12,2,i===0?red:0x66503f,.7));
+            add(scene.add.text(mx,top+216,metrics[i][0],{
+                fontFamily:'Georgia',fontSize:desktop?'21px':'18px',
+                fontStyle:'bold',color:'#e7cb9f'
+            }).setOrigin(.5));
+            add(scene.add.text(mx,top+251,metrics[i][1],{
+                fontFamily:'monospace',fontSize:'10px',color:'#9a9f98'
+            }).setOrigin(.5));
         }
         label(top+303,
             `${SEA_WEATHER.names?.[scene.seaEvent]||'MAR SERENO'} · MALDIÇÃO ${Math.round(scene.curse||0)}%`,
-            desktop?14:12,'#d4bca9',false);
+            desktop?14:12,'#b8a093',false);
         const mk=(cy,text,onTap,tone='navy')=>{
+            // Keep the original selectable centers, size and structure for
+            // the existing Game.js controller, touch and keyboard handlers.
             const ww=desktop?520:392,hh=55;
-            const pal=tone==='exit'?[0x592a37,0xd79587,'#f9e6d5']:
-                tone==='gold'?[0xa8804d,0xf2d09b,'#182431']:[0x203b48,0x9cbdba,'#f6ddbb'];
+            const pal=tone==='exit'?[0x2b171c,0xa44b50,'#e5c9bb']:
+                tone==='gold'?[0x292024,0xc6a078,'#f0d7b5']:
+                [0x151e21,0x7d6654,'#d7c9b5'];
             const box=add(scene.add.rectangle(x,cy,ww,hh,pal[0],1)
                 .setStrokeStyle(2,pal[1],.96));
-            add(scene.add.rectangle(x-ww/2+8,cy,4,hh-10,pal[1]));
-            const txt=add(scene.add.text(x,cy,text,{fontFamily:'Georgia',fontSize:desktop?'17px':'16px',
-                color:pal[2],fontStyle:'bold',align:'center',wordWrap:{width:ww-25}}).setOrigin(.5));
+            add(scene.add.rectangle(x-ww/2+8,cy,3,hh-12,
+                tone==='exit'?red:pal[1]));
+            const txt=add(scene.add.text(x,cy,text,{
+                fontFamily:'Georgia',fontSize:desktop?'17px':'16px',
+                color:pal[2],fontStyle:'bold',align:'center',
+                wordWrap:{width:ww-25}
+            }).setOrigin(.5));
             const option={box,text:txt,onTap,hit:{x,y:cy,w:ww,h:hh},base:pal[1]};
             scene.pausePadOptions.push(option);
             return option;
@@ -74,8 +97,9 @@ const SEA_UI = {
         const audio=mk(top+451,SEA_AUDIO.enabled?'♫  DESATIVAR ÁUDIO':'♫  ATIVAR ÁUDIO',
             ()=>{const enabled=SEA_AUDIO.toggle();
                 audio.text.setText(enabled?'♫  DESATIVAR ÁUDIO':'♫  ATIVAR ÁUDIO');},'navy');
-        mk(top+517,'⚓  RETORNAR AO PORTO · 75% DO OURO',()=>scene.finish(false,true),'exit');
-        label(top+h-40,'ESC / P  ·  TOQUE  ·  ENTER / CONTROLE',11,'#9ba5a4',false);
+        mk(top+517,'⚓  RETORNAR AO PORTO · 75% DO OURO',
+            ()=>scene.finish(false,true),'exit');
+        label(top+h-40,'ESC / P · A CONFIRMA · B VOLTA · TOQUE',11,'#988a7c',false);
         scene.setPausePadFocus(0);
         return root;
     }

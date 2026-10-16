@@ -14,9 +14,14 @@ on:
       - 'tests/port-visual.test.cjs'
       - 'tests/port-theme-abyss.test.cjs'
       - 'tests/port-controller-navigation.test.cjs'
+      - 'tests/mare-negra-overlays.test.cjs'
+      - 'tests/mare-negra-overlays-visual.test.cjs'
       - '.github/workflows/port-ui.yml'
   pull_request:
     paths:
+      - 'SeaMenus.js'
+      - 'SeaIslands.js'
+      - 'ROADMAP.md'
       - 'PortUI.js'
       - 'PortUI.css'
       - 'PortThemeAbyss.css'
@@ -27,6 +32,8 @@ on:
       - 'tests/port-visual.test.cjs'
       - 'tests/port-theme-abyss.test.cjs'
       - 'tests/port-controller-navigation.test.cjs'
+      - 'tests/mare-negra-overlays.test.cjs'
+      - 'tests/mare-negra-overlays-visual.test.cjs'
 jobs:
   port-smoke:
     runs-on: ubuntu-latest
@@ -43,6 +50,7 @@ jobs:
           node --check SeaIslands.js
           node tests/port-ui-rebuild.test.cjs
           node tests/port-controller-navigation.test.cjs
+          node tests/mare-negra-overlays.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
@@ -60,6 +68,7 @@ jobs:
           sleep 2
           node tests/port-visual.test.cjs
           node tests/port-theme-abyss.test.cjs
+          node tests/mare-negra-overlays-visual.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

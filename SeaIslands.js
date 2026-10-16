@@ -59,8 +59,8 @@ const SEA_ISLANDS = {
         s.islandOverlay = null;
         s.islandNavAt = 0;
         s.anchorButton = s.add.rectangle(SEA_DESKTOP ? SEA_VIEW.width-123 : 240,
-            SEA_DESKTOP ? 296 : 517,190,42,0x244237,.94)
-            .setStrokeStyle(2,0xd8bc87,.9).setScrollFactor(0).setDepth(190).setVisible(false);
+            SEA_DESKTOP ? 296 : 517,190,42,0x182321,.97)
+            .setStrokeStyle(2,0xa58b64,.92).setScrollFactor(0).setDepth(190).setVisible(false);
         s.anchorText = s.add.text(SEA_DESKTOP ? SEA_VIEW.width-123 : 240,
             SEA_DESKTOP ? 296 : 517,'⚓ ATRACAR',{
                 fontFamily:'Georgia',fontStyle:'bold',fontSize:'15px',color:'#ffdeac'
@@ -103,12 +103,12 @@ const SEA_ISLANDS = {
         let hint=near.allowed?'F / A OU TOQUE PARA ATRACAR':
             near.threatened?'PERIGO: NAVIOS HOSTIS NAS PROXIMIDADES':
             'REDUZA PARA 67 NÓS OU MENOS';
-        s.anchorButton.setFillStyle(near.allowed?0x244237:0x473339,.96);
-        s.anchorButton.setStrokeStyle(2,near.allowed?0xeed19b:0xa97871,.9);
+        s.anchorButton.setFillStyle(near.allowed?0x182521:0x30191e,.97);
+        s.anchorButton.setStrokeStyle(2,near.allowed?0xbda47d:0x9a5352,.94);
         s.anchorText.setText(near.allowed?'⚓ ATRACAR':'⚓ ANCORA INDISPONÍVEL');
         s.anchorHint.setText(hint);
         const island=near.island;
-        s.anchorPulse.lineStyle(2,near.allowed?0xe4d6a7:0xbd8793,.85);
+        s.anchorPulse.lineStyle(2,near.allowed?0xb8a180:0xa65d65,.85);
         const ring=island.radius+s.hullRadius+48+Math.sin(s.elapsed*2.8)*4;
         s.anchorPulse.strokeCircle(island.x,island.y,ring);
     },
@@ -216,15 +216,15 @@ const SEA_ISLANDS = {
     screenButton(s,root,x,y,w,h,name,detail,index,disabled=false) {
         const selected=index>=0?index===s.islandChoiceIndex:
             (s.islandOutcome?s.islandChoiceIndex===0:s.islandChoiceIndex===3);
-        const bg=disabled?0x252b30:selected?0x806140:0x233c45;
-        const edge=disabled?0x6a5b5a:selected?0xf0d09d:0x91a7a2;
+        const bg=disabled?0x131a1d:selected?0x392025:0x161e21;
+        const edge=disabled?0x534844:selected?0xc3a078:0x655343;
         root.add(s.add.rectangle(x,y,w,h,bg,.97).setStrokeStyle(selected?3:2,edge,.95));
         root.add(s.add.text(x,y-10,name,{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',fontStyle:'bold',
-            color:disabled?'#ab9c93':'#f5e4c6',align:'center',wordWrap:{width:w-25}
+            color:disabled?'#928c84':'#e5d3bc',align:'center',wordWrap:{width:w-25}
         }).setOrigin(.5));
         if(detail)root.add(s.add.text(x,y+17,detail,{
-            fontFamily:'monospace',fontSize:'11px',color:disabled?'#918a8a':'#c5d1cc',
+            fontFamily:'monospace',fontSize:'11px',color:disabled?'#87837e':'#b3b9af',
             align:'center',wordWrap:{width:w-28}
         }).setOrigin(.5));
         s.islandOptions.push({hit:{x,y,w,h},onTap:()=>{
@@ -241,22 +241,23 @@ const SEA_ISLANDS = {
         const top=SEA_DESKTOP?30:62,width=SEA_DESKTOP?620:448,height=SEA_DESKTOP?650:668;
         const root=s.add.container(0,0).setScrollFactor(0).setDepth(430);
         s.islandOverlay=root;s.islandOptions=[];
-        root.add(s.add.rectangle(x,ymid,SEA_VIEW.width,SEA_VIEW.height,0x060d16,.91));
-        root.add(s.add.rectangle(x,top+height/2,width,height,0x182632,.98)
-            .setStrokeStyle(3,0xc2a16e));
-        root.add(s.add.rectangle(x,top+height/2,width-16,height-16,0x351e2b,.13)
-            .setStrokeStyle(1,0xe4c293,.45));
+        root.add(s.add.rectangle(x,ymid,SEA_VIEW.width,SEA_VIEW.height,0x05080b,.94));
+        root.add(s.add.rectangle(x,top+height/2,width,height,0x101719,.995)
+            .setStrokeStyle(2,0x957356,.94));
+        root.add(s.add.rectangle(x,top+height/2,width-16,height-16,0x1e151b,.46)
+            .setStrokeStyle(1,0x5b4536,.86));
+        root.add(s.add.rectangle(x,top+height-75,width-34,2,0x8d3740,.58));
         const ornament=s.add.graphics();root.add(ornament);
-        ornament.lineStyle(2,0xb89a6c,.77);
+        ornament.lineStyle(1,0x937051,.8);
         ornament.lineBetween(x-width/2+28,top+99,x+width/2-28,top+99);
         ornament.lineBetween(x-width/2+28,top+height-77,x+width/2-28,top+height-77);
         root.add(s.add.text(x,top+29,'✦  O ARQUIPÉLAGO DOS CONDENADOS  ✦',{
             fontFamily:'monospace',fontSize:SEA_DESKTOP?'15px':'11px',
-            color:'#e6c99c'
+            color:'#b89d78'
         }).setOrigin(.5));
         root.add(s.add.text(x,top+68,this.titles[type],{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'29px':'22px',
-            fontStyle:'bold',color:'#f6d5a3',align:'center',wordWrap:{width:width-35}
+            fontStyle:'bold',color:'#e6d0b2',align:'center',wordWrap:{width:width-35}
         }).setOrigin(.5));
         const asset=type==='reef'?'island-reef':'island-'+type;
         if(s.textures.exists(asset)){
@@ -265,21 +266,21 @@ const SEA_ISLANDS = {
         }
         root.add(s.add.text(x,top+262,this.lore[type],{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',
-            color:'#e4d4c1',align:'center',lineSpacing:5,wordWrap:{width:width-52}
+            color:'#d6c6b7',align:'center',lineSpacing:5,wordWrap:{width:width-52}
         }).setOrigin(.5));
         const visited=s.islandVisits.has(island.id);
         if(s.islandOutcome){
             root.add(s.add.text(x,top+360,'ESCOLHA REGISTRADA',{
-                fontFamily:'Georgia',fontSize:'21px',fontStyle:'bold',color:'#f0d09f'
+                fontFamily:'Georgia',fontSize:'21px',fontStyle:'bold',color:'#d9bc95'
             }).setOrigin(.5));
             root.add(s.add.text(x,top+410,s.islandOutcome,{
                 fontFamily:'monospace',fontSize:SEA_DESKTOP?'15px':'13px',
-                color:'#bfd5b9',align:'center',wordWrap:{width:width-45}
+                color:'#aec2b1',align:'center',wordWrap:{width:width-45}
             }).setOrigin(.5));
         }else{
             const actions=this.choices[type];
             root.add(s.add.text(x,top+328,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
-                fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#f1a69c':'#b7c6bf'
+                fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#d68c86':'#aba99d'
             }).setOrigin(.5));
             for(let i=0;i<actions.length;i++){
                 const choice=actions[i];
