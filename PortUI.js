@@ -134,6 +134,33 @@ const SEA_PORT_UI = {
     const n=this.root.querySelector('.port-toast');
     if(n){n.textContent=message;n.hidden=false;}
   },
+  exportBackup() {
+    // A portable copy of the normalized v4 profile. Never touch game saves.
+    let objectUrl=null,anchor=null;
+    try {
+      const now=new Date();
+      const profile=SeaProfile.load();
+      const backup={format:'mar-de-sangue-captain-backup',schema:4,
+        exportedAt:now.toISOString(),profile};
+      const blob=new Blob([JSON.stringify(backup,null,2)+'\n'],
+        {type:'application/json;charset=utf-8'});
+      objectUrl=URL.createObjectURL(blob);
+      anchor=document.createElement('a');
+      anchor.href=objectUrl;
+      anchor.download='mar-de-sangue-save-v4-'+now.toISOString().slice(0,10)+'.json';
+      anchor.style.display='none';
+      document.body.append(anchor);
+      anchor.click();
+      this.notify('Cópia do progresso preparada. Guarde o arquivo JSON em local seguro.');
+      return true;
+    } catch(_) {
+      this.notify('Não foi possível exportar o progresso neste navegador.');
+      return false;
+    } finally {
+      anchor?.remove();
+      if(objectUrl)setTimeout(()=>URL.revokeObjectURL(objectUrl),3000);
+    }
+  },
   action(value) {
     const scene=this.scene;if(!scene)return;
     const [name,id]=value.split(':');
@@ -153,6 +180,7 @@ const SEA_PORT_UI = {
       else this.notify(result.error||'Não foi possível concluir a compra.');
       return;
     }
+    if(name==='export-backup'){this.exportBackup();return;}
     if(name==='reset-confirm'){SeaProfile.reset();this.goto('menu');return;}
     if(name==='next'){
       const report=scene.report;
@@ -421,7 +449,10 @@ const SEA_PORT_UI = {
           '<div><span>EXPEDIÇÕES</span><strong>'+this.num(p.sorties)+'</strong></div>'+
         '</div>'+
         '<div class="port-bottom"><span>O PODER TEM UM PREÇO. O MAR, OUTRO.</span>'+
-          '<button class="port-text-button" data-action="reset" type="button">REINICIAR PROGRESSO ↗</button>'+
+          '<div class="port-bottom__actions">'+
+            '<button class="port-text-button" data-action="export-backup" type="button">↓ GUARDAR SAVE .JSON</button>'+
+            '<button class="port-text-button" data-action="reset" type="button">REINICIAR PROGRESSO ↗</button>'+
+          '</div>'+
         '</div>'+
       '</main>'+
       '<aside class="port-aside port-aside--r">'+
@@ -489,7 +520,9 @@ const SEA_PORT_UI = {
       '<span class="port-eyebrow">O PACTO É IRREVERSÍVEL</span><h1>ESQUECER O MAR?</h1>'+
       '<p>O capitão abandonará o ouro, os navios aperfeiçoados, as missões, os recordes e o histórico de expedições deste dispositivo.</p>'+
       '<strong>ESTA ESCOLHA NÃO PODE SER DESFEITA.</strong>'+
-      '<div class="port-warning__actions">'+this.button('menu','NÃO. VOLTAR AO PORTO','','←','port-choice--primary')+
+      '<p>Antes de apagar, baixe uma cópia local. O arquivo JSON não modifica nem restaura automaticamente o jogo.</p>'+
+      '<div class="port-warning__actions">'+this.button('export-backup','GUARDAR CÓPIA DO SAVE','Baixar o progresso v4 sem modificar a campanha','↓','')+
+        this.button('menu','NÃO. VOLTAR AO PORTO','','←','port-choice--primary')+
         this.button('reset-confirm','SIM. APAGAR TUDO','','☠','port-choice--danger')+
       '</div></section></main>';
   },

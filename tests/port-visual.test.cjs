@@ -54,6 +54,27 @@ const {chromium}=require('playwright-core');
         label+': menu tem overflow horizontal '+JSON.stringify(measure));
       assert(measure.heroWidth>width*(isMobile?.75:.32),
         label+': largura de herói insuficiente '+JSON.stringify(measure));
+      // 3.6b: browser file download and profile immutability.
+      const stateBeforeBackup=await page.evaluate(()=>({
+        save:localStorage.getItem('carcaca.mar-de-sangue.v4'),
+        profile:SeaProfile.load()
+      }));
+      const [captainDownload]=await Promise.all([
+        page.waitForEvent('download',{timeout:12000}),
+        page.locator('[data-action="export-backup"]').click()
+      ]);
+      assert(/^mar-de-sangue-save-v4-\d{4}-\d{2}-\d{2}\.json$/.test(
+        captainDownload.suggestedFilename()),label+': filename must be portable');
+      const captainData=JSON.parse(fs.readFileSync(await captainDownload.path(),'utf8'));
+      assert.equal(captainData.schema,4,label+': backup schema');
+      assert.equal(captainData.format,'mar-de-sangue-captain-backup');
+      assert.equal(captainData.profile.version,4);
+      assert.deepEqual(captainData.profile,stateBeforeBackup.profile,
+        label+': exported profile must match game profile');
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        stateBeforeBackup.save,label+': exporting cannot change the save');
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-captain-backup-3-6b.png'),fullPage:true});
       await page.locator('[data-action="yard:armas"]').click();
       await page.locator('.port-upgrades').waitFor({timeout:10000});
       await page.screenshot({path:path.join('port-artifacts',label+'-yard.png'),fullPage:true});

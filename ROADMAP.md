@@ -23,6 +23,8 @@
 | **3.4b — Rumos da Carta** | ✅ Integrado; CI verde | Waypoints manuais para marcos descobertos, rumo, distância e radar; [PR #33](https://github.com/pedromaintenance/o-mar-de-sangue/pull/33); verificação física/Pages pendente |
 | **3.5a — Paisagem Sonora Reativa** | ✅ Integrada; CI verde | 6 contextos de trilha e teclas M (Atlas) / N (som); [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) e [documentação](docs/soundscape-3-5.md). Validação auditiva no Pages pendente |
 | **3.5b — Mixagem Separada** | ✅ Integrada; CI verde | Música/efeitos independentes, mute mestre, persistência isolada e PWA v39; [PR #36](https://github.com/pedromaintenance/o-mar-de-sangue/pull/36) e [documentação](docs/audio-mixer-3-5b.md). QA auditivo físico pendente |
+| **3.6a — PWA Resiliente** | 🟡 PR #37 em validação | Aviso offline e atualização voluntária, viagem offline testável; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) ainda sem merge |
+| **3.6b — Backup do Capitão** | 🟡 Implementada; CI pendente | Download manual JSON do save v4 sem modificação; opção de segurança antes do reset; [especificação](docs/captain-backup-3-6b.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -132,10 +134,19 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ### P2 — 3.6: Acessibilidade e robustez
 
-- [ ] Consolidar guia de controle em todos os menus (Xbox, teclado, toque).
-- [ ] Verificar navegação sem mouse e foco em cada overlay.
-- [ ] Testar PWA instalada, cache, reconexão offline e preservação de saves.
-- [ ] Acrescentar testes de desempenho para máquinas e celulares modestos.
+**3.6a — PWA Resiliente:** [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) implementou aviso offline, update opt-in e teste de navegação sem internet; permanece aguardando aprovação integral do CI para merge. [Detalhes](docs/pwa-3-6a.md) na branch do PR.
+
+**3.6b — Backup do Capitão (implementada, sob CI):**
+
+- [x] Baixar uma cópia JSON v4 do perfil consolidado diretamente do Porto.
+- [x] Oferecer backup antes da confirmação de apagar todo o progresso, sem alterar as opções originais.
+- [x] Usar apenas leitura de `SeaProfile.load()`, sem sobrescrever saves, economia ou campanha.
+- [x] Testar arquivo real no Chromium em desktop e Android emulado, preservando `localStorage`.
+- [ ] Testes CI verdes, merge e verificação de download no Pages. [Design e QA](docs/captain-backup-3-6b.md).
+
+**3.6c — Planejado:** restauração de backup após validação estrita, pré-visualização, confirmação explícita e preservação automática do save anterior.
+
+**Outros trabalhos:** consolidar guia de controles Xbox/teclado/toque, revisar navegação sem mouse e desempenho em celulares modestos, testar PWA instalada e reconexão reais.
 
 ## Regras técnicas que protegem as funcionalidades
 
@@ -159,6 +170,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Conferir **3.5b — Mixagem Separada** no GitHub Pages: música/efeitos, mute, botões no celular e preferências após reiniciar a PWA. Depois planejar as regras e a migração v4→v5 da **reputação persistente 3.3b**, sem alterar saves antes da aprovação. Ainda há validações físicas pendentes do Atlas 3.4b, Registro Político 3.3b.0 e Paisagem Sonora 3.5a.
+Validar os PRs #37 (PWA offline) e #38 (Backup do Capitão) separadamente; conferir ambos no GitHub Pages após merge. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
