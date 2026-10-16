@@ -2,6 +2,10 @@
 
 **Estado:** especificação de design, aguardando aprovação de regras/balanceamento. Nenhuma alteração no save nesta versão.
 
+## Marco intermediário 3.3b.0 — Registro visual, não reputação
+
+A etapa [Registro das Três Bandeiras](political-ledger-3-3b0.md) apresenta a decisão temporária já registrada em `politicalChoice` no Diário do Capitão, sem pontos de reputação e sem migração. Esta visualização não executa nenhuma das mudanças de esquema ou balanceamento propostas abaixo; as decisões futuras continuam pendentes.
+
 ## Contexto existente
 
 O perfil do jogador é `SeaProfile` no `Game.js`, com `defaults()`, `load()`, `store()` e `settle()` na **versão 4**. O carregador aceita o save v4 e um save legado v3. A decisão do encontro **Três Bandeiras na Maré** existe somente na cena (`politicalLedger`, `politicalChoice`) e não é passada para `settle()`.
