@@ -458,7 +458,7 @@ const SEA_PORT_UI = {
       ['SANDBOX','Ondas sucessivas, frota hostil crescente e recompensas acumuladas.'],
       ['ATRACAÇÃO','Aproxime-se devagar e afaste inimigos. F, botão A ou toque para atracar.'],
       ['ESTALEIRO','Catorze melhorias sem limite artificial; cada nível aumenta o preço. LB/RB ou Q/E trocam as abas.'],
-      ['ÁUDIO E PROGRESSO','ESC/P pausa. M silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.']
+      ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+

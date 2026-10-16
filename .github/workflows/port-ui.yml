@@ -14,6 +14,9 @@ on:
       - 'Game.js'
       - 'SeaMenus.js'
       - 'SeaIslands.js'
+      - 'SeaEffects.js'
+      - 'SeaWeather.js'
+      - 'tests/soundscape-3-5.test.cjs'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
       - 'tests/port-theme-abyss.test.cjs'
@@ -32,6 +35,9 @@ on:
     paths:
       - 'SeaMenus.js'
       - 'SeaIslands.js'
+      - 'SeaEffects.js'
+      - 'SeaWeather.js'
+      - 'tests/soundscape-3-5.test.cjs'
       - 'ROADMAP.md'
       - 'PortUI.js'
       - 'PortUI.css'
@@ -64,6 +70,9 @@ jobs:
         run: |
           node --check PortUI.js
           node --check Game.js
+          node --check SeaEffects.js
+          node --check SeaWeather.js
+          node tests/soundscape-3-5.test.cjs
           node --check SeaMenus.js
           node --check SeaIslands.js
           node tests/port-ui-rebuild.test.cjs

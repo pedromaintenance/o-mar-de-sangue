@@ -10,6 +10,19 @@ const SEA_MUSIC = {
     hostedVersion: 'flac-20261014-v1', sources: {}, flacCapability: null,
     tracks: {}, players: {}, objectUrls: {}, ready: false, loading: null,
     wanted: 'crimson', started: false, gestureSeen: false,
+    currentMood: 'sailing', intensity: 1,
+    // Two existing licensed/imported tracks, never new assets or save fields.
+    // Volume differences separate calm exploration from narrative tension.
+    moods: {
+        port: { track: 'crimson', level: .55 },
+        sailing: { track: 'crimson', level: 1 },
+        island: { track: 'crimson', level: .62 },
+        parley: { track: 'black', level: .72 },
+        danger: { track: 'black', level: .9 },
+        boss: { track: 'black', level: 1 },
+        crimson: { track: 'crimson', level: 1 }, // legacy callers
+        black: { track: 'black', level: 1 }
+    },
     volume: (() => { try { return Math.max(0,Math.min(.6, Number(localStorage.getItem('carcaca.mar.music.volume') ?? '.25'))); }
         catch (_) { return .25; } })(),
     db() {
@@ -139,7 +152,23 @@ const SEA_MUSIC = {
         try{localStorage.setItem('carcaca.mar.music.volume',String(this.volume));}catch(_){}
         return this.volume;
     },
-    setMood(mood) { this.wanted=mood==='black'?'black':'crimson'; },
+    resolveMood(s) {
+        // Dialogues take priority; do not interrupt an encounter with
+        // combat cues caused by the weather/curse underneath its overlay.
+        if(s?.islandDocked)
+            return s.islandSelected?.kind==='parley'?'parley':'island';
+        if(s?.bossAlert || s?.missionBoss && s?.objective==='boss')return 'boss';
+        if((s?.curse||0)>=65 || ['storm','maelstrom'].includes(s?.seaEvent))
+            return 'danger';
+        return 'sailing';
+    },
+    setMood(mood) {
+        const key=Object.prototype.hasOwnProperty.call(this.moods,mood)?mood:'sailing';
+        const config=this.moods[key];
+        this.currentMood=key;
+        this.wanted=config.track;
+        this.intensity=config.level;
+    },
     status() {
         const quality = this.sources.crimson === 'flac' && this.sources.black === 'flac' ? 'FLAC' : 'TRILHAS';
         if (this.ready && !this.supportsFlac() && !this.count())
@@ -218,7 +247,8 @@ const SEA_MUSIC = {
         const step=Math.max(.001,Math.min(.045,dt*.22));
         for(const id of ['crimson','black']){
             const a=this.players[id];if(!a)continue;
-            const goal=audible && id===this.wanted?this.volume:0;
+            const goal=audible && id===this.wanted
+                ? this.volume * this.intensity : 0;
             if (Math.abs(a.volume-goal)<step)a.volume=goal;
             else a.volume=Math.max(0,Math.min(1,a.volume+Math.sign(goal-a.volume)*step));
             // Quando o jogo está silenciado, interrompa a decodificação de áudio.

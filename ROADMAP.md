@@ -20,6 +20,7 @@
 | **3.3a — Três Bandeiras na Maré** | ✅ Concluído | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos temporários; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
 | **3.4a — Carta dos Náufragos** | ✅ Integrado; teste físico pendente | Atlas M/View/toque e descoberta progressiva sem alterar saves; [PR #32](https://github.com/pedromaintenance/o-mar-de-sangue/pull/32) |
 | **3.4b — Rumos da Carta** | ✅ Integrado; CI verde | Waypoints manuais para marcos descobertos, rumo, distância e radar; [PR #33](https://github.com/pedromaintenance/o-mar-de-sangue/pull/33); verificação física/Pages pendente |
+| **3.5a — Paisagem Sonora Reativa** | 🟡 Implementada; aguardando CI | Música contextual em 6 estados e correção do conflito M/áudio; [especificação](docs/soundscape-3-5.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -95,9 +96,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ### P2 — 3.5: Áudio, efeitos e atmosfera
 
-- [ ] Organizar trilhas por contexto: porto, navegação, combate, boss e eventos.
-- [ ] Definir transições suaves e volumes separados, sem quebrar a importação atual de FLAC/MP3.
-- [ ] Usar efeitos com parcimônia, oferecendo redução de movimento e preservando FPS.
+**3.5a — Paisagem Sonora Reativa (código implementado; QA de publicação pendente)**
+
+- [x] Corrigir conflito entre `M` (Carta dos Náufragos) e áudio: `N` passa a silenciar/restaurar; botões do porto e Diário preservados.
+- [x] Reutilizar as duas faixas existentes em seis contextos: porto, mar, ilha, negociação política, perigo e chefe.
+- [x] Reaproveitar crossfade e preferências anteriores de volume; não introduzir áudio de terceiros nem alterar importação manual FLAC/MP3.
+- [x] Adicionar testes de contexto, fades e atalhos, além de browser test M/N e CI.
+- [ ] Confirmar smoke e browser CI, merge e teste auditivo no GitHub Pages.
+- [ ] Testar PWA offline e som com Xbox/Android físicos.
+
+**3.5b — Planejado:** controles independentes de volume para música e efeitos. **3.5c — Planejado:** ampliar trilhas por contexto após seleção de arquivos. A prioridade também inclui efeitos moderados e FPS estável. [Design e QA](docs/soundscape-3-5.md).
 
 ### P2 — 3.6: Acessibilidade e robustez
 
@@ -128,6 +136,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Conferir **3.4b — Rumos da Carta** no GitHub Pages, incluindo atualização da PWA e teste físico no Xbox. Em seguida definir regras da **3.3b — Reputação** antes de qualquer migração v4→v5. Continuam planejadas 3.5 Áudio e 3.6 Robustez.
+Validar a **3.5a — Paisagem Sonora Reativa** por CI e publicar para teste no Pages. Seguem pendentes os testes físicos do Atlas 3.4b e os trabalhos de **3.3b — Reputação** (antes é necessário aprovar regras e migração v4→v5), **3.5b — Volumes separados** e **3.6 — Robustez**.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.

@@ -39,9 +39,9 @@ const SEA_AUDIO = {
         const flip = () => { this.toggle(); render(); };
         btn.on('pointerdown', flip);
         if (scene.input.keyboard) {
-            scene.input.keyboard.on('keydown-M', flip);
+            scene.input.keyboard.on('keydown-N', flip);
             scene.events.once(Phaser.Scenes.Events.SHUTDOWN,
-                () => scene.input.keyboard.off('keydown-M', flip));
+                () => scene.input.keyboard.off('keydown-N', flip));
         }
         render();
         return btn;

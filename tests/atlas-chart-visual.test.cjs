@@ -67,10 +67,19 @@ const {chromium}=require('playwright-core');
     return {open:s.atlasOpen,paused:s.pausedByCaptain,overlay:!!s.atlasElements};
    });
    assert.deepEqual(exited,{open:false,paused:false,overlay:false});
+   const soundBefore=await page.evaluate(()=>SEA_AUDIO.enabled);
    await page.keyboard.press('m');
    await page.waitForFunction(()=>game.scene.getScene('Game').atlasOpen);
+   const soundAfterAtlas=await page.evaluate(()=>SEA_AUDIO.enabled);
+   assert.equal(soundAfterAtlas,soundBefore,'M opening Atlas must NOT toggle the music');
    await page.keyboard.press('Escape');
    await page.waitForFunction(()=>!game.scene.getScene('Game').atlasOpen);
+   await page.keyboard.press('n');
+   const muted=await page.evaluate(()=>SEA_AUDIO.enabled);
+   assert.equal(muted,!soundBefore,'N must toggle audio without opening Atlas');
+   assert.equal(await page.evaluate(()=>game.scene.getScene('Game').atlasOpen),false);
+   await page.keyboard.press('n');
+   assert.equal(await page.evaluate(()=>SEA_AUDIO.enabled),soundBefore,'Restore audio state');
    // Discovered state is voyage local. Move the avatar solely within this
    // isolated test page, near parley, to test new chart symbol.
    const discovered=await page.evaluate(()=>{
