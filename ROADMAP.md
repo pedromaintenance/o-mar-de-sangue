@@ -24,7 +24,7 @@
 | **3.5a — Paisagem Sonora Reativa** | ✅ Integrada; CI verde | 6 contextos de trilha e teclas M (Atlas) / N (som); [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) e [documentação](docs/soundscape-3-5.md). Validação auditiva no Pages pendente |
 | **3.5b — Mixagem Separada** | ✅ Integrada; CI verde | Música/efeitos independentes, mute mestre, persistência isolada e PWA v39; [PR #36](https://github.com/pedromaintenance/o-mar-de-sangue/pull/36) e [documentação](docs/audio-mixer-3-5b.md). QA auditivo físico pendente |
 | **3.6a — PWA Resiliente** | 🟡 PR #37 em validação | Aviso offline e atualização voluntária, viagem offline testável; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) ainda sem merge |
-| **3.6b — Backup do Capitão** | 🟡 Implementada; CI pendente | Download manual JSON do save v4 sem modificação; opção de segurança antes do reset; [especificação](docs/captain-backup-3-6b.md) |
+| **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -136,13 +136,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 **3.6a — PWA Resiliente:** [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) implementou aviso offline, update opt-in e teste de navegação sem internet; permanece aguardando aprovação integral do CI para merge. [Detalhes](docs/pwa-3-6a.md) na branch do PR.
 
-**3.6b — Backup do Capitão (implementada, sob CI):**
+**3.6b — Backup do Capitão (integrada à `main`; CI aprovado em 16/10/2026):**
 
 - [x] Baixar uma cópia JSON v4 do perfil consolidado diretamente do Porto.
 - [x] Oferecer backup antes da confirmação de apagar todo o progresso, sem alterar as opções originais.
 - [x] Usar apenas leitura de `SeaProfile.load()`, sem sobrescrever saves, economia ou campanha.
 - [x] Testar arquivo real no Chromium em desktop e Android emulado, preservando `localStorage`.
-- [ ] Testes CI verdes, merge e verificação de download no Pages. [Design e QA](docs/captain-backup-3-6b.md).
+- [x] CI Node e Chromium aprovados; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) integrado (`f1f4e60`). [Design e QA](docs/captain-backup-3-6b.md).
+- [ ] Conferir o download JSON na versão publicada do Pages e na PWA instalada.
 
 **3.6c — Planejado:** restauração de backup após validação estrita, pré-visualização, confirmação explícita e preservação automática do save anterior.
 
@@ -170,6 +171,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar os PRs #37 (PWA offline) e #38 (Backup do Capitão) separadamente; conferir ambos no GitHub Pages após merge. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
+Corrigir e validar o PR #37 (PWA offline); o PR #38 (Backup do Capitão) foi integrado à `main` com CI verde. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
