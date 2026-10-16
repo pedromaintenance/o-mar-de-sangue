@@ -75,6 +75,52 @@ const {chromium}=require('playwright-core');
         stateBeforeBackup.save,label+': exporting cannot change the save');
       await page.screenshot({path:path.join('port-artifacts',
         label+'-captain-backup-3-6b.png'),fullPage:true});
+      // 3.6c: a real exported file can be previewed, cancelled, applied
+      // only with two confirmations, and then undone without losing v4.
+      const importedData={...captainData,profile:{
+        ...captainData.profile,gold:captainData.profile.gold+91,
+        mission:captainData.profile.mission+2
+      }};
+      const file={name:'captain-v4.json',mimeType:'application/json',
+        buffer:Buffer.from(JSON.stringify(importedData))};
+      await page.locator('#sea-port-backup').setInputFiles(file);
+      await page.locator('.port-restore').waitFor({timeout:10000});
+      assert(await page.locator('.port-restore__row').count()>=6);
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        stateBeforeBackup.save,'Preview cannot write save');
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-save-restore-preview-3-6c.png'),fullPage:true});
+      await page.locator('[data-action="restore-cancel"]').click();
+      await page.locator('.port-hero').waitFor({timeout:10000});
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        stateBeforeBackup.save,'Cancel must keep progress');
+      await page.locator('#sea-port-backup').setInputFiles({
+        name:'corrupt.json',mimeType:'application/json',buffer:Buffer.from('{broken')
+      });
+      await page.locator('.port-toast:not([hidden])').waitFor({timeout:10000});
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        stateBeforeBackup.save,'Corrupted JSON must never change progress');
+      await page.locator('#sea-port-backup').setInputFiles(file);
+      await page.locator('[data-action="restore-arm"]').click();
+      assert.equal(await page.locator('[data-action="restore-confirm"]').count(),1,
+        'Final destructive action only appears after initial confirmation');
+      await page.locator('[data-action="restore-confirm"]').click();
+      await page.locator('.port-hero').waitFor({timeout:10000});
+      const afterRestore=await page.evaluate(()=>({
+        profile:SeaProfile.load(),rollback:SEA_SAVE_TRANSFER.lastRollback(),
+        stored:localStorage.getItem('carcaca.mar-de-sangue.v4')
+      }));
+      assert.equal(afterRestore.profile.gold,importedData.profile.gold);
+      assert.equal(afterRestore.rollback.profile.gold,stateBeforeBackup.profile.gold);
+      assert.equal(await page.locator('[data-action="restore-rollback"]').count(),1);
+      await page.locator('[data-action="restore-rollback"]').click();
+      await page.locator('.port-restore').waitFor({timeout:10000});
+      await page.locator('[data-action="restore-arm"]').click();
+      await page.locator('[data-action="restore-confirm"]').click();
+      await page.locator('.port-hero').waitFor({timeout:10000});
+      assert.equal(await page.evaluate(()=>SeaProfile.load().gold),
+        stateBeforeBackup.profile.gold,'Rollback must recover previous profile');
+      assert.deepEqual(await page.evaluate(()=>SeaProfile.load()),stateBeforeBackup.profile);
       await page.locator('[data-action="yard:armas"]').click();
       await page.locator('.port-upgrades').waitFor({timeout:10000});
       await page.screenshot({path:path.join('port-artifacts',label+'-yard.png'),fullPage:true});
