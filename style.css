@@ -41,6 +41,25 @@ canvas {
   box-shadow: 0 8px 24px rgba(0,0,0,.35);
 }
 
+/* Visible only while offline or when a new worker is already installed.
+ * Kept separate from Phaser's touch surfaces and the installation prompt. */
+#pwa-status[hidden],#pwa-status [hidden]{display:none!important}
+#pwa-status{
+  position:fixed;top:9px;left:50%;transform:translateX(-50%);
+  max-width:calc(100vw - 24px);display:flex;gap:8px;align-items:center;
+  justify-content:center;flex-wrap:wrap;padding:5px 9px;z-index:10001;
+  border:1px solid #82634a;background:rgba(17,19,23,.94);border-radius:6px;
+  color:#edd0aa;font:600 11px/1.5 Georgia,serif;text-align:center;
+  box-shadow:0 4px 18px rgba(0,0,0,.45);letter-spacing:.04em
+}
+#pwa-status button{
+  background:#3d2527;color:#f5d3a3;border:1px solid #af805d;
+  border-radius:4px;padding:5px 8px;min-height:32px;max-width:100%;
+  white-space:normal;touch-action:manipulation;cursor:pointer;
+  font:600 11px/1.4 Georgia,serif
+}
+#pwa-status button:focus-visible{outline:2px solid #f8d59b;outline-offset:2px}
+@media(max-width:420px){#pwa-status{top:7px;font-size:10px;padding:4px 6px}}
 /* Proíbe scroll, duplo toque para zoom e gestos do navegador sobre o controle. */
 html, body, #app-shell, #game-container, #game-container canvas {
   touch-action: none; overscroll-behavior: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
