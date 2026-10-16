@@ -58,7 +58,9 @@ const SEA_MATH={nice:v=>String(Math.floor(v||0))};
 const SEA_MUSIC={volume:.25,load:async()=>true,status:()=> 'FLAC',
  setVolume(v){this.volume=Math.max(0,Math.min(.6,v))},
  importFiles:async()=>2};
-const SEA_AUDIO={enabled:true,toggle(){this.enabled=!this.enabled}};
+const SEA_AUDIO={enabled:true,effectsVolume:1,
+ toggle(){this.enabled=!this.enabled},
+ setEffectsVolume(n){this.effectsVolume=Math.max(0,Math.min(1,Math.round(n*100)/100));}};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
 const context={document:doc,window:win,Phaser,
  SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_UPGRADES:upgrades};
@@ -83,6 +85,15 @@ scene.page='result';scene.report={won:true,mode:'mission',collected:200,reward:1
  bank:850,kills:8,rammings:3,stage:4,islands:2};
 ui.render();assert(ui.root.innerHTML.includes('OURO RECUPERADO'));
 ui.action('volume:up');assert.equal(SEA_MUSIC.volume,.3);
+assert(ui.root.innerHTML.includes('fx-volume:down'),
+ 'SFX buttons must be reachable on every port screen');
+ui.action('fx-volume:down');
+assert.equal(SEA_AUDIO.effectsVolume,.9);
+assert.equal(SEA_MUSIC.volume,.3,'FX gain must not change music gain');
+assert(ui.root.innerHTML.includes('90%'),'SFX gain must show its percentage');
+ui.action('fx-volume:up');
+assert.equal(SEA_AUDIO.effectsVolume,1);
+assert.equal(SEA_MUSIC.volume,.3);
 ui.action('mute');assert.equal(SEA_AUDIO.enabled,false);
 ui.action('yard:casco');assert.equal(starts.at(-1)[1].group,'casco');
 ui.action('reset-confirm');assert.equal(p.gold,55);

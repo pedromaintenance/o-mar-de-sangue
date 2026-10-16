@@ -89,6 +89,41 @@ const {chromium}=require('playwright-core');
         finally{SEA_GAMEPAD.poll=original;}
       });
       await page.locator('.port-hero').waitFor({timeout:10000});
+      // 3.5b — exercise both footer mixers with real mouse/touch hitboxes.
+      const audioBefore=await page.evaluate(()=>({
+        music:SEA_MUSIC.volume,fx:SEA_AUDIO.effectsVolume,
+        enabled:SEA_AUDIO.enabled,
+        profile:localStorage.getItem('carcaca.mar-de-sangue.v4')
+      }));
+      assert.equal(audioBefore.music,.25);
+      assert.equal(audioBefore.fx,1,'Legacy baseline should be 100% SFX');
+      await page.locator('[data-action="fx-volume:down"]').click();
+      await page.locator('[data-action="volume:up"]').click();
+      const audioAfter=await page.evaluate(()=>({
+        music:SEA_MUSIC.volume,fx:SEA_AUDIO.effectsVolume,
+        sfxSaved:localStorage.getItem('carcaca.mar.sfx.volume'),
+        musicSaved:localStorage.getItem('carcaca.mar.music.volume'),
+        profile:localStorage.getItem('carcaca.mar-de-sangue.v4')
+      }));
+      assert(Math.abs(audioAfter.music-.3)<.0001);
+      assert(Math.abs(audioAfter.fx-.9)<.0001);
+      assert.equal(audioAfter.sfxSaved,'0.9');
+      assert.equal(audioAfter.musicSaved,'0.3');
+      assert.equal(audioAfter.profile,audioBefore.profile,
+        'Mixer actions must leave gameplay progress untouched');
+      assert.equal(await page.locator('.port-sound__group').count(),2);
+      await page.locator('[data-action="mute"]').click();
+      assert.equal(await page.evaluate(()=>SEA_AUDIO.enabled),false);
+      assert.equal(await page.evaluate(()=>SEA_AUDIO.effectsVolume),.9,
+        'Master mute cannot discard SFX gain');
+      await page.locator('[data-action="mute"]').click();
+      assert.equal(await page.evaluate(()=>SEA_AUDIO.enabled),true);
+      await page.screenshot({path:path.join('port-artifacts',label+'-audio-mixer-3-5b.png'),fullPage:true});
+      await page.reload({waitUntil:'domcontentloaded'});
+      await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
+      const afterReload=await page.evaluate(()=>({music:SEA_MUSIC.volume,fx:SEA_AUDIO.effectsVolume}));
+      assert(Math.abs(afterReload.music-.3)<.0001&&Math.abs(afterReload.fx-.9)<.0001,
+        'Independent audio preferences must survive page reload');
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));
       console.log('PASS visual '+label,measure);
       await page.close();

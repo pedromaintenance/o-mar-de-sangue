@@ -22,6 +22,7 @@
 | **3.4a — Carta dos Náufragos** | ✅ Integrado; teste físico pendente | Atlas M/View/toque e descoberta progressiva sem alterar saves; [PR #32](https://github.com/pedromaintenance/o-mar-de-sangue/pull/32) |
 | **3.4b — Rumos da Carta** | ✅ Integrado; CI verde | Waypoints manuais para marcos descobertos, rumo, distância e radar; [PR #33](https://github.com/pedromaintenance/o-mar-de-sangue/pull/33); verificação física/Pages pendente |
 | **3.5a — Paisagem Sonora Reativa** | ✅ Integrada; CI verde | 6 contextos de trilha e teclas M (Atlas) / N (som); [PR #34](https://github.com/pedromaintenance/o-mar-de-sangue/pull/34) e [documentação](docs/soundscape-3-5.md). Validação auditiva no Pages pendente |
+| **3.5b — Mixagem Separada** | 🟡 Implementada; CI pendente | Volume independente de música/efeitos no porto, mute geral preservado, preferências locais e testes de regressão; [especificação](docs/audio-mixer-3-5b.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -117,7 +118,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Confirmar publicação e testar as transições **ouvindo** no GitHub Pages.
 - [ ] Testar PWA offline e som com Xbox/Android físicos.
 
-**3.5b — Planejado:** controles independentes de volume para música e efeitos. **3.5c — Planejado:** ampliar trilhas por contexto após seleção de arquivos. A prioridade também inclui efeitos moderados e FPS estável. [Design e QA](docs/soundscape-3-5.md).
+**3.5b — Mixagem Separada (branch de implementação, publicação condicionada ao CI)**
+
+- [x] Volume da **música** separado do volume de **efeitos sonoros**, ambos com botões de incremento/decremento no rodapé do porto.
+- [x] Manter botão de silenciar todos os sons; silenciar não apaga preferências individuais.
+- [x] Manter chave de volume musical preexistente e criar apenas uma chave isolada de preferências de efeitos no navegador, sem migrar o `SeaProfile` v4.
+- [x] Preservar o volume padrão de efeitos de jogadores antigos (100% do ganho já usado pelo motor); zerar efeitos evita sintetizar sons.
+- [x] Cobrir persistência/recarregamento, mute mestre, clamping de volumes e acesso por mouse/toque/teclado no CI Node/Chromium.
+- [ ] Obter **smoke e Chromium verdes**, integrar PR à `main` e conferir PWA/Pages em dispositivo real.
+
+**3.5c — Planejado:** ampliar trilhas por contexto após seleção de arquivos; otimizar efeitos e FPS. [3.5a — Atmosfera](docs/soundscape-3-5.md) · [3.5b — Mixagem](docs/audio-mixer-3-5b.md).
 
 ### P2 — 3.6: Acessibilidade e robustez
 
@@ -148,6 +158,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Conferir **3.3b.0 — Registro Político** no GitHub Pages após concluir Três Bandeiras; testar também a PWA instalada. A seguir definir regras e migração v4→v5 da **reputação persistente 3.3b**, sem alterar saves antes do planejamento e aprovação. Seguem testes físicos do Atlas 3.4b, da 3.5a de áudio, e melhorias 3.5b/3.6.
+Concluir CI e publicar **3.5b — Mixagem Separada** para teste no Pages: música/efeitos/mute, novos botões em celular e preferências após reiniciar a PWA. Depois definir regras e migração v4→v5 da **reputação persistente 3.3b**, sem alterar saves antes da aprovação. Ainda há validações físicas pendentes do Atlas 3.4b, do Registro Político 3.3b.0 e da paisagem sonora 3.5a.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.

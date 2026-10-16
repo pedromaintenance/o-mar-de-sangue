@@ -17,6 +17,7 @@ on:
       - 'SeaEffects.js'
       - 'SeaWeather.js'
       - 'tests/soundscape-3-5.test.cjs'
+      - 'tests/audio-mixer-3-5b.test.cjs'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
       - 'tests/port-theme-abyss.test.cjs'
@@ -38,6 +39,7 @@ on:
       - 'SeaEffects.js'
       - 'SeaWeather.js'
       - 'tests/soundscape-3-5.test.cjs'
+      - 'tests/audio-mixer-3-5b.test.cjs'
       - 'ROADMAP.md'
       - 'PortUI.js'
       - 'PortUI.css'
@@ -73,6 +75,7 @@ jobs:
           node --check SeaEffects.js
           node --check SeaWeather.js
           node tests/soundscape-3-5.test.cjs
+          node tests/audio-mixer-3-5b.test.cjs
           node --check SeaMenus.js
           node --check SeaIslands.js
           node tests/port-ui-rebuild.test.cjs
