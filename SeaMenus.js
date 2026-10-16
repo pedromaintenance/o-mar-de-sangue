@@ -73,6 +73,12 @@ const SEA_UI = {
         label(top+303,
             `${SEA_WEATHER.names?.[scene.seaEvent]||'MAR SERENO'} · MALDIÇÃO ${Math.round(scene.curse||0)}%`,
             desktop?14:12,'#b8a093',false);
+        // A voyage's political act remains legible after leaving the coast.
+        // Do not infer permanent reputation or disclose an undiscovered event.
+        const pact=SEA_ISLANDS.politicalRecord(scene);
+        label(top+325,pact.title,desktop?13:12,
+            pact.agreed?'#d7b18b':'#999a91',true,w-70);
+        label(top+345,pact.detail,desktop?11:10,'#b9b0a2',false,w-65);
         const mk=(cy,text,onTap,tone='navy')=>{
             // Keep the original selectable centers, size and structure for
             // the existing Game.js controller, touch and keyboard handlers.
