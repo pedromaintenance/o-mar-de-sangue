@@ -17,7 +17,7 @@
 | **3.0 — A Maré Negra** | ✅ Concluído | Identidade sombria dos menus; [PR #27](https://github.com/pedromaintenance/o-mar-de-sangue/pull/27), oficialização [PR #28](https://github.com/pedromaintenance/o-mar-de-sangue/pull/28) |
 | **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
 | **3.2 — HUD de combate** | ✅ Implementado; CI aprovado | Casco e recarga legíveis, maldição crítica e estado do mar; [PR #30](https://github.com/pedromaintenance/o-mar-de-sangue/pull/30) |
-| **3.3a — Três Bandeiras na Maré** | 🟡 Em validação | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos apenas nesta viagem, sem migração de saves |
+| **3.3a — Três Bandeiras na Maré** | ✅ Testes aprovados | Primeira negociação política entre sobreviventes, Corte e culto de Daegon; efeitos apenas nesta viagem, sem migração de saves; [PR #31](https://github.com/pedromaintenance/o-mar-de-sangue/pull/31) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -57,8 +57,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Documentar facções e custos/recompensas em [docs/political-events-3-3.md](docs/political-events-3-3.md).
 - [x] Implementar protótipo vertical de uma negociação em uma ilha de naufrágio determinística, com efeitos na viagem.
 - [x] Preservar o save v4 sem campos novos; especificar previamente a **migração necessária** para reputações persistentes (3.3b).
-- [ ] Aprovar testes de regressão de eventos, escolhas, controles e layout Android/desktop.
-- [ ] Integrar PR e conferir publicação no GitHub Pages.
+- [x] Aprovar testes Node e Chromium: escolhas, consequências, retorno por B, layout Android/desktop e ausência de alteração do save.
+- [ ] Confirmar merge e disponibilização no GitHub Pages (verificação após integração).
 
 **3.3a é deliberadamente um protótipo jogável**, não um sistema completo de reputação. `politicalLedger` e `politicalChoice` vivem apenas na cena. `SeaProfile` e seus saves não mudam.
 
@@ -107,6 +107,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e publicar **3.3a — Três Bandeiras na Maré**. Em seguida, desenhar 3.3b (reputações e migração de save) antes de codificá-la. O próximo trabalho visual independente segue sendo **3.4 — Atlas e orientação**.
+Após disponibilizar **3.3a — Três Bandeiras na Maré**, especificar 3.3b (reputação, impactos e migração de save) antes de codificá-la. O próximo trabalho visual independente segue sendo **3.4 — Atlas e orientação**.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
