@@ -79,7 +79,12 @@ pad.just={0:true};ui.update(100);assert.equal(buy0.clicked,1);
 assert.equal(activeTab.clicked,undefined);
 // Preserve second card index across RB; no scenes recreated.
 ui.focusTarget(buy1);
-ui.render=pref=>{rendered.push({pref,group:scene.yardGroup});};
+ui.render=pref=>{
+ rendered.push({pref,group:scene.yardGroup});
+ // Mirror the real render(): a changed tab creates new buttons and moves
+ // the DOM focus to the equivalent upgrade in the new category.
+ if(pref)document.activeElement={dataset:{action:pref}};
+};
 pad.just={5:true};ui.update(200);
 assert.equal(scene.yardGroup,'apoio');
 assert.equal(rendered.at(-1).pref,'buy:cofre');
