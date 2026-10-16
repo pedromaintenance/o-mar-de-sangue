@@ -21,8 +21,9 @@ async function scenario(initialController){
  const nav={onLine:true,serviceWorker:service};
  const doc={getElementById:id=>els[id]};
  const ctx={window:win,navigator:nav,document:doc,console};
- vm.runInNewContext(src,ctx);
- const pwa=vm.runInNewContext('SEA_PWA',ctx);
+ vm.createContext(ctx);
+ vm.runInContext(src+';this.pwa=SEA_PWA;',ctx);
+ const pwa=ctx.pwa;
  assert.equal(pwa.ready,true);
  assert.equal(els['pwa-status'].hidden,true,'Online by default');
  nav.onLine=false;win.emit('offline');
