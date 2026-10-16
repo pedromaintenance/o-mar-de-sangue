@@ -15,7 +15,7 @@
 | **2.2 — Bestiário / Dagon** | ✅ Concluído | Sprite completo emergindo do Mar de Sangue; [PR #22](https://github.com/pedromaintenance/o-mar-de-sangue/pull/22) |
 | **2.3–2.5 — Navegação Xbox** | ✅ Concluído | Direcional espacial, foco em compras e troca de abas com LB/RB e Q/E; [PRs #23–#26](https://github.com/pedromaintenance/o-mar-de-sangue/pull/26) |
 | **3.0 — A Maré Negra** | ✅ Concluído | Identidade sombria dos menus; [PR #27](https://github.com/pedromaintenance/o-mar-de-sangue/pull/27), oficialização [PR #28](https://github.com/pedromaintenance/o-mar-de-sangue/pull/28) |
-| **3.1 — Interfaces durante a viagem** | 🟡 Em implementação | Diário do Capitão e encontros das ilhas com paleta Maré Negra, sem mudar regras de jogo; consultar o PR associado a este roadmap |
+| **3.1 — Interfaces durante a viagem** | ✅ Concluído | Diário do Capitão e atracação com paleta Maré Negra, sem alterar regras; [PR #29](https://github.com/pedromaintenance/o-mar-de-sangue/pull/29) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -28,8 +28,9 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 **Escopo desta entrega:**
 - [x] Aplicar a mesma paleta de ferro escuro, vermelho seco, bronze antigo e marfim ao **Diário do Capitão** (pausa).
 - [x] Uniformizar as janelas de encontro nas **ilhas**, incluindo botões selecionados, aviso de recursos insuficientes, confirmação de escolhas e botão de atracação.
-- [ ] Obter e revisar as capturas automáticas dos dois modais em desktop e layout compacto.
-- [ ] Confirmar merge e funcionamento na versão publicada.
+- [x] Obter e revisar as capturas automáticas dos dois modais em desktop e layout compacto.
+- [x] Verificar contratos funcionais e capturas no GitHub Actions (desktop e mobile).
+- [ ] Confirmar merge e funcionamento na versão publicada (revisão posterior à publicação).
 
 **Não alterar:** valores de danos, eventos das ilhas, efeitos das escolhas, restituição do ouro, atributos, progressão, zona de toque, sequência de opções, modo offline ou funcionamento da pausa.
 
