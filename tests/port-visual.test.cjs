@@ -107,7 +107,7 @@ const {chromium}=require('playwright-core');
       }));
       assert(Math.abs(audioAfter.music-.3)<.0001);
       assert(Math.abs(audioAfter.fx-.9)<.0001);
-      assert.equal(audioAfter.sfxSaved,'.9');
+      assert.equal(audioAfter.sfxSaved,'0.9');
       assert.equal(audioAfter.musicSaved,'0.3');
       assert.equal(audioAfter.profile,audioBefore.profile,
         'Mixer actions must leave gameplay progress untouched');
