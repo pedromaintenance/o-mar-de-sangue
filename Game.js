@@ -1414,8 +1414,7 @@ class Game extends Phaser.Scene {
                         e.label?.setText(SEA_FOES[e.type].name+
                             (stage>0?' · '+Math.min(100,stage*25)+'%':''));
                     }
-                    if(SEA_GUNNERY.ready(e.chargeMs,duration,0,-Math.max(0,e.cooldown),0)
-                        &&e.cooldown<=0){
+                    if(e.chargeMs>=duration&&e.cooldown<=0){
                         this.enemyFire(e,distance);
                         e.chargeMs=0;e.chargeStage=0;
                         e.label?.setText(SEA_FOES[e.type].name);
@@ -1423,8 +1422,8 @@ class Game extends Phaser.Scene {
                             (.85+Math.random()*.35);
                     }
                 }else{
+                    if(e.chargeStage)e.label?.setText(SEA_FOES[e.type].name);
                     e.chargeMs=0;e.chargeStage=0;
-                    e.label?.setText(SEA_FOES[e.type].name);
                 }
             } else {
                 e.chargeMs=0;e.chargeStage=0;
