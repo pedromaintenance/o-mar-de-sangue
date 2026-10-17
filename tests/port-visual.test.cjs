@@ -396,6 +396,79 @@ const {chromium}=require('playwright-core');
       assert((await page.locator('#port-main').innerText()).includes('PRÊMIO DO CONTRATO'));
       await page.screenshot({path:path.join('port-artifacts',
         label+'-rescue-contract-result-3-7a.png'),fullPage:true});
+      // 3.7a.2 — distinct smuggling experience inside the real Phaser game.
+      await page.locator('[data-action="contracts"]').click();
+      await page.locator('#port-contract-title').waitFor({timeout:10000});
+      assert.equal(await page.locator('[data-action="contract:rescue"]').count(),1);
+      assert.equal(await page.locator('[data-action="contract:smuggle"]').count(),1);
+      const boardWidths=await page.evaluate(()=>{
+        const root=document.getElementById('sea-port-ui');
+        return {scroll:root.scrollWidth,client:root.clientWidth};
+      });
+      assert(boardWidths.scroll<=boardWidths.client+2,
+        label+': contraband board overflow '+JSON.stringify(boardWidths));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-smuggling-board-3-7a2.png'),fullPage:true});
+      await page.locator('[data-action="contract:smuggle"]').click();
+      await page.waitForFunction(()=>game.scene.isActive('Game')&&
+        game.scene.getScene('Game').contract?.id==='smuggle',{timeout:20000});
+      const smuggleIntro=await page.evaluate(()=>{
+        const s=game.scene.getScene('Game');
+        return {id:s.contract.id,phase:s.contract.phase,
+          bounty:s.contract.bounty,suspicion:s.contract.suspicion,
+          waypoint:s.chartWaypointId,revealed:s.chartDiscovered.size,
+          objective:s.objectiveText(),save:SeaProfile.load().version};
+      });
+      assert.equal(smuggleIntro.id,'smuggle');
+      assert.equal(smuggleIntro.phase,'deliver');
+      assert.equal(smuggleIntro.bounty,190);
+      assert.equal(smuggleIntro.save,4);
+      assert(smuggleIntro.waypoint!==null&&smuggleIntro.revealed>=1);
+      assert(smuggleIntro.objective.includes('CONTRABANDO'));
+      const inspectorCheck=await page.evaluate(()=>{
+        const s=game.scene.getScene('Game');
+        s.elapsed=8;
+        SEA_CONTRACTS.update(s,.05);
+        const e=s.enemies.find(e=>e.smugglingInspector);
+        if(e){
+          e.x=s.player.x+20;e.y=s.player.y;
+          for(let i=0;i<15;i++)SEA_CONTRACTS.update(s,.05);
+        }
+        return {inspector:!!e,heat:s.contract.suspicion,phase:s.contract.phase};
+      });
+      assert(inspectorCheck.inspector&&inspectorCheck.heat>0,
+        label+': inspector must create measurable detection risk');
+      const smuggleDelivery=await page.evaluate(()=>{
+        const s=game.scene.getScene('Game'),dest=s.islands.find(i=>i.id===s.contract.destinationId);
+        for(const e of s.enemies)e.dead=true;
+        s.player.setPosition(dest.x+dest.radius+s.hullRadius+35,dest.y);
+        s.playerVelocity.x=0;s.playerVelocity.y=0;
+        const docked=SEA_ISLANDS.tryDock(s);
+        s.contract.suspicion=75;
+        if(docked)SEA_ISLANDS.select(s); // secret delivery must be rejected
+        const rejected=!!s.islandError&&s.contract.completed===false;
+        if(docked){SEA_ISLANDS.navigate(s,1);SEA_ISLANDS.select(s);}
+        return {docked,rejected,completed:s.contract.completed,
+          route:s.contract.route,bounty:s.contract.bounty,
+          beforeClose:s.ended,choice:s.islandSelected?.id,destination:dest.id};
+      });
+      assert(smuggleDelivery.docked&&smuggleDelivery.rejected&&
+        smuggleDelivery.completed&&smuggleDelivery.route==='bribe'&&
+        smuggleDelivery.bounty===115&&!smuggleDelivery.beforeClose,
+        label+': smuggling delivery='+JSON.stringify(smuggleDelivery));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-smuggling-delivery-3-7a2.png'),fullPage:true});
+      await page.evaluate(()=>SEA_ISLANDS.close(game.scene.getScene('Game')));
+      await page.locator('#sea-port-ui [data-action="contracts"]').waitFor({timeout:20000});
+      const contrabandReport=await page.evaluate(()=>game.scene.getScene('SeaPort').report);
+      assert(contrabandReport.contractCompleted&&contrabandReport.contractBounty===115);
+      assert.equal(contrabandReport.contractRoute,'bribe');
+      assert.equal(await page.evaluate(()=>SeaProfile.load().version),4);
+      assert.equal(await page.evaluate(()=>SeaProfile.load().mission),captainData.profile.mission,
+        label+': smuggling must not progress campaign');
+      assert((await page.locator('#port-main').innerText()).includes('SUBORNO À CORTE'));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-smuggling-result-3-7a2.png'),fullPage:true});
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));
       console.log('PASS visual '+label,measure);
       await page.close();
