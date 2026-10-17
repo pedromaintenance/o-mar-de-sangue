@@ -29,7 +29,7 @@
 | **3.6d — Diálogos Acessíveis** | ✅ Integrada; CI verde | Tabela de saves com semântica acessível, confirmação anunciada e cancelamento seguro por ESC/B; [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) e [documentação](docs/critical-dialog-accessibility-3-6d.md). QA físico pendente |
 | **3.6e — Leitura Ampliada** | ✅ Integrada; CI verde | Texto ampliado no Porto, preferência isolada, QA Node/Chromium desktop e Android; [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) e [documentação](docs/port-readability-3-6e.md). Teste físico pendente |
 | **3.6f — Guias Contextuais da Viagem** | ✅ Integrada; CI verde | Instruções na pausa, Carta e ilhas; Node/Chromium aprovados e hitboxes preservadas; [PR #42](https://github.com/pedromaintenance/o-mar-de-sangue/pull/42) e [documentação](docs/voyage-control-guides-3-6f.md). QA físico pendente |
-| **3.6g — Diagnóstico de Desempenho** | 🟡 Implementado; CI pendente | FPS estimado, média/pico de quadro, quadros >33 ms e F3, somente quando ativado; [documentação](docs/performance-diagnostics-3-6g.md) |
+| **3.6g — Diagnóstico de Desempenho** | ✅ Integrado; CI verde | FPS aproximado, tempo médio/pico, quadros lentos, botão no Porto e F3; [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) e [documentação](docs/performance-diagnostics-3-6g.md). QA físico pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -193,13 +193,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI smoke e Chromium verdes, inclusive geometria das legendas; [PR #42](https://github.com/pedromaintenance/o-mar-de-sangue/pull/42) integrado via squash (`e143a4e`). [Design e QA](docs/voyage-control-guides-3-6f.md).
 - [ ] Conferir no Pages/PWA e em controle Xbox/Android físicos.
 
-**3.6g — Diagnóstico Optativo de Desempenho (implementado na branch):**
+**3.6g — Diagnóstico Optativo de Desempenho (integrado à `main`; CI aprovado em 17/10/2026):**
 
 - [x] Medir FPS aproximado, média/pico de duração de quadro e contagem de quadros >33 ms com amostragem limitada a uma atualização de texto por segundo.
 - [x] Alternar no rodapé do Porto e com F3 em viagem, persistindo apenas preferência isolada em `localStorage`.
 - [x] Não criar objetos gráficos nem amostrar métricas quando desligado; destruir sobreposição na saída da expedição.
 - [x] Testar Node, Chrome e Android emulado para leitura de números, posicionamento, persistência e save v4 intacto.
-- [ ] CI verde, merge na main e verificação física do indicador em celulares modestos. [Especificação](docs/performance-diagnostics-3-6g.md).
+- [x] Smoke/Chromium verdes; [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) integrado por squash (`ee2396e`). [Especificação](docs/performance-diagnostics-3-6g.md).
+- [ ] Conferir o indicador no Pages/PWA em celulares modestos e com controle físico.
 
 **3.6h — Planejada:** avaliar orçamentos de efeitos e opções de qualidade *após* coleta de métricas em hardware real, sem alterar física ou IA automaticamente.
 
@@ -227,6 +228,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Aprovar e publicar o medidor 3.6g após CI, depois testar **MOSTRAR FPS** no Pages em PC e Android real, com e sem efeitos intensos. Documentar leituras de desempenho antes de qualquer ajuste adaptativo 3.6h. Reputação persistente 3.3b aguarda regras e migração v4→v5 aprovadas.
+Testar **MOSTRAR FPS** da 3.6g no Pages em PC e Android real; comparar FPS/média/pico em mar calmo, combate intenso e encontros, com o diagnóstico ativado e desligado. Usar evidências para decidir a 3.6h, sem alterar IA/física automaticamente. Reputação persistente 3.3b ainda depende de regras e migração v4→v5 aprovadas.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
