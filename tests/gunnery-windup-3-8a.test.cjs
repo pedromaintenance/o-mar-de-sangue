@@ -41,7 +41,8 @@ assert.equal(ship.cannonCharge.port,0);
 ship.keys.Q.isDown=false;advance(300);assert.equal(ship.cannonCharge.port,0);
 ship.cannonPointers.set('finger1','starboard');advance(2050);
 assert.equal(attempts[1],'starboard');
-ship.cannonPointers.clear();ship.profile.levels.cadencia=22;
+ship.cannonPointers.clear();advance(50); // release prior touch charge
+ship.profile.levels.cadencia=22;
 ship.keys.SPACE.isDown=true;advance(300);
 assert.deepEqual(attempts.slice(-2),['port','starboard']);
 ship.resetCannonCharge();
