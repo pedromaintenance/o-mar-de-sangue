@@ -49,6 +49,40 @@ const {chromium}=require('playwright-core');
     assert.deepEqual(before.touch?.port,{x:342,y:702,radius:48});
     assert.deepEqual(before.touch?.starboard,{x:432,y:702,radius:48});
    }
+   // 3.6k: validate deterministic sea cache inside a real running Phaser
+   // scene and prove that same-tick draws make no redundant hash calls.
+   const pixelCacheTest=await page.evaluate(()=>{
+     const scene=game.scene.getScene('Game'),pixel=SEA_PIXEL;
+     const original=pixel.hash;
+     let calls=0;
+     pixel.hash=function(...args){calls++;return original.apply(this,args);};
+     const saved=localStorage.getItem('carcaca.mar-de-sangue.v4');
+     try{
+       scene.seaPixelFrameCache=null;
+       pixel.seaFrame(scene,10.10);
+       const initial=calls,cache=scene.seaPixelFrameCache;
+       calls=0;
+       pixel.seaFrame(scene,10.11);
+       const stable=calls;
+       calls=0;
+       pixel.seaFrame(scene,10.90);
+       const changed=calls;
+       return {initial,stable,changed,points:cache.points.length,
+         accents:cache.accents.length,
+         sameCache:scene.seaPixelFrameCache===cache,
+         unchangedSave:saved===localStorage.getItem('carcaca.mar-de-sangue.v4')};
+     }finally{
+       pixel.hash=original;
+       pixel.seaFrame(scene,scene.seaPixelT);
+     }
+   });
+   const pointCount=isMobile?110:190;
+   assert.equal(pixelCacheTest.initial,3*pointCount+22);
+   assert.equal(pixelCacheTest.stable,0);
+   assert.equal(pixelCacheTest.changed,pointCount);
+   assert.equal(pixelCacheTest.points,pointCount);
+   assert.equal(pixelCacheTest.accents,11);
+   assert(pixelCacheTest.sameCache&&pixelCacheTest.unchangedSave);
    // 3.6g diagnostics: actual Game scene, keyboard F3 and touch-safe location.
    const profileBeforePerf=await page.evaluate(()=>
      localStorage.getItem('carcaca.mar-de-sangue.v4'));

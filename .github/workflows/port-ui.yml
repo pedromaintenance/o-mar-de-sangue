@@ -30,6 +30,8 @@ on:
       - 'SeaWeather.js'
       - 'tests/soundscape-3-5.test.cjs'
       - 'tests/weather-redraw-cache-3-6j.test.cjs'
+      - 'SeaPixelPolish.js'
+      - 'tests/procedural-sea-cache-3-6k.test.cjs'
       - 'tests/audio-mixer-3-5b.test.cjs'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
@@ -53,6 +55,8 @@ on:
       - 'SeaWeather.js'
       - 'tests/soundscape-3-5.test.cjs'
       - 'tests/weather-redraw-cache-3-6j.test.cjs'
+      - 'SeaPixelPolish.js'
+      - 'tests/procedural-sea-cache-3-6k.test.cjs'
       - 'tests/audio-mixer-3-5b.test.cjs'
       - 'ROADMAP.md'
       - 'PortUI.js'
@@ -111,6 +115,8 @@ jobs:
           node --check SeaEffects.js
           node --check SeaWeather.js
           node tests/weather-redraw-cache-3-6j.test.cjs
+          node --check SeaPixelPolish.js
+          node tests/procedural-sea-cache-3-6k.test.cjs
           node tests/soundscape-3-5.test.cjs
           node tests/audio-mixer-3-5b.test.cjs
           node --check SeaMenus.js

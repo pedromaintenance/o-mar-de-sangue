@@ -33,6 +33,7 @@
 | **3.6h — Relatório FPS Exportável** | ✅ Integrada; CI verde | Até 180 amostras temporárias e download JSON com resumo; [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) e [especificação](docs/fps-export-report-3-6h.md). Testes físicos pendentes |
 | **3.6i — Comparação FPS Local** | ✅ Integrada; CI verde | Comparação local de dois JSON, seis métricas e avisos de comparabilidade; [PR #45](https://github.com/pedromaintenance/o-mar-de-sangue/pull/45) e [documentação](docs/fps-comparison-3-6i.md). QA físico pendente |
 | **3.6j — Redesenho Eficiente do Clima** | ✅ Integrada; CI verde | Elimina redesenhos redundantes do clima sem reduzir efeitos nem alterar o save; [PR #46](https://github.com/pedromaintenance/o-mar-de-sangue/pull/46) e [documentação](docs/weather-render-cache-3-6j.md). QA físico pendente |
+| **3.6k — Cache do Mar Procedural** | 🟡 Implementada; CI pendente | Cache determinístico de posições/cintilação preservando comandos de desenho e save; [documentação](docs/procedural-sea-cache-3-6k.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -233,7 +234,15 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI `port-smoke` e `port-visual` aprovados; [PR #46](https://github.com/pedromaintenance/o-mar-de-sangue/pull/46) integrado via squash (`7b4e8d2`). [Documentação técnica](docs/weather-render-cache-3-6j.md).
 - [ ] Testar no Pages/PWA com dispositivos físicos, medir FPS sem atribuir ganho sem benchmark.
 
-**3.6k — Planejada:** usar relatórios FPS capturados no mesmo dispositivo para avaliar custo de partículas, desenho procedural do mar e orçamentos de efeitos, sem reduzir qualidade ou alterar física/IA automaticamente.
+**3.6k — Cache Determinístico do Mar Procedural (implementado na branch):**
+
+- [x] Reutilizar posições fixas dos 190/110 vestígios e 11 faixas decorativas, com cache local à cena e reinicialização em cada viagem.
+- [x] Reutilizar hashes da cintilação até a janela `Math.floor(t*1.5)` mudar, sem alterar ritmo ou geometria.
+- [x] Comparar todas as operações de desenho com uma referência da 3.6j em vários climas, graus de maldição, câmeras e instantes no Node.
+- [x] Verificar no Chromium o cache ativo durante uma viagem real e a ausência de gravações de save.
+- [ ] Validar CI smoke/visual e publicar no Pages; testar a água no PC e Android/PWA reais. [Documentação e QA](docs/procedural-sea-cache-3-6k.md).
+
+**3.6l — Planejada:** avaliar custo de partículas e orçamento de efeitos com relatórios de FPS comparáveis no mesmo aparelho; não reduzir fidelidade visual, nem alterar IA ou física sem dados reais.
 
 **Outros trabalhos:** foco sem mouse, testes Xbox físico, leitor de tela e PWA instalada/reconexão reais.
 
@@ -259,6 +268,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Testar no Pages a 3.6j: navegar em tempestade, neblina e remoinho, observando o HUD da maldição e eventuais artefatos visuais. Comparar FPS com sessões semelhantes antes/depois quando possível; 3.6k depende de medições reais para ajustar orçamento de efeitos. Reputação 3.3b segue pendente de regras e migração v4→v5.
+Concluir CI e publicar a 3.6k; testar no Pages a cintilação do mar em clima calmo, tempestade, névoa e maldição sem alterações de aparência. Capturar relatórios FPS comparáveis no mesmo aparelho para priorizar a 3.6l de partículas/efeitos. Reputação persistente 3.3b continua dependente de aprovação das regras e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
