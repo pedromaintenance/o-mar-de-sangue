@@ -132,7 +132,8 @@ const SEA_ISLANDS = {
         let found=null;
         for(const island of s.islands){
             if(s.islandVisits.has(island.id) &&
-               !(s.contract?.phase==='deliver'&&island.id===s.contract.shelterId))continue;
+               !(s.contract?.phase==='deliver'&&island.id===s.contract.shelterId)&&
+               !(s.contract?.id==='smuggle'&&!s.contract.completed&&island.id===s.contract.destinationId))continue;
             const d=Math.hypot(s.player.x-island.x,s.player.y-island.y);
             const gap=d-island.radius-s.hullRadius;
             if(gap<-10||gap>112)continue;
@@ -202,6 +203,7 @@ const SEA_ISLANDS = {
         if(choice.contractAction){
             const result=SEA_CONTRACTS.apply(s,choice);
             if(result){SEA_AUDIO.play('gold',.55);this.render(s);}
+            else if(s.islandError)this.render(s);
             return result;
         }
         if(s.islandVisits.has(s.islandSelected.id))return false;

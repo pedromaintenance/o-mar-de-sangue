@@ -81,9 +81,10 @@ assert.equal(c.init(regular,'rescue'),true);
 assert(!/SeaProfile\.|localStorage|sessionStorage|\bfetch\s*\(/.test(code['SeaContracts.js']),
  'Contracts cannot mutate permanent progression or call remote endpoints');
 assert(code['Game.js'].includes('contractBounty=won&&this.contract?.completed'));
-assert(code['Game.js'].includes('this.contractId = data?.contract'));
+assert(code['Game.js'].includes("['rescue','smuggle'].includes(data?.contract)"));
 assert(code['Game.js'].includes("if (this.contract)return SEA_CONTRACTS.status(this)"));
-assert(code['PortUI.js'].includes("this.start('sandbox','rescue')"));
+assert(code['PortUI.js'].includes("['rescue','smuggle'].includes(id)"));
+assert(code['PortUI.js'].includes("this.start('sandbox',id)"));
 assert(code['index.html'].indexOf('SeaContracts.js')>code['index.html'].indexOf('SeaAtlas.js'));
 assert(code['index.html'].indexOf('SeaContracts.js')<code['index.html'].indexOf('Game.js'));
 console.log('PASS 3.7a rescue: two stops, waypoint, anti-replay, payout condition and v4 isolation');
