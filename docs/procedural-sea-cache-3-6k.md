@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6k: Cache Determinístico do Mar Procedural
 
-**Estado:** implementação em branch, aguardando aprovação dos jobs `port-smoke` e `port-visual`.
+**Estado:** integrado à `main` em 17/10/2026 pelo [PR #47](https://github.com/pedromaintenance/o-mar-de-sangue/pull/47) (squash `c2634cc`), com CI `port-smoke` e `port-visual` verdes. Teste físico no Pages/PWA pendente.
 
 ## Diagnóstico
 
@@ -36,7 +36,7 @@ Essa é uma contagem de operações poupadas, **não uma alegação de ganho de 
 - [x] `tests/procedural-sea-cache-3-6k.test.cjs` conserva uma implementação de referência da 3.6j e compara **todas as chamadas de desenho e argumentos** em dez condições de clima, maldição, câmera e tempo; inclui viewport desktop e celular.
 - [x] O mesmo teste verifica ausência de hashes em quadros sem mudança de cintilação, atualização de exatamente N cintilações quando o tempo muda e reinicialização do cache na próxima cena.
 - [x] `tests/mare-negra-hud-visual.test.cjs`: viagem Phaser real em Chromium nos três formatos oficiais, conferindo contagem de hashes e save intacto.
-- [ ] CI `port-smoke` e `port-visual` verdes, seguido de merge.
+- [x] CI `port-smoke` e `port-visual` verdes; merge `c2634cc`.
 - [ ] Testar no Pages a animação do mar, os efeitos de clima e a navegação em Android/PWA físicos.
 
 ## Próximo marco
