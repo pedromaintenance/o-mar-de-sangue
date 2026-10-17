@@ -364,7 +364,7 @@ class Game extends Phaser.Scene {
         this.mode = data?.mode || p.mode || 'mission';
         this.stage = data?.stage || p.mission || 1;
         this.wave = 1;
-        this.contractId = data?.contract==='rescue' && this.mode==='sandbox' ? 'rescue' : null;
+        this.contractId = this.mode==='sandbox' && ['rescue','smuggle'].includes(data?.contract) ? data.contract : null;
     }
     create() {
         seaCenterCanvas(this.game);
@@ -514,7 +514,7 @@ class Game extends Phaser.Scene {
             window.removeEventListener('blur', this.onLoseFocus);
         });
         const tip = this.add.text(SEA_VIEW.width / 2, 137,
-            (this.contract ? 'CONTRATO · RESGATE DOS AFOGADOS' :
+            (this.contract ? 'CONTRATO · '+SEA_CONTRACTS.offers[this.contract.id].title :
              this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
                 ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS · M: CARTA · N: SOM · ESC/P: PAUSA'
@@ -1334,6 +1334,8 @@ class Game extends Phaser.Scene {
         this.animateWorldVisuals();
         this.updateShots(dt);
         if (this.sinking) return;
+        SEA_CONTRACTS.update(this,dt);
+        if (this.ended) return;
         this.collectTreasures(dt);
         this.progressBattle(dt);
         if (this.ended) return;
@@ -1727,6 +1729,8 @@ class Game extends Phaser.Scene {
             report.contractTitle=SEA_CONTRACTS.offers[this.contract.id].title;
             report.contractBounty=contractBounty;
             report.contractCompleted=!!this.contract.completed;
+            report.contractSeized=!!this.contract.intercepted;
+            report.contractRoute=this.contract.route||null;
         }
         // Ir ao porto garante que todos os efeitos e eventos da cena sejam encerrados.
         this.scene.start('SeaPort', { page: 'result', report });
