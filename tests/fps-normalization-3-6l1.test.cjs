@@ -49,7 +49,7 @@ corrupted2.summary.updateFrames+=1;
 assert.throws(()=>c.parse(JSON.stringify(corrupted2)),/Contagens de quadros incompatíveis/);
 const changed=report(20,60,3,6);
 changed.samples[0].frames=59;
-assert.throws(()=>c.parse(JSON.stringify(changed)),/Contagem de quadros incompatíveis/);
+assert.throws(()=>c.parse(JSON.stringify(changed)),/Contagens de quadros incompatíveis/);
 const executable=source.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
 assert(!/SeaProfile\s*\.|\blocalStorage\b|\bfetch\s*\(|XMLHttpRequest/.test(executable));
 console.log('PASS 3.6l.1: normalized slow/FX rates, v1 legacy and verified totals');
