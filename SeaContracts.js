@@ -58,7 +58,7 @@ const SEA_CONTRACTS = {
   apply(s,choice) {
     const c=s.contract,target=this.target(s);
     if(!c||!choice||!target||s.islandSelected?.id!==target.id||
-       s.islandVisits?.has(target.id)||c.completed)return false;
+       (c.phase==='pickup'&&s.islandVisits?.has(target.id))||c.completed)return false;
     if((c.phase==='pickup'&&choice.contractAction!=='pickup')||
        (c.phase==='deliver'&&choice.contractAction!=='deliver'))return false;
     if(c.phase==='pickup'){
