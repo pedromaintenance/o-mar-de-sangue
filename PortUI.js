@@ -31,7 +31,7 @@ const SEA_PORT_UI = {
     // Independent accessibility preference; never part of SeaProfile v4.
     try{this.readable=localStorage.getItem(this.readableKey)==='1';}
     catch(_){this.readable=false;}
-    this.pendingRestore=null;this.restoreArmed=false;
+    this.pendingRestore=null;this.restoreArmed=false;this.comparedFps=null;
     const root=document.createElement('div');
     root.id='sea-port-ui';
     root.className='port-ui';
@@ -106,6 +106,26 @@ const SEA_PORT_UI = {
         }
         input.value='';return;
       }
+      if(input.id==='sea-port-fps-compare'){
+        try{
+          const files=Array.from(input.files||[]);
+          if(files.length!==2)throw Error('Selecione exatamente dois relatórios FPS JSON.');
+          const parsed=[];
+          for(const file of files){
+            if(file.size>SEA_PERFORMANCE_COMPARE.maxFileBytes)
+              throw Error('Cada relatório deve ter no máximo 256 KB.');
+            parsed.push(SEA_PERFORMANCE_COMPARE.parse(await file.text()));
+          }
+          if(!this.root||!this.scene)return;
+          this.comparedFps=SEA_PERFORMANCE_COMPARE.compare(parsed[0],parsed[1]);
+          this.scene.page='fps-compare';
+          this.render('compare-back');
+        }catch(err){
+          this.comparedFps=null;
+          if(this.root)this.notify(err.message||'Relatórios FPS inválidos.');
+        }
+        input.value='';return;
+      }
       if(input.id!=='sea-port-tracks'||!input.files?.length)return;
       try{
         const count=await SEA_MUSIC.importFiles(input.files);
@@ -140,12 +160,13 @@ const SEA_PORT_UI = {
     if(this.onKey&&typeof window!=='undefined')window.removeEventListener('keydown',this.onKey);
     if(typeof document!=='undefined')document.body.classList.remove('port-ui-open');
     this.root=null;this.scene=null;
-    this.pendingRestore=null;this.restoreArmed=false;
+    this.pendingRestore=null;this.restoreArmed=false;this.comparedFps=null;
     this.lastYardFocus=null;
   },
   goto(page,group) {
     const scene=this.scene;if(!scene)return;
     if(page!=='restore'){this.pendingRestore=null;this.restoreArmed=false;}
+    if(page!=='fps-compare')this.comparedFps=null;
     scene.scene.start('SeaPort',{page,group:group||scene.yardGroup});
   },
   start(mode) {
@@ -232,6 +253,7 @@ const SEA_PORT_UI = {
       else this.notify(result.error||'Não foi possível concluir a compra.');
       return;
     }
+    if(name==='compare-fps'){this.root.querySelector('#sea-port-fps-compare')?.click();return;}
     if(name==='export-fps'){this.exportPerformance();return;}
     if(name==='performance'){
       SEA_PERFORMANCE.toggle();this.render('performance');return;
@@ -508,6 +530,7 @@ const SEA_PORT_UI = {
       '<button data-action="mute" type="button" aria-label="Ligar ou desligar todo o áudio">'+
         (SEA_AUDIO.enabled?'SILENCIAR TUDO':'ATIVAR SOM')+'</button>'+
       '<button data-action="import" type="button">TROCAR TRILHAS</button>'+
+      '<button data-action="compare-fps" type="button" aria-label="Comparar dois relatórios FPS JSON">COMPARAR FPS .JSON</button>'+
       '<button data-action="export-fps" type="button" aria-label="Baixar relatório de FPS da última viagem"'+
         (SEA_PERFORMANCE.report()?'':' disabled title="Ative o diagnóstico e conclua uma viagem"')+
         '>BAIXAR RELATÓRIO FPS</button>'+
@@ -616,7 +639,8 @@ const SEA_PORT_UI = {
       ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
        ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
       ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.'],
-      ['RELATÓRIO FPS','Ative MOSTRAR FPS, navegue e retorne ao Porto. Use BAIXAR RELATÓRIO FPS para exportar até 180 janelas de um segundo em JSON. Os dados ficam só na memória e desaparecem ao recarregar.']
+      ['RELATÓRIO FPS','Ative MOSTRAR FPS, navegue e retorne ao Porto. Use BAIXAR RELATÓRIO FPS para exportar até 180 janelas de um segundo em JSON. Os dados ficam só na memória e desaparecem ao recarregar.'],
+      ['COMPARAR RELATÓRIOS','Selecione exatamente dois relatórios FPS JSON exportados pelo jogo. O Porto compara médias, piores quadros e advertências sem modificar saves nem enviar os arquivos à rede.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+
@@ -626,6 +650,38 @@ const SEA_PORT_UI = {
         '<div><h2>'+name+'</h2><p>'+this.text(desc)+'</p></div></article>').join('')+
       '</section><div class="port-page__foot">'+this.button('menu','VOLTAR AO PORTO','','←','port-choice--return')+
       '</div></main>';
+  },
+  fpsCompare(){
+    const data=this.comparedFps;
+    if(!data)return this.home(SeaProfile.load());
+    const number=v=>Number(v).toLocaleString('pt-BR',{maximumFractionDigits:1});
+    const readout=(v,u)=>number(v)+(u==='ms'?' ms':u==='fps'?' FPS':'');
+    const flags=(v)=>v.view==='compact'?'TELA COMPACTA':'TELA DESKTOP';
+    return '<main class="port-page port-page--narrow" id="port-main">'+
+      '<section class="port-warning port-compare" role="region" aria-labelledby="port-compare-title">'+
+      '<span class="port-eyebrow">DIAGNÓSTICO · COMPARAÇÃO LOCAL</span>'+
+      '<h1 id="port-compare-title">DOIS MARES, DOIS RITMOS</h1>'+
+      '<p>Relatório A: '+flags(data.a)+' · '+number(data.a.sampleCount)+' janelas. '+
+        'Relatório B: '+flags(data.b)+' · '+number(data.b.sampleCount)+' janelas.</p>'+
+      '<div class="port-restore__grid port-compare__grid" role="table" aria-label="Comparação entre dois relatórios FPS">'+
+        '<div class="port-restore__row port-compare__row port-restore__row--head" role="row">'+
+          '<span role="columnheader">MÉTRICA</span>'+
+          '<span role="columnheader">A</span><span role="columnheader">B</span>'+
+          '<span role="columnheader">B − A</span></div>'+
+        data.metrics.map(m=>
+          '<div class="port-restore__row port-compare__row" role="row">'+
+            '<span role="rowheader">'+this.text(m.label)+'</span>'+
+            '<strong role="cell">'+readout(m.a,m.unit)+'</strong>'+
+            '<strong role="cell">'+readout(m.b,m.unit)+'</strong>'+
+            '<strong role="cell">'+(m.delta>0?'+':'')+readout(m.delta,m.unit)+'</strong>'+
+          '</div>').join('')+
+      '</div>'+
+      '<p>FPS maior costuma ser melhor; tempo por quadro e quadros lentos menores costumam ser melhores. '+
+        'A diferença não demonstra qual efeito gráfico causou uma queda.</p>'+
+      (data.warnings.length?'<div class="port-compare__warnings" role="status"><strong>ATENÇÃO À COMPARAÇÃO</strong>'+
+        '<ul>'+data.warnings.map(w=>'<li>'+this.text(w)+'</li>').join('')+'</ul></div>':'')+
+      '<div class="port-page__foot">'+this.button('menu','VOLTAR AO PORTO','Nenhum progresso foi alterado','←','port-choice--primary')+'</div>'+
+      '</section></main>';
   },
   restore() {
     const incoming=this.pendingRestore?.profile;
@@ -712,6 +768,7 @@ const SEA_PORT_UI = {
     const p=SeaProfile.load(),page=this.scene.page;
     const body=page==='yard'?this.yard(p):page==='help'?this.help():
       page==='reset'?this.reset():page==='restore'?this.restore():
+      page==='fps-compare'?this.fpsCompare():
        page==='result'?this.result(this.scene.report):this.home(p);
     ui.innerHTML='<div class="port-background" aria-hidden="true">'+
       '<span class="port-background__moon"></span><span class="port-background__sea"></span>'+
@@ -722,7 +779,8 @@ const SEA_PORT_UI = {
       this.music()+'<span class="port-footer__version">PORTO RECONSTRUÍDO</span></footer>'+
       '</div><div class="port-toast" hidden role="status"></div>'+
       '<input id="sea-port-tracks" hidden type="file" multiple accept=".flac,.mp3,audio/*">'+
-       '<input id="sea-port-backup" hidden type="file" accept=".json,application/json">';
+       '<input id="sea-port-backup" hidden type="file" accept=".json,application/json">'+
+       '<input id="sea-port-fps-compare" hidden type="file" multiple accept=".json,application/json">';
     ui.scrollTop=scroll;
     if(active)this.focusByAction(active);
   }
