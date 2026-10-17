@@ -206,6 +206,9 @@ const SEA_PORT_UI = {
       else this.notify(result.error||'Não foi possível concluir a compra.');
       return;
     }
+    if(name==='performance'){
+      SEA_PERFORMANCE.toggle();this.render('performance');return;
+    }
     if(name==='readability'){
       this.readable=!this.readable;
       try{localStorage.setItem(this.readableKey,this.readable?'1':'0');}
@@ -478,6 +481,9 @@ const SEA_PORT_UI = {
       '<button data-action="mute" type="button" aria-label="Ligar ou desligar todo o áudio">'+
         (SEA_AUDIO.enabled?'SILENCIAR TUDO':'ATIVAR SOM')+'</button>'+
       '<button data-action="import" type="button">TROCAR TRILHAS</button>'+
+      '<button data-action="performance" type="button" aria-pressed="'+(SEA_PERFORMANCE.enabled?'true':'false')+
+        '" aria-label="Mostrar diagnóstico de desempenho na viagem">'+
+        (SEA_PERFORMANCE.enabled?'OCULTAR FPS':'MOSTRAR FPS')+'</button>'+
       '<button data-action="readability" type="button" aria-pressed="'+(this.readable?'true':'false')+
         '" aria-label="Alternar leitura ampliada no porto">'+
         (this.readable?'TEXTO PADRÃO':'AMPLIAR TEXTO')+'</button>'+
@@ -578,7 +584,8 @@ const SEA_PORT_UI = {
       ['ESTALEIRO','Catorze melhorias sem limite artificial; cada nível aumenta o preço. LB/RB ou Q/E trocam as abas.'],
       ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.'],
       ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
-       ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.']
+       ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
+      ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+
