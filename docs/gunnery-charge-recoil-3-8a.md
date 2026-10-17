@@ -1,6 +1,6 @@
 # 3.8a.0 — Preparar a salva, sentir o recuo, temer os monstros
 
-**Situação:** implementação para validação em 17/10/2026. CI, merge e publicação dependem dos testes. Esta entrega foi priorizada por feedback sobre a sensação física do combate, antes de novos tipos de contratos.
+**Situação:** publicada em 17/10/2026 após [PR #52](https://github.com/pedromaintenance/o-mar-de-sangue/pull/52), squash `74c28be`; CI PR e pós-merge aprovado ([run 39076723611](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39076723611)); [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) confirmado ([run 39076723306](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39076723306)). A mudança foi priorizada por feedback sobre a sensação física do combate.
 
 ## Regras do novo tiro
 
@@ -34,8 +34,8 @@
 - Não altera geometria nem posições dos alvos táteis, padrões políticos, mapas ou contratos de resgate/contrabando.
 - [x] Teste Node `tests/gunnery-windup-3-8a.test.cjs`: valores de carga, aproximação exponencial, intervalo de recarga, cancelamento, os dois bordos, fórmula de recuo, criaturas sem projéteis e navio inimigo preparando disparo.
 - [x] QA visual em `tests/mare-negra-hud-visual.test.cjs`: segurar um canhão durante a expedição, registrar a barra parcial e confirmar o disparo no navegador real em três tamanhos.
-- [ ] `port-smoke` e `port-visual` verdes no PR.
-- [ ] Merge em `main`, CI pós-merge verde e deploy confirmado no Pages.
+- [x] `port-smoke` e `port-visual` verdes no PR.
+- [x] PR #52 integrado, CI pós-merge verde na `main` e deploy concluído no Pages.
 - [ ] Jogo real em Android físico, teclado, controle Xbox, com testes de balanceamento de dificuldade e recuo, especialmente nos níveis altos de canhão.
 
 ## Pontos de atenção
