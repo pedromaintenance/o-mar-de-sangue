@@ -63,13 +63,13 @@ const SEA_CONTRACTS = {
        (c.phase==='deliver'&&choice.contractAction!=='deliver'))return false;
     if(c.phase==='pickup'){
       c.phase='deliver';
-      s.islandOutcome='Os náufragos estão a bordo. Seus perseguidores continuam no mar.\\n'+
+      s.islandOutcome='Os náufragos estão a bordo. Seus perseguidores continuam no mar.\n'+
         'Leve-os ao Santuário de Deméter, agora marcado na Carta.';
       this.mark(s);
     }else{
       c.completed=true;
       c.phase='complete';
-      s.islandOutcome='Os náufragos desembarcam sob a proteção do santuário.\\n'+
+      s.islandOutcome='Os náufragos desembarcam sob a proteção do santuário.\n'+
         'Contrato cumprido: 125 ouro será pago ao retornar ao Porto.';
       s.chartWaypointId=null;
     }
