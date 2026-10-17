@@ -175,7 +175,7 @@ const SEA_PORT_UI = {
     const profile=SeaProfile.load();
     scene.scene.start('Game',mode==='mission'?
       {mode:'mission',stage:profile.mission}:
-      {mode:'sandbox',...(contract==='rescue'?{contract:'rescue'}:{})});
+      {mode:'sandbox',...(['rescue','smuggle'].includes(contract)?{contract}:{})});
   },
   notify(message) {
     if(!this.root)return;
@@ -240,9 +240,9 @@ const SEA_PORT_UI = {
     const [name,id]=value.split(':');
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='contracts'){this.goto('contracts');return;}
-    if(name==='contract'&&id==='rescue'){
+    if(name==='contract'&&['rescue','smuggle'].includes(id)){
       if(scene.page!=='contracts')return;
-      this.start('sandbox','rescue');return;
+      this.start('sandbox',id);return;
     }
     if(name==='menu'){this.goto('menu');return;}
     if(name==='yard'){
@@ -576,7 +576,7 @@ const SEA_PORT_UI = {
           this.button('sandbox','MAR SEM FIM','Recorde: onda '+this.num(p.bestWave),'∞','')+
           this.button('yard:armas','ESTALEIRO','Reforce seu navio e sua tripulação','⚒','')+
           this.button('help','DIÁRIO DE BORDO','Comandos, regras e navegação','☷','')+
-          this.button('contracts','CONTRATOS DA COSTA SUL','Nova expedição: resgate de náufragos','⚓','port-choice--contract')+
+          this.button('contracts','CONTRATOS DA COSTA SUL','Resgate e contrabando · duas expedições','⚓','port-choice--contract')+
         '</div>'+
         '<div class="port-statbar" aria-label="Estado da embarcação">'+
           '<div><span>CASCO</span><strong>'+this.num(stats.maxHP)+'</strong></div>'+
@@ -606,19 +606,22 @@ const SEA_PORT_UI = {
         '</div></aside></div>';
   },
   contracts(){
-    const offer=SEA_CONTRACTS.offers.rescue;
-    return '<main class="port-page port-page--narrow" id="port-main">'+
+    const rescue=SEA_CONTRACTS.offers.rescue,smuggle=SEA_CONTRACTS.offers.smuggle;
+    return '<main class="port-page port-page--narrow port-contracts" id="port-main">'+
       '<section class="port-warning" role="region" aria-labelledby="port-contract-title">'+
-      '<span class="port-eyebrow">UM TRABALHO QUE A CORTE NÃO FARÁ</span>'+
+      '<span class="port-eyebrow">PACTOS, FISCALIZAÇÃO E SOBREVIVÊNCIA</span>'+
       '<h1 id="port-contract-title">CONTRATOS DA COSTA SUL</h1>'+
-      '<p>Uma viagem independente. Não avança a campanha, não altera reputação e não exige novo save.</p>'+
-      '<h2>'+this.text(offer.title)+'</h2><p>'+this.text(offer.description)+'</p>'+
-      '<p>PRÊMIO: <strong>'+this.num(offer.bounty)+' OURO</strong> · somente após a entrega. '+
-      'Uma rota é marcada na Carta (M / View / toque). A segunda é revelada após o resgate.</p>'+
-      '<div class="port-warning__actions">'+
-      this.button('contract:rescue','ACEITAR CONTRATO','Recolher e entregar sobreviventes','⚓','port-choice--primary')+
+      '<p>Expedições independentes: não avançam missões ou reputação e preservam o save v4.</p>'+
+      '<h2>'+this.text(rescue.title)+'</h2><p>'+this.text(rescue.description)+'</p>'+
+      '<p>PRÊMIO: <strong>'+this.num(rescue.bounty)+' OURO</strong> · após entrega em Deméter.</p>'+
+      this.button('contract:rescue','ACEITAR RESGATE','Recolher e entregar sobreviventes','⚓','port-choice--primary')+
+      '<h2>'+this.text(smuggle.title)+'</h2><p>'+this.text(smuggle.description)+'</p>'+
+      '<p>Carga embarcada · destino marcado na Carta. A suspeita aumenta perto do fiscal. '+
+        'Entrega secreta: <strong>190 OURO</strong> e +12 maldição (suspeita abaixo de 60%). '+
+        'Suborno na entrega: <strong>115 OURO</strong>. Suspeita em 100% confisca a carga.</p>'+
+      this.button('contract:smuggle','ACEITAR CONTRABANDO','Escapar da inspeção e negociar a entrega','✥','')+
       this.button('menu','VOLTAR AO PORTO','','←','')+
-      '</div></section></main>';
+      '</section></main>';
   },
   yard(p) {
     const group=this.scene?.yardGroup||'armas';
@@ -763,12 +766,13 @@ const SEA_PORT_UI = {
   result(r) {
     if(!r)return this.home(SeaProfile.load());
     const won=!!r.won,withdrawn=!!r.withdrawn;
-    const state=won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
-    const desc=won?'As velas ainda conhecem o caminho.':
+    const state=r.contractSeized?'CARGA APREENDIDA':won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
+    const desc=r.contractSeized?'A Corte confiscou a pólvora. O contrato não será pago.':won?'As velas ainda conhecem o caminho.':
       withdrawn?'Quem retorna ainda pode contar a história.':'O oceano nunca esquece os seus.';
     const data=[
-      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?'RESGATADOS':'NÃO ENTREGUES'],
-        ['PRÊMIO DO CONTRATO',r.contractBounty||0]]:[]),
+      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?'ENTREGUE':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
+        ['PRÊMIO DO CONTRATO',r.contractBounty||0],
+        ...(r.contractRoute?[[ 'FORMA DA ENTREGA',r.contractRoute==='hidden'?'CLANDESTINA':'SUBORNO À CORTE' ]]:[])]:[]),
       ['OURO ENCONTRADO',r.collected],['OURO RECUPERADO',r.reward],
       ['INIMIGOS AFUNDADOS',r.kills],['ABALROAMENTOS',r.rammings],
       ['COFRE DO CAPITÃO',r.bank],
