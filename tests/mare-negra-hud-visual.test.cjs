@@ -104,6 +104,10 @@ const {chromium}=require('playwright-core');
    assert(telemetry.enabled&&telemetry.visible&&telemetry.sceneIsGame);
    assert(telemetry.report&&telemetry.report.fps>0&&telemetry.report.fps<240);
    assert(telemetry.text.includes('MÉDIA')&&telemetry.text.includes('PICO'));
+   assert.equal(telemetry.report.effectBudget?.limit,48,
+     label+': FX telemetry must use the real scene budget');
+   assert(telemetry.text.includes('FX '),
+     label+': enabled telemetry must display the FX budget');
    assert.equal(telemetry.depth,145);
    assert.equal(telemetry.position.x,isMobile?240:640);
    assert.equal(telemetry.position.y,isMobile?596:683);
@@ -237,6 +241,9 @@ const {chromium}=require('playwright-core');
    assert(metrics.samples.length>0&&metrics.samples.length<=180);
    assert(metrics.summary.meanFps>0);
    assert(metrics.summary.worstFrameMs>0);
+   assert.equal(metrics.summary.effectBudget?.limit,48);
+   assert(metrics.summary.effectBudget.peakActive>=0);
+   assert(metrics.summary.effectBudget.atLimitFrames>=0);
    assert(!('profile' in metrics)&&!('player' in metrics),
      'FPS report must not contain personal save data');
    assert.equal(await page.evaluate(()=>
