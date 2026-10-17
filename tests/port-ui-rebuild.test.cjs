@@ -18,7 +18,14 @@ const html=fs.readFileSync('index.html','utf8');
 
 class Element {
   constructor(tag){this.tag=tag;this.innerHTML='';this.dataset={};this.style={};
-    this.listeners={};this.children=[];this.scrollTop=0;}
+    this.listeners={};this.children=[];this.scrollTop=0;
+    const flags=new Set();
+    this.classList={contains:c=>flags.has(c),add:c=>flags.add(c),
+      remove:c=>flags.delete(c),toggle:(c,on)=>{
+        if(on===undefined)on=!flags.has(c);
+        if(on)flags.add(c);else flags.delete(c);return on;
+      }};
+  }
   setAttribute(k,v){this[k]=v;}
   append(c){this.children.push(c);}
   remove(){this.removed=true;}
@@ -33,6 +40,9 @@ class Element {
   querySelectorAll(){return [];}
 }
 const app=new Element('div'),classes=new Set();
+const prefs=new Map(),writes=[];
+const localStorage={getItem:key=>prefs.has(key)?prefs.get(key):null,
+  setItem(key,val){writes.push([key,String(val)]);prefs.set(key,String(val));}};
 const doc={
   activeElement:null,createElement:(tag)=>new Element(tag),
   getElementById:id=>id==='app-shell'?app:null,
@@ -70,7 +80,7 @@ const SEA_AUDIO={enabled:true,effectsVolume:1,
 const SEA_SAVE_TRANSFER={lastRollback:()=>null,clearRollback:()=>{},maxSize:262144};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
 const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
- SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_UPGRADES:upgrades};
+ SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_UPGRADES:upgrades,localStorage};
 vm.createContext(context);
 vm.runInContext(script+'\nthis.ui=SEA_PORT_UI;',context);
 const ui=context.ui;
@@ -82,6 +92,21 @@ for(const action of ['mission','sandbox','yard:armas','help','reset']){
 assert(ui.root.innerHTML.includes('ship_flagship.png'));
 assert(ui.root.innerHTML.includes('700'));
 assert(ui.root.innerHTML.includes('export-backup'),'Backup should be visible from port');
+const beforeReadable=JSON.stringify(p);
+assert.equal(ui.readable,false,'Default font mode must be unchanged');
+assert(ui.root.innerHTML.includes('data-action="readability"'));
+ui.action('readability');
+assert.equal(prefs.get('carcaca.mar.port.readable.v1'),'1');
+assert(ui.root.classList.contains('port-ui--readable'));
+assert(ui.root.innerHTML.includes('TEXTO PADRÃO'));
+assert(ui.root.innerHTML.includes('aria-pressed="true"'));
+assert.equal(JSON.stringify(p),beforeReadable,'Reading preference cannot mutate progress');
+ui.action('readability');
+assert.equal(prefs.get('carcaca.mar.port.readable.v1'),'0');
+assert(!ui.root.classList.contains('port-ui--readable'));
+assert(ui.root.innerHTML.includes('AMPLIAR TEXTO'));
+assert.equal(JSON.stringify(p),beforeReadable);
+assert(writes.every(([key])=>key==='carcaca.mar.port.readable.v1'));
 ui.action('mission');assert.equal(starts.at(-1)[0],'Game');
 assert.equal(starts.at(-1)[1].stage,5);
 ui.action('sandbox');assert.equal(starts.at(-1)[1].mode,'sandbox');
