@@ -55,6 +55,7 @@ const SEA_PERFORMANCE_COMPARE = {
     const fxSummary=summary.effectBudget===undefined?null:
       this.effectBudget(summary.effectBudget,summaryClean.updateFrames);
     let fxWindows=0,fxPeak=0,fxAtLimit=0;
+    let countedFrames=0,countedSlow=0;
     let prev=0;
     for(const sample of data.samples){
       if(!sample||typeof sample!=='object'||Array.isArray(sample))
@@ -70,6 +71,8 @@ const SEA_PERFORMANCE_COMPARE = {
       if(!Number.isInteger(sample.frames)||!Number.isInteger(sample.slowFrames)||
          sample.slowFrames>sample.frames)
         throw Error('Contagem de quadros inválida.');
+      countedFrames+=sample.frames;
+      countedSlow+=sample.slowFrames;
       if(sample.effectBudget!==undefined){
         if(!fxSummary)throw Error('Telemetria de efeitos sem resumo.');
         const fx=this.effectBudget(sample.effectBudget,sample.frames);
@@ -77,6 +80,11 @@ const SEA_PERFORMANCE_COMPARE = {
         fxAtLimit+=fx.atLimitFrames;
       }
     }
+    // Absolute totals must agree with their retained windows. Do not
+    // normalize forged counts or compare incomplete / inconsistent records.
+    if(countedFrames!==summaryClean.updateFrames||
+       countedSlow!==summaryClean.slowFrames)
+      throw Error('Contagens de quadros incompatíveis com as amostras.');
     if(fxSummary){
       if(fxWindows!==data.samples.length||fxPeak!==fxSummary.peakActive||
          fxAtLimit!==fxSummary.atLimitFrames)
@@ -117,6 +125,16 @@ const SEA_PERFORMANCE_COMPARE = {
       const av=a.summary[key],bv=b.summary[key],delta=Math.round((bv-av)*10)/10;
       return {label,unit,a:av,b:bv,delta,higherBetter};
     });
+    // Different voyage lengths make raw slow-frame counts misleading.
+    // Rates are derived from validated retained frame counts only.
+    const perThousand=(events,frames)=>Math.round(events*10000/frames)/10;
+    const rateRow=(label,av,bv,higherBetter)=>{
+      metrics.push({label,unit:'por mil quadros',a:av,b:bv,
+        delta:Math.round((bv-av)*10)/10,higherBetter});
+    };
+    rateRow('LENTOS / 1.000',
+      perThousand(a.summary.slowFrames,a.summary.updateFrames),
+      perThousand(b.summary.slowFrames,b.summary.updateFrames),false);
     // Optional field: old 3.6h/3.6i JSON files still compare normally.
     const af=a.summary.effectBudget,bf=b.summary.effectBudget;
     if(!!af!==!!bf)
@@ -130,6 +148,9 @@ const SEA_PERFORMANCE_COMPARE = {
         ['FX · NO LIMITE','atLimitFrames','quadros']
       ])metrics.push({label,unit,a:af[key],b:bf[key],
         delta:Math.round((bf[key]-af[key])*10)/10,higherBetter:null});
+      rateRow('FX NO LIMITE / 1.000',
+        perThousand(af.atLimitFrames,a.summary.updateFrames),
+        perThousand(bf.atLimitFrames,b.summary.updateFrames),null);
       warnings.push('Carga de efeitos pode refletir diferenças de combate; não demonstra causalidade de FPS.');
     }
     return {a,b,metrics,warnings};

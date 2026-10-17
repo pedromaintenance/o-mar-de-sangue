@@ -23,6 +23,7 @@ on:
       - 'tests/performance-3-6g.test.cjs'
       - 'tests/performance-report-3-6h.test.cjs'
       - 'tests/effect-budget-3-6l.test.cjs'
+      - 'tests/fps-normalization-3-6l1.test.cjs'
       - 'SeaPerformanceCompare.js'
       - 'tests/performance-compare-3-6i.test.cjs'
       - 'SeaMenus.js'
@@ -77,6 +78,7 @@ on:
       - 'tests/performance-3-6g.test.cjs'
       - 'tests/performance-report-3-6h.test.cjs'
       - 'tests/effect-budget-3-6l.test.cjs'
+      - 'tests/fps-normalization-3-6l1.test.cjs'
       - 'SeaPerformanceCompare.js'
       - 'tests/performance-compare-3-6i.test.cjs'
       - 'tests/port-ui-rebuild.test.cjs'
@@ -110,6 +112,7 @@ jobs:
           node tests/performance-3-6g.test.cjs
           node tests/performance-report-3-6h.test.cjs
           node tests/effect-budget-3-6l.test.cjs
+          node tests/fps-normalization-3-6l1.test.cjs
           node --check SeaPerformanceCompare.js
           node tests/performance-compare-3-6i.test.cjs
           node --check PwaStatus.js

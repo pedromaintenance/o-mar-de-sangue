@@ -310,7 +310,8 @@ const {chromium}=require('playwright-core');
       const reportTable=page.getByRole('table',{name:'Comparação entre dois relatórios FPS'});
       assert.equal(await reportTable.count(),1);
       assert.equal(await reportTable.getByRole('columnheader').count(),4);
-      assert.equal(await reportTable.getByRole('rowheader').count(),6);
+      assert.equal(await reportTable.getByRole('rowheader').count(),7);
+       assert((await reportTable.innerText()).includes('LENTOS / 1.000'));
       assert((await reportTable.innerText()).includes('-15'));
       assert((await page.locator('.port-compare__warnings').innerText()).includes('diferentes'));
       const comparisonOverflow=await page.evaluate(()=>({
