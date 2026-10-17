@@ -78,9 +78,10 @@ const SEA_AUDIO={enabled:true,effectsVolume:1,
  toggle(){this.enabled=!this.enabled},
  setEffectsVolume(n){this.effectsVolume=Math.max(0,Math.min(1,Math.round(n*100)/100));}};
 const SEA_SAVE_TRANSFER={lastRollback:()=>null,clearRollback:()=>{},maxSize:262144};
+const SEA_PERFORMANCE={enabled:false,toggle(){this.enabled=!this.enabled;return this.enabled;}};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
 const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
- SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_UPGRADES:upgrades,localStorage};
+ SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_PERFORMANCE,SEA_UPGRADES:upgrades,localStorage};
 vm.createContext(context);
 vm.runInContext(script+'\nthis.ui=SEA_PORT_UI;',context);
 const ui=context.ui;
@@ -95,6 +96,19 @@ assert(ui.root.innerHTML.includes('export-backup'),'Backup should be visible fro
 const beforeReadable=JSON.stringify(p);
 assert.equal(ui.readable,false,'Default font mode must be unchanged');
 assert(ui.root.innerHTML.includes('data-action="readability"'));
+assert(ui.root.innerHTML.includes('data-action="performance"'));
+assert(ui.root.innerHTML.includes('MOSTRAR FPS'));
+const beforePerf=JSON.stringify(p);
+ui.action('performance');
+assert.equal(SEA_PERFORMANCE.enabled,true);
+assert(ui.root.innerHTML.includes('OCULTAR FPS'));
+assert(ui.root.innerHTML.includes('aria-pressed="true"'));
+assert.equal(JSON.stringify(p),beforePerf,'Performance switch cannot touch progress');
+ui.action('performance');
+assert.equal(SEA_PERFORMANCE.enabled,false);
+assert(ui.root.innerHTML.includes('MOSTRAR FPS'));
+assert.equal(JSON.stringify(p),beforePerf);
+
 ui.action('readability');
 assert.equal(prefs.get('carcaca.mar.port.readable.v1'),'1');
 assert(ui.root.classList.contains('port-ui--readable'));
