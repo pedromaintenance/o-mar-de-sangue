@@ -68,12 +68,12 @@ const legacy=JSON.parse(JSON.stringify(p.report()));
 delete legacy.summary.effectBudget;
 legacy.samples.forEach(s=>delete s.effectBudget);
 assert.equal(c.parse(JSON.stringify(legacy)).summary.effectBudget,undefined);
-assert.equal(c.compare(valid,c.parse(JSON.stringify(legacy))).metrics.length,6);
+assert.equal(c.compare(valid,c.parse(JSON.stringify(legacy))).metrics.length,7);
 assert(c.compare(valid,c.parse(JSON.stringify(legacy))).warnings.some(
  w=>w.includes('Apenas um relatório')));
 const compared=c.compare(valid,c.parse(JSON.stringify(p.report())));
-assert.equal(compared.metrics.length,9);
-assert.equal(compared.metrics[6].label,'FX · MÉDIA');
+assert.equal(compared.metrics.length,11);
+assert.equal(compared.metrics[7].label,'FX · MÉDIA');
 assert(compared.warnings.some(w=>w.includes('causalidade')));
 assert(!JSON.stringify(valid).includes('samples'),'Comparator discards raw frames');
 function invalid(modify){
