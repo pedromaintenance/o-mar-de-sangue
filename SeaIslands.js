@@ -194,7 +194,7 @@ const SEA_ISLANDS = {
         s.islandDocked=false;s.islandSelected=null;s.islandOptions=[];s.islandOutcome='';
         s.touchReset();s.islandCandidate=null;
         // Return to Port only after the final sanctuary outcome has been read.
-        if(s.contract?.completed&&!s.ended)s.finish(true);
+        if(s.contract?.completed&&!s.ended&&!s.sinking)s.finish(true);
     },
     apply(s,choice) {
         if(!s.islandDocked||s.islandOutcome||!choice||!s.islandSelected)return false;
