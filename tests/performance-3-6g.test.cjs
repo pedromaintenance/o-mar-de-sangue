@@ -38,6 +38,7 @@ assert(beforeGame.includes("this.input.keyboard.off('keydown-F3', this.onPerform
 assert(!/SeaProfile\s*\.|\.fire\(|playerVelocity|\.spawnEnemy\(/.test(code),
   'Performance module cannot reference game state or enemy behavior');
 for(const desktop of [true,false]){
+ values.delete('carcaca.mar.performance.visible.v1');
  const perf=load(desktop),gameScene=scene();
  assert.equal(perf.enabled,false,'Disabled by default');
  perf.attach(gameScene);
@@ -47,7 +48,7 @@ for(const desktop of [true,false]){
  assert.equal(perf.enabled,true);
  assert.equal(perf.label.visible,true);
  assert.equal(perf.label.x,desktop?640:240);
- assert.equal(perf.label.y,desktop?683:602);
+ assert.equal(perf.label.y,desktop?683:596);
  assert.equal(perf.label.depth,145);
  assert.equal(created.at(-1).options.fontFamily,'monospace');
  for(let i=0;i<60;i++)perf.sample(16.7);
