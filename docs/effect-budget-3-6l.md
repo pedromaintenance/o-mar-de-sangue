@@ -11,6 +11,7 @@ Os relatórios 3.6h/3.6i antes mediam apenas intervalos de atualização. Sem co
 ## Entrega
 
 - Com **MOSTRAR FPS** ativo, a 3.6l lê passivamente `effectsActive` e `effectsLimit` uma vez por chamada já existente a `SEA_PERFORMANCE.sample(delta)`.
+- Em telas compactas, o indicador é elevado de y=596 para y=580 para manter a terceira linha fora dos controles de toque.
 - O indicador FPS em viagem ganha a linha `FX pico/limite · NO LIMITE N`, atualizada junto com a janela de FPS, aproximadamente uma vez por segundo.
 - Cada amostra exportada ganha **opcionalmente** `effectBudget`: média e pico de efeitos ativos, orçamento observado e quantidade de quadros da janela no limite.
 - O resumo do relatório mostra média ponderada pelo número de atualizações, pico global, limite observado e total de quadros no limite.
