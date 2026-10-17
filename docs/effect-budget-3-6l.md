@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6l: Telemetria de Orçamento dos Efeitos
 
-**Estado:** implementação proposta em 17/10/2026, com publicação condicionada ao CI. Validação de FPS em dispositivo físico ainda pendente.
+**Estado:** integrado à `main` em 17/10/2026 pelo [PR #48](https://github.com/pedromaintenance/o-mar-de-sangue/pull/48) (squash `d7b554c`). CI Node/Chromium aprovado no PR. Medição física de FPS ainda pendente.
 
 ## Diagnóstico observado no código
 
@@ -33,7 +33,8 @@ Os relatórios 3.6h/3.6i antes mediam apenas intervalos de atualização. Sem co
 
 - [x] Testes Node `tests/effect-budget-3-6l.test.cjs`: opt-out, médias, picos, quadros no limite, deep copy, relatório anterior v1, arquivo adulterado e ausência de escrita no save.
 - [x] Assert de integração no `tests/mare-negra-hud-visual.test.cjs`, usando uma expedição Phaser real nos três viewports oficiais; confere contador, texto e JSON exportado.
-- [ ] CI `port-smoke` e `port-visual` verdes no PR e no merge.
+- [x] CI `port-smoke` e `port-visual` verdes no PR; merge `d7b554c`.
+- [ ] Confirmar CI na `main` após merge.
 - [ ] Navegação no GitHub Pages, PWA e dispositivo físico real.
 
 ## Procedimento de medição recomendado
