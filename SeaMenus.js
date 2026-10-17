@@ -105,7 +105,7 @@ const SEA_UI = {
                 audio.text.setText(enabled?'♫  DESATIVAR ÁUDIO':'♫  ATIVAR ÁUDIO');},'navy');
         mk(top+517,'⚓  RETORNAR AO PORTO · 75% DO OURO',
             ()=>scene.finish(false,true),'exit');
-        label(top+h-40,'↑↓ / DIRECIONAL: ESCOLHER · ENTER / A: CONFIRMAR · ESC / P / B: VOLTAR · TOQUE',11,'#988a7c',false);
+        label(top+h-40,'↑↓: ESCOLHER · ENTER/A: CONFIRMAR · ESC/P/B: VOLTAR · TOQUE',11,'#988a7c',false);
         scene.setPausePadFocus(0);
         return root;
     }
