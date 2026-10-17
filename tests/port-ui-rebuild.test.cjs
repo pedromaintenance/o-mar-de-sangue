@@ -78,7 +78,8 @@ const SEA_AUDIO={enabled:true,effectsVolume:1,
  toggle(){this.enabled=!this.enabled},
  setEffectsVolume(n){this.effectsVolume=Math.max(0,Math.min(1,Math.round(n*100)/100));}};
 const SEA_SAVE_TRANSFER={lastRollback:()=>null,clearRollback:()=>{},maxSize:262144};
-const SEA_PERFORMANCE={enabled:false,toggle(){this.enabled=!this.enabled;return this.enabled;}};
+const SEA_PERFORMANCE={enabled:false,mockReport:null,
+  report(){return this.mockReport;},toggle(){this.enabled=!this.enabled;return this.enabled;}};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
 const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
  SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_PERFORMANCE,SEA_UPGRADES:upgrades,localStorage};
@@ -97,6 +98,25 @@ const beforeReadable=JSON.stringify(p);
 assert.equal(ui.readable,false,'Default font mode must be unchanged');
 assert(ui.root.innerHTML.includes('data-action="readability"'));
 assert(ui.root.innerHTML.includes('data-action="performance"'));
+assert(ui.root.innerHTML.includes('data-action="export-fps"'));
+assert(ui.root.innerHTML.includes('disabled title="Ative o diagnóstico'));
+const mockReport={
+  format:'mar-de-sangue-performance-report',schema:1,
+  capturedAt:'2026-10-17T10:10:00.000Z',samples:[{second:1,fps:59,meanMs:16.9}]
+};
+SEA_PERFORMANCE.mockReport=mockReport;
+ui.render();
+assert(ui.root.innerHTML.includes('BAIXAR RELATÓRIO FPS'));
+assert(!ui.root.innerHTML.includes('disabled title="Ative o diagnóstico'));
+ui.action('export-fps');
+assert.equal(downloads.length,1);
+assert(downloads.at(-1).file.startsWith('mar-de-sangue-fps-'));
+assert.equal(JSON.parse(lastBackup.content).format,mockReport.format);
+assert.deepEqual(JSON.parse(lastBackup.content).samples,mockReport.samples);
+assert.equal(JSON.stringify(p),JSON.stringify(SeaProfile.load()));
+SEA_PERFORMANCE.mockReport=null;
+ui.render();
+
 assert(ui.root.innerHTML.includes('MOSTRAR FPS'));
 const beforePerf=JSON.stringify(p);
 ui.action('performance');
@@ -133,8 +153,8 @@ scene.page='reset';ui.render();assert(ui.root.innerHTML.includes('reset-confirm'
 assert(ui.root.innerHTML.includes('GUARDAR CÓPIA DO SAVE'));
 const previous=JSON.stringify(p);
 ui.action('export-backup');
-assert.equal(downloads.length,1,'Export must invoke file download once');
-assert(downloads[0].file.startsWith('mar-de-sangue-save-v4-'));
+assert.equal(downloads.length,2,'Save and FPS report downloads must be independent');
+assert(downloads[1].file.startsWith('mar-de-sangue-save-v4-'));
 const backup=JSON.parse(lastBackup.content);
 assert.equal(backup.format,'mar-de-sangue-captain-backup');
 assert.equal(backup.schema,4);

@@ -187,6 +187,32 @@ const SEA_PORT_UI = {
       if(objectUrl)setTimeout(()=>URL.revokeObjectURL(objectUrl),3000);
     }
   },
+  exportPerformance() {
+    const report=SEA_PERFORMANCE.report();
+    if(!report){this.notify('Ative MOSTRAR FPS, faça uma viagem e retorne ao Porto.');return false;}
+    let anchor=null,objectUrl=null;
+    try{
+      const timestamp=new Date().toISOString().slice(0,10);
+      // Diagnostics only: excludes game progression, accounts and device IDs.
+      const blob=new Blob([JSON.stringify(report,null,2)+'\n'],
+        {type:'application/json;charset=utf-8'});
+      objectUrl=URL.createObjectURL(blob);
+      anchor=document.createElement('a');
+      anchor.href=objectUrl;
+      anchor.download='mar-de-sangue-fps-'+timestamp+'.json';
+      anchor.style.display='none';
+      document.body.append(anchor);
+      anchor.click();
+      this.notify('Relatório FPS preparado. Nenhum save foi alterado.');
+      return true;
+    }catch(_){
+      this.notify('Não foi possível exportar o relatório FPS.');
+      return false;
+    }finally{
+      anchor?.remove();
+      if(objectUrl)setTimeout(()=>URL.revokeObjectURL(objectUrl),3000);
+    }
+  },
   action(value) {
     const scene=this.scene;if(!scene)return;
     const [name,id]=value.split(':');
@@ -206,6 +232,7 @@ const SEA_PORT_UI = {
       else this.notify(result.error||'Não foi possível concluir a compra.');
       return;
     }
+    if(name==='export-fps'){this.exportPerformance();return;}
     if(name==='performance'){
       SEA_PERFORMANCE.toggle();this.render('performance');return;
     }
@@ -481,6 +508,9 @@ const SEA_PORT_UI = {
       '<button data-action="mute" type="button" aria-label="Ligar ou desligar todo o áudio">'+
         (SEA_AUDIO.enabled?'SILENCIAR TUDO':'ATIVAR SOM')+'</button>'+
       '<button data-action="import" type="button">TROCAR TRILHAS</button>'+
+      '<button data-action="export-fps" type="button" aria-label="Baixar relatório de FPS da última viagem"'+
+        (SEA_PERFORMANCE.report()?'':' disabled title="Ative o diagnóstico e conclua uma viagem"')+
+        '>BAIXAR RELATÓRIO FPS</button>'+
       '<button data-action="performance" type="button" aria-pressed="'+(SEA_PERFORMANCE.enabled?'true':'false')+
         '" aria-label="Mostrar diagnóstico de desempenho na viagem">'+
         (SEA_PERFORMANCE.enabled?'OCULTAR FPS':'MOSTRAR FPS')+'</button>'+
@@ -585,7 +615,8 @@ const SEA_PORT_UI = {
       ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.'],
       ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
        ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
-      ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.']
+      ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.'],
+      ['RELATÓRIO FPS','Ative MOSTRAR FPS, navegue e retorne ao Porto. Use BAIXAR RELATÓRIO FPS para exportar até 180 janelas de um segundo em JSON. Os dados ficam só na memória e desaparecem ao recarregar.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+
