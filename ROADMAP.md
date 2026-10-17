@@ -250,7 +250,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Adicionar comparação opcional de carga FX entre dois relatórios e alertas de incerteza; validar valores importados.
 - [x] Incluir testes Node, verificações em Chromium e cache PWA v52 sem mudar `Game.js`, save, controles, física, IA ou o orçamento visual.
 - [x] CI `port-smoke` e `port-visual` aprovados no PR; squash merge [#48](https://github.com/pedromaintenance/o-mar-de-sangue/pull/48) (`d7b554c`).
-- [ ] Confirmar o deploy Pages e testar FPS/PWA em aparelho real.
+- [x] Deploy GitHub Pages confirmado em 17/10/2026 após o merge (run [39037006934](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39037006934)); CI na `main` também aprovado.
+- [ ] Verificar FPS/PWA em aparelho físico e colher relatórios reais.
 - [ ] Coletar relatórios comparáveis de mar calmo vs. eventos/combate. **Ainda não há benchmark real justificando redução de partículas.**
 - [Especificação, limitações e roteiro de QA](docs/effect-budget-3-6l.md).
 
