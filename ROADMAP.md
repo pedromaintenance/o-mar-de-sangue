@@ -308,7 +308,7 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ### 3.8 — Ferro, Pólvora e Sangue (primeiro marco em validação)
 
-**3.8a.0 — Salva Preparada, Recuo e Predadores do Mar (em validação, 17/10/2026):**
+**3.8a.0 — Salva Preparada, Recuo e Predadores do Mar (publicado em 17/10/2026):**
 
 - [x] Trocar disparo imediato por **segurar o comando** em teclado, Xbox e toque, com carga independente por bordo e cancelamento ao soltar.
 - [x] Iniciar em **2000 ms** e reduzir o tempo por `2000 × exp(-0,105 × nível de Serventes Treinados)`, preservando recarga/limites preexistentes.
@@ -317,7 +317,9 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Navios inimigos carregam salvas com tempo inicial de 2 s na dificuldade 1 e progressão exponencial na dificuldade.
 - [x] Criaturas marinhas deixam de lançar projéteis: enguias, afogados, coral, caranguejo, tartaruga e Dagon investem fisicamente; Kraken mantém tentáculo próximo; fases de invocação de Dagon preservadas.
 - [x] Testes Node, HUD Chromium em três viewports, documentação e cache PWA v56; mantém save v4 e níveis de estaleiro.
-- [ ] CI verde no PR, squash merge, CI pós-merge e Pages publicados; **teste físico e balanceamento pendentes**.
+- [x] PR [#52](https://github.com/pedromaintenance/o-mar-de-sangue/pull/52) aprovado (Node e Chromium nas três resoluções), integrado por squash (`74c28be`).
+- [x] CI pós-merge na `main` aprovado ([run 39076723611](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39076723611)); [Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39076723306](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39076723306)).
+- [ ] Validar controle Xbox e Android físicos, PWA offline instalado e balanceamento dos níveis de carga/recuo.
 - [Especificação, cálculos e roteiro de QA](docs/gunnery-charge-recoil-3-8a.md).
 
 ### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
