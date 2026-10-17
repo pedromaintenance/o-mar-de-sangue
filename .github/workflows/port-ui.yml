@@ -48,6 +48,7 @@ on:
       - 'SeaAtlas.js'
       - 'SeaContracts.js'
       - 'tests/rescue-contract-3-7a.test.cjs'
+      - 'tests/smuggling-contract-3-7a2.test.cjs'
       - 'tests/atlas-chart.test.cjs'
       - 'tests/atlas-chart-visual.test.cjs'
       - '.github/workflows/port-ui.yml'
@@ -96,6 +97,7 @@ on:
       - 'SeaAtlas.js'
       - 'SeaContracts.js'
       - 'tests/rescue-contract-3-7a.test.cjs'
+      - 'tests/smuggling-contract-3-7a2.test.cjs'
       - 'tests/atlas-chart.test.cjs'
       - 'tests/atlas-chart-visual.test.cjs'
 jobs:
@@ -140,6 +142,7 @@ jobs:
           node tests/atlas-chart.test.cjs
           node --check SeaContracts.js
           node tests/rescue-contract-3-7a.test.cjs
+          node tests/smuggling-contract-3-7a2.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
