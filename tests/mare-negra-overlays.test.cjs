@@ -74,7 +74,7 @@ for(const desktop of [true,false]){
    'pause overlay must intercept taps from the game');
  const labels=all.filter(o=>o.kind==='text').map(o=>o.text);
  assert(labels.some(s=>String(s).includes('DIÁRIO DO CAPITÃO')));
- assert(labels.some(s=>String(s).includes('DIRECIONAL: ESCOLHER')&&String(s).includes('ENTER / A: CONFIRMAR')&&String(s).includes('ESC / P / B: VOLTAR')),
+ assert(labels.some(s=>String(s).includes('↑↓: ESCOLHER')&&String(s).includes('ENTER/A: CONFIRMAR')&&String(s).includes('ESC/P/B: VOLTAR')),
    'Pause legend must expose real keyboard and Xbox actions');
  assert(labels.some(s=>String(s).includes('MALDIÇÃO 23%')));
  assert(labels.some(s=>String(s).includes('Derrotar o arauto')));
