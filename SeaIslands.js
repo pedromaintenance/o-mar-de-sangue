@@ -131,7 +131,8 @@ const SEA_ISLANDS = {
         if (!s.player || s.ended || s.sinking) return null;
         let found=null;
         for(const island of s.islands){
-            if(s.islandVisits.has(island.id))continue;
+            if(s.islandVisits.has(island.id) &&
+               !(s.contract?.phase==='deliver'&&island.id===s.contract.shelterId))continue;
             const d=Math.hypot(s.player.x-island.x,s.player.y-island.y);
             const gap=d-island.radius-s.hullRadius;
             if(gap<-10||gap>112)continue;
@@ -198,12 +199,12 @@ const SEA_ISLANDS = {
     },
     apply(s,choice) {
         if(!s.islandDocked||s.islandOutcome||!choice||!s.islandSelected)return false;
-        if(s.islandVisits.has(s.islandSelected.id))return false;
         if(choice.contractAction){
             const result=SEA_CONTRACTS.apply(s,choice);
             if(result){SEA_AUDIO.play('gold',.55);this.render(s);}
             return result;
         }
+        if(s.islandVisits.has(s.islandSelected.id))return false;
         if(choice.cost&&s.gold<choice.cost){
             s.islandError='OURO INSUFICIENTE PARA ESTA ESCOLHA';
             this.render(s);
