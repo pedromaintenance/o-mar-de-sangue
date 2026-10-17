@@ -267,6 +267,24 @@ const {chromium}=require('playwright-core');
       assert.equal(await page.locator('[data-action="readability"]').getAttribute('aria-pressed'),'false');
       assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar.port.readable.v1')),'0');
       assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),readingBefore.save);
+      // 3.6g: opt-in diagnostics from mobile-friendly port controls.
+      const priorPerfSave=await page.evaluate(()=>
+        localStorage.getItem('carcaca.mar-de-sangue.v4'));
+      assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'false');
+      await page.locator('[data-action="performance"]').click();
+      assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'true');
+      assert.equal(await page.evaluate(()=>
+        localStorage.getItem('carcaca.mar.performance.visible.v1')),'1');
+      assert.equal(await page.evaluate(()=>
+        localStorage.getItem('carcaca.mar-de-sangue.v4')),priorPerfSave);
+      await page.reload({waitUntil:'domcontentloaded'});
+      await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
+      assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'true',
+        label+': FPS preference must survive reload');
+      await page.locator('[data-action="performance"]').click();
+      assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'false');
+      assert.equal(await page.evaluate(()=>
+        localStorage.getItem('carcaca.mar-de-sangue.v4')),priorPerfSave);
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));
       console.log('PASS visual '+label,measure);
       await page.close();
