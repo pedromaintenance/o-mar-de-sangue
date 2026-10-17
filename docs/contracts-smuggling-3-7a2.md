@@ -1,6 +1,6 @@
 # 3.7a.2 — Pólvora sem Bandeira
 
-**Estado:** implementação em validação (17/10/2026); CI, merge e deploy ainda condicionais. Este documento não equivale a publicação.
+**Estado:** publicado em 17/10/2026 após [PR #51](https://github.com/pedromaintenance/o-mar-de-sangue/pull/51), squash `baf76d7`. CI do PR e pós-merge aprovado ([run 39072990117](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39072990117)). [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) publicado ([run 39072989625](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39072989625)).
 
 ## Proposta de gameplay
 
@@ -45,8 +45,8 @@ A Costa não é dividida em facções moralmente puras: a inspeção existe como
 
 - [x] Desenvolvimento de gameplay e integração com Porto/Atlas/ilhas.
 - [x] Testes Node e Chromium adicionados aos workflows.
-- [ ] Validar CI `port-smoke` e `port-visual` na branch/PR.
-- [ ] Integrar PR, validar CI pós-merge, publicar no GitHub Pages e registrar o deploy no roadmap.
+- [x] `port-smoke` e `port-visual` verdes na branch e no PR; screenshots e jornadas de contrabando em três viewports.
+- [x] PR #51 integrado à `main`, CI pós-merge verde e GitHub Pages publicado; roadmap atualizado.
 - [ ] Validar manualmente em celular físico, controles Xbox, PWA offline e viagens longas.
 
 ## Próxima entrega
