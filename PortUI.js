@@ -560,7 +560,8 @@ const SEA_PORT_UI = {
       ['SANDBOX','Ondas sucessivas, frota hostil crescente e recompensas acumuladas.'],
       ['ATRACAÇÃO','Aproxime-se devagar e afaste inimigos. F, botão A ou toque para atracar.'],
       ['ESTALEIRO','Catorze melhorias sem limite artificial; cada nível aumenta o preço. LB/RB ou Q/E trocam as abas.'],
-      ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.']
+      ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.'],
+      ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+
@@ -586,21 +587,21 @@ const SEA_PORT_UI = {
       ['NÍVEIS DE MELHORIAS',oldUpgrades,newUpgrades]
     ];
     return '<main class="port-page port-page--narrow" id="port-main">'+
-      '<section class="port-warning port-restore">'+
+      '<section class="port-warning port-restore" role="region" aria-labelledby="port-restore-title" aria-describedby="port-restore-guidance">'+
         '<span class="port-warning__sigil" aria-hidden="true">⚓</span>'+
         '<span class="port-eyebrow">ARQUIVOS DO CAPITÃO · SAVE V4</span>'+
-        '<h1>RECUPERAR O PASSADO?</h1>'+
-        '<p>Compare antes de substituir. A última versão deste navegador ficará guardada localmente para permitir desfazer.</p>'+
+        '<h1 id="port-restore-title">RECUPERAR O PASSADO?</h1>'+
+        '<p id="port-restore-guidance">Compare antes de substituir. ESC, Backspace ou B cancelam. A última versão deste navegador ficará guardada localmente para permitir desfazer.</p>'+
         '<div class="port-restore__grid" role="table" aria-label="Comparação de progresso">'+
           '<div class="port-restore__row port-restore__row--head" role="row">'+
-            '<span>REGISTRO</span><span>ATUAL</span><span>IMPORTADO</span></div>'+
+            '<span role="columnheader">REGISTRO</span><span role="columnheader">ATUAL</span><span role="columnheader">IMPORTADO</span></div>'+
           rows.map(([key,oldValue,newValue])=>
-            '<div class="port-restore__row" role="row"><span>'+this.text(key)+'</span>'+
-            '<strong>'+this.num(oldValue)+'</strong><strong>'+this.num(newValue)+'</strong></div>').join('')+
+            '<div class="port-restore__row" role="row"><span role="rowheader">'+this.text(key)+'</span>'+
+            '<strong role="cell">'+this.num(oldValue)+'</strong><strong role="cell">'+this.num(newValue)+'</strong></div>').join('')+
         '</div>'+
         '<p class="port-restore__notice">A substituição muda o progresso consolidado, não as músicas importadas nem as opções de som. Apenas backup v4 é aceito.</p>'+
         (this.restoreArmed?
-          '<strong>CONFIRMAÇÃO FINAL: o progresso atual será substituído.</strong>'+
+          '<strong role="alert">CONFIRMAÇÃO FINAL: o progresso atual será substituído. ESC, Backspace ou B cancelam.</strong>'+
           '<div class="port-restore__actions">'+
             this.button('restore-cancel','CANCELAR','Manter o save atual','←','port-choice--primary')+
             this.button('restore-confirm','SIM, RESTAURAR SAVE','Salvar cópia local do atual e usar o backup','⚠','port-choice--danger')+
@@ -613,8 +614,8 @@ const SEA_PORT_UI = {
   },
   reset() {
     return '<main class="port-page port-page--narrow" id="port-main">'+
-      '<section class="port-warning"><span class="port-warning__sigil" aria-hidden="true">☠</span>'+
-      '<span class="port-eyebrow">O PACTO É IRREVERSÍVEL</span><h1>ESQUECER O MAR?</h1>'+
+      '<section class="port-warning" role="region" aria-labelledby="port-reset-title"><span class="port-warning__sigil" aria-hidden="true">☠</span>'+
+      '<span class="port-eyebrow">O PACTO É IRREVERSÍVEL</span><h1 id="port-reset-title">ESQUECER O MAR?</h1>'+
       '<p>O capitão abandonará o ouro, os navios aperfeiçoados, as missões, os recordes e o histórico de expedições deste dispositivo.</p>'+
       '<strong>ESTA ESCOLHA NÃO PODE SER DESFEITA.</strong>'+
       '<p>Antes de apagar, baixe uma cópia local. O arquivo JSON não modifica nem restaura automaticamente o jogo.</p>'+

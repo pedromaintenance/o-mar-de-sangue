@@ -112,4 +112,15 @@ pad.just={6:true};const before=rendered.length;ui.update(250);
 assert.equal(rendered.length,before,'LT must not act as RB');
 pad.just={1:true};ui.update(300);
 assert.equal(starts.at(-1)[1].page,'menu','B must return from yard to menu');
+// Critical restore dialog: gamepad B cancels without invoking apply().
+scene.page='restore';
+ui.pendingRestore={profile:{gold:999}};
+ui.restoreArmed=true;
+pad.just={1:true};
+const previousStarts=starts.length;
+ui.update(410);
+assert.equal(starts.length,previousStarts+1);
+assert.equal(starts.at(-1)[1].page,'menu');
+assert.equal(ui.pendingRestore,null);
+assert.equal(ui.restoreArmed,false);
 console.log('PASS: no ghost tab focus, buy-first, ↓ buys not return, LB/RB, Q/E mechanism, B');

@@ -90,6 +90,31 @@ const {chromium}=require('playwright-core');
         stateBeforeBackup.save,'Preview cannot write save');
       await page.screenshot({path:path.join('port-artifacts',
         label+'-save-restore-preview-3-6c.png'),fullPage:true});
+      // 3.6d: the comparison is a proper accessible table, and safe
+      // Cancel is the initial keyboard/controller focus.
+      const comparison=page.getByRole('table',{name:'Comparação de progresso'});
+      assert.equal(await comparison.count(),1);
+      assert.equal(await comparison.getByRole('columnheader').count(),3);
+      assert.equal(await comparison.getByRole('rowheader').count(),6);
+      assert.equal(await comparison.getByRole('cell').count(),12);
+      assert.equal(await focused(),'restore-cancel','Unsafe action must never have first focus');
+      await page.keyboard.press('Escape');
+      await page.locator('.port-hero').waitFor({timeout:10000});
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        stateBeforeBackup.save,'Escape must cancel without writing');
+      await page.locator('#sea-port-backup').setInputFiles(file);
+      await page.locator('.port-restore').waitFor({timeout:10000});
+      await page.evaluate(()=>{
+        const previous=SEA_GAMEPAD.poll;
+        SEA_GAMEPAD.poll=()=>({connected:true,just:{1:true}});
+        try{SEA_PORT_UI.update(99999)}
+        finally{SEA_GAMEPAD.poll=previous}
+      });
+      await page.locator('.port-hero').waitFor({timeout:10000});
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        stateBeforeBackup.save,'Xbox B must cancel without writing');
+      await page.locator('#sea-port-backup').setInputFiles(file);
+      await page.locator('.port-restore').waitFor({timeout:10000});
       await page.locator('[data-action="restore-cancel"]').click();
       await page.locator('.port-hero').waitFor({timeout:10000});
       assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
@@ -102,6 +127,9 @@ const {chromium}=require('playwright-core');
         stateBeforeBackup.save,'Corrupted JSON must never change progress');
       await page.locator('#sea-port-backup').setInputFiles(file);
       await page.locator('[data-action="restore-arm"]').click();
+      assert.equal(await focused(),'restore-cancel',
+        'Final confirmation must still focus Cancel, never the destructive button');
+      assert.equal(await page.getByRole('alert').count(),1);
       assert.equal(await page.locator('[data-action="restore-confirm"]').count(),1,
         'Final destructive action only appears after initial confirmation');
       await page.locator('[data-action="restore-confirm"]').click();
