@@ -49,6 +49,47 @@ const {chromium}=require('playwright-core');
     assert.deepEqual(before.touch?.port,{x:342,y:702,radius:48});
     assert.deepEqual(before.touch?.starboard,{x:432,y:702,radius:48});
    }
+   // 3.6g diagnostics: actual Game scene, keyboard F3 and touch-safe location.
+   const profileBeforePerf=await page.evaluate(()=>
+     localStorage.getItem('carcaca.mar-de-sangue.v4'));
+   assert.equal(await page.evaluate(()=>SEA_PERFORMANCE.enabled),false);
+   await page.keyboard.press('F3');
+   await page.waitForFunction(()=>SEA_PERFORMANCE.enabled,{timeout:10000});
+   const telemetry=await page.evaluate(()=>{
+     const p=SEA_PERFORMANCE,s=game.scene.getScene('Game');
+     for(let n=0;n<75;n++)p.sample(16.7);
+     const box=p.label?.getBounds?.(),center=p.label;
+     return {enabled:p.enabled,text:p.label?.text||'',visible:p.label?.visible,
+       report:p.latest,position:{x:center?.x,y:center?.y},
+       box:{x:box?.x,y:box?.y,width:box?.width,height:box?.height},
+       depth:center?.depth,sceneIsGame:p.scene===s,
+       pause:{...s.pauseButtonHitbox},
+       save:localStorage.getItem('carcaca.mar-de-sangue.v4'),
+       preference:localStorage.getItem('carcaca.mar.performance.visible.v1')};
+   });
+   assert(telemetry.enabled&&telemetry.visible&&telemetry.sceneIsGame);
+   assert(telemetry.report&&telemetry.report.fps>0&&telemetry.report.fps<240);
+   assert(telemetry.text.includes('MÉDIA')&&telemetry.text.includes('PICO'));
+   assert.equal(telemetry.depth,145);
+   assert.equal(telemetry.position.x,isMobile?240:640);
+   assert.equal(telemetry.position.y,isMobile?602:683);
+   assert(telemetry.box.x>=0&&
+     telemetry.box.x+telemetry.box.width<=(isMobile?480:1280),
+     label+': telemetry outside canvas width');
+   if(isMobile){
+     assert(telemetry.box.y+telemetry.box.height<620,
+       label+': telemetry overlaps joystick and cannon control panel');
+   }
+   assert.equal(telemetry.save,profileBeforePerf);
+   assert.equal(telemetry.preference,'1');
+   assert.deepEqual(telemetry.pause,{x:isMobile?412:454,y:78,w:120,h:40});
+   await page.screenshot({path:path.join('port-artifacts',
+     'mare-negra-3-6g-'+label+'-fps.png'),fullPage:true});
+   await page.keyboard.press('F3');
+   await page.waitForFunction(()=>!SEA_PERFORMANCE.enabled,{timeout:10000});
+   assert.equal(await page.evaluate(()=>SEA_PERFORMANCE.label?.visible),false);
+   assert.equal(await page.evaluate(()=>
+     localStorage.getItem('carcaca.mar-de-sangue.v4')),profileBeforePerf);
    await page.screenshot({path:path.join('port-artifacts','mare-negra-3-2-'+label+'-hud.png'),fullPage:true});
    const alert=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');
