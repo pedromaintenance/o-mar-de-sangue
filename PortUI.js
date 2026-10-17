@@ -779,7 +779,7 @@ const SEA_PORT_UI = {
       '<div class="port-page__header"><span class="port-eyebrow">CRÔNICAS DOS QUE REGRESSARAM</span>'+
       '<h1>'+this.text(state)+'</h1><p>'+this.text(desc)+'</p></div>'+
       '<div class="port-result-grid">'+data.map(([title,value])=>
-        '<div><span>'+this.text(title)+'</span><strong>'+this.num(value)+'</strong></div>').join('')+
+        '<div><span>'+this.text(title)+'</span><strong>'+(typeof value==='string'?this.text(value):this.num(value))+'</strong></div>').join('')+
       '</div><div class="port-result-actions">'+
         this.button('yard:armas','MELHORAR O NAVIO','Abrir estaleiro','⚒','')+
         this.button(r.contractTitle?'contracts':'next',r.contractTitle?'OUTRO CONTRATO':r.mode==='mission'?'PRÓXIMA MISSÃO':'NOVA JORNADA','Voltar ao Mar de Sangue','⚔','port-choice--primary')+
