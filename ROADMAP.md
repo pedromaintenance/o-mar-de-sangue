@@ -255,13 +255,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Coletar relatórios comparáveis de mar calmo vs. eventos/combate. **Ainda não há benchmark real justificando redução de partículas.**
 - [Especificação, limitações e roteiro de QA](docs/effect-budget-3-6l.md).
 
-**3.6l.1 — Comparação Normalizada de FPS (em validação, 17/10/2026):**
+**3.6l.1 — Comparação Normalizada de FPS (integrada à `main` em 17/10/2026):**
 
 - [x] Adicionar **LENTOS / 1.000** atualizações retidas, mantendo os seis indicadores absolutos e a diferença B − A.
 - [x] Adicionar **FX NO LIMITE / 1.000** somente quando os dois arquivos JSON incluem a telemetria 3.6l.
 - [x] Conferir que totais de quadros e quadros lentos importados correspondem às amostras; manter compatibilidade com FPS v1 anteriores.
 - [x] Atualizar Diário de Bordo, testes Node/Chromium, workflow CI e cache offline PWA v53.
-- [ ] Aprovar CI do PR e na `main`, integrar via squash, confirmar GitHub Pages.
+- [x] `port-smoke` e `port-visual` verdes no PR; [PR #49](https://github.com/pedromaintenance/o-mar-de-sangue/pull/49) integrado via squash (`4b5ca20`).
+- [ ] Confirmar CI pós-merge e publicação no GitHub Pages.
 - [ ] Testar comparações com medições reais no mesmo dispositivo; **ainda não há dados justificando redução de partículas**.
 - [Especificação e roteiro de QA](docs/fps-normalization-3-6l1.md).
 
