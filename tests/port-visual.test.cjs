@@ -285,6 +285,54 @@ const {chromium}=require('playwright-core');
       assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'false');
       assert.equal(await page.evaluate(()=>
         localStorage.getItem('carcaca.mar-de-sangue.v4')),priorPerfSave);
+      // 3.6i: two local reports can be compared without uploading data.
+      const compareOriginalSave=await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4'));
+      const makeFps=(fps,view,count)=>({
+        format:'mar-de-sangue-performance-report',schema:1,
+        capturedAt:'2026-10-17T10:22:00.000Z',
+        startedAt:'2026-10-17T10:20:00.000Z',
+        source:'viagem-concluida',view,metric:'Phaser Game.update delta',
+        seconds:count,retainedWindows:count,rollingLimit:180,truncated:false,
+        summary:{minFps:fps,medianFps:fps,meanFps:fps,
+           worstFrameMs:40,slowFrames:count,updateFrames:fps*count},
+        samples:Array.from({length:count},(_,i)=>({
+           second:i+1,fps,meanMs:16.7,maxMs:40,slowFrames:1,frames:fps
+        }))
+      });
+      const compareFiles=[
+        {name:'calm-sea.json',mimeType:'application/json',
+          buffer:Buffer.from(JSON.stringify(makeFps(59,'compact',30)))},
+        {name:'battle.json',mimeType:'application/json',
+          buffer:Buffer.from(JSON.stringify(makeFps(44,'desktop',12)))}
+      ];
+      await page.locator('#sea-port-fps-compare').setInputFiles(compareFiles);
+      await page.locator('.port-compare').waitFor({timeout:10000});
+      const reportTable=page.getByRole('table',{name:'Comparação entre dois relatórios FPS'});
+      assert.equal(await reportTable.count(),1);
+      assert.equal(await reportTable.getByRole('columnheader').count(),4);
+      assert.equal(await reportTable.getByRole('rowheader').count(),6);
+      assert((await reportTable.innerText()).includes('-15'));
+      assert((await page.locator('.port-compare__warnings').innerText()).includes('diferentes'));
+      const comparisonOverflow=await page.evaluate(()=>({
+        scroll:document.querySelector('#sea-port-ui').scrollWidth,
+        client:document.querySelector('#sea-port-ui').clientWidth
+      }));
+      assert(comparisonOverflow.scroll<=comparisonOverflow.client+2,
+        label+': comparison overflow '+JSON.stringify(comparisonOverflow));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-fps-comparison-3-6i.png'),fullPage:true});
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        compareOriginalSave,'FPS comparison must be read-only');
+      await page.keyboard.press('Escape');
+      await page.locator('.port-hero').waitFor({timeout:10000});
+      await page.locator('#sea-port-fps-compare').setInputFiles([
+        compareFiles[0],
+        {name:'corrupt.json',mimeType:'application/json',buffer:Buffer.from('{invalid')}
+      ]);
+      await page.locator('.port-toast:not([hidden])').waitFor({timeout:10000});
+      assert.equal(await page.locator('.port-compare').count(),0);
+      assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
+        compareOriginalSave,'Invalid FPS files must never touch the save');
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));
       console.log('PASS visual '+label,measure);
       await page.close();
