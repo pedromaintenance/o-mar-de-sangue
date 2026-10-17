@@ -26,7 +26,7 @@
 | **3.6a — PWA Resiliente** | ✅ Integrada; CI verde | Modo offline, atualização voluntária e precache v42 reparado; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) e [documentação](docs/pwa-3-6a.md). Testes físicos no Pages/PWA pendentes |
 | **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
 | **3.6c — Restauração Segura** | ✅ Integrada; CI verde | Importação JSON v4, prévia, dupla confirmação, backup automático e desfazer; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) e [documentação](docs/captain-restore-3-6c.md). Teste físico no Pages pendente |
-| **3.6d — Diálogos Acessíveis** | 🟡 Implementada; CI pendente | Comparação de saves legível por tecnologias assistivas, alerta na confirmação final e cancelamento seguro por ESC/B; [documentação](docs/critical-dialog-accessibility-3-6d.md) |
+| **3.6d — Diálogos Acessíveis** | ✅ Integrada; CI verde | Tabela de saves com semântica acessível, confirmação anunciada e cancelamento seguro por ESC/B; [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) e [documentação](docs/critical-dialog-accessibility-3-6d.md). QA físico pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -164,13 +164,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI smoke/Chromium verdes; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) integrado via squash (`d26718c`). [Especificação e QA](docs/captain-restore-3-6c.md).
 - [ ] Conferir no Pages e PWA instalada importação, cancelamento e desfazer.
 
-**3.6d — Diálogos Acessíveis (implementação na branch):**
+**3.6d — Diálogos Acessíveis (integrada à `main`; CI aprovado em 16/10/2026):**
 
 - [x] Identificar semanticamente a comparação dos saves v4 para leitores de tela, com cabeçalhos e células nomeados.
 - [x] Anunciar a confirmação destrutiva e manter o foco inicial em **CANCELAR**.
 - [x] Explicar no Diário de Bordo os controles de backup e restauração com teclado/controle.
 - [x] Testar ESC e B do Xbox cancelando a restauração sem qualquer gravação; validar layout desktop/Android em Chromium.
-- [ ] Aprovar smoke e testes de navegador, integrar à main e conferir foco/voz em dispositivo físico. [Design e testes](docs/critical-dialog-accessibility-3-6d.md).
+- [x] Smoke e Chromium aprovados (desktop e Android emulado); [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) integrado (`3a8e3a7`). [Design e testes](docs/critical-dialog-accessibility-3-6d.md).
+- [ ] Conferir leitor de tela, teclado e Xbox físicos e a atualização do Pages/PWA.
 
 **Outros trabalhos:** consolidar guia dos controles Xbox/teclado/toque em cada overlay, aprimorar foco sem mouse e desempenho em celulares modestos, testar PWA instalada/reconexão reais.
 
@@ -196,6 +197,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Finalizar e publicar a 3.6d após CI aprovado; no GitHub Pages, conferir comparação acessível de saves, cancelamento via ESC/B e trilha completa exportar→restaurar→desfazer. Em seguida preparar as regras e migração de reputação 3.3b (v4→v5) antes de alterar dados. Saves v4 permanecem intactos. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
+Conferir no GitHub Pages a 3.6d integrada: leitor de tela/teclado, cancelamento por ESC/B, e fluxo exportar→restaurar→desfazer. Próximo desenvolvimento: consolidar o contrato de acessibilidade das demais interfaces e discutir regras/migração de reputação 3.3b (v4→v5), antes de alterar dados. Save v4 mantido. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
