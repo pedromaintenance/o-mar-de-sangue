@@ -89,7 +89,7 @@ const SEA_CONTRACTS = {
     if(!c||c.id!=='smuggle'||c.completed||c.intercepted||s.ended||s.sinking)
       return;
     const delta=Math.max(0,Math.min(Number(dt)||0,.1));
-    if(s.elapsed<17||!s.player||!delta)return;
+    if(s.elapsed<6||!s.player||!delta)return;
     if(!c.inspectorSpawned){
       c.inspectorSpawned=true;
       const inspector=s.spawnEnemy?.('patrulha',330)||
