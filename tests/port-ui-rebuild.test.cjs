@@ -113,6 +113,8 @@ ui.action('sandbox');assert.equal(starts.at(-1)[1].mode,'sandbox');
 scene.page='yard';ui.render();assert(ui.root.innerHTML.includes('buy:canhoes'));
 ui.action('buy:canhoes');assert.equal(p.levels.canhoes,2);
 scene.page='help';ui.render();assert(ui.root.innerHTML.includes('DIÁRIO DE BORDO'));
+assert(ui.root.innerHTML.includes('DIÁRIOS E ENCONTROS'));
+assert(ui.root.innerHTML.includes('Carta: M / View'));
 scene.page='reset';ui.render();assert(ui.root.innerHTML.includes('reset-confirm'));
 assert(ui.root.innerHTML.includes('GUARDAR CÓPIA DO SAVE'));
 const previous=JSON.stringify(p);
