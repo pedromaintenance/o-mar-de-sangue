@@ -314,3 +314,40 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
   .port-pad-hint{order:-1;font-size:10px}
   .port-tabs__hint{font-size:9px}
 }
+
+
+/* 3.6e — leitura ampliada; preserve existing grid, touch targets and skin. */
+.port-ui.port-ui--readable .port-choice__copy strong{font-size:clamp(16px,1.35vw,19px);line-height:1.35;letter-spacing:.035em}
+.port-ui.port-ui--readable .port-choice__copy small{font-size:14px;line-height:1.5}
+.port-ui.port-ui--readable .port-help p,
+.port-ui.port-ui--readable .port-upgrade p{font-size:16px;line-height:1.55}
+.port-ui.port-ui--readable .port-help h2{font-size:20px}
+.port-ui.port-ui--readable .port-upgrade__head span,
+.port-ui.port-ui--readable .port-upgrade__foot>span{font-size:12px;line-height:1.45}
+.port-ui.port-ui--readable .port-upgrade h2{font-size:24px}
+.port-ui.port-ui--readable .port-restore__row{font-size:15px;line-height:1.4}
+.port-ui.port-ui--readable .port-restore__row--head{font-size:12px}
+.port-ui.port-ui--readable .port-restore .port-warning p{font-size:16px;line-height:1.5}
+.port-ui.port-ui--readable .port-restore__notice{font-size:15px!important}
+.port-ui.port-ui--readable .port-statbar span,
+.port-ui.port-ui--readable .port-result-grid span{font-size:12px;line-height:1.35;letter-spacing:.06em;text-align:center}
+.port-ui.port-ui--readable .port-section-label,
+.port-ui.port-ui--readable .port-eyebrow{font-size:13px;letter-spacing:.08em}
+.port-ui.port-ui--readable .port-sound__label,
+.port-ui.port-ui--readable .port-sound__group .port-sound__label,
+.port-ui.port-ui--readable .port-sound button,
+.port-ui.port-ui--readable .port-pad-hint{font-size:12px}
+.port-ui.port-ui--readable .port-sound small,
+.port-ui.port-ui--readable .port-bottom{font-size:12px;line-height:1.5;letter-spacing:.02em}
+.port-ui.port-ui--readable .port-page__header p{font-size:17px;line-height:1.5}
+.port-ui.port-ui--readable .port-text-button{font-size:13px!important}
+.port-ui.port-ui--readable .port-restore__row,
+.port-ui.port-ui--readable .port-choice__copy{min-width:0}
+@media(max-width:410px){
+ .port-ui.port-ui--readable .port-statbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .port-ui.port-ui--readable .port-statbar>div:nth-child(2){border-right:0}
+ .port-ui.port-ui--readable .port-choice{min-height:82px}
+ .port-ui.port-ui--readable .port-restore__row{font-size:13px;gap:4px}
+ .port-ui.port-ui--readable .port-restore__row--head{font-size:11px}
+ .port-ui.port-ui--readable .port-bottom__actions{justify-content:flex-start}
+}
