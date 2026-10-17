@@ -364,6 +364,7 @@ class Game extends Phaser.Scene {
         this.mode = data?.mode || p.mode || 'mission';
         this.stage = data?.stage || p.mission || 1;
         this.wave = 1;
+        this.contractId = data?.contract==='rescue' && this.mode==='sandbox' ? 'rescue' : null;
     }
     create() {
         seaCenterCanvas(this.game);
@@ -432,6 +433,7 @@ class Game extends Phaser.Scene {
         SEA_WEATHER.init(this);
         SEA_ISLANDS.init(this);
         SEA_ATLAS.init(this);
+        SEA_CONTRACTS.init(this,this.contractId);
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         if (!SEA_DESKTOP) this.createTouchControls();
@@ -512,7 +514,8 @@ class Game extends Phaser.Scene {
             window.removeEventListener('blur', this.onLoseFocus);
         });
         const tip = this.add.text(SEA_VIEW.width / 2, 137,
-            (this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
+            (this.contract ? 'CONTRATO · RESGATE DOS AFOGADOS' :
+             this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
                 ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS · M: CARTA · N: SOM · ESC/P: PAUSA'
                 : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nTOQUE NA CARTA PARA ABRIR O ATLAS\nSEGURE O CANHÃO PARA DISPARAR'), {
@@ -1533,7 +1536,15 @@ class Game extends Phaser.Scene {
     progressBattle(dt) {
         if (this.ended) return;
         this.waveClock += dt;
-        if (this.mode === 'sandbox') {
+        if (this.contract) {
+            // One-off contract sortie: regular enemies remain dangerous, but
+            // endless waves must not overtake a two-stop rescue objective.
+            const alive=this.enemies.reduce((n,e)=>n+(!e.dead?1:0),0);
+            if(alive<3&&this.elapsed>this.nextSpawnTime){
+                this.spawnEnemy(this.chooseFoe(),460);
+                this.nextSpawnTime=this.elapsed+7;
+            }
+        } else if (this.mode === 'sandbox') {
             if (this.waveClock > 52) {
                 this.waveClock -= 52; this.wave++; this.currentDifficulty = this.wave;
                 this.shipHP = Math.min(this.maxShipHP, this.shipHP + Math.max(8, this.maxShipHP * .10));
@@ -1569,6 +1580,7 @@ class Game extends Phaser.Scene {
         if ((this.elapsed | 0) % 15 === 0 && this.treasures.length > 120) this.treasures = this.treasures.filter(t => !t.taken);
     }
     objectiveText() {
+        if (this.contract)return SEA_CONTRACTS.status(this);
         if (this.mode === 'sandbox') return `ONDA ${this.wave} · +${Math.max(0, Math.ceil(52 - this.waveClock))}s até reforços`;
         if (this.objective === 'boss') return `ENFRENTAR ${SEA_FOES[this.missionBoss]?.name || 'O CHEFE'} · ${this.bossKills || 0}/1`;
         if (this.objective === 'kill') return `CAÇA À CORTE · ${this.kills}/${this.targetKills} navios`;
@@ -1707,9 +1719,15 @@ class Game extends Phaser.Scene {
         if (this.atlasOpen) SEA_ATLAS.close(this);
         let commission = 0;
         if (won && this.mode === 'mission') commission = Math.round(42 * Math.pow(1.25, Math.min(this.stage, 90)));
+        const contractBounty=won&&this.contract?.completed ? this.contract.bounty : 0;
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
-            collected: SEA_MATH.safe(this.gold + commission), kills: this.kills,
+            collected: SEA_MATH.safe(this.gold + commission + contractBounty), kills: this.kills,
             rammings: this.rammingSinks, islands: this.islandVisits?.size || 0 });
+        if(this.contract){
+            report.contractTitle=SEA_CONTRACTS.offers[this.contract.id].title;
+            report.contractBounty=contractBounty;
+            report.contractCompleted=!!this.contract.completed;
+        }
         // Ir ao porto garante que todos os efeitos e eventos da cena sejam encerrados.
         this.scene.start('SeaPort', { page: 'result', report });
     }
