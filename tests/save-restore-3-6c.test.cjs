@@ -65,4 +65,7 @@ const beforeRollbackFailure=store.get(save);
 assert.throws(()=>t.apply(imported),/QuotaExceededError/);
 assert.equal(store.get(save),beforeRollbackFailure,'Backup failure must abort before save write');
 failKey=null;
+assert(t.lastRollback()?.profile,'An undo snapshot must exist before an explicit wipe');
+t.clearRollback();
+assert.equal(t.lastRollback(),null,'Erase progress must remove the undo snapshot');
 console.log('PASS 3.6c: strict v4 schema, reject corrupted/malicious files, rollback, undo and write failure');
