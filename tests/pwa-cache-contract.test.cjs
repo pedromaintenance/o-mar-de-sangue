@@ -20,5 +20,5 @@ for(const url of assets){
   assert(fs.statSync(local).isFile(),'Precache resource is not a file: '+url);
 }
 assert(!assets.some(x=>x.includes('manifest.json')&&x!=='./manifest.webmanifest'));
-assert(context.cacheName.includes('v42-offline'));
+assert(/^omar-mar-de-sangue-v[0-9]+-/.test(context.cacheName));
 console.log('PASS precache: '+assets.length+' verified local resources, zero missing');
