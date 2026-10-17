@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.6c — Restauração segura do Capitão
 
-**Estado:** implementação e testes submetidos à revisão CI. Sem migração ou alteração do esquema `SeaProfile` v4.
+**Estado:** integrado à `main` em 16/10/2026 via [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39), com smoke e Chromium aprovados. Sem migração ou alteração do esquema `SeaProfile` v4. Testes físicos no Pages/PWA ainda pendentes.
 
 ## Fluxo do jogador
 
@@ -30,7 +30,7 @@ A substituição **não** altera preferências de som, músicas de IndexedDB, PW
 - [x] `tests/port-visual.test.cjs`: importar JSON verdadeiro no Chromium em 1600×900, 1280×720 e Android 390×844; prévia sem escrita; cancelar; JSON inválido; confirmação em duas etapas; verificar progresso restaurado e desfazer; screenshots.
 - [x] Contrato Node existente atualizado para a dependência adicional.
 - [x] GitHub Actions observa o módulo novo e executa teste Node além dos testes de navegador já existentes.
-- [ ] **Aguardar CI verde antes de integrar à main.**
+- [x] CI smoke/Chromium aprovados; squash merge `d26718c`.
 - [ ] Teste no Pages/PWA instalada e arquivo exportado em outro navegador.
 
 ## Próxima melhoria
