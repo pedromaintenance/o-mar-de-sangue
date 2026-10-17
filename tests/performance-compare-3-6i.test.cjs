@@ -21,7 +21,7 @@ const a=tool.parse(JSON.stringify(report()));
 const b=tool.parse(JSON.stringify(report({count:10,fps:45,view:'desktop'})));
 const result=tool.compare(a,b);
 const rows=JSON.parse(JSON.stringify(result.metrics));
-assert.equal(rows.length,6);
+assert.equal(rows.length,7);
 assert.deepEqual(rows[0],{label:'FPS MÉDIO',unit:'fps',a:59,b:45,
  delta:-14,higherBetter:true});
 assert(result.warnings.some(s=>s.includes('diferentes')));
