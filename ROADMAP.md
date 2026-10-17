@@ -262,7 +262,7 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Conferir que totais de quadros e quadros lentos importados correspondem às amostras; manter compatibilidade com FPS v1 anteriores.
 - [x] Atualizar Diário de Bordo, testes Node/Chromium, workflow CI e cache offline PWA v53.
 - [x] `port-smoke` e `port-visual` verdes no PR; [PR #49](https://github.com/pedromaintenance/o-mar-de-sangue/pull/49) integrado via squash (`4b5ca20`).
-- [ ] Confirmar CI pós-merge e publicação no GitHub Pages.
+- [x] CI pós-merge na `main` aprovado ([run 39039034306](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39039034306)); [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) publicado em 17/10/2026 ([run 39039056469](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39039056469)).
 - [ ] Testar comparações com medições reais no mesmo dispositivo; **ainda não há dados justificando redução de partículas**.
 - [Especificação e roteiro de QA](docs/fps-normalization-3-6l1.md).
 
