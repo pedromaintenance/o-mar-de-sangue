@@ -34,8 +34,9 @@ Os relatórios 3.6h/3.6i antes mediam apenas intervalos de atualização. Sem co
 - [x] Testes Node `tests/effect-budget-3-6l.test.cjs`: opt-out, médias, picos, quadros no limite, deep copy, relatório anterior v1, arquivo adulterado e ausência de escrita no save.
 - [x] Assert de integração no `tests/mare-negra-hud-visual.test.cjs`, usando uma expedição Phaser real nos três viewports oficiais; confere contador, texto e JSON exportado.
 - [x] CI `port-smoke` e `port-visual` verdes no PR; merge `d7b554c`.
-- [ ] Confirmar CI na `main` após merge.
-- [ ] Navegação no GitHub Pages, PWA e dispositivo físico real.
+- [x] CI `port-smoke` e `port-visual` na `main` aprovados após merge.
+- [x] Publicação confirmada no [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/), [execução 39037006934](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39037006934).
+- [ ] Navegação, FPS e PWA em dispositivo físico real.
 
 ## Procedimento de medição recomendado
 
