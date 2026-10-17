@@ -21,7 +21,7 @@ A substituição **não** altera preferências de som, músicas de IndexedDB, PW
 - O snapshot pré-restauração é **local**, não substitui a exportação em arquivo, e pode desaparecer se o navegador limpar armazenamento. Apenas **um snapshot** é retido; uma nova restauração o substitui.
 - Rejeitar backups de esquema v5 é intencional; ainda não existe migração oficial da reputação persistente 3.3b.
 - Não há sincronização entre dispositivos nem importação de dados arbitrários. Arquivos antigos incompatíveis devem ser migrados em etapa própria.
-- A gravação local é separada do armazenamento de áudio. A opção de apagar o progresso no menu mantém seu comportamento anterior.
+- A gravação local é separada do armazenamento de áudio. **Apagar tudo** também remove o snapshot de desfazer; se o navegador impedir a remoção, o reset é cancelado para evitar dados ocultos.
 - Na PWA, a nova versão `v43-restore` adiciona `SeaSaveTransfer.js` ao precache, enquanto os demais recursos existentes permanecem disponíveis.
 
 ## QA
