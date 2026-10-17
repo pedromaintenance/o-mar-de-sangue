@@ -19,6 +19,8 @@ on:
       - 'tests/pwa-cache-contract.test.cjs'
       - 'tests/pwa-offline-visual.test.cjs'
       - 'Game.js'
+      - 'SeaPerformance.js'
+      - 'tests/performance-3-6g.test.cjs'
       - 'SeaMenus.js'
       - 'SeaIslands.js'
       - 'SeaEffects.js'
@@ -61,6 +63,8 @@ on:
       - 'tests/pwa-cache-contract.test.cjs'
       - 'tests/pwa-offline-visual.test.cjs'
       - 'Game.js'
+      - 'SeaPerformance.js'
+      - 'tests/performance-3-6g.test.cjs'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
       - 'tests/port-theme-abyss.test.cjs'
@@ -88,6 +92,8 @@ jobs:
           node --check SeaSaveTransfer.js
           node tests/save-restore-3-6c.test.cjs
           node --check Game.js
+          node --check SeaPerformance.js
+          node tests/performance-3-6g.test.cjs
           node --check PwaStatus.js
           node tests/pwa-status-3-6.test.cjs
           node tests/pwa-cache-contract.test.cjs
