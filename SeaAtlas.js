@@ -191,7 +191,7 @@ const SEA_ATLAS = {
             '▣ NEGOCIAÇÃO   ■ ALTAR   ✚ SANTUÁRIO   ○ VISITADA',
             desktop?12:10,'#bfaa8c',{mono:true});
         txt(cx,top+(desktop?622:574),
-            'TOQUE UM MARCO · SETAS + ENTER · DIRECIONAL + A',
+            'TOQUE: MARCAR · SETAS / DIRECIONAL: ESCOLHER · ENTER / A: MARCAR · ESC / B: FECHAR',
             desktop?11:10,'#b4a08a',{mono:true});
         const closeY=top+h-(desktop?30:40),closeW=desktop?300:322,closeH=48;
         add(s.add.rectangle(cx,closeY,closeW,closeH,0x362128,.98)

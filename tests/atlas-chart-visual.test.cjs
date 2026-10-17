@@ -48,6 +48,18 @@ const {chromium}=require('playwright-core');
    assert(opened.consumed&&opened.open);
    assert(opened.text.some(t=>t.includes('CARTA DOS NÁUFRAGOS')));
    assert(opened.text.some(t=>t.includes('CONHECIDAS')));
+   assert(opened.text.some(t=>t.includes('TOQUE: MARCAR')&&
+     t.includes('ESC / B: FECHAR')),label+': missing chart controls guide');
+   const chartGuide=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     const o=s.atlasElements.list.find(v=>v.type==='Text'&&v.text.includes('TOQUE: MARCAR'));
+     const b=o?.getBounds?.(),close=s.atlasCloseHitbox;
+     return {bottom:b?.bottom??0,closeTop:close.y-close.h/2,
+       save:localStorage.getItem('carcaca.mar-de-sangue.v4')};
+   });
+   assert(chartGuide.bottom>0&&chartGuide.bottom<chartGuide.closeTop,
+     label+': Atlas guidance must not cover close button');
+   assert.equal(chartGuide.save,before.profile);
    await page.screenshot({path:path.join('port-artifacts','mare-negra-3-4-'+label+'-atlas.png'),fullPage:true});
    const frozen=await page.evaluate(()=>{
     const s=game.scene.getScene('Game'),p={x:s.player.x,y:s.player.y};

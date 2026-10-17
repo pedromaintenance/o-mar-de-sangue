@@ -33,6 +33,18 @@ const {chromium}=require('playwright-core');
    assert.equal(pause.paused,true);
    assert.equal(pause.options,3);
    assert.equal(pause.focused,0);
+   const pauseGuide=await page.evaluate(()=>{
+     const scene=game.scene.getScene('Game');
+     const guide=scene.pauseElements.list.find(o=>o.type==='Text'&&o.text.includes('↑↓: ESCOLHER'));
+     return {text:guide?.text||'',bounds:guide?.getBounds?.()||null,
+       options:scene.pausePadOptions?.map(o=>({...o.hit}))};
+   });
+   assert(pauseGuide.text.includes('ENTER/A: CONFIRMAR'));
+   assert(pauseGuide.text.includes('ESC/P/B: VOLTAR'));
+   assert.equal(pauseGuide.options.length,3,'Help copy cannot create an action');
+   const lastPause=pauseGuide.options.at(-1);
+   assert(pauseGuide.bounds&&pauseGuide.bounds.y>lastPause.y+lastPause.h/2,
+     label+': pause guidance overlaps final button '+JSON.stringify({guide:pauseGuide.bounds,last:lastPause}));
    await page.screenshot({path:path.join('port-artifacts',
      'mare-negra-3-1-'+label+'-pause.png'),fullPage:true});
    const focus=await page.evaluate(()=>{
@@ -53,6 +65,19 @@ const {chromium}=require('playwright-core');
     return {count:s.islandOptions.length,depth:s.islandOverlay.depth};
    });
    assert.equal(island.count,4);
+   const islandGuide=await page.evaluate(()=>{
+     const scene=game.scene.getScene('Game');
+     const guide=scene.islandOverlay.list.find(o=>o.type==='Text'&&o.text.includes('DIRECIONAL: ESCOLHER'));
+     return {text:guide?.text||'',bounds:guide?.getBounds?.()||null,
+       options:scene.islandOptions?.map(o=>({...o.hit}))};
+   });
+   assert(islandGuide.text.includes('ENTER / A: CONFIRMAR'));
+   assert(islandGuide.text.includes('ESC / B: VOLTAR'));
+   assert.equal(islandGuide.options.length,4);
+   const lastIsland=islandGuide.options.at(-1);
+   assert(islandGuide.bounds&&
+      (islandGuide.bounds.y+islandGuide.bounds.height)<lastIsland.y-lastIsland.h/2,
+     label+': island help overlaps the return hitbox');
    await page.screenshot({path:path.join('port-artifacts',
      'mare-negra-3-1-'+label+'-island.png'),fullPage:true});
    const outcome=await page.evaluate(()=>{

@@ -66,6 +66,8 @@ assert(s.atlasElements);
 assert.equal(s.atlasElements.depth||460,460); // visual depth applied by scene
 assert(elements.some(e=>e.type==='rectangle'&&e.interactive),'must intercept background pointers');
 assert(elements.some(e=>e.type==='text'&&String(e.text).includes('CARTA DOS NÁUFRAGOS')));
+assert(elements.some(e=>e.type==='text'&&String(e.text).includes('TOQUE: MARCAR')&&String(e.text).includes('ESC / B: FECHAR')),
+ 'Atlas must show pointer, keyboard and controller guidance');
 assert(elements.some(e=>e.type==='text'&&String(e.text).includes('CONHECIDAS 2')));
 assert(elements.some(e=>e.type==='text'&&String(e.text).includes('VISITADAS 1')));
 assert(s.atlasCloseHitbox.w>=300);

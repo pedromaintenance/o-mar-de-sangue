@@ -570,6 +570,7 @@ const SEA_PORT_UI = {
       ['NAVEGAÇÃO','W / ↑ acelerar · S / ↓ frear / ré · A/D ou ←/→ virar'],
       ['CANHÕES','Q bombordo · E estibordo · ESPAÇO dispara os dois bordos'],
       ['CONTROLE XBOX','Analógico esquerdo · LT/LB bombordo · RT/RB estibordo · A confirma · B retorna'],
+      ['DIÁRIOS E ENCONTROS','Em pausa, ilhas e Carta: setas / direcional para escolher, Enter / A para confirmar, ESC / B para voltar. Pausa: ESC / P / Menu. Carta: M / View. Atracação: F / A / toque.'],
       ['ABALROAMENTO','Velocidade e ângulo da proa determinam o impacto. Rochas danificam o casco.'],
       ['MISSÕES','Escolta, caçada, sobrevivência e chefes. A campanha avança após vitórias.'],
       ['SANDBOX','Ondas sucessivas, frota hostil crescente e recompensas acumuladas.'],
