@@ -285,7 +285,17 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Validar no controle Xbox e Android físicos, PWA offline e sessões longas.
 - [Especificação, anti-replay e roteiro de QA](docs/contracts-rescue-3-7a.md).
 
-**3.7a.2 — Contrabando (planejado):** transportar carga por rota perigosa, com condições de perda, inspeção e consequências claras; prototipar no mesmo modo de contrato, sem migração de save.
+**3.7a.2 — Pólvora sem Bandeira: Contrabando (implementado, em validação 17/10/2026):**
+- [x] Expandir o quadro **CONTRATOS DA COSTA SUL** para dois contratos independentes, sem alterar a campanha ou o save v4.
+- [x] Carga clandestina embarcada desde o início; ruína real de destino marcada na Carta, sem revelar outras ilhas.
+- [x] Introduzir **patrulha fiscal da Corte** após seis segundos, com suspeita de 0–100% que sobe por proximidade e cai ao fugir/afundar o fiscal; telemetria no objetivo.
+- [x] Confisco aos 100%: retorno ao Porto por apreensão, bônus zero e resultado específico, sem fingir naufrágio.
+- [x] Duas decisões de entrega: clandestina com suspeita <60% (190 ouro, +12 maldição) ou suborno à Corte (115 ouro, sem maldição adicional); validação e proteção contra pagamentos duplicados.
+- [x] Integrar atracação existente, inclusive ruína já visitada, feedback de suspeita, recompensa no settlement normal e PWA offline v55.
+- [x] Adicionar testes Node e Chromium em três viewports ao workflow; preservar o teste de resgate 3.7a.1.
+- [ ] Exigir CI verde, integrar PR, publicar no GitHub Pages e atualizar o status com link real de deploy.
+- [ ] Teste físico Android/Xbox/PWA e balanceamento após relatos de jogabilidade.
+- [Documentação de regras, riscos, QA e limites](docs/contracts-smuggling-3-7a2.md).
 
 **3.7a.3 — Caçada (planejado):** alvo identificável no Atlas após obtenção de pista, critérios de captura/abate e recompensas; não repetir simplesmente a missão atual de fragatas.
 
@@ -347,6 +357,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Priorizar a validação e o lançamento de 3.7a.1 (Resgate dos Afogados), depois contrabando/caçada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Validar e publicar 3.7a.2 (Contrabando) após CI; depois iniciar 3.7a.3 (Caçada). Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
