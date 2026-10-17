@@ -32,7 +32,7 @@
 | **3.6g — Diagnóstico de Desempenho** | ✅ Integrado; CI verde | FPS aproximado, tempo médio/pico, quadros lentos, botão no Porto e F3; [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) e [documentação](docs/performance-diagnostics-3-6g.md). QA físico pendente |
 | **3.6h — Relatório FPS Exportável** | ✅ Integrada; CI verde | Até 180 amostras temporárias e download JSON com resumo; [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) e [especificação](docs/fps-export-report-3-6h.md). Testes físicos pendentes |
 | **3.6i — Comparação FPS Local** | ✅ Integrada; CI verde | Comparação local de dois JSON, seis métricas e avisos de comparabilidade; [PR #45](https://github.com/pedromaintenance/o-mar-de-sangue/pull/45) e [documentação](docs/fps-comparison-3-6i.md). QA físico pendente |
-| **3.6j — Redesenho Eficiente do Clima** | 🟡 Implementada; CI pendente | Caching de elementos gráficos estáticos e invalidação em transições, preservando animações e saves; [documentação](docs/weather-render-cache-3-6j.md) |
+| **3.6j — Redesenho Eficiente do Clima** | ✅ Integrada; CI verde | Elimina redesenhos redundantes do clima sem reduzir efeitos nem alterar o save; [PR #46](https://github.com/pedromaintenance/o-mar-de-sangue/pull/46) e [documentação](docs/weather-render-cache-3-6j.md). QA físico pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -224,13 +224,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI `port-smoke` e `port-visual` verdes; [PR #45](https://github.com/pedromaintenance/o-mar-de-sangue/pull/45) integrado por squash (`76e33ab`). [Design e QA](docs/fps-comparison-3-6i.md).
 - [ ] Verificar comparações no Pages, Android físico e PWA instalada.
 
-**3.6j — Cache de Redesenho do Clima (implementado na branch):**
+**3.6j — Cache de Redesenho do Clima (integrado à `main`; CI aprovado em 17/10/2026):**
 
 - [x] Evitar repetição de `setAlpha`/`setFillStyle` em clima inalterado, preservando os valores originais.
 - [x] Eliminar limpezas redundantes do céu e remoinho quando inativos, sem alterar a animação em tempestade, neblina ou remoinho.
 - [x] Redesenhar o rótulo/barra da maldição somente quando o texto, cor ou largura visível em pixels muda.
 - [x] Adicionar regressões Node e Chromium desktop/Android para chamadas gráficas e transições, sem alterar física, IA ou save.
-- [ ] CI smoke e visual verdes, integração à `main`, Pages e verificação física. [Documentação técnica](docs/weather-render-cache-3-6j.md).
+- [x] CI `port-smoke` e `port-visual` aprovados; [PR #46](https://github.com/pedromaintenance/o-mar-de-sangue/pull/46) integrado via squash (`7b4e8d2`). [Documentação técnica](docs/weather-render-cache-3-6j.md).
+- [ ] Testar no Pages/PWA com dispositivos físicos, medir FPS sem atribuir ganho sem benchmark.
 
 **3.6k — Planejada:** usar relatórios FPS capturados no mesmo dispositivo para avaliar custo de partículas, desenho procedural do mar e orçamentos de efeitos, sem reduzir qualidade ou alterar física/IA automaticamente.
 
@@ -258,6 +259,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar CI e publicar a 3.6j (cache de redesenho climático). Testar no Pages tempestade, neblina, remoinho e maldição; comparar relatórios FPS do mesmo aparelho em viagens similares, sem atribuir ganhos sem medição. A 3.6k de orçamento de efeitos requer esses dados; reputação persistente 3.3b depende de regras e migração v4→v5 aprovadas.
+Testar no Pages a 3.6j: navegar em tempestade, neblina e remoinho, observando o HUD da maldição e eventuais artefatos visuais. Comparar FPS com sessões semelhantes antes/depois quando possível; 3.6k depende de medições reais para ajustar orçamento de efeitos. Reputação 3.3b segue pendente de regras e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
