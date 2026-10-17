@@ -41,6 +41,46 @@ const {chromium}=require('playwright-core');
     };
    });
    assert(before.hud.includes('CASCO')&&before.hud.includes('OURO')&&before.hud.includes('NÓS'));
+   // 3.8a: hold a cannon input in a running Phaser scene, then observe
+   // the charging meter and first volley. No instant-fire on touchstart.
+   const fireStart=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     for(const e of s.enemies)e.dead=true;
+     s.scene.pause();
+     s.cannonPointers.set('qa-port','port');
+     const result={shot:s.lastPortShot,at:s.time.now,
+       ms:SEA_GUNNERY.chargeMs(s.profile.levels.cadencia)};
+     // The CI browser may render 4 FPS in software: a wall-clock sleep
+     // does NOT imply 600ms of Phaser updates. Drive 12 real-sized frames.
+     for(let i=0;i<12;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
+     s.updateHUD();
+     return result;
+   });
+   assert.equal(fireStart.ms,2000,label+': level zero should start at 2 seconds');
+   const half=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     return {charge:s.cannonCharge.port,portShot:s.lastPortShot,
+       otherCharge:s.cannonCharge.starboard};
+   });
+   assert(half.charge>200&&half.charge<1900&&
+     half.portShot===fireStart.shot&&half.otherCharge===0,
+     label+': the first shot needs a held charge '+JSON.stringify(half));
+   await page.screenshot({path:path.join('port-artifacts',
+     'gunnery-3-8a-'+label+'-windup.png'),fullPage:true});
+   const volley=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     for(let i=0;i<32;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
+     const shot=s.lastPortShot;
+     s.cannonPointers.delete('qa-port');s.updateCannonCharge(.01,{});
+     s.scene.resume();
+     return {shot,starboardShot:s.lastStarboardShot,charge:s.cannonCharge.port,
+       v:{x:s.playerVelocity.x,y:s.playerVelocity.y}};
+   });
+   assert(volley.shot>fireStart.shot&&
+     volley.starboardShot===-1000&&volley.charge===0,
+     label+': completed windup must fire one independent broadside '+JSON.stringify(volley));
+   assert(Math.hypot(volley.v.x,volley.v.y)>0,
+     label+': a broadside should transfer momentum to the hull');
    assert(before.quest.length>0&&before.badge.includes('MALDIÇÃO'));
    assert.deepEqual(before.pause,{x:isMobile?412:454,y:78,w:120,h:40});
    assert.equal(before.x,isMobile?338:1154);assert.equal(before.y,239);
