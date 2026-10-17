@@ -193,10 +193,17 @@ const SEA_ISLANDS = {
         if(s.islandOverlay){s.islandOverlay.destroy(true);s.islandOverlay=null;}
         s.islandDocked=false;s.islandSelected=null;s.islandOptions=[];s.islandOutcome='';
         s.touchReset();s.islandCandidate=null;
+        // Return to Port only after the final sanctuary outcome has been read.
+        if(s.contract?.completed&&!s.ended)s.finish(true);
     },
     apply(s,choice) {
         if(!s.islandDocked||s.islandOutcome||!choice||!s.islandSelected)return false;
         if(s.islandVisits.has(s.islandSelected.id))return false;
+        if(choice.contractAction){
+            const result=SEA_CONTRACTS.apply(s,choice);
+            if(result){SEA_AUDIO.play('gold',.55);this.render(s);}
+            return result;
+        }
         if(choice.cost&&s.gold<choice.cost){
             s.islandError='OURO INSUFICIENTE PARA ESTA ESCOLHA';
             this.render(s);
@@ -272,7 +279,7 @@ const SEA_ISLANDS = {
         this.render(s);
         return true;
     },
-    screenButton(s,root,x,y,w,h,name,detail,index,disabled=false) {
+    screenButton(s,root,x,y,w,h,name,detail,index,disabled=false,choice=null) {
         const selected=index>=0?index===s.islandChoiceIndex:
             (s.islandOutcome?s.islandChoiceIndex===0:s.islandChoiceIndex===3);
         const bg=disabled?0x131a1d:selected?0x392025:0x161e21;
@@ -288,7 +295,7 @@ const SEA_ISLANDS = {
         }).setOrigin(.5));
         s.islandOptions.push({hit:{x,y,w,h},onTap:()=>{
             if(index===-1)this.close(s);
-            else this.apply(s,this.choices[s.islandSelected.kind][index]);
+            else this.apply(s,choice||this.choices[s.islandSelected.kind][index]);
         }});
     },
     render(s) {
@@ -342,7 +349,7 @@ const SEA_ISLANDS = {
                 color:'#aec2b1',align:'center',wordWrap:{width:width-45}
             }).setOrigin(.5));
         }else{
-            const actions=this.choices[type];
+            const actions=SEA_CONTRACTS.options(s,island)||this.choices[type];
             root.add(s.add.text(x,top+328,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
                 fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#d68c86':'#aba99d'
             }).setOrigin(.5));
@@ -354,7 +361,7 @@ const SEA_ISLANDS = {
                 this.screenButton(s,root,x,top+385+i*72,width-48,63,
                     choice.name,hint,i,!!(
                         (choice.cost&&s.gold<choice.cost)||
-                        (choice.hp<0&&s.shipHP<=Math.abs(choice.hp))));
+                        (choice.hp<0&&s.shipHP<=Math.abs(choice.hp))),choice);
             }
         }
         // Static legend between decisions and the return control; this
