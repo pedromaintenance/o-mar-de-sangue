@@ -350,7 +350,8 @@ const SEA_ISLANDS = {
                 color:'#aec2b1',align:'center',wordWrap:{width:width-45}
             }).setOrigin(.5));
         }else{
-            const actions=SEA_CONTRACTS.options(s,island)||this.choices[type];
+            const contractActions=typeof SEA_CONTRACTS!=='undefined'?SEA_CONTRACTS.options(s,island):null;
+            const actions=contractActions||this.choices[type];
             root.add(s.add.text(x,top+328,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
                 fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#d68c86':'#aba99d'
             }).setOrigin(.5));
