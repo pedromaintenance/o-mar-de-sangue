@@ -26,6 +26,7 @@
 | **3.6a — PWA Resiliente** | ✅ Integrada; CI verde | Modo offline, atualização voluntária e precache v42 reparado; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) e [documentação](docs/pwa-3-6a.md). Testes físicos no Pages/PWA pendentes |
 | **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
 | **3.6c — Restauração Segura** | ✅ Integrada; CI verde | Importação JSON v4, prévia, dupla confirmação, backup automático e desfazer; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) e [documentação](docs/captain-restore-3-6c.md). Teste físico no Pages pendente |
+| **3.6d — Diálogos Acessíveis** | 🟡 Implementada; CI pendente | Comparação de saves legível por tecnologias assistivas, alerta na confirmação final e cancelamento seguro por ESC/B; [documentação](docs/critical-dialog-accessibility-3-6d.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -163,7 +164,15 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI smoke/Chromium verdes; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) integrado via squash (`d26718c`). [Especificação e QA](docs/captain-restore-3-6c.md).
 - [ ] Conferir no Pages e PWA instalada importação, cancelamento e desfazer.
 
-**Outros trabalhos:** consolidar guia de controles Xbox/teclado/toque, revisar navegação sem mouse e desempenho em celulares modestos, testar PWA instalada e reconexão reais.
+**3.6d — Diálogos Acessíveis (implementação na branch):**
+
+- [x] Identificar semanticamente a comparação dos saves v4 para leitores de tela, com cabeçalhos e células nomeados.
+- [x] Anunciar a confirmação destrutiva e manter o foco inicial em **CANCELAR**.
+- [x] Explicar no Diário de Bordo os controles de backup e restauração com teclado/controle.
+- [x] Testar ESC e B do Xbox cancelando a restauração sem qualquer gravação; validar layout desktop/Android em Chromium.
+- [ ] Aprovar smoke e testes de navegador, integrar à main e conferir foco/voz em dispositivo físico. [Design e testes](docs/critical-dialog-accessibility-3-6d.md).
+
+**Outros trabalhos:** consolidar guia dos controles Xbox/teclado/toque em cada overlay, aprimorar foco sem mouse e desempenho em celulares modestos, testar PWA instalada/reconexão reais.
 
 ## Regras técnicas que protegem as funcionalidades
 
@@ -187,6 +196,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Testar no GitHub Pages exportação 3.6b, restauração e desfazer 3.6c e navegação PWA 3.6a offline. A seguir, fortalecer a acessibilidade do porto e orientar a migração de reputação 3.3b (v4→v5) antes de alterar dados. Versão v4 permanece intacta. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
+Finalizar e publicar a 3.6d após CI aprovado; no GitHub Pages, conferir comparação acessível de saves, cancelamento via ESC/B e trilha completa exportar→restaurar→desfazer. Em seguida preparar as regras e migração de reputação 3.3b (v4→v5) antes de alterar dados. Saves v4 permanecem intactos. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
