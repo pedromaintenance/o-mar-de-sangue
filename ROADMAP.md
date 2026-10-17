@@ -281,7 +281,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Incluir documentação, teste Node e percurso funcional automatizado em Chromium desktop/Android; PWA offline v54.
 - [x] PR [#50](https://github.com/pedromaintenance/o-mar-de-sangue/pull/50) aprovado (Node e Chromium desktop/Android), squash merge `412856c`.
 - [x] Publicação concluída no [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39067335133](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39067335133)).
-- [ ] Validar no controle Xbox e Android físicos, PWA offline e sessões longas; confirmar CI pós-merge.
+- [x] CI pós-merge `port-smoke` / `port-visual` aprovado na `main` ([run 39067335575](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39067335575)).
+- [ ] Validar no controle Xbox e Android físicos, PWA offline e sessões longas.
 - [Especificação, anti-replay e roteiro de QA](docs/contracts-rescue-3-7a.md).
 
 **3.7a.2 — Contrabando (planejado):** transportar carga por rota perigosa, com condições de perda, inspeção e consequências claras; prototipar no mesmo modo de contrato, sem migração de save.
