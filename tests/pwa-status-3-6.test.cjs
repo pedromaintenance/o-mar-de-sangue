@@ -57,7 +57,7 @@ async function scenario(initialController){
  for(const needle of ['id="pwa-status"','id="pwa-update"','id="pwa-offline"',
    'src="PwaStatus.js"'])assert(html.includes(needle),'Shell missing '+needle);
  assert(worker.includes('"./PwaStatus.js"'),'Offline cache must contain status module');
- assert(worker.includes('omar-mar-de-sangue-v42-offline-20261016'));
+ assert(/const CACHE_NAME='omar-mar-de-sangue-v[0-9]+-[^']+';/.test(worker));
  assert(!['SeaProfile.load(', 'SeaProfile.store(', 'SeaProfile.reset(', 'SeaProfile.settle(', 'localStorage.', 'localStorage[', 'sessionStorage.', 'sessionStorage['].some(term=>src.includes(term)),
      'PWA status must not read or change game/profile data');
  console.log('PASS 3.6a: offline label, non-forced update, first install, PWA registration and save isolation');
