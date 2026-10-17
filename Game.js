@@ -67,11 +67,11 @@ const SEA_UPGRADES = [
     { id: 'velas', icon: '▲', name: 'Velas Escarlates', desc: '+20 velocidade e aceleração', base: 30, factor: 1.46, group: 'motor' },
     { id: 'leme', icon: '⌁', name: 'Leme Ancestral', desc: 'Curvas mais rápidas', base: 25, factor: 1.44, group: 'motor' },
     { id: 'canhoes', icon: '✹', name: 'Canhões Rúnicos', desc: '+7 dano por bola de canhão', base: 40, factor: 1.49, group: 'armas' },
-    { id: 'cadencia', icon: '❖', name: 'Serventes Treinados', desc: 'Diminui tempo de recarga lateral', base: 65, factor: 1.54, group: 'armas' },
+    { id: 'cadencia', icon: '❖', name: 'Serventes Treinados', desc: 'Reduz exponencialmente a preparação do tiro (2s inicialmente)', base: 65, factor: 1.54, group: 'armas' },
     { id: 'bateria', icon: '☷', name: 'Baterias Geminadas', desc: 'Mais projéteis por bordo a cada 3 níveis', base: 120, factor: 1.58, group: 'armas' },
     { id: 'alcance', icon: '➤', name: 'Pólvora Alquímica', desc: 'Projéteis mais rápidos e mais alcance', base: 52, factor: 1.48, group: 'armas' },
     { id: 'esporao', icon: '⚔', name: 'Esporão de Golzdov', desc: 'Amplifica dano de abalroamento', base: 45, factor: 1.52, group: 'casco' },
-    { id: 'reforco', icon: '⬡', name: 'Escoras do Abismo', desc: 'Menos dano e recuo por choque', base: 70, factor: 1.51, group: 'casco' },
+    { id: 'reforco', icon: '⬡', name: 'Escoras do Abismo', desc: 'Menos dano de choque e recuo dos canhões', base: 70, factor: 1.51, group: 'casco' },
     { id: 'oficina', icon: '✚', name: 'Carpinteiros de Bordo', desc: 'Reparo lento fora de combate', base: 110, factor: 1.57, group: 'apoio' },
     { id: 'ima', icon: '◉', name: 'Rede dos Catadores', desc: 'Captura ouro a uma distância maior', base: 44, factor: 1.48, group: 'apoio' },
     { id: 'cofre', icon: '◇', name: 'Cofre do Capitão', desc: 'Mais ouro resgatado por viagem', base: 65, factor: 1.59, group: 'apoio' },
@@ -383,6 +383,7 @@ class Game extends Phaser.Scene {
         // Controle independente por dedo: a mão do leme não impede a dos canhões.
         this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 62, deadzone: .12 };
         this.cannonPointers = new Map();
+        this.cannonCharge = {port:0,starboard:0};
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
@@ -448,9 +449,8 @@ class Game extends Phaser.Scene {
         this.onDock = e => { if (!e?.repeat && !this.atlasOpen) SEA_ISLANDS.tryDock(this); };
         this.onAtlas = e => { if(!e?.repeat) SEA_ATLAS.toggle(this); };
         this.onPerformance = e => {if(!e?.repeat) SEA_PERFORMANCE.toggle();};
-        this.input.keyboard.on('keydown-SPACE', this.onBoth);
-        this.input.keyboard.on('keydown-Q', this.onPort);
-        this.input.keyboard.on('keydown-E', this.onStarboard);
+        // Q/E/ESPAÇO agora são lidos enquanto estão pressionados por quadro.
+        // Não disparar instantaneamente no keydown.
         this.input.keyboard.on('keydown-ESC', this.onPause);
         this.input.keyboard.on('keydown-P', this.onPause);
         this.input.keyboard.on('keydown-F', this.onDock);
@@ -699,6 +699,7 @@ class Game extends Phaser.Scene {
         enemy.spriteScale = ship.scaleX;
         enemy.visualPhase = id * 1.39;
         enemy.isMonster = supernatural;
+        enemy.chargeMs=0;enemy.chargeStage=0;
         enemy.wake = this.add.image(pos.x,pos.y,supernatural ? 'fx-violet-0' : 'fx-foam-0')
             .setDepth(13).setAlpha(0).setScale(supernatural ? 2.2 : 1.35);
         enemy.flashUntil = 0;
@@ -840,7 +841,6 @@ class Game extends Phaser.Scene {
         if (near(port) || near(starboard)) {
             const side = near(port) ? 'port' : 'starboard';
             this.cannonPointers.set(pointer.id, side);
-            this.fire(side);
             this.updateCannonHighlights();
         }
     }
@@ -882,9 +882,33 @@ class Game extends Phaser.Scene {
         }
     }
     touchReset() {
+        this.resetCannonCharge();
         this.releaseJoystick();
         this.cannonPointers?.clear();
         this.updateCannonHighlights();
+    }
+    resetCannonCharge() {
+        if(!this.cannonCharge)return;
+        this.cannonCharge.port=0;this.cannonCharge.starboard=0;
+    }
+    updateCannonCharge(dt,pad) {
+        if(!this.cannonCharge||!this.keys||!this.shipStats)return;
+        const pressed={
+            port:!!(this.keys.Q.isDown||this.keys.SPACE.isDown||pad?.port||
+                [...(this.cannonPointers?.values()||[])].includes('port')),
+            starboard:!!(this.keys.E.isDown||this.keys.SPACE.isDown||pad?.starboard||
+                [...(this.cannonPointers?.values()||[])].includes('starboard'))
+        };
+        const required=SEA_GUNNERY.chargeMs(this.profile?.levels?.cadencia||0);
+        for(const side of ['port','starboard']){
+            if(!pressed[side]){this.cannonCharge[side]=0;continue;}
+            this.cannonCharge[side]=Math.min(required,this.cannonCharge[side]+
+                Math.max(0,Math.min(dt,.05))*1000);
+            const last=this[side==='port'?'lastPortShot':'lastStarboardShot'];
+            if(SEA_GUNNERY.ready(this.cannonCharge[side],required,this.time.now,
+                    last,this.shipStats.reload)&&this.fire(side))
+                this.cannonCharge[side]=0;
+        }
     }
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
@@ -913,9 +937,12 @@ class Game extends Phaser.Scene {
                 this.splash(x, y, 0xffdfab, 5);
                 this.v15Burst(x,y,0,.27); this.v15Burst(x,y,4,.19);
             }
-            // Recuo lateral dos canhões: pequeno, mas perceptível em navios leves.
-            this.playerVelocity.x -= sign * rightX * 2.5;
-            this.playerVelocity.y -= sign * rightY * 2.5;
+            // Conservação de impulso: baterias mais fortes deslocam mais;
+            // as Escoras do Abismo amortecem sem anular instantaneamente o empuxo.
+            const recoil=SEA_GUNNERY.recoil(this.shipStats.cannonDamage,count,
+                this.profile?.levels?.reforco||0,1.5);
+            this.playerVelocity.x -= sign * rightX * recoil;
+            this.playerVelocity.y -= sign * rightY * recoil;
             this.triggerCannonUiFx(sign < 0 ? 'port' : 'starboard');
         }
         if (fired) SEA_AUDIO.play('cannon', .85 + Math.min(.45, this.shipStats.balls * .11));
@@ -1239,6 +1266,8 @@ class Game extends Phaser.Scene {
         SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05),
             SEA_MUSIC.resolveMood(this));
         if (this.ended || this.sinking) return;
+        if(this.atlasOpen||this.islandDocked||this.pausedByCaptain)
+            this.resetCannonCharge();
         // Xbox View (button 8) opens/returns the voyage atlas. Pause and
         // island dialogs take precedence; no fire or ship physics under it.
         if (this.atlasOpen) {
@@ -1301,11 +1330,8 @@ class Game extends Phaser.Scene {
         const up = throttle > 0.01, down = throttle < -0.01;
         if (up) { this.playerVelocity.x += faceX * this.shipStats.accel * throttle * dt; this.playerVelocity.y += faceY * this.shipStats.accel * throttle * dt; }
         if (down) { this.playerVelocity.x += faceX * 210 * throttle * dt; this.playerVelocity.y += faceY * 210 * throttle * dt; }
-        // Manter canhões pressionados dispara automaticamente quando recarregados.
-        for (const side of new Set(this.cannonPointers.values())) this.fire(side);
-        if (pad.port && pad.starboard) this.fire('both');
-        else if (pad.port) this.fire('port');
-        else if (pad.starboard) this.fire('starboard');
+        // Uma salva só sai quando o respectivo bordo completa a preparação.
+        this.updateCannonCharge(dt,pad);
         const vx = this.playerVelocity.x, vy = this.playerVelocity.y;
         const forward = vx * faceX + vy * faceY;
         const sideX = vx - forward * faceX, sideY = vy - forward * faceY;
@@ -1350,8 +1376,8 @@ class Game extends Phaser.Scene {
             const distance = Math.max(.01, Phaser.Math.Distance.Between(e.x, e.y, this.player.x, this.player.y));
             const aim = Math.atan2(this.player.x - e.x, -(this.player.y - e.y));
             const sideAngle = Phaser.Math.Angle.Wrap(aim - e.heading);
-            const aggressive = ['ram','chase','tentacle'].includes(e.pattern);
-            const kiting = e.pattern === 'sniper' && distance < e.maxRange * .52;
+            const aggressive = e.isMonster || ['ram','chase','tentacle'].includes(e.pattern);
+            const kiting = !e.isMonster && e.pattern === 'sniper' && distance < e.maxRange * .52;
             let desired;
             if (aggressive) desired = aim;
             else {
@@ -1361,18 +1387,47 @@ class Game extends Phaser.Scene {
                 if (e.pattern === 'boss' || e.pattern === 'abyss') desired += .14;
             }
             if (kiting) desired = aim + Math.PI;
-            if (distance < 850) {
+            if (distance < (e.isMonster?1400:850)) {
                 const diff = Phaser.Math.Angle.Wrap(desired - e.heading);
                 e.heading += SEA_MATH.clamp(diff, -1.75 * dt, 1.75 * dt);
                 const throttle = aggressive ? 1 : distance > e.maxRange * .75 ? .8 : distance < 135 ? .38 : .57;
-                e.vx += Math.sin(e.heading) * 180 * throttle * dt;
-                e.vy -= Math.cos(e.heading) * 180 * throttle * dt;
+                const thrust=e.isMonster?260:180;
+                e.vx += Math.sin(e.heading) * thrust * throttle * dt;
+                e.vy -= Math.cos(e.heading) * thrust * throttle * dt;
                 e.cooldown -= dt * 1000;
-                if (e.pattern !== 'ram' && distance < e.maxRange && e.cooldown <= 0) {
-                    this.enemyFire(e, distance);
-                    e.cooldown = e.cooldownBase * (1 - Math.min(.44, .016 * this.currentDifficulty)) * (.85 + Math.random() * .35);
+                if(e.isMonster){
+                    // Criaturas investem e chocam-se contra o casco; nenhuma
+                    // arma de projéteis pode ser emitida por este ramo.
+                    e.chargeMs=0;
+                    if(distance<e.radius+this.hullRadius+105&&e.cooldown<=0){
+                        if(e.type==='kraken')this.tentacleAttack(e);
+                        else this.monsterLunge(e,distance);
+                        e.cooldown=e.cooldownBase*(.85+Math.random()*.35);
+                    }
+                }else if(e.pattern!=='ram'&&distance<e.maxRange){
+                    const duration=SEA_GUNNERY.chargeMs(Math.max(0,
+                        (this.currentDifficulty-1)*.5));
+                    e.chargeMs=Math.min(duration,(e.chargeMs||0)+dt*1000);
+                    const stage=Math.floor(e.chargeMs/duration*4);
+                    if(stage!==e.chargeStage){
+                        e.chargeStage=stage;
+                        e.label?.setText(SEA_FOES[e.type].name+
+                            (stage>0?' · '+Math.min(100,stage*25)+'%':''));
+                    }
+                    if(SEA_GUNNERY.ready(e.chargeMs,duration,0,-Math.max(0,e.cooldown),0)
+                        &&e.cooldown<=0){
+                        this.enemyFire(e,distance);
+                        e.chargeMs=0;e.chargeStage=0;
+                        e.label?.setText(SEA_FOES[e.type].name);
+                        e.cooldown=e.cooldownBase*(1-Math.min(.44,.016*this.currentDifficulty))*
+                            (.85+Math.random()*.35);
+                    }
+                }else{
+                    e.chargeMs=0;e.chargeStage=0;
+                    e.label?.setText(SEA_FOES[e.type].name);
                 }
             } else {
+                e.chargeMs=0;e.chargeStage=0;
                 e.heading += Math.sin(this.elapsed + e.id) * dt * .2;
                 e.vx += Math.sin(e.heading) * 95 * dt;
                 e.vy -= Math.cos(e.heading) * 95 * dt;
@@ -1381,7 +1436,8 @@ class Game extends Phaser.Scene {
             const drag = Math.exp(-1.25 * dt);
             e.vx *= drag; e.vy *= drag;
             const speed = Math.hypot(e.vx, e.vy);
-            if (speed > e.speed) { e.vx *= e.speed / speed; e.vy *= e.speed / speed; }
+            const cap=e.isMonster?e.speed*1.35:e.speed;
+            if (speed > cap) { e.vx *= cap / speed; e.vy *= cap / speed; }
             e.x += e.vx * dt; e.y += e.vy * dt;
             this.collideWorldBounds(e);
             for (const island of this.islands) {
@@ -1391,19 +1447,8 @@ class Game extends Phaser.Scene {
         }
     }
     enemyFire(e, distance) {
-        // Um monstro não deve parecer que está disparando canhões de dentro do corpo.
-        if (e.pattern === 'tentacle') { this.tentacleAttack(e); return; }
-        if (e.pattern === 'abyss') { this.dagonAttack(e, distance); return; }
-        if (e.type === 'enguia' || e.type === 'afogados' || e.type === 'coral') {
-            const dx = (this.player.x-e.x)/distance, dy=(this.player.y-e.y)/distance;
-            const count = e.type === 'afogados' ? 2 : 1;
-            for (let j=0;j<count;j++) {
-                let x=e.x+dx*e.radius,y=e.y+dy*e.radius;
-                this.makeShot(x,y,(dx+(j?-.09:0))*280,(dy+(j?.09:0))*280,false,e.atk,1.75);
-            }
-            this.splash(e.x,e.y,0x79d2ca,12);
-            return;
-        }
+        // Monstros nunca passam pelo emissor de projéteis.
+        if(e.isMonster)return;
         const dx = (this.player.x - e.x) / distance, dy = (this.player.y - e.y) / distance;
         const rx = Math.cos(e.heading), ry = Math.sin(e.heading);
         const sign = dx * rx + dy * ry > 0 ? 1 : -1;
@@ -1418,6 +1463,8 @@ class Game extends Phaser.Scene {
                 fireDX * (e.pattern === 'sniper' ? 370 : 265), fireDY * (e.pattern === 'sniper' ? 370 : 265),
                 false, e.atk, e.pattern === 'sniper' ? 2.2 : 1.85);
         }
+        const impulse=SEA_GUNNERY.recoil(e.atk,bullets,0,e.mass);
+        e.vx-=fireDX*impulse;e.vy-=fireDY*impulse;
         this.splash(e.x + fireDX * 29, e.y + fireDY * 29, e.boss ? 0xffac83 : 0xc8a8bd, 7);
         if (distance < 840) SEA_AUDIO.play('enemy', e.boss ? .8 : .46, distance);
     }
@@ -1445,25 +1492,23 @@ class Game extends Phaser.Scene {
             e.cooldownBase*=.76;
         }
     }
-    dagonAttack(e,distance) {
-        if (e.dead || this.ended) return;
-        const px=this.player.x,py=this.player.y;
-        const dx=(px-e.x)/Math.max(1,distance),dy=(py-e.y)/Math.max(1,distance);
-        const eye=this.add.image(e.x+dx*50,e.y+dy*50,'fx-dagon-eye').setDepth(35).setScale(.38).setAlpha(.9);
-        this.tweens.add({targets:eye,x:px,y:py,alpha:0,scale:.65,duration:720,onComplete:()=>eye.destroy()});
-        this.announce('DAGON · MARÉ DA COROA!'); this.burst(e.x,e.y,'violet',2.1);
-        this.time.delayedCall(780,()=>{
-            if (this.ended || e.dead || !e.ship.active) return;
-            this.splash(px,py,0x79d6c4,23);
-            if (Math.hypot(this.player.x-px,this.player.y-py)<100+this.hullRadius)
-                this.damageShip(e.atk,px,py,'cannon');
-        });
-        if(e.hp/e.maxhp<.66&&e.specialPhase===0) {
-            e.specialPhase=1;
-            this.spawnEnemy('afogados',380);this.spawnEnemy('afogados',450);
-        } else if(e.hp/e.maxhp<.34&&e.specialPhase===1){
-            e.specialPhase=2;
-            this.spawnEnemy('coral',390);this.spawnEnemy('caranguejo',470);
+    monsterLunge(e,distance) {
+        if(e.dead||this.ended)return;
+        const dx=(this.player.x-e.x)/Math.max(1,distance);
+        const dy=(this.player.y-e.y)/Math.max(1,distance);
+        const impulse=e.speed*(e.type==='dagon'?2.1:1.35);
+        e.vx+=dx*impulse;e.vy+=dy*impulse;
+        this.splash(e.x,e.y,0x79d2ca,9);
+        if(e.type==='dagon'){
+            this.announce('DAGON · INVESTIDA DO ABISMO!');
+            // As duas fases de reforcos do chefe continuam existindo.
+            if(e.hp/e.maxhp<.66&&e.specialPhase===0){
+                e.specialPhase=1;
+                this.spawnEnemy('afogados',380);this.spawnEnemy('afogados',450);
+            }else if(e.hp/e.maxhp<.34&&e.specialPhase===1){
+                e.specialPhase=2;
+                this.spawnEnemy('coral',390);this.spawnEnemy('caranguejo',470);
+            }
         }
     }
     paintEnemies() {
@@ -1604,8 +1649,9 @@ class Game extends Phaser.Scene {
             const g=this.statusBars;g.clear();
             const hp=SEA_MATH.clamp(this.shipHP/this.maxShipHP,0,1);
             this.hud.setColor(hp<.28?'#f2a5a0':'#e8d9c4');
-            const p=SEA_MATH.clamp((this.time.now-this.lastPortShot)/this.shipStats.reload,0,1);
-            const st=SEA_MATH.clamp((this.time.now-this.lastStarboardShot)/this.shipStats.reload,0,1);
+            const required=SEA_GUNNERY.chargeMs(this.profile?.levels?.cadencia||0);
+            const p=SEA_MATH.clamp((this.cannonCharge?.port||0)/required,0,1);
+            const st=SEA_MATH.clamp((this.cannonCharge?.starboard||0)/required,0,1);
             const parts=[[16,151,hp,hp<.28?0xc14c55:hp<.55?0xc4a26c:0x91b3a4],[175,63,p,0xc3a273],[249,63,st,0xc3a273]];
             for(const [x,w,value,color] of parts){
                 // Original x and width preserved; thicker contrast at y=92.
