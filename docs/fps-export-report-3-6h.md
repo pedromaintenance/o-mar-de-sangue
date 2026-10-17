@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6h: Relatório Exportável de FPS
 
-**Estado:** implementação na branch, aguardando CI `port-smoke` e `port-visual`. Ainda não publicada.
+**Estado:** integrada à `main` em 17/10/2026 pelo [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) (squash `fa2ccf6`), com CI smoke/Chromium aprovados. Testes físicos no Pages/PWA ainda pendentes.
 
 ## Para que serve
 
@@ -35,7 +35,7 @@ A interface atualizada passa pelo cache PWA **v48**.
 - [x] `tests/performance-report-3-6h.test.cjs`: janela limitada, resumo, relatório imutável, isolamento de armazenamento, substituição ao iniciar outra viagem e captura após saída.
 - [x] `tests/port-ui-rebuild.test.cjs`: botão inicialmente desabilitado, download JSON, nome de arquivo e independência do save.
 - [x] `tests/mare-negra-hud-visual.test.cjs`: viagem real no Chrome 1600×900, 1280×720 e Android emulado 390×844; retornar ao Porto, baixar arquivo, analisar conteúdo e conferir save intacto.
-- [ ] CI `port-smoke` e `port-visual` verdes, squash merge e publicação no Pages.
+- [x] CI `port-smoke` e `port-visual` aprovados; squash merge `fa2ccf6`.
 - [ ] Teste físico: coletar amostras em celular modesto em navegação calma, tempestade e batalha intensa, em sessões comparáveis. Anotar percepção de travamentos.
 
 ## Próximo passo
