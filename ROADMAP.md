@@ -243,7 +243,17 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI `port-smoke` e `port-visual` aprovados; [PR #47](https://github.com/pedromaintenance/o-mar-de-sangue/pull/47) integrado via squash (`c2634cc`). [Documentação e QA](docs/procedural-sea-cache-3-6k.md).
 - [ ] Verificar a água no Pages, Android/PWA e colher relatórios FPS em aparelhos reais.
 
-**3.6l — Planejada:** avaliar custo de partículas e orçamento de efeitos com relatórios de FPS comparáveis no mesmo aparelho; não reduzir fidelidade visual, nem alterar IA ou física sem dados reais.
+**3.6l — Telemetria de Orçamento dos Efeitos (em validação, 17/10/2026):**
+
+- [x] Instrumentar passivamente o orçamento **já existente** (48 efeitos `burst` / `v15Burst`) quando o diagnóstico FPS estiver ligado, sem criar ou eliminar partículas.
+- [x] Acrescentar à janela de FPS e ao JSON v1 campos opcionais de média, pico e quadros no limite; preservar compatibilidade com relatórios antigos.
+- [x] Adicionar comparação opcional de carga FX entre dois relatórios e alertas de incerteza; validar valores importados.
+- [x] Incluir testes Node, verificações em Chromium e cache PWA v52 sem mudar `Game.js`, save, controles, física, IA ou o orçamento visual.
+- [ ] Exigir CI verde antes de integrar à `main` e publicar no Pages; depois testar em aparelho real.
+- [ ] Coletar relatórios comparáveis de mar calmo vs. eventos/combate. **Ainda não há benchmark real justificando redução de partículas.**
+- [Especificação, limitações e roteiro de QA](docs/effect-budget-3-6l.md).
+
+**3.6m — Condicionada a evidências:** avaliar otimizações conservadoras de efeitos apenas com medições repetidas e referência de equivalência visual.
 
 **Outros trabalhos:** foco sem mouse, testes Xbox físico, leitor de tela e PWA instalada/reconexão reais.
 
@@ -269,6 +279,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Testar no Pages a 3.6k: navegar em clima calmo, tempestade, névoa e maldição, conferindo cintilação e detalhes do mar no PC e celular. Coletar dois relatórios FPS comparáveis no mesmo aparelho para orientar a 3.6l (partículas e efeitos) sem mexer na IA/física antes de dados. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Testar 3.6k/3.6l no Pages e PWA física. Coletar, no mesmo aparelho, relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
