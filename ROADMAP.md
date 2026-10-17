@@ -27,7 +27,7 @@
 | **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
 | **3.6c — Restauração Segura** | ✅ Integrada; CI verde | Importação JSON v4, prévia, dupla confirmação, backup automático e desfazer; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) e [documentação](docs/captain-restore-3-6c.md). Teste físico no Pages pendente |
 | **3.6d — Diálogos Acessíveis** | ✅ Integrada; CI verde | Tabela de saves com semântica acessível, confirmação anunciada e cancelamento seguro por ESC/B; [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) e [documentação](docs/critical-dialog-accessibility-3-6d.md). QA físico pendente |
-| **3.6e — Leitura Ampliada** | 🟡 Implementada; CI pendente | Opção de texto maior no Porto, persistência separada do save e regressões Android/desktop; [documentação](docs/port-readability-3-6e.md) |
+| **3.6e — Leitura Ampliada** | ✅ Integrada; CI verde | Texto ampliado no Porto, preferência isolada, QA Node/Chromium desktop e Android; [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) e [documentação](docs/port-readability-3-6e.md). Teste físico pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -174,13 +174,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Smoke e Chromium aprovados (desktop e Android emulado); [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) integrado (`3a8e3a7`). [Design e testes](docs/critical-dialog-accessibility-3-6d.md).
 - [ ] Conferir leitor de tela, teclado e Xbox físicos e a atualização do Pages/PWA.
 
-**3.6e — Leitura Ampliada (implementação na branch; CI pendente):**
+**3.6e — Leitura Ampliada (integrada à `main`; CI aprovado em 16/10/2026):**
 
 - [x] Incluir botão reversível **AMPLIAR TEXTO / TEXTO PADRÃO** no rodapé do Porto.
 - [x] Ampliar textos de menu, Diário, estaleiro e comparação de saves preservando responsividade (Android em duas colunas na barra de status).
 - [x] Salvar a preferência em chave isolada de `localStorage`, sem mudar `SeaProfile` v4, áudio ou PWA.
 - [x] Cobrir alternância por botão, `aria-pressed`, tamanho computado e ausência de overflow no Chromium em 1600×900, 1280×720 e Android 390×844.
-- [ ] Concluir smoke/visual verdes, integrar e testar em Pages/PWA, leitor de tela e Xbox físico. [Escopo e QA](docs/port-readability-3-6e.md).
+- [x] CI smoke e Chromium (1600×900, 1280×720, Android 390×844) aprovados; [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) integrado (`11f8ceb`). [Escopo e QA](docs/port-readability-3-6e.md).
+- [ ] Conferir no Pages/PWA, leitor de tela e Xbox físico.
 
 **Outros trabalhos:** consolidar controles nos overlays, aprimorar foco sem mouse e desempenho em celulares modestos, testar PWA instalada/reconexão reais.
 
@@ -206,6 +207,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e publicar 3.6e — Leitura Ampliada, depois conferir no Pages a alternância em Android, persistência após reload e telas de estaleiro e save. Seguir com acessibilidade da navegação 3.6f e preparar regras/migração v4→v5 de reputação 3.3b somente após aprovação, sem quebrar saves existentes.
+Testar no Pages a 3.6e Leitura Ampliada no celular e desktop (alternância, persistência, Diário, estaleiro e restauração). Continuar 3.6f com acessibilidade das sobreposições de navegação e medições de desempenho, mantendo 3.3b reputação persistente pendente de aprovação de regras e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
