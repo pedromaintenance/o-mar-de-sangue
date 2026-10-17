@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6g: Diagnóstico Optativo de Desempenho
 
-**Estado:** implementado na branch; publicação depende de smoke e Chromium verdes.
+**Estado:** integrado à `main` em 17/10/2026 pelo [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) (squash `ee2396e`), com smoke e Chromium aprovados. Verificação física no Pages/PWA pendente.
 
 ## Como usar
 
@@ -30,7 +30,7 @@ O indicador mostra, aproximadamente uma vez por segundo:
 - [x] Contrato do Porto `tests/port-ui-rebuild.test.cjs`: botão e `aria-pressed`, save imutável.
 - [x] Chromium `tests/port-visual.test.cjs`: botão, reload/persistência e save preservado em 1600×900, 1280×720 e Android emulado 390×844.
 - [x] Chromium `tests/mare-negra-hud-visual.test.cjs`: F3 durante a viagem, métricas na tela, posicionamento seguro perto dos controles e hitboxes originais intactos.
-- [ ] Aprovar CI `port-smoke` e `port-visual` antes de integrar.
+- [x] CI `port-smoke` e `port-visual` aprovados; PR #43 integrado.
 - [ ] Teste em celular real: FPS em navegação calma, ilha, combate pesado e retorno ao Porto. Testar também com modo desligado para comparar consumo/fluidez.
 
 ## Próximo passo — 3.6h
