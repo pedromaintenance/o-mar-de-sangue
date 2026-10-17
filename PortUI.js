@@ -231,7 +231,11 @@ const SEA_PORT_UI = {
       }
       return;
     }
-    if(name==='reset-confirm'){SeaProfile.reset();this.goto('menu');return;}
+    if(name==='reset-confirm'){
+      try{SEA_SAVE_TRANSFER.clearRollback();}
+      catch(_){this.notify('Não foi possível apagar a cópia anterior. Reset cancelado.');return;}
+      SeaProfile.reset();this.goto('menu');return;
+    }
     if(name==='next'){
       const report=scene.report;
       const mode=report?.mode==='sandbox'?'sandbox':'mission';this.start(mode);
