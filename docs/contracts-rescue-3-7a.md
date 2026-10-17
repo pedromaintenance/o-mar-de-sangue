@@ -46,7 +46,7 @@ As localizações são escolhidas **deterministicamente** entre ilhas já existe
 - [x] Teste visual Chromium integrado à suíte já existente.
 - [x] `port-smoke` e `port-visual` do PR verdes, incluindo 1600×900, 1280×720 e Android 390×844.
 - [x] Integrado à `main` por squash `412856c`; GitHub Pages publicado.
-- [ ] Confirmar CI pós-merge na `main`.
+- [x] CI pós-merge na `main` aprovado ([run 39067335575](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39067335575)).
 - [ ] Validar manualmente no Xbox, teclado, Android físico e PWA offline.
 
 ### Limites intencionais
