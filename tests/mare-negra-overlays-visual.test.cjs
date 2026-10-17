@@ -35,16 +35,16 @@ const {chromium}=require('playwright-core');
    assert.equal(pause.focused,0);
    const pauseGuide=await page.evaluate(()=>{
      const scene=game.scene.getScene('Game');
-     const guide=scene.pauseElements.list.find(o=>o.type==='Text'&&o.text.includes('DIRECIONAL: ESCOLHER'));
+     const guide=scene.pauseElements.list.find(o=>o.type==='Text'&&o.text.includes('↑↓: ESCOLHER'));
      return {text:guide?.text||'',bounds:guide?.getBounds?.()||null,
        options:scene.pausePadOptions?.map(o=>({...o.hit}))};
    });
-   assert(pauseGuide.text.includes('ENTER / A: CONFIRMAR'));
-   assert(pauseGuide.text.includes('ESC / P / B: VOLTAR'));
+   assert(pauseGuide.text.includes('ENTER/A: CONFIRMAR'));
+   assert(pauseGuide.text.includes('ESC/P/B: VOLTAR'));
    assert.equal(pauseGuide.options.length,3,'Help copy cannot create an action');
    const lastPause=pauseGuide.options.at(-1);
    assert(pauseGuide.bounds&&pauseGuide.bounds.top>lastPause.y+lastPause.h/2,
-     label+': pause guidance overlaps final button');
+     label+': pause guidance overlaps final button '+JSON.stringify({guide:pauseGuide.bounds,last:lastPause}));
    await page.screenshot({path:path.join('port-artifacts',
      'mare-negra-3-1-'+label+'-pause.png'),fullPage:true});
    const focus=await page.evaluate(()=>{
