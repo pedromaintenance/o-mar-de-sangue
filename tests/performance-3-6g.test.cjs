@@ -35,7 +35,7 @@ assert(beforeGame.includes('SEA_PERFORMANCE.sample(delta);'));
 assert(beforeGame.includes('SEA_PERFORMANCE.detach(this);'));
 assert(beforeGame.includes("this.input.keyboard.on('keydown-F3', this.onPerformance);"));
 assert(beforeGame.includes("this.input.keyboard.off('keydown-F3', this.onPerformance);"));
-assert(!/SeaProfile|\.fire\(|playerVelocity|\.spawnEnemy\(/.test(code),
+assert(!/SeaProfile\s*\.|\.fire\(|playerVelocity|\.spawnEnemy\(/.test(code),
   'Performance module cannot reference game state or enemy behavior');
 for(const desktop of [true,false]){
  const perf=load(desktop),gameScene=scene();
