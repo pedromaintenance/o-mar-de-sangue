@@ -351,3 +351,24 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
  .port-ui.port-ui--readable .port-restore__row--head{font-size:11px}
  .port-ui.port-ui--readable .port-bottom__actions{justify-content:flex-start}
 }
+
+
+/* 3.6i — comparison is a read-only table; preserve mobile readability. */
+.port-compare{gap:14px}
+.port-compare__grid{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.port-compare__row{grid-template-columns:minmax(105px,1.45fr) repeat(3,minmax(72px,1fr));
+  min-width:420px;gap:6px}
+.port-compare__row strong{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.port-compare__warnings{width:100%;text-align:left;
+  border:1px solid rgba(205,166,99,.65);padding:12px 15px;
+  color:#e8ceb1;background:rgba(35,26,22,.78);font-size:13px;line-height:1.5}
+.port-compare__warnings ul{margin:8px 0 0;padding-left:20px}
+.port-compare .port-page__foot{width:100%}
+.port-ui--readable .port-compare__row{min-width:510px;font-size:15px;line-height:1.5}
+@media(max-width:640px){
+ .port-compare__grid{width:100%;-webkit-overflow-scrolling:touch}
+ .port-compare__row{font-size:12px;min-width:420px}
+ .port-compare__warnings{font-size:12px}
+ .port-compare>p{font-size:13px;line-height:1.5}
+ .port-ui--readable .port-compare__row{min-width:510px}
+}

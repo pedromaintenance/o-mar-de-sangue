@@ -31,6 +31,7 @@
 | **3.6f — Guias Contextuais da Viagem** | ✅ Integrada; CI verde | Instruções na pausa, Carta e ilhas; Node/Chromium aprovados e hitboxes preservadas; [PR #42](https://github.com/pedromaintenance/o-mar-de-sangue/pull/42) e [documentação](docs/voyage-control-guides-3-6f.md). QA físico pendente |
 | **3.6g — Diagnóstico de Desempenho** | ✅ Integrado; CI verde | FPS aproximado, tempo médio/pico, quadros lentos, botão no Porto e F3; [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) e [documentação](docs/performance-diagnostics-3-6g.md). QA físico pendente |
 | **3.6h — Relatório FPS Exportável** | ✅ Integrada; CI verde | Até 180 amostras temporárias e download JSON com resumo; [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) e [especificação](docs/fps-export-report-3-6h.md). Testes físicos pendentes |
+| **3.6i — Comparação FPS Local** | 🟡 Implementada; CI pendente | Comparação de dois relatórios JSON no Porto, validação estrita, avisos de comparabilidade, sem tocar no save; [documentação](docs/fps-comparison-3-6i.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -212,7 +213,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI `port-smoke` e `port-visual` verdes; [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) integrado por squash (`fa2ccf6`). [Escopo e QA](docs/fps-export-report-3-6h.md).
 - [ ] Conferir download e captura no Pages/PWA em aparelhos reais.
 
-**3.6i — Planejada:** avaliar otimizações gráficas em partículas, desenho do mar e orçamento de efeitos com base nas medições do Pages em aparelhos reais, sem alteração automática de física/IA.
+**3.6i — Comparador Local de FPS (implementado na branch):**
+
+- [x] Validar exatamente dois relatórios FPS v1 locais por formato, tamanho, limites numéricos e ordem temporal, sem importar textos não confiáveis à interface.
+- [x] Comparar FPS médio, mediano e mínimo, pior tempo de quadro e contagens, com diferença B − A em tabela responsiva.
+- [x] Destacar limitações de capturas curtas, durações diferentes, modos de visualização distintos, perda de amostras e sessões incompletas.
+- [x] Garantir operação offline, isolamento do save v4 e descarte do comparativo ao voltar ao Porto.
+- [x] Adicionar testes Node e Chromium desktop/Android para arquivos válidos, inválidos, cancelamento e layout.
+- [ ] CI verde, merge, Pages e teste físico. [Design e QA](docs/fps-comparison-3-6i.md).
+
+**3.6j — Planejada:** otimizações gráficas em partículas, desenho do mar e orçamento de efeitos **após medições reais e comparáveis**, sem mudança automática de física/IA.
 
 **Outros trabalhos:** foco sem mouse, testes Xbox físico, leitor de tela e PWA instalada/reconexão reais.
 
@@ -238,6 +248,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Testar no GitHub Pages a 3.6h: ativar FPS no Porto, realizar viagens e baixar relatórios JSON de mar calmo, combate e tempestade no mesmo aparelho. Comparar as métricas antes de implementar a 3.6i de otimizações gráficas. Reputação persistente 3.3b continua dependendo da aprovação das regras e migração v4→v5.
+Publicar a 3.6i após CI e testar COMPARAR FPS .JSON no Pages com dois relatórios da 3.6h (mar calmo versus combate, mesmo aparelho). Usar diferenças e avisos para priorizar a 3.6j — otimizações gráficas apoiadas em medições, sem mudar física/IA antes de evidências. Reputação persistente 3.3b ainda exige regras e migração v4→v5 aprovadas.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.

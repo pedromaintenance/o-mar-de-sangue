@@ -22,6 +22,8 @@ on:
       - 'SeaPerformance.js'
       - 'tests/performance-3-6g.test.cjs'
       - 'tests/performance-report-3-6h.test.cjs'
+      - 'SeaPerformanceCompare.js'
+      - 'tests/performance-compare-3-6i.test.cjs'
       - 'SeaMenus.js'
       - 'SeaIslands.js'
       - 'SeaEffects.js'
@@ -67,6 +69,8 @@ on:
       - 'SeaPerformance.js'
       - 'tests/performance-3-6g.test.cjs'
       - 'tests/performance-report-3-6h.test.cjs'
+      - 'SeaPerformanceCompare.js'
+      - 'tests/performance-compare-3-6i.test.cjs'
       - 'tests/port-ui-rebuild.test.cjs'
       - 'tests/port-visual.test.cjs'
       - 'tests/port-theme-abyss.test.cjs'
@@ -97,6 +101,8 @@ jobs:
           node --check SeaPerformance.js
           node tests/performance-3-6g.test.cjs
           node tests/performance-report-3-6h.test.cjs
+          node --check SeaPerformanceCompare.js
+          node tests/performance-compare-3-6i.test.cjs
           node --check PwaStatus.js
           node tests/pwa-status-3-6.test.cjs
           node tests/pwa-cache-contract.test.cjs
