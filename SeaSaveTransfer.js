@@ -78,7 +78,11 @@ const SEA_SAVE_TRANSFER = {
     const priorSnapshot=localStorage.getItem(this.rollbackKey);
     // Preserve the currently visible progress even for a player still using
     // an old v3 save. The old raw v4 string is kept for exact recovery.
-    const previousProfile=this.profile(SeaProfile.load());
+    const current=SeaProfile.load();
+    // The game may read older saves with extra legacy metadata. Keep only
+    // canonical v4 fields in the rollback, while retaining exact raw v4 bytes.
+    const previousProfile=this.profile(Object.fromEntries(
+      this.profileFields.map(field=>[field,current[field]])));
     const snapshot=JSON.stringify({
       format:'mar-de-sangue-pre-restore',schema:1,
       createdAt:new Date().toISOString(),previousProfile,previousRawV4:previous
