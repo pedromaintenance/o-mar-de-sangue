@@ -59,6 +59,10 @@ const SEA_SAVE_TRANSFER = {
       throw Error('Formato de backup inválido: exige exportação v4 do Capitão.');
     return {profile:this.profile(json.profile),exportedAt:json.exportedAt};
   },
+  clearRollback() {
+    // A deliberate "erase progress" must also remove the undo copy.
+    localStorage.removeItem(this.rollbackKey);
+  },
   lastRollback() {
     try {
       const raw=localStorage.getItem(this.rollbackKey);
