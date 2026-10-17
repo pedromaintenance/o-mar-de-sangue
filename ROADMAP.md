@@ -272,14 +272,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ### 3.7 — A Costa dos Condenados: contratos, eventos e rotas
 
-**3.7a.1 — Resgate dos Afogados (implementação em validação):**
+**3.7a.1 — Resgate dos Afogados (publicada em 17/10/2026):**
 - [x] Adicionar ao Porto um quadro acessível de **CONTRATOS DA COSTA SUL**, com um contrato real e retorno seguro.
 - [x] Nova expedição **Resgate dos Afogados** em modo sandbox já existente: recolher sobreviventes em um naufrágio e entregá-los a Deméter; sem nova modalidade no save.
 - [x] Marcar somente o destino atual no Atlas: o ponto de entrega é revelado apenas após o resgate. Permitir entrega mesmo em santuário já visitado.
 - [x] Manter atracação lenta/sem inimigos próximos, combates e controles existentes; suspender ondas de 52 s apenas durante a expedição de contrato.
 - [x] Premiar com 125 ouro exclusivamente ao concluir a entrega; retirada ou derrota sem bônus. Não avançar missão nem alterar reputação/save v4.
 - [x] Incluir documentação, teste Node e percurso funcional automatizado em Chromium desktop/Android; PWA offline v54.
-- [ ] Validar CI, integrar PR e confirmar Pages; teste físico ainda necessário.
+- [x] PR [#50](https://github.com/pedromaintenance/o-mar-de-sangue/pull/50) aprovado (Node e Chromium desktop/Android), squash merge `412856c`.
+- [x] Publicação concluída no [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39067335133](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39067335133)).
+- [ ] Validar no controle Xbox e Android físicos, PWA offline e sessões longas; confirmar CI pós-merge.
 - [Especificação, anti-replay e roteiro de QA](docs/contracts-rescue-3-7a.md).
 
 **3.7a.2 — Contrabando (planejado):** transportar carga por rota perigosa, com condições de perda, inspeção e consequências claras; prototipar no mesmo modo de contrato, sem migração de save.
