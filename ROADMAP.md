@@ -25,7 +25,7 @@
 | **3.5b — Mixagem Separada** | ✅ Integrada; CI verde | Música/efeitos independentes, mute mestre, persistência isolada e PWA v39; [PR #36](https://github.com/pedromaintenance/o-mar-de-sangue/pull/36) e [documentação](docs/audio-mixer-3-5b.md). QA auditivo físico pendente |
 | **3.6a — PWA Resiliente** | ✅ Integrada; CI verde | Modo offline, atualização voluntária e precache v42 reparado; [PR #37](https://github.com/pedromaintenance/o-mar-de-sangue/pull/37) e [documentação](docs/pwa-3-6a.md). Testes físicos no Pages/PWA pendentes |
 | **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
-| **3.6c — Restauração Segura** | 🟡 Implementada; CI pendente | Importação JSON v4 validada, prévia lado a lado, dupla confirmação, cópia local do save anterior e opção de desfazer; [documentação](docs/captain-restore-3-6c.md) |
+| **3.6c — Restauração Segura** | ✅ Integrada; CI verde | Importação JSON v4, prévia, dupla confirmação, backup automático e desfazer; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) e [documentação](docs/captain-restore-3-6c.md). Teste físico no Pages pendente |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -152,7 +152,7 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI Node e Chromium aprovados; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) integrado (`f1f4e60`). [Design e QA](docs/captain-backup-3-6b.md).
 - [ ] Conferir o download JSON na versão publicada do Pages e na PWA instalada.
 
-**3.6c — Restauração Segura (implementada na branch; CI obrigatório):**
+**3.6c — Restauração Segura (integrada à `main`; CI aprovado em 16/10/2026):**
 
 - [x] Importar backups JSON v4 exportados pelo Capitão, limitados a 256 KB e esquema estrito, sem código arbitrário.
 - [x] Mostrar diferenças do progresso atual e do importado antes de qualquer gravação.
@@ -160,7 +160,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Guardar snapshot local do save atual **antes** da escrita e permitir desfazer a última restauração.
 - [x] Recusar dados v3/v5, campos inesperados e níveis inválidos; não alterar música, física, combate ou save v4.
 - [x] Adicionar testes Node e Chromium de restauração, undo, falhas de armazenamento e Android emulado.
-- [ ] CI smoke e Chromium verdes, merge na main e teste físico do download/importação no Pages. [Especificação e QA](docs/captain-restore-3-6c.md).
+- [x] CI smoke/Chromium verdes; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) integrado via squash (`d26718c`). [Especificação e QA](docs/captain-restore-3-6c.md).
+- [ ] Conferir no Pages e PWA instalada importação, cancelamento e desfazer.
 
 **Outros trabalhos:** consolidar guia de controles Xbox/teclado/toque, revisar navegação sem mouse e desempenho em celulares modestos, testar PWA instalada e reconexão reais.
 
@@ -186,6 +187,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar a 3.6c de restauração JSON com rollback/dupla confirmação e publicar somente após CI verde; testar no Pages a exportação 3.6b, importação 3.6c e PWA 3.6a offline. Versão v4 permanece sem migração. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
+Testar no GitHub Pages exportação 3.6b, restauração e desfazer 3.6c e navegação PWA 3.6a offline. A seguir, fortalecer a acessibilidade do porto e orientar a migração de reputação 3.3b (v4→v5) antes de alterar dados. Versão v4 permanece intacta. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
