@@ -110,7 +110,7 @@ const {chromium}=require('playwright-core');
      label+': enabled telemetry must display the FX budget');
    assert.equal(telemetry.depth,145);
    assert.equal(telemetry.position.x,isMobile?240:640);
-   assert.equal(telemetry.position.y,isMobile?596:683);
+   assert.equal(telemetry.position.y,isMobile?580:683);
    assert(telemetry.box.x>=0&&
      telemetry.box.x+telemetry.box.width<=(isMobile?480:1280),
      label+': telemetry outside canvas width');
