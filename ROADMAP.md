@@ -243,13 +243,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI `port-smoke` e `port-visual` aprovados; [PR #47](https://github.com/pedromaintenance/o-mar-de-sangue/pull/47) integrado via squash (`c2634cc`). [Documentação e QA](docs/procedural-sea-cache-3-6k.md).
 - [ ] Verificar a água no Pages, Android/PWA e colher relatórios FPS em aparelhos reais.
 
-**3.6l — Telemetria de Orçamento dos Efeitos (em validação, 17/10/2026):**
+**3.6l — Telemetria de Orçamento dos Efeitos (integrada à `main` em 17/10/2026; PR #48, CI do PR verde):**
 
 - [x] Instrumentar passivamente o orçamento **já existente** (48 efeitos `burst` / `v15Burst`) quando o diagnóstico FPS estiver ligado, sem criar ou eliminar partículas.
 - [x] Acrescentar à janela de FPS e ao JSON v1 campos opcionais de média, pico e quadros no limite; preservar compatibilidade com relatórios antigos.
 - [x] Adicionar comparação opcional de carga FX entre dois relatórios e alertas de incerteza; validar valores importados.
 - [x] Incluir testes Node, verificações em Chromium e cache PWA v52 sem mudar `Game.js`, save, controles, física, IA ou o orçamento visual.
-- [ ] Exigir CI verde antes de integrar à `main` e publicar no Pages; depois testar em aparelho real.
+- [x] CI `port-smoke` e `port-visual` aprovados no PR; squash merge [#48](https://github.com/pedromaintenance/o-mar-de-sangue/pull/48) (`d7b554c`).
+- [ ] Confirmar o deploy Pages e testar FPS/PWA em aparelho real.
 - [ ] Coletar relatórios comparáveis de mar calmo vs. eventos/combate. **Ainda não há benchmark real justificando redução de partículas.**
 - [Especificação, limitações e roteiro de QA](docs/effect-budget-3-6l.md).
 
