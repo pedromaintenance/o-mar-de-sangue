@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.6j — Cache de redesenho do clima
 
-**Estado:** implementação na branch; CI pendente. Melhoria gráfica conservadora, sem redução de qualidade.
+**Estado:** integrado à `main` em 17/10/2026 via [PR #46](https://github.com/pedromaintenance/o-mar-de-sangue/pull/46) (squash `7b4e8d2`). CI smoke e Chromium aprovados. Teste físico no Pages/PWA pendente; melhoria gráfica conservadora, sem redução de qualidade.
 
 ## Observação de código
 
@@ -26,7 +26,7 @@ O serviço PWA usa cache **v50** para disponibilizar a mudança offline. Não ex
 - [x] Novo `tests/weather-redraw-cache-3-6j.test.cjs`: clima constante sem chamadas redundantes; invalidações em tempestade/névoa; gotas e remoinho continuam desenhados; estado físico intacto.
 - [x] `tests/mare-negra-hud-visual.test.cjs`: mede chamadas reais de `Graphics.clear`, `setAlpha`, `setFillStyle`, `setText` numa viagem Phaser em desktop e Android emulado, verificando saída/entrada de tempestade.
 - [x] `tests/soundscape-3-5.test.cjs`, HUD, controles, saves, PWA e demais regressões continuam obrigatórios.
-- [ ] CI `port-smoke` e `port-visual` verdes antes do merge.
+- [x] CI `port-smoke` e `port-visual` aprovados; merge `7b4e8d2`.
 - [ ] Teste físico do Pages/PWA: observar transições de tempestade/névoa/remoinho e comparar dois relatórios FPS de durações semelhantes no mesmo dispositivo.
 
 ## Próxima etapa
