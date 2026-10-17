@@ -1,6 +1,6 @@
 # 3.7a.1 — Contratos da Costa Sul: Resgate dos Afogados
 
-**Estado:** primeira entrega jogável da fase 3.7, em validação no PR. Novos contratos e reputação ainda não implementados.
+**Estado:** publicada em 17/10/2026 após [PR #50](https://github.com/pedromaintenance/o-mar-de-sangue/pull/50), squash `412856c`. Node/Chromium do PR aprovados e [Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39067335133](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39067335133)). Novos contratos e reputação não implementados.
 
 ## Objetivo de design
 
@@ -44,8 +44,9 @@ As localizações são escolhidas **deterministicamente** entre ilhas já existe
 - [x] Implementação isolada e sem novos campos no save v4.
 - [x] Teste de contrato Node incluído no CI.
 - [x] Teste visual Chromium integrado à suíte já existente.
-- [ ] Aguardar `port-smoke` e `port-visual` do PR.
-- [ ] Integrar à `main` após CI verde, confirmar publicação no GitHub Pages e atualizar estado do roadmap.
+- [x] `port-smoke` e `port-visual` do PR verdes, incluindo 1600×900, 1280×720 e Android 390×844.
+- [x] Integrado à `main` por squash `412856c`; GitHub Pages publicado.
+- [ ] Confirmar CI pós-merge na `main`.
 - [ ] Validar manualmente no Xbox, teclado, Android físico e PWA offline.
 
 ### Limites intencionais
