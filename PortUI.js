@@ -5,6 +5,8 @@
  */
 const SEA_PORT_UI = {
   root:null, scene:null, lastPadAt:0, lastPadDir:'', lastYardFocus:null,
+  readable:false,
+  readableKey:'carcaca.mar.port.readable.v1',
   // A ordem das abas é uma regra de navegação, não depende da posição no DOM.
   yardTabs:['casco','motor','armas','apoio'],
   text(value) {
@@ -26,10 +28,14 @@ const SEA_PORT_UI = {
     const shell=document.getElementById('app-shell');
     if(!shell)return false;
     this.scene=scene;
+    // Independent accessibility preference; never part of SeaProfile v4.
+    try{this.readable=localStorage.getItem(this.readableKey)==='1';}
+    catch(_){this.readable=false;}
     this.pendingRestore=null;this.restoreArmed=false;
     const root=document.createElement('div');
     root.id='sea-port-ui';
     root.className='port-ui';
+    root.classList.toggle('port-ui--readable',this.readable);
     root.setAttribute('aria-label','Porto de O Mar de Sangue');
     shell.append(root);this.root=root;
     document.body.classList.add('port-ui-open');
@@ -199,6 +205,12 @@ const SEA_PORT_UI = {
       if(result.ok){this.render('buy:'+id);this.notify('Melhoria adquirida. O estaleiro foi atualizado.');}
       else this.notify(result.error||'Não foi possível concluir a compra.');
       return;
+    }
+    if(name==='readability'){
+      this.readable=!this.readable;
+      try{localStorage.setItem(this.readableKey,this.readable?'1':'0');}
+      catch(_){/* Still apply during this session on restricted browsers. */}
+      this.render('readability');return;
     }
     if(name==='export-backup'){this.exportBackup();return;}
     if(name==='restore-file'){
@@ -466,6 +478,9 @@ const SEA_PORT_UI = {
       '<button data-action="mute" type="button" aria-label="Ligar ou desligar todo o áudio">'+
         (SEA_AUDIO.enabled?'SILENCIAR TUDO':'ATIVAR SOM')+'</button>'+
       '<button data-action="import" type="button">TROCAR TRILHAS</button>'+
+      '<button data-action="readability" type="button" aria-pressed="'+(this.readable?'true':'false')+
+        '" aria-label="Alternar leitura ampliada no porto">'+
+        (this.readable?'TEXTO PADRÃO':'AMPLIAR TEXTO')+'</button>'+
       '<small data-music-status>'+this.text(SEA_MUSIC.status())+'</small>'+
       '</div>';
   },
@@ -561,7 +576,8 @@ const SEA_PORT_UI = {
       ['ATRACAÇÃO','Aproxime-se devagar e afaste inimigos. F, botão A ou toque para atracar.'],
       ['ESTALEIRO','Catorze melhorias sem limite artificial; cada nível aumenta o preço. LB/RB ou Q/E trocam as abas.'],
       ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.'],
-      ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.']
+      ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
+       ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+
@@ -651,6 +667,7 @@ const SEA_PORT_UI = {
   render(preferred=null) {
     if(!this.root||!this.scene)return;
     const ui=this.root;
+    ui.classList.toggle('port-ui--readable',this.readable);
     const scroll=ui.scrollTop;
     const active=preferred||document.activeElement?.dataset?.action||null;
     const p=SeaProfile.load(),page=this.scene.page;
