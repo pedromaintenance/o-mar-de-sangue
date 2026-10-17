@@ -120,7 +120,7 @@ const SEA_CONTRACTS = {
        (c.phase==='pickup'&&s.islandVisits?.has(target.id))||c.completed||
        c.intercepted)return false;
     if(c.id==='smuggle'){
-      if(s.islandVisits?.has(target.id))return false;
+      // A visited ruin can still receive cargo; c.completed prevents replay.
       const hidden=choice.contractAction==='smuggle-hidden';
       if(!hidden&&choice.contractAction!=='smuggle-bribe')return false;
       if(hidden&&c.suspicion>=60){
