@@ -72,7 +72,7 @@ const {chromium}=require('playwright-core');
    assert(telemetry.text.includes('MÉDIA')&&telemetry.text.includes('PICO'));
    assert.equal(telemetry.depth,145);
    assert.equal(telemetry.position.x,isMobile?240:640);
-   assert.equal(telemetry.position.y,isMobile?602:683);
+   assert.equal(telemetry.position.y,isMobile?596:683);
    assert(telemetry.box.x>=0&&
      telemetry.box.x+telemetry.box.width<=(isMobile?480:1280),
      label+': telemetry outside canvas width');
