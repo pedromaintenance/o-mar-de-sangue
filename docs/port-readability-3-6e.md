@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6e: Leitura Ampliada do Porto
 
-**Situação:** implementação concluída na branch; integração condicionada ao CI. Não há alteração de regras de jogo nem saves.
+**Situação:** integrado à `main` em 16/10/2026 pelo [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) (squash `11f8ceb`), com CI smoke e Chromium aprovados. Não há alteração de regras de jogo nem saves. QA físico no Pages/PWA pendente.
 
 ## O que muda
 - Adiciona o botão **AMPLIAR TEXTO** no rodapé do Porto, acessível em todas as telas do Porto (menu, estaleiro, Diário de Bordo, resultados, backup, restauração e reset). Ao ativar, muda para **TEXTO PADRÃO**.
@@ -18,7 +18,7 @@
 ## Testes
 - [x] Contrato Node: ação, alternância, `aria-pressed`, chave isolada e save intacto.
 - [x] Chromium desktop 1600×900 e 1280×720 e Android emulado 390×844: tamanho computado maior, sem overflow horizontal em menu e restauração, screenshots, preferência após reload e isolamento de saves/áudio.
-- [ ] CI `port-smoke` e `port-visual` verdes antes do merge.
+- [x] CI `port-smoke` e `port-visual` aprovados; PR #41 integrado.
 - [ ] QA manual: dispositivo físico, gamepad e leitor de tela, inclusive com layout Android e PWA instalada.
 
 ## Como testar
