@@ -285,7 +285,7 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Validar no controle Xbox e Android físicos, PWA offline e sessões longas.
 - [Especificação, anti-replay e roteiro de QA](docs/contracts-rescue-3-7a.md).
 
-**3.7a.2 — Pólvora sem Bandeira: Contrabando (implementado, em validação 17/10/2026):**
+**3.7a.2 — Pólvora sem Bandeira: Contrabando (publicado em 17/10/2026):**
 - [x] Expandir o quadro **CONTRATOS DA COSTA SUL** para dois contratos independentes, sem alterar a campanha ou o save v4.
 - [x] Carga clandestina embarcada desde o início; ruína real de destino marcada na Carta, sem revelar outras ilhas.
 - [x] Introduzir **patrulha fiscal da Corte** após seis segundos, com suspeita de 0–100% que sobe por proximidade e cai ao fugir/afundar o fiscal; telemetria no objetivo.
@@ -293,7 +293,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Duas decisões de entrega: clandestina com suspeita <60% (190 ouro, +12 maldição) ou suborno à Corte (115 ouro, sem maldição adicional); validação e proteção contra pagamentos duplicados.
 - [x] Integrar atracação existente, inclusive ruína já visitada, feedback de suspeita, recompensa no settlement normal e PWA offline v55.
 - [x] Adicionar testes Node e Chromium em três viewports ao workflow; preservar o teste de resgate 3.7a.1.
-- [ ] Exigir CI verde, integrar PR, publicar no GitHub Pages e atualizar o status com link real de deploy.
+- [x] PR [#51](https://github.com/pedromaintenance/o-mar-de-sangue/pull/51) aprovado (Node e Chromium nas três resoluções), integrado por squash (`baf76d7`).
+- [x] CI pós-merge na `main` aprovado ([run 39072990117](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39072990117)); [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39072989625](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39072989625)).
 - [ ] Teste físico Android/Xbox/PWA e balanceamento após relatos de jogabilidade.
 - [Documentação de regras, riscos, QA e limites](docs/contracts-smuggling-3-7a2.md).
 
