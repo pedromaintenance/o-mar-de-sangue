@@ -2,7 +2,7 @@
 
 **Identidade:** horror naval, horror cósmico e conflito político no universo da **Carcaça**.  
 **Plataforma atual:** jogo web estático (GitHub Pages), PWA offline, Phaser + porto HTML/CSS.  
-**Atualização:** 16 de outubro de 2026.  
+**Atualização:** 17 de outubro de 2026.  
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
 
 > **Princípio de desenvolvimento:** evoluir a experiência sem reescrever subsistemas que já funcionam. Separar apresentação de regras; preservar saves, acessibilidade básica, funcionamento offline, mouse/toque, teclado e controle Xbox. Toda interface nova deve passar por testes de regressão antes do merge.
@@ -266,6 +266,58 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Testar comparações com medições reais no mesmo dispositivo; **ainda não há dados justificando redução de partículas**.
 - [Especificação e roteiro de QA](docs/fps-normalization-3-6l1.md).
 
+## Novo ciclo de gameplay — 3.7 a 4.0 (proposta de 17/10/2026)
+
+**Princípio:** a evolução seguinte deve ampliar **o que o jogador pode escolher e como pode vencer**, não apenas aumentar dano, vida e número de inimigos. Nenhum item abaixo marcado como planejado é uma funcionalidade publicada.
+
+### 3.7 — A Costa dos Condenados: contratos, eventos e rotas
+
+**3.7a.1 — Resgate dos Afogados (implementação em validação):**
+- [x] Adicionar ao Porto um quadro acessível de **CONTRATOS DA COSTA SUL**, com um contrato real e retorno seguro.
+- [x] Nova expedição **Resgate dos Afogados** em modo sandbox já existente: recolher sobreviventes em um naufrágio e entregá-los a Deméter; sem nova modalidade no save.
+- [x] Marcar somente o destino atual no Atlas: o ponto de entrega é revelado apenas após o resgate. Permitir entrega mesmo em santuário já visitado.
+- [x] Manter atracação lenta/sem inimigos próximos, combates e controles existentes; suspender ondas de 52 s apenas durante a expedição de contrato.
+- [x] Premiar com 125 ouro exclusivamente ao concluir a entrega; retirada ou derrota sem bônus. Não avançar missão nem alterar reputação/save v4.
+- [x] Incluir documentação, teste Node e percurso funcional automatizado em Chromium desktop/Android; PWA offline v54.
+- [ ] Validar CI, integrar PR e confirmar Pages; teste físico ainda necessário.
+- [Especificação, anti-replay e roteiro de QA](docs/contracts-rescue-3-7a.md).
+
+**3.7a.2 — Contrabando (planejado):** transportar carga por rota perigosa, com condições de perda, inspeção e consequências claras; prototipar no mesmo modo de contrato, sem migração de save.
+
+**3.7a.3 — Caçada (planejado):** alvo identificável no Atlas após obtenção de pista, critérios de captura/abate e recompensas; não repetir simplesmente a missão atual de fragatas.
+
+**3.7b — Eventos dinâmicos (planejado):** navios pedindo socorro, perseguições, encontros com sobreviventes/cultistas/Corte e decisões com impacto em rota, risco e recursos. Criar limites de frequência para preservar combate e exploração.
+
+**3.7c — Rotas perigosas (planejado):** três perfis de rota para contratos (curta/patrulhada, longa/perigosa, sobrenatural/maldição). Reaproveitar Atlas e condições climáticas existentes, sem introduzir autopiloto ou spoiler de locais desconhecidos.
+
+**Critérios da fase:** pelo menos três objetivos jogáveis distintos, mapa útil à decisão, falha/retirada bem definidas, nenhum bloqueio de missão e controles/CI protegidos.
+
+### 3.8 — Ferro, Pólvora e Sangue (proposto, não implementado)
+
+- **3.8a — Equipamentos ativos:** selecionar entre arpão, morteiro, fumaça e pólvora amaldiçoada, com usos, recargas e limites explícitos, sem desbalancear os canhões normais.
+- **3.8b — Abordagem naval:** opção após enfraquecer/imobilizar inimigos, com saquear, libertar cativos ou capturar, inclusive risco de perda e consequência política.
+- **3.8c — Danos localizados:** velas, leme e canhões com efeitos temporários e telegráficos, evitando simulação excessivamente complexa.
+- **Dependência:** testes de interface e de IA, preservação das hitboxes touch/Xbox e economia/recompensas não exploráveis.
+
+### 3.9 — Os Homens do Convés (proposto, não implementado)
+
+- **3.9a — Oficiais:** timoneiro, artilheiro, carpinteiro e navegador com função tática distinta. Preferir dois ou três slots com decisões relevantes a dezenas de atributos.
+- **3.9b — Interesses da tripulação:** personagens reagem a escolhas e condições materiais sem moralidade simplista ou micromanagement de fome.
+- **3.9c — Especialização do navio:** estilos de construção rápida, blindada, saqueadora ou sobrenatural. Definir caps/alternativas antes de adicionar upgrades permanentes.
+- **Dependência:** balancear interface do estaleiro; qualquer persistência além do save v4 exige design e migração aprovados.
+
+### 4.0 — As Três Bandeiras (proposto, não implementado)
+
+- **4.0a — Reputação e dívidas:** relações independentes de sobreviventes, Corte Feérica e culto de Daegon; definir efeitos e limites antes de realizar migração testada `v4→v5` (ver [proposta 3.3b](docs/reputation-3-3b-design.md)).
+- **4.0b — Domínio de rotas/portos:** pedágios, bloqueios, informações e refúgios vinculados a relações políticas.
+- **4.0c — Campanhas divergentes:** proteger comunidades, colaborar com a Corte, buscar pactos ou recusar alinhamentos permanentes.
+- **4.0d — Consequências narrativas:** encontros posteriores e respostas materiais ao histórico político do jogador, com alternativas viáveis.
+- **Dependência:** salvamento/migração reversível, campanha balanceada e aprovação da lore; evitar tratar facções como alinhamentos morais fixos.
+
+**Ordem tática de implementação:** 3.7a.1 → 3.7a.2/3.7a.3 → eventos/rotas → equipamentos ativos → abordagem → tripulação → reputação persistente → campanha ramificada.
+
+**Regras de proteção:** publicar apenas marcos testados; distinguir proposta de entrega; preservar progresso do jogador, acessibilidade, PWA offline e funcionamento das versões anteriores. Desempenho 3.6m segue **condicionado a medições** em aparelhos reais, não bloqueia gameplay novo.
+
 **3.6m — Condicionada a evidências:** avaliar otimizações conservadoras de efeitos apenas com medições repetidas e referência de equivalência visual.
 
 **Outros trabalhos:** foco sem mouse, testes Xbox físico, leitor de tela e PWA instalada/reconexão reais.
@@ -292,6 +344,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Testar 3.6k/3.6l/3.6l.1 no Pages e PWA física. Coletar, no mesmo aparelho, relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Priorizar a validação e o lançamento de 3.7a.1 (Resgate dos Afogados), depois contrabando/caçada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.

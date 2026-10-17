@@ -46,6 +46,8 @@ on:
       - 'tests/political-parley.test.cjs'
       - 'tests/political-parley-visual.test.cjs'
       - 'SeaAtlas.js'
+      - 'SeaContracts.js'
+      - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/atlas-chart.test.cjs'
       - 'tests/atlas-chart-visual.test.cjs'
       - '.github/workflows/port-ui.yml'
@@ -92,6 +94,8 @@ on:
       - 'tests/political-parley.test.cjs'
       - 'tests/political-parley-visual.test.cjs'
       - 'SeaAtlas.js'
+      - 'SeaContracts.js'
+      - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/atlas-chart.test.cjs'
       - 'tests/atlas-chart-visual.test.cjs'
 jobs:
@@ -134,6 +138,8 @@ jobs:
           node tests/political-parley.test.cjs
           node --check SeaAtlas.js
           node tests/atlas-chart.test.cjs
+          node --check SeaContracts.js
+          node tests/rescue-contract-3-7a.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:

@@ -372,3 +372,11 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
  .port-compare>p{font-size:13px;line-height:1.5}
  .port-ui--readable .port-compare__row{min-width:510px}
 }
+
+/* 3.7a — the contract is an additional voyage, not a replacement for missions. */
+.port-actions .port-choice--contract{grid-column:1/-1;min-height:70px;
+  background:linear-gradient(110deg,#3b282b,#18242a 72%,#302025);border-color:#ad8466}
+.port-contracts .port-warning__actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+.port-contracts h2{font:700 clamp(19px,2.5vw,25px)/1.25 Georgia,serif;color:#efd0a9;
+  text-align:center;margin:8px 0 0}
+@media(max-width:410px){.port-contracts .port-warning__actions{grid-template-columns:1fr}}

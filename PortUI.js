@@ -169,12 +169,13 @@ const SEA_PORT_UI = {
     if(page!=='fps-compare')this.comparedFps=null;
     scene.scene.start('SeaPort',{page,group:group||scene.yardGroup});
   },
-  start(mode) {
+  start(mode,contract=null) {
     const scene=this.scene;if(!scene)return;
     SeaProfile.selectMode(mode);
     const profile=SeaProfile.load();
     scene.scene.start('Game',mode==='mission'?
-      {mode:'mission',stage:profile.mission}:{mode:'sandbox'});
+      {mode:'mission',stage:profile.mission}:
+      {mode:'sandbox',...(contract==='rescue'?{contract:'rescue'}:{})});
   },
   notify(message) {
     if(!this.root)return;
@@ -238,6 +239,11 @@ const SEA_PORT_UI = {
     const scene=this.scene;if(!scene)return;
     const [name,id]=value.split(':');
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
+    if(name==='contracts'){this.goto('contracts');return;}
+    if(name==='contract'&&id==='rescue'){
+      if(scene.page!=='contracts')return;
+      this.start('sandbox','rescue');return;
+    }
     if(name==='menu'){this.goto('menu');return;}
     if(name==='yard'){
       if(scene.page==='yard'){
@@ -501,7 +507,8 @@ const SEA_PORT_UI = {
   },
   header(page,p) {
     const titles={menu:'O MAR DE SANGUE',yard:'ESTALEIRO',help:'DIÁRIO DE BORDO',
-      reset:'O ESQUECIMENTO',result:'FIM DA EXPEDIÇÃO'};
+      reset:'O ESQUECIMENTO',result:'FIM DA EXPEDIÇÃO',
+      contracts:'CONTRATOS DA COSTA SUL'};
     return '<header class="port-top">'+
       '<div class="port-top__brand"><span class="port-top__sigil" aria-hidden="true">✥</span>'+
       '<div><span class="port-eyebrow">CRÔNICAS DA CARCAÇA</span>'+
@@ -569,6 +576,7 @@ const SEA_PORT_UI = {
           this.button('sandbox','MAR SEM FIM','Recorde: onda '+this.num(p.bestWave),'∞','')+
           this.button('yard:armas','ESTALEIRO','Reforce seu navio e sua tripulação','⚒','')+
           this.button('help','DIÁRIO DE BORDO','Comandos, regras e navegação','☷','')+
+          this.button('contracts','CONTRATOS DA COSTA SUL','Nova expedição: resgate de náufragos','⚓','port-choice--contract')+
         '</div>'+
         '<div class="port-statbar" aria-label="Estado da embarcação">'+
           '<div><span>CASCO</span><strong>'+this.num(stats.maxHP)+'</strong></div>'+
@@ -596,6 +604,21 @@ const SEA_PORT_UI = {
           '</div>'+
           '<p>O ouro está seguro no cofre. A próxima viagem não tem essa garantia.</p>'+
         '</div></aside></div>';
+  },
+  contracts(){
+    const offer=SEA_CONTRACTS.offers.rescue;
+    return '<main class="port-page port-page--narrow" id="port-main">'+
+      '<section class="port-warning" role="region" aria-labelledby="port-contract-title">'+
+      '<span class="port-eyebrow">UM TRABALHO QUE A CORTE NÃO FARÁ</span>'+
+      '<h1 id="port-contract-title">CONTRATOS DA COSTA SUL</h1>'+
+      '<p>Uma viagem independente. Não avança a campanha, não altera reputação e não exige novo save.</p>'+
+      '<h2>'+this.text(offer.title)+'</h2><p>'+this.text(offer.description)+'</p>'+
+      '<p>PRÊMIO: <strong>'+this.num(offer.bounty)+' OURO</strong> · somente após a entrega. '+
+      'Uma rota é marcada na Carta (M / View / toque). A segunda é revelada após o resgate.</p>'+
+      '<div class="port-warning__actions">'+
+      this.button('contract:rescue','ACEITAR CONTRATO','Recolher e entregar sobreviventes','⚓','port-choice--primary')+
+      this.button('menu','VOLTAR AO PORTO','','←','')+
+      '</div></section></main>';
   },
   yard(p) {
     const group=this.scene?.yardGroup||'armas';
@@ -640,6 +663,7 @@ const SEA_PORT_UI = {
        ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
       ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.'],
       ['RELATÓRIO FPS','Ative MOSTRAR FPS, navegue e retorne ao Porto. Use BAIXAR RELATÓRIO FPS para exportar até 180 janelas de um segundo em JSON. Os dados ficam só na memória e desaparecem ao recarregar.'],
+      ['CONTRATOS','No Porto, aceite Resgate dos Afogados. A Carta revela primeiro o naufrágio; recolha os sobreviventes e leve-os ao santuário de Deméter. O pagamento só acontece se concluir a entrega.'],
       ['COMPARAR RELATÓRIOS','Selecione dois relatórios FPS JSON. Além das contagens, veja quadros lentos por 1.000 atualizações e saturação FX por 1.000 quando disponível. Tudo permanece no aparelho, sem modificar saves.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
@@ -743,6 +767,8 @@ const SEA_PORT_UI = {
     const desc=won?'As velas ainda conhecem o caminho.':
       withdrawn?'Quem retorna ainda pode contar a história.':'O oceano nunca esquece os seus.';
     const data=[
+      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?'RESGATADOS':'NÃO ENTREGUES'],
+        ['PRÊMIO DO CONTRATO',r.contractBounty||0]]:[]),
       ['OURO ENCONTRADO',r.collected],['OURO RECUPERADO',r.reward],
       ['INIMIGOS AFUNDADOS',r.kills],['ABALROAMENTOS',r.rammings],
       ['COFRE DO CAPITÃO',r.bank],
@@ -753,10 +779,10 @@ const SEA_PORT_UI = {
       '<div class="port-page__header"><span class="port-eyebrow">CRÔNICAS DOS QUE REGRESSARAM</span>'+
       '<h1>'+this.text(state)+'</h1><p>'+this.text(desc)+'</p></div>'+
       '<div class="port-result-grid">'+data.map(([title,value])=>
-        '<div><span>'+this.text(title)+'</span><strong>'+this.num(value)+'</strong></div>').join('')+
+        '<div><span>'+this.text(title)+'</span><strong>'+(typeof value==='string'?this.text(value):this.num(value))+'</strong></div>').join('')+
       '</div><div class="port-result-actions">'+
         this.button('yard:armas','MELHORAR O NAVIO','Abrir estaleiro','⚒','')+
-        this.button('next',r.mode==='mission'?'PRÓXIMA MISSÃO':'NOVA JORNADA','Voltar ao Mar de Sangue','⚔','port-choice--primary')+
+        this.button(r.contractTitle?'contracts':'next',r.contractTitle?'OUTRO CONTRATO':r.mode==='mission'?'PRÓXIMA MISSÃO':'NOVA JORNADA','Voltar ao Mar de Sangue','⚔','port-choice--primary')+
         this.button('menu','MENU PRINCIPAL','','←','')+
       '</div></main>';
   },
@@ -769,7 +795,7 @@ const SEA_PORT_UI = {
     const p=SeaProfile.load(),page=this.scene.page;
     const body=page==='yard'?this.yard(p):page==='help'?this.help():
       page==='reset'?this.reset():page==='restore'?this.restore():
-      page==='fps-compare'?this.fpsCompare():
+      page==='fps-compare'?this.fpsCompare():page==='contracts'?this.contracts():
        page==='result'?this.result(this.scene.report):this.home(p);
     ui.innerHTML='<div class="port-background" aria-hidden="true">'+
       '<span class="port-background__moon"></span><span class="port-background__sea"></span>'+

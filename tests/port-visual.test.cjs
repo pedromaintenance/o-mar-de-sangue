@@ -334,6 +334,68 @@ const {chromium}=require('playwright-core');
       assert.equal(await page.locator('.port-compare').count(),0);
       assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4')),
         compareOriginalSave,'Invalid FPS files must never touch the save');
+      // 3.7a — real contract board, same Phaser voyage and result screen.
+      const contractSave=await page.evaluate(()=>localStorage.getItem('carcaca.mar-de-sangue.v4'));
+      await page.locator('[data-action="contracts"]').click();
+      await page.locator('#port-contract-title').waitFor({timeout:10000});
+      assert((await page.locator('#port-main').innerText()).includes('RESGATE DOS AFOGADOS'));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-rescue-contract-board-3-7a.png'),fullPage:true});
+      await page.locator('[data-action="contract:rescue"]').click();
+      await page.waitForFunction(()=>game.scene.isActive('Game')&&
+        !!game.scene.getScene('Game').contract,{timeout:20000});
+      const initial=await page.evaluate(()=>{
+        const s=game.scene.getScene('Game');
+        return {mode:s.mode,contract:s.contract.id,phase:s.contract.phase,
+          text:s.objectiveText(),waypoint:s.chartWaypointId,
+          revealed:s.chartDiscovered.size,save:SeaProfile.load().version};
+      });
+      assert.equal(initial.mode,'sandbox');
+      assert.equal(initial.contract,'rescue');
+      assert.equal(initial.phase,'pickup');
+      assert(initial.text.includes('NÁUFRAGOS'));
+      assert(initial.waypoint!==null&&initial.revealed>=1);
+      assert.equal(initial.save,4);
+      const pickupState=await page.evaluate(()=>{
+        const s=game.scene.getScene('Game'),island=s.islands.find(i=>i.id===s.contract.pickupId);
+        for(const e of s.enemies)e.dead=true;
+        s.player.setPosition(island.x+island.radius+s.hullRadius+35,island.y);
+        s.playerVelocity.x=0;s.playerVelocity.y=0;
+        const docked=SEA_ISLANDS.tryDock(s);
+        if(docked)SEA_ISLANDS.select(s);
+        return {docked,phase:s.contract.phase,waypoint:s.chartWaypointId,
+          outcome:s.islandOutcome,finished:s.ended};
+      });
+      assert(pickupState.docked&&pickupState.phase==='deliver'&&
+        pickupState.waypoint!==null&&!pickupState.finished);
+      assert(pickupState.outcome.includes('náufragos'));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-rescue-contract-pickup-3-7a.png'),fullPage:true});
+      await page.evaluate(()=>SEA_ISLANDS.close(game.scene.getScene('Game')));
+      const delivery=await page.evaluate(()=>{
+        const s=game.scene.getScene('Game'),island=s.islands.find(i=>i.id===s.contract.shelterId);
+        for(const e of s.enemies)e.dead=true;
+        s.player.setPosition(island.x+island.radius+s.hullRadius+35,island.y);
+        s.playerVelocity.x=0;s.playerVelocity.y=0;
+        const docked=SEA_ISLANDS.tryDock(s);
+        const selected=s.islandSelected?.id;
+        if(docked)SEA_ISLANDS.select(s);
+        return {docked,selected,target:island.id,completed:s.contract.completed,
+          bounty:s.contract.bounty,ended:s.ended};
+      });
+      assert(delivery.docked&&delivery.completed&&!delivery.ended,
+        label+': delivery='+JSON.stringify(delivery));
+      await page.evaluate(()=>SEA_ISLANDS.close(game.scene.getScene('Game')));
+      await page.locator('#sea-port-ui [data-action="contracts"]').waitFor({timeout:20000});
+      const report=await page.evaluate(()=>game.scene.getScene('SeaPort').report);
+      assert(report.contractCompleted&&report.contractBounty===125);
+      assert.equal(report.mode,'sandbox');
+      assert.equal(await page.evaluate(()=>SeaProfile.load().version),4);
+      assert.equal(await page.evaluate(()=>SeaProfile.load().mission),captainData.profile.mission,
+        label+': rescue must not advance regular campaign');
+      assert((await page.locator('#port-main').innerText()).includes('PRÊMIO DO CONTRATO'));
+      await page.screenshot({path:path.join('port-artifacts',
+        label+'-rescue-contract-result-3-7a.png'),fullPage:true});
       if(errors.length)throw Error(label+' browser errors: '+errors.join(' | '));
       console.log('PASS visual '+label,measure);
       await page.close();
