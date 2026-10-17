@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6l.1: Comparação Justa de FPS
 
-**Estado:** proposta para integração em 17/10/2026. Testes automatizados e publicação dependem do CI. Não há benchmark físico novo, nem modificação de partículas.
+**Estado:** integrado à `main` em 17/10/2026 pelo [PR #49](https://github.com/pedromaintenance/o-mar-de-sangue/pull/49) (squash `4b5ca20`), com CI Node/Chromium verde no PR. Teste físico pendente; não há benchmark novo de FPS nem modificação de partículas.
 
 ## Problema material
 
@@ -29,7 +29,8 @@ Não é possível decidir cortar partículas com base nessa comparação absolut
 
 - [x] Novo `tests/fps-normalization-3-6l1.test.cjs`: sessões de diferentes durações, diferenças absolutas vs relativas, FX opcional, legados v1 e adulterações dos totais.
 - [x] Atualização dos contratos anteriores: `tests/performance-compare-3-6i.test.cjs`, `tests/effect-budget-3-6l.test.cjs`, `tests/port-visual.test.cjs`.
-- [ ] `port-smoke` e `port-visual` em GitHub Actions verdes.
+- [x] `port-smoke` e `port-visual` no PR aprovados; squash merge `4b5ca20`.
+- [ ] Confirmar CI pós-merge na `main`.
 - [ ] Publicação Pages concluída; validação manual no navegador, PWA e celular físico.
 
 ## Como testar no Pages
