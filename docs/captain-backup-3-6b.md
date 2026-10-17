@@ -17,7 +17,7 @@ A exportação é **somente leitura**: usa `SeaProfile.load()` e `Blob` + `URL.c
 
 ## Limites de segurança
 
-- **Não há importação/restauração nesta etapa.** Baixar um JSON não altera a partida, e simplesmente abrir esse arquivo não restaura progresso.
+- **A exportação continua sendo somente leitura.** A restauração foi adicionada separadamente na [etapa 3.6c](captain-restore-3-6c.md), com escolha explícita do arquivo, comparação e duas confirmações. Simplesmente abrir o JSON não restaura progresso.
 - O backup **não é criptografado**. Deve ser guardado em local seguro e compartilhado com cuidado.
 - O backup **não inclui** áudio importado ou preferências do navegador: são recursos independentes armazenados em outras chaves e/ou IndexedDB.
 - Não inclui a situação transitória de uma viagem em curso: recompensas só entram no perfil conforme regras de consolidação já existentes.
@@ -34,6 +34,6 @@ A exportação é **somente leitura**: usa `SeaProfile.load()` e `Blob` + `URL.c
 
 ## Horizonte
 
-**3.6c (planejado):** restauração por upload JSON **somente** após validação estrita, resumo do progresso a recuperar, confirmação dupla e preservação automática do save anterior. Essa etapa deve contemplar futuros arquivos v5, sem importar dados arbitrários.
+**3.6c (em validação):** importação/restauração de backups JSON v4 com validação estrita, comparação, confirmação dupla e snapshot anterior. Backups v5 continuam dependentes de futura migração, sem importar dados arbitrários. [Documentação da 3.6c](captain-restore-3-6c.md).
 
 A 3.3b de reputação persistente ainda requer regras e migração v4→v5; este backup é uma rede de proteção adicional, não substitui a migração.
