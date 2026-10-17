@@ -76,6 +76,7 @@ const SEA_PIXEL = {
     if(!scene.seaBase)return;
     scene.seaPixelG=scene.add.graphics().setScrollFactor(0).setDepth(-106.6);
     scene.seaPixelT=0;
+    scene.seaPixelFrameCache=null; // deterministic, scene-local, memory only
     // Borda de espuma e pequenos vestígios são elementos visuais, não colisores.
     this.seaFrame(scene,0);
   },
@@ -90,12 +91,34 @@ const SEA_PIXEL = {
     const fog=scene.seaEvent==='fog';
     const cursed=scene.curse>=65;
     const count=SEA_DESKTOP?190:110;
+    // Pixel locations are deterministic for a given viewport; recomputing
+    // their hashes every paint cannot move the sea. Keep the cache local to
+    // the Phaser scene and invalidate it on viewport/count changes.
+    let cache=scene.seaPixelFrameCache;
+    if(!cache||cache.width!==width||cache.height!==height||cache.count!==count){
+      const points=Array.from({length:count},(_,i)=>({
+        x:Math.floor(this.hash(i,3)*(width+tile)),
+        y:Math.floor(this.hash(i,9)*(height+tile))
+      }));
+      const accents=Array.from({length:11},(_,i)=>({
+        x:this.hash(i,19)*width,
+        y:Math.floor(this.hash(i,23)*height)
+      }));
+      cache={width,height,count,points,accents,flickerTick:null,flicker:[]};
+      scene.seaPixelFrameCache=cache;
+    }
+    // Only the flicker seed changes when floor(t*1.5) changes. Its visual
+    // schedule is untouched; in-between frames reuse the exact same values.
+    const flickerTick=Math.floor(t*1.5);
+    if(cache.flickerTick!==flickerTick){
+      cache.flicker=Array.from({length:count},(_,i)=>this.hash(i,flickerTick));
+      cache.flickerTick=flickerTick;
+    }
     for(let i=0;i<count;i++){
-      const x=Math.floor(this.hash(i,3)* (width+tile));
-      const y=Math.floor(this.hash(i,9)* (height+tile));
+      const {x,y}=cache.points[i];
       const px=Math.floor((x-offX)/step)*step,
             py=Math.floor((y-offY)/step)*step;
-      const flicker=this.hash(i,Math.floor(t*1.5));
+      const flicker=cache.flicker[i];
       if(flicker<.22)continue;
       const color=storm?0x8b9ba4:
             cursed?(i%4===0?0xb54d55:0x61283b):
@@ -109,8 +132,8 @@ const SEA_PIXEL = {
       }
     }
     if(cursed||storm)for(let i=0;i<11;i++){
-      const x=Math.floor((this.hash(i,19)*width+t*8*(i%2?1:-1)+width*8)%width);
-      const y=Math.floor(this.hash(i,23)*height);
+      const {x:baseX,y}=cache.accents[i];
+      const x=Math.floor((baseX+t*8*(i%2?1:-1)+width*8)%width);
       g.fillStyle(cursed?0xaa354c:0xc0d0c9,.25);
       g.fillRect(x,y,18+(i%3)*9,2);
     }
