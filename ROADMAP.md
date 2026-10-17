@@ -27,6 +27,7 @@
 | **3.6b — Backup do Capitão** | ✅ Integrada; CI verde | Download JSON v4 sem modificação e proteção antes do reset; [PR #38](https://github.com/pedromaintenance/o-mar-de-sangue/pull/38) e [documentação](docs/captain-backup-3-6b.md). Conferência física no Pages pendente |
 | **3.6c — Restauração Segura** | ✅ Integrada; CI verde | Importação JSON v4, prévia, dupla confirmação, backup automático e desfazer; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) e [documentação](docs/captain-restore-3-6c.md). Teste físico no Pages pendente |
 | **3.6d — Diálogos Acessíveis** | ✅ Integrada; CI verde | Tabela de saves com semântica acessível, confirmação anunciada e cancelamento seguro por ESC/B; [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) e [documentação](docs/critical-dialog-accessibility-3-6d.md). QA físico pendente |
+| **3.6e — Leitura Ampliada** | 🟡 Implementada; CI pendente | Opção de texto maior no Porto, persistência separada do save e regressões Android/desktop; [documentação](docs/port-readability-3-6e.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -173,7 +174,15 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Smoke e Chromium aprovados (desktop e Android emulado); [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) integrado (`3a8e3a7`). [Design e testes](docs/critical-dialog-accessibility-3-6d.md).
 - [ ] Conferir leitor de tela, teclado e Xbox físicos e a atualização do Pages/PWA.
 
-**Outros trabalhos:** consolidar guia dos controles Xbox/teclado/toque em cada overlay, aprimorar foco sem mouse e desempenho em celulares modestos, testar PWA instalada/reconexão reais.
+**3.6e — Leitura Ampliada (implementação na branch; CI pendente):**
+
+- [x] Incluir botão reversível **AMPLIAR TEXTO / TEXTO PADRÃO** no rodapé do Porto.
+- [x] Ampliar textos de menu, Diário, estaleiro e comparação de saves preservando responsividade (Android em duas colunas na barra de status).
+- [x] Salvar a preferência em chave isolada de `localStorage`, sem mudar `SeaProfile` v4, áudio ou PWA.
+- [x] Cobrir alternância por botão, `aria-pressed`, tamanho computado e ausência de overflow no Chromium em 1600×900, 1280×720 e Android 390×844.
+- [ ] Concluir smoke/visual verdes, integrar e testar em Pages/PWA, leitor de tela e Xbox físico. [Escopo e QA](docs/port-readability-3-6e.md).
+
+**Outros trabalhos:** consolidar controles nos overlays, aprimorar foco sem mouse e desempenho em celulares modestos, testar PWA instalada/reconexão reais.
 
 ## Regras técnicas que protegem as funcionalidades
 
@@ -197,6 +206,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Conferir no GitHub Pages a 3.6d integrada: leitor de tela/teclado, cancelamento por ESC/B, e fluxo exportar→restaurar→desfazer. Próximo desenvolvimento: consolidar o contrato de acessibilidade das demais interfaces e discutir regras/migração de reputação 3.3b (v4→v5), antes de alterar dados. Save v4 mantido. Conferir ambos no Pages após a liberação do cache offline. Antes de implementar **3.3b — Reputação persistente**, aprovar regras e migração v4→v5. Continuam pendentes as verificações físicas de Xbox, Android, Atlas e áudio.
+Validar e publicar 3.6e — Leitura Ampliada, depois conferir no Pages a alternância em Android, persistência após reload e telas de estaleiro e save. Seguir com acessibilidade da navegação 3.6f e preparar regras/migração v4→v5 de reputação 3.3b somente após aprovação, sem quebrar saves existentes.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
