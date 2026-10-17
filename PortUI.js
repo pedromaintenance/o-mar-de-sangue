@@ -26,6 +26,7 @@ const SEA_PORT_UI = {
     const shell=document.getElementById('app-shell');
     if(!shell)return false;
     this.scene=scene;
+    this.pendingRestore=null;this.restoreArmed=false;
     const root=document.createElement('div');
     root.id='sea-port-ui';
     root.className='port-ui';
@@ -82,12 +83,29 @@ const SEA_PORT_UI = {
       }
     };
     this.onChange=async e=>{
-      if(e.target.id!=='sea-port-tracks'||!e.target.files?.length)return;
+      const input=e.target;
+      if(input.id==='sea-port-backup'){
+        const file=input.files?.[0];
+        if(!file)return;
+        try{
+          if(file.size>SEA_SAVE_TRANSFER.maxSize)throw Error('Arquivo maior que 256 KB.');
+          const data=SEA_SAVE_TRANSFER.parse(await file.text());
+          if(!this.scene||!this.root)return;
+          this.pendingRestore={...data,source:'file'};
+          this.restoreArmed=false;
+          this.scene.page='restore';
+          this.render('restore-cancel');
+        }catch(err){
+          if(this.root)this.notify(err.message||'Backup inválido.');
+        }
+        input.value='';return;
+      }
+      if(input.id!=='sea-port-tracks'||!input.files?.length)return;
       try{
-        const count=await SEA_MUSIC.importFiles(e.target.files);
+        const count=await SEA_MUSIC.importFiles(input.files);
         if(this.scene&&this.root)this.notify(count?'Trilhas importadas.':'Nenhuma trilha reconhecida.');
       }catch(err){this.notify('Não foi possível importar as trilhas.');}
-      e.target.value='';
+      input.value='';
     };
     root.addEventListener('click',this.onClick);
     root.addEventListener('change',this.onChange);
@@ -116,10 +134,12 @@ const SEA_PORT_UI = {
     if(this.onKey&&typeof window!=='undefined')window.removeEventListener('keydown',this.onKey);
     if(typeof document!=='undefined')document.body.classList.remove('port-ui-open');
     this.root=null;this.scene=null;
+    this.pendingRestore=null;this.restoreArmed=false;
     this.lastYardFocus=null;
   },
   goto(page,group) {
     const scene=this.scene;if(!scene)return;
+    if(page!=='restore'){this.pendingRestore=null;this.restoreArmed=false;}
     scene.scene.start('SeaPort',{page,group:group||scene.yardGroup});
   },
   start(mode) {
@@ -181,7 +201,41 @@ const SEA_PORT_UI = {
       return;
     }
     if(name==='export-backup'){this.exportBackup();return;}
-    if(name==='reset-confirm'){SeaProfile.reset();this.goto('menu');return;}
+    if(name==='restore-file'){
+      this.root.querySelector('#sea-port-backup')?.click();return;
+    }
+    if(name==='restore-rollback'){
+      const snapshot=SEA_SAVE_TRANSFER.lastRollback();
+      if(!snapshot){this.notify('Cópia anterior indisponível.');return;}
+      this.pendingRestore=snapshot;this.restoreArmed=false;
+      scene.page='restore';this.render('restore-cancel');return;
+    }
+    if(name==='restore-cancel'){
+      this.pendingRestore=null;this.restoreArmed=false;
+      this.goto('menu');return;
+    }
+    if(name==='restore-arm'){
+      if(!this.pendingRestore||scene.page!=='restore')return;
+      this.restoreArmed=true;this.render('restore-cancel');return;
+    }
+    if(name==='restore-confirm'){
+      if(!this.pendingRestore||!this.restoreArmed||scene.page!=='restore')return;
+      try{
+        SEA_SAVE_TRANSFER.apply(this.pendingRestore.profile);
+        this.pendingRestore=null;this.restoreArmed=false;
+        scene.page='menu';this.render('mission');
+        this.notify('Progresso restaurado. Save anterior guardado neste navegador.');
+      }catch(err){
+        this.restoreArmed=false;this.render('restore-cancel');
+        this.notify(err.message||'Não foi possível restaurar o save.');
+      }
+      return;
+    }
+    if(name==='reset-confirm'){
+      try{SEA_SAVE_TRANSFER.clearRollback();}
+      catch(_){this.notify('Não foi possível apagar a cópia anterior. Reset cancelado.');return;}
+      SeaProfile.reset();this.goto('menu');return;
+    }
     if(name==='next'){
       const report=scene.report;
       const mode=report?.mode==='sandbox'?'sandbox':'mission';this.start(mode);
@@ -451,6 +505,9 @@ const SEA_PORT_UI = {
         '<div class="port-bottom"><span>O PODER TEM UM PREÇO. O MAR, OUTRO.</span>'+
           '<div class="port-bottom__actions">'+
             '<button class="port-text-button" data-action="export-backup" type="button">↓ GUARDAR SAVE .JSON</button>'+
+            '<button class="port-text-button" data-action="restore-file" type="button">↑ RESTAURAR SAVE .JSON</button>'+
+            (SEA_SAVE_TRANSFER.lastRollback()?
+              '<button class="port-text-button" data-action="restore-rollback" type="button">↶ DESFAZER RESTAURAÇÃO</button>':'')+
             '<button class="port-text-button" data-action="reset" type="button">REINICIAR PROGRESSO ↗</button>'+
           '</div>'+
         '</div>'+
@@ -514,6 +571,46 @@ const SEA_PORT_UI = {
       '</section><div class="port-page__foot">'+this.button('menu','VOLTAR AO PORTO','','←','port-choice--return')+
       '</div></main>';
   },
+  restore() {
+    const incoming=this.pendingRestore?.profile;
+    if(!incoming)return this.home(SeaProfile.load());
+    const present=SeaProfile.load();
+    const oldUpgrades=Object.values(present.levels||{}).reduce((n,v)=>n+(Number(v)||0),0);
+    const newUpgrades=Object.values(incoming.levels).reduce((n,v)=>n+v,0);
+    const rows=[
+      ['OURO',present.gold,incoming.gold],
+      ['MISSÃO ATUAL',present.mission,incoming.mission],
+      ['EXPEDIÇÕES',present.sorties,incoming.sorties],
+      ['VITÓRIAS',present.wins,incoming.wins],
+      ['MELHOR ONDA',present.bestWave,incoming.bestWave],
+      ['NÍVEIS DE MELHORIAS',oldUpgrades,newUpgrades]
+    ];
+    return '<main class="port-page port-page--narrow" id="port-main">'+
+      '<section class="port-warning port-restore">'+
+        '<span class="port-warning__sigil" aria-hidden="true">⚓</span>'+
+        '<span class="port-eyebrow">ARQUIVOS DO CAPITÃO · SAVE V4</span>'+
+        '<h1>RECUPERAR O PASSADO?</h1>'+
+        '<p>Compare antes de substituir. A última versão deste navegador ficará guardada localmente para permitir desfazer.</p>'+
+        '<div class="port-restore__grid" role="table" aria-label="Comparação de progresso">'+
+          '<div class="port-restore__row port-restore__row--head" role="row">'+
+            '<span>REGISTRO</span><span>ATUAL</span><span>IMPORTADO</span></div>'+
+          rows.map(([key,oldValue,newValue])=>
+            '<div class="port-restore__row" role="row"><span>'+this.text(key)+'</span>'+
+            '<strong>'+this.num(oldValue)+'</strong><strong>'+this.num(newValue)+'</strong></div>').join('')+
+        '</div>'+
+        '<p class="port-restore__notice">A substituição muda o progresso consolidado, não as músicas importadas nem as opções de som. Apenas backup v4 é aceito.</p>'+
+        (this.restoreArmed?
+          '<strong>CONFIRMAÇÃO FINAL: o progresso atual será substituído.</strong>'+
+          '<div class="port-restore__actions">'+
+            this.button('restore-cancel','CANCELAR','Manter o save atual','←','port-choice--primary')+
+            this.button('restore-confirm','SIM, RESTAURAR SAVE','Salvar cópia local do atual e usar o backup','⚠','port-choice--danger')+
+          '</div>'
+          :'<div class="port-restore__actions">'+
+            this.button('restore-cancel','CANCELAR','Não alterar o progresso','←','port-choice--primary')+
+            this.button('restore-arm','CONTINUAR RESTAURAÇÃO','Ver confirmação final','⚓','')+
+          '</div>')+
+      '</section></main>';
+  },
   reset() {
     return '<main class="port-page port-page--narrow" id="port-main">'+
       '<section class="port-warning"><span class="port-warning__sigil" aria-hidden="true">☠</span>'+
@@ -557,7 +654,8 @@ const SEA_PORT_UI = {
     const active=preferred||document.activeElement?.dataset?.action||null;
     const p=SeaProfile.load(),page=this.scene.page;
     const body=page==='yard'?this.yard(p):page==='help'?this.help():
-      page==='reset'?this.reset():page==='result'?this.result(this.scene.report):this.home(p);
+      page==='reset'?this.reset():page==='restore'?this.restore():
+       page==='result'?this.result(this.scene.report):this.home(p);
     ui.innerHTML='<div class="port-background" aria-hidden="true">'+
       '<span class="port-background__moon"></span><span class="port-background__sea"></span>'+
       '<span class="port-background__vignette"></span></div>'+
@@ -566,7 +664,8 @@ const SEA_PORT_UI = {
       '<span class="port-pad-hint">✥ DIRECIONAL: NAVEGAR · A: CONFIRMAR · B: VOLTAR</span>'+
       this.music()+'<span class="port-footer__version">PORTO RECONSTRUÍDO</span></footer>'+
       '</div><div class="port-toast" hidden role="status"></div>'+
-      '<input id="sea-port-tracks" hidden type="file" multiple accept=".flac,.mp3,audio/*">';
+      '<input id="sea-port-tracks" hidden type="file" multiple accept=".flac,.mp3,audio/*">'+
+       '<input id="sea-port-backup" hidden type="file" accept=".json,application/json">';
     ui.scrollTop=scroll;
     if(active)this.focusByAction(active);
   }

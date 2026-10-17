@@ -67,9 +67,10 @@ const SEA_MUSIC={volume:.25,load:async()=>true,status:()=> 'FLAC',
 const SEA_AUDIO={enabled:true,effectsVolume:1,
  toggle(){this.enabled=!this.enabled},
  setEffectsVolume(n){this.effectsVolume=Math.max(0,Math.min(1,Math.round(n*100)/100));}};
+const SEA_SAVE_TRANSFER={lastRollback:()=>null,clearRollback:()=>{},maxSize:262144};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
 const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
- SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_UPGRADES:upgrades};
+ SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_UPGRADES:upgrades};
 vm.createContext(context);
 vm.runInContext(script+'\nthis.ui=SEA_PORT_UI;',context);
 const ui=context.ui;

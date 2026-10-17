@@ -38,7 +38,7 @@ const {chromium}=require('playwright-core');
      assert(initial?.includes('"gold":743'),'Save must exist before disconnecting');
      const cached=await page.evaluate(async()=>{
        const keys=await caches.keys();
-       const name=keys.find(k=>k.includes('v42-offline-20261016'));
+       const name=keys.find(k=>/^omar-mar-de-sangue-v[0-9]+-/.test(k));
        if(!name)return null;
        const cache=await caches.open(name);
        return {name,html:!!(await cache.match('./index.html')),
