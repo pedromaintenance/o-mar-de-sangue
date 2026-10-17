@@ -48,7 +48,7 @@ for(const desktop of [true,false]){
  assert.equal(perf.enabled,true);
  assert.equal(perf.label.visible,true);
  assert.equal(perf.label.x,desktop?640:240);
- assert.equal(perf.label.y,desktop?683:596);
+ assert.equal(perf.label.y,desktop?683:580);
  assert.equal(perf.label.depth,145);
  assert.equal(created.at(-1).options.fontFamily,'monospace');
  for(let i=0;i<60;i++)perf.sample(16.7);

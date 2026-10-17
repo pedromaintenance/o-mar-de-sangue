@@ -10,6 +10,19 @@ const SEA_PERFORMANCE_COMPARE = {
        value<min||value>max)throw Error('Número inválido: '+label);
     return value;
   },
+  effectBudget(value,frames){
+    if(!value||typeof value!=='object'||Array.isArray(value))
+      throw Error('Telemetria de efeitos inválida.');
+    const meanActive=this.number(value.meanActive,'média de efeitos',0,1000);
+    const peakActive=this.number(value.peakActive,'pico de efeitos',0,1000);
+    const limit=this.number(value.limit,'limite de efeitos',1,1000);
+    const atLimitFrames=this.number(value.atLimitFrames,'quadros no limite',0,frames);
+    if(!Number.isInteger(peakActive)||!Number.isInteger(limit)||
+       !Number.isInteger(atLimitFrames)||peakActive>limit||
+       meanActive>peakActive||atLimitFrames>frames)
+      throw Error('Telemetria de efeitos incompatível.');
+    return {meanActive,peakActive,limit,atLimitFrames};
+  },
   parse(raw){
     if(typeof raw!=='string'||!raw.trim()||raw.length>this.maxFileBytes)
       throw Error('Arquivo FPS vazio ou acima de 256 KB.');
@@ -39,6 +52,9 @@ const SEA_PERFORMANCE_COMPARE = {
       key==='updateFrames'||key==='minFps'||key==='meanFps'||key==='medianFps'?1:0);
     if(summaryClean.slowFrames>summaryClean.updateFrames)
       throw Error('Contagem de quadros lentos incompatível.');
+    const fxSummary=summary.effectBudget===undefined?null:
+      this.effectBudget(summary.effectBudget,summaryClean.updateFrames);
+    let fxWindows=0,fxPeak=0,fxAtLimit=0;
     let prev=0;
     for(const sample of data.samples){
       if(!sample||typeof sample!=='object'||Array.isArray(sample))
@@ -54,6 +70,18 @@ const SEA_PERFORMANCE_COMPARE = {
       if(!Number.isInteger(sample.frames)||!Number.isInteger(sample.slowFrames)||
          sample.slowFrames>sample.frames)
         throw Error('Contagem de quadros inválida.');
+      if(sample.effectBudget!==undefined){
+        if(!fxSummary)throw Error('Telemetria de efeitos sem resumo.');
+        const fx=this.effectBudget(sample.effectBudget,sample.frames);
+        fxWindows++;fxPeak=Math.max(fxPeak,fx.peakActive);
+        fxAtLimit+=fx.atLimitFrames;
+      }
+    }
+    if(fxSummary){
+      if(fxWindows!==data.samples.length||fxPeak!==fxSummary.peakActive||
+         fxAtLimit!==fxSummary.atLimitFrames)
+        throw Error('Telemetria de efeitos incompatível com as amostras.');
+      summaryClean.effectBudget=fxSummary;
     }
     // No imported arbitrary strings or user filenames survive validation.
     return {
@@ -89,6 +117,21 @@ const SEA_PERFORMANCE_COMPARE = {
       const av=a.summary[key],bv=b.summary[key],delta=Math.round((bv-av)*10)/10;
       return {label,unit,a:av,b:bv,delta,higherBetter};
     });
+    // Optional field: old 3.6h/3.6i JSON files still compare normally.
+    const af=a.summary.effectBudget,bf=b.summary.effectBudget;
+    if(!!af!==!!bf)
+      warnings.push('Apenas um relatório inclui a telemetria de efeitos da 3.6l.');
+    if(af&&bf){
+      if(af.limit!==bf.limit)
+        warnings.push('Os relatórios usam limites de efeitos diferentes.');
+      for(const [label,key,unit] of [
+        ['FX · MÉDIA','meanActive','efeitos'],
+        ['FX · PICO','peakActive','efeitos'],
+        ['FX · NO LIMITE','atLimitFrames','quadros']
+      ])metrics.push({label,unit,a:af[key],b:bf[key],
+        delta:Math.round((bf[key]-af[key])*10)/10,higherBetter:null});
+      warnings.push('Carga de efeitos pode refletir diferenças de combate; não demonstra causalidade de FPS.');
+    }
     return {a,b,metrics,warnings};
   }
 };
