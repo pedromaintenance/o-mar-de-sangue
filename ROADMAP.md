@@ -30,7 +30,7 @@
 | **3.6e — Leitura Ampliada** | ✅ Integrada; CI verde | Texto ampliado no Porto, preferência isolada, QA Node/Chromium desktop e Android; [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) e [documentação](docs/port-readability-3-6e.md). Teste físico pendente |
 | **3.6f — Guias Contextuais da Viagem** | ✅ Integrada; CI verde | Instruções na pausa, Carta e ilhas; Node/Chromium aprovados e hitboxes preservadas; [PR #42](https://github.com/pedromaintenance/o-mar-de-sangue/pull/42) e [documentação](docs/voyage-control-guides-3-6f.md). QA físico pendente |
 | **3.6g — Diagnóstico de Desempenho** | ✅ Integrado; CI verde | FPS aproximado, tempo médio/pico, quadros lentos, botão no Porto e F3; [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) e [documentação](docs/performance-diagnostics-3-6g.md). QA físico pendente |
-| **3.6h — Relatório FPS Exportável** | 🟡 Implementada; CI pendente | Até 180 janelas em memória, resumo de FPS e download JSON após viagem sem tocar no save; [especificação](docs/fps-export-report-3-6h.md) |
+| **3.6h — Relatório FPS Exportável** | ✅ Integrada; CI verde | Até 180 amostras temporárias e download JSON com resumo; [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) e [especificação](docs/fps-export-report-3-6h.md). Testes físicos pendentes |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -203,13 +203,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Smoke/Chromium verdes; [PR #43](https://github.com/pedromaintenance/o-mar-de-sangue/pull/43) integrado por squash (`ee2396e`). [Especificação](docs/performance-diagnostics-3-6g.md).
 - [ ] Conferir o indicador no Pages/PWA em celulares modestos e com controle físico.
 
-**3.6h — Relatório FPS Exportável (implementação na branch):**
+**3.6h — Relatório FPS Exportável (integrada à `main`; CI aprovado em 17/10/2026):**
 
 - [x] Reter até 180 janelas de aproximadamente 1 segundo, exclusivamente na memória, descartando as mais antigas com indicador `truncated`.
 - [x] Calcular FPS mínimo, mediano e médio, pico de quadro e contagem de quadros lentos entre as amostras retidas.
 - [x] Disponibilizar **BAIXAR RELATÓRIO FPS** no Porto somente quando houver medição real; gerar JSON sem dados do save.
 - [x] Cobrir isolamento de dados, vida útil da sessão, download e visual desktop/Android por testes Node e Chromium.
-- [ ] CI smoke/visual verdes, merge e publicação no Pages. [Escopo e QA](docs/fps-export-report-3-6h.md).
+- [x] CI `port-smoke` e `port-visual` verdes; [PR #44](https://github.com/pedromaintenance/o-mar-de-sangue/pull/44) integrado por squash (`fa2ccf6`). [Escopo e QA](docs/fps-export-report-3-6h.md).
+- [ ] Conferir download e captura no Pages/PWA em aparelhos reais.
 
 **3.6i — Planejada:** avaliar otimizações gráficas em partículas, desenho do mar e orçamento de efeitos com base nas medições do Pages em aparelhos reais, sem alteração automática de física/IA.
 
@@ -237,6 +238,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e publicar a 3.6h de exportação FPS após CI. No Pages, coletar relatórios JSON em mar calmo, combate e tempestade no mesmo aparelho e usá-los para orientar a 3.6i de otimizações gráficas. Não alterar física/IA sem dados. Reputação persistente 3.3b continua aguardando regras e migração v4→v5 aprovadas.
+Testar no GitHub Pages a 3.6h: ativar FPS no Porto, realizar viagens e baixar relatórios JSON de mar calmo, combate e tempestade no mesmo aparelho. Comparar as métricas antes de implementar a 3.6i de otimizações gráficas. Reputação persistente 3.3b continua dependendo da aprovação das regras e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
