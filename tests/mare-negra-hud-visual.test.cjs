@@ -120,6 +120,38 @@ const {chromium}=require('playwright-core');
    assert(pause.handled&&pause.paused&&pause.closed);
    assert.equal(pause.options,3);
    if(errors.length)throw Error(label+' runtime errors: '+errors.join(' | '));
+   // 3.6h: complete the real voyage and verify the browser downloads a
+   // bounded, read-only FPS report without mutating SeaProfile.
+   await page.evaluate(()=>{
+     const scene=game.scene.getScene('Game');
+     SEA_PERFORMANCE.setEnabled(true);
+     for(let i=0;i<90;i++)SEA_PERFORMANCE.sample(16.7);
+     scene.scene.start('SeaPort',{page:'menu'});
+   });
+   await page.locator('#sea-port-ui [data-action="export-fps"]').waitFor({timeout:20000});
+   assert.equal(await page.locator('[data-action="export-fps"]').isDisabled(),false,
+     label+': report must become exportable only after collecting samples');
+   const saveBeforeReport=await page.evaluate(()=>
+     localStorage.getItem('carcaca.mar-de-sangue.v4'));
+   const [reportDownload]=await Promise.all([
+      page.waitForEvent('download',{timeout:12000}),
+      page.locator('[data-action="export-fps"]').click()
+   ]);
+   assert(/^mar-de-sangue-fps-\d{4}-\d{2}-\d{2}\.json$/.test(
+      reportDownload.suggestedFilename()));
+   const metrics=JSON.parse(fs.readFileSync(await reportDownload.path(),'utf8'));
+   assert.equal(metrics.format,'mar-de-sangue-performance-report');
+   assert.equal(metrics.schema,1);
+   assert.equal(metrics.source,'viagem-concluida');
+   assert(metrics.samples.length>0&&metrics.samples.length<=180);
+   assert(metrics.summary.meanFps>0);
+   assert(metrics.summary.worstFrameMs>0);
+   assert(!('profile' in metrics)&&!('player' in metrics),
+     'FPS report must not contain personal save data');
+   assert.equal(await page.evaluate(()=>
+     localStorage.getItem('carcaca.mar-de-sangue.v4')),saveBeforeReport);
+   await page.screenshot({path:path.join('port-artifacts',
+     'mare-negra-3-6h-'+label+'-fps-export.png'),fullPage:true});
    console.log('PASS Maré Negra HUD '+label,before.hud);
    await page.close();
   }
