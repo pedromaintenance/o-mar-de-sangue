@@ -248,8 +248,11 @@ const {chromium}=require('playwright-core');
       await page.locator('.port-help-grid').waitFor();
       assert(await page.locator('.port-help-grid').innerText().then(t=>t.includes('LEITURA AMPLIADA')));
       await page.locator('[data-action="menu"]').first().click();
+      // Wait for the newly mounted Port scene before importing a save. An
+      // old input may be detached during Phaser's scene transition.
+      await page.locator('#sea-port-ui .port-hero').waitFor({timeout:15000});
       await page.locator('#sea-port-backup').setInputFiles(file);
-      await page.locator('.port-restore').waitFor();
+      await page.locator('.port-restore').waitFor({timeout:15000});
       const restoreWidth=await page.evaluate(()=>({
         full:document.getElementById('sea-port-ui').scrollWidth,
         client:document.getElementById('sea-port-ui').clientWidth
