@@ -374,14 +374,17 @@ const {chromium}=require('playwright-core');
       await page.evaluate(()=>SEA_ISLANDS.close(game.scene.getScene('Game')));
       const delivery=await page.evaluate(()=>{
         const s=game.scene.getScene('Game'),island=s.islands.find(i=>i.id===s.contract.shelterId);
+        for(const e of s.enemies)e.dead=true;
         s.player.setPosition(island.x+island.radius+s.hullRadius+35,island.y);
         s.playerVelocity.x=0;s.playerVelocity.y=0;
         const docked=SEA_ISLANDS.tryDock(s);
+        const selected=s.islandSelected?.id;
         if(docked)SEA_ISLANDS.select(s);
-        return {docked,completed:s.contract.completed,
+        return {docked,selected,target:island.id,completed:s.contract.completed,
           bounty:s.contract.bounty,ended:s.ended};
       });
-      assert(delivery.docked&&delivery.completed&&!delivery.ended);
+      assert(delivery.docked&&delivery.completed&&!delivery.ended,
+        label+': delivery='+JSON.stringify(delivery));
       await page.evaluate(()=>SEA_ISLANDS.close(game.scene.getScene('Game')));
       await page.locator('#sea-port-ui [data-action="contracts"]').waitFor({timeout:20000});
       const report=await page.evaluate(()=>game.scene.getScene('SeaPort').report);
