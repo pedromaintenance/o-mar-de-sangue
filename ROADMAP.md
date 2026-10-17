@@ -28,6 +28,7 @@
 | **3.6c — Restauração Segura** | ✅ Integrada; CI verde | Importação JSON v4, prévia, dupla confirmação, backup automático e desfazer; [PR #39](https://github.com/pedromaintenance/o-mar-de-sangue/pull/39) e [documentação](docs/captain-restore-3-6c.md). Teste físico no Pages pendente |
 | **3.6d — Diálogos Acessíveis** | ✅ Integrada; CI verde | Tabela de saves com semântica acessível, confirmação anunciada e cancelamento seguro por ESC/B; [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40) e [documentação](docs/critical-dialog-accessibility-3-6d.md). QA físico pendente |
 | **3.6e — Leitura Ampliada** | ✅ Integrada; CI verde | Texto ampliado no Porto, preferência isolada, QA Node/Chromium desktop e Android; [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) e [documentação](docs/port-readability-3-6e.md). Teste físico pendente |
+| **3.6f — Guias Contextuais da Viagem** | 🟡 Implementada; CI pendente | Instruções corretas de teclado, Xbox e toque na pausa, Carta e ilhas; sem alterações de hitboxes/combat/save; [documentação](docs/voyage-control-guides-3-6f.md) |
 
 A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga ainda está disponível em `?theme=classic`.
 
@@ -183,7 +184,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] CI smoke e Chromium (1600×900, 1280×720, Android 390×844) aprovados; [PR #41](https://github.com/pedromaintenance/o-mar-de-sangue/pull/41) integrado (`11f8ceb`). [Escopo e QA](docs/port-readability-3-6e.md).
 - [ ] Conferir no Pages/PWA, leitor de tela e Xbox físico.
 
-**Outros trabalhos:** consolidar controles nos overlays, aprimorar foco sem mouse e desempenho em celulares modestos, testar PWA instalada/reconexão reais.
+**3.6f — Guias Contextuais da Viagem (implementada na branch):**
+
+- [x] Padronizar os comandos exibidos em pausa, Carta e encontros (↑↓/direcional, Enter/A, ESC/B, toque).
+- [x] Adicionar instrução de sobreposições ao Diário de Bordo, preservando teclado/gamepad/hitboxes existentes.
+- [x] Testar contrato de opções e hitboxes por Node, e geometria das legendas diante dos botões de retorno no Chromium desktop/Android emulado.
+- [ ] CI smoke e visual verdes, merge e verificação física em Pages/PWA. [Design e QA](docs/voyage-control-guides-3-6f.md).
+
+**3.6g — Planejada:** instrumentação não intrusiva de desempenho (FPS/tempos de quadro) em celulares modestos, sem alterar física nem IA antes de obter medições.
+
+**Outros trabalhos:** foco sem mouse, testes Xbox físico, leitor de tela e PWA instalada/reconexão reais.
 
 ## Regras técnicas que protegem as funcionalidades
 
@@ -207,6 +217,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Testar no Pages a 3.6e Leitura Ampliada no celular e desktop (alternância, persistência, Diário, estaleiro e restauração). Continuar 3.6f com acessibilidade das sobreposições de navegação e medições de desempenho, mantendo 3.3b reputação persistente pendente de aprovação de regras e migração v4→v5.
+Validar CI e publicar a 3.6f; testar as legendas dos modais da viagem no Pages via teclado/Xbox/toque. Depois estudar 3.6g (FPS em celulares modestos). Reputação persistente 3.3b aguarda regras aprovadas e migração v4→v5; nenhum save v4 será modificado sem plano de reversão.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
