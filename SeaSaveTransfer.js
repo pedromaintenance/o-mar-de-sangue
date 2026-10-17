@@ -47,7 +47,7 @@ const SEA_SAVE_TRANSFER = {
     return cleaned;
   },
   parse(text) {
-    if(typeof text!=='string'||!text||text.length>this.maxSize)
+    if(typeof text!=='string'||!text.trim()||text.length>this.maxSize)
       throw Error('Arquivo vazio ou maior que 256 KB.');
     let json;
     try { json=JSON.parse(text); } catch(_) {throw Error('JSON inválido ou danificado.');}
