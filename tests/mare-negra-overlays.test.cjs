@@ -74,6 +74,8 @@ for(const desktop of [true,false]){
    'pause overlay must intercept taps from the game');
  const labels=all.filter(o=>o.kind==='text').map(o=>o.text);
  assert(labels.some(s=>String(s).includes('DIÁRIO DO CAPITÃO')));
+ assert(labels.some(s=>String(s).includes('DIRECIONAL: ESCOLHER')&&String(s).includes('ENTER / A: CONFIRMAR')&&String(s).includes('ESC / P / B: VOLTAR')),
+   'Pause legend must expose real keyboard and Xbox actions');
  assert(labels.some(s=>String(s).includes('MALDIÇÃO 23%')));
  assert(labels.some(s=>String(s).includes('Derrotar o arauto')));
  assert(labels.some(s=>String(s).includes('REGISTRO POLÍTICO · NENHUM ACORDO')),
@@ -122,6 +124,13 @@ for(const desktop of [true,false]){
  assert.deepEqual(Array.from(scene.islandOptions.slice(0,3),o=>o.hit.h),
    [63,63,63]);
  assert.equal(scene.islandOptions[3].hit.h,49);
+ const islandHints=all.slice(renderedBefore).filter(o=>o.kind==='text');
+ const controls=islandHints.find(o=>String(o.text).includes('ESC / B: VOLTAR')&&
+   String(o.text).includes('DIRECIONAL: ESCOLHER'));
+ assert(controls,'Island overlay should describe selection, confirm, and exit');
+ const bottom=scene.islandOptions.at(-1).hit;
+ assert(controls.args[1]<bottom.y-bottom.h/2,'Control legend must not overlap the return button');
+ assert.equal(scene.islandOptions.length,4,'Control legend cannot create extra choice');
  // Keep the original effect data; the callback must still dispatch choice #2.
  let applied=null,closed=0;
  ctx.islands.apply=(_s,choice)=>{applied=choice;};
