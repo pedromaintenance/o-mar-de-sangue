@@ -640,7 +640,7 @@ const SEA_PORT_UI = {
        ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
       ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.'],
       ['RELATÓRIO FPS','Ative MOSTRAR FPS, navegue e retorne ao Porto. Use BAIXAR RELATÓRIO FPS para exportar até 180 janelas de um segundo em JSON. Os dados ficam só na memória e desaparecem ao recarregar.'],
-      ['COMPARAR RELATÓRIOS','Selecione exatamente dois relatórios FPS JSON exportados pelo jogo. O Porto compara médias, piores quadros e advertências sem modificar saves nem enviar os arquivos à rede.']
+      ['COMPARAR RELATÓRIOS','Selecione dois relatórios FPS JSON. Além das contagens, veja quadros lentos por 1.000 atualizações e saturação FX por 1.000 quando disponível. Tudo permanece no aparelho, sem modificar saves.']
     ];
     return '<main class="port-page" id="port-main"><div class="port-page__header">'+
       '<span class="port-eyebrow">DOUTRINA DO CAPITÃO</span><h1>DIÁRIO DE BORDO</h1>'+
@@ -676,8 +676,9 @@ const SEA_PORT_UI = {
             '<strong role="cell">'+(m.delta>0?'+':'')+readout(m.delta,m.unit)+'</strong>'+
           '</div>').join('')+
       '</div>'+
-      '<p>FPS maior costuma ser melhor; tempo por quadro e quadros lentos menores costumam ser melhores. '+
-        'A diferença não demonstra qual efeito gráfico causou uma queda.</p>'+
+      '<p>Taxas por 1.000 consideram apenas as atualizações retidas em cada captura; '+
+        'servem para comparar viagens de durações diferentes. FPS maior costuma ser melhor; '+
+        'isso não demonstra qual efeito gráfico causou uma queda.</p>'+
       (data.warnings.length?'<div class="port-compare__warnings" role="status"><strong>ATENÇÃO À COMPARAÇÃO</strong>'+
         '<ul>'+data.warnings.map(w=>'<li>'+this.text(w)+'</li>').join('')+'</ul></div>':'')+
       '<div class="port-page__foot">'+this.button('menu','VOLTAR AO PORTO','Nenhum progresso foi alterado','←','port-choice--primary')+'</div>'+
