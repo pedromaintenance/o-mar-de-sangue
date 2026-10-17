@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6f: Guias Contextuais da Viagem
 
-**Status:** implementação na branch; publicação sujeita à aprovação de smoke e Chromium.
+**Status:** integrado à `main` em 17/10/2026 pelo [PR #42](https://github.com/pedromaintenance/o-mar-de-sangue/pull/42) (squash `e143a4e`), com CI smoke e Chromium aprovados. Verificação física no Pages/PWA pendente.
 
 ## Objetivo
 
@@ -28,7 +28,7 @@ O service worker usa nova revisão de cache para distribuir a atualização offl
 
 - [x] Testes Node em `tests/mare-negra-overlays.test.cjs`, `tests/atlas-chart.test.cjs` e `tests/port-ui-rebuild.test.cjs`: legendas presentes, opções/hitboxes inalteradas, nenhum dado oculto revelado.
 - [x] Testes reais de navegador em `tests/mare-negra-overlays-visual.test.cjs` (desktop e celular) e `tests/atlas-chart-visual.test.cjs` (1600×900, 1280×720 e Android 390×844): legendas renderizadas, fora dos botões de saída, nenhuma gravação de save.
-- [ ] CI `port-smoke` e `port-visual` concluídos com sucesso.
+- [x] CI `port-smoke` e `port-visual` aprovados após ajuste da geometria verificada no navegador; squash merge `e143a4e`.
 - [ ] Validação física com gamepad Xbox, Android e PWA instalada; conferir contrastes em monitores modestos.
 
 ## Próximas etapas
