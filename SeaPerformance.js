@@ -31,7 +31,7 @@ const SEA_PERFORMANCE = {
     if(!this.scene)return;
     if(!this.label){
       const {width,height}=SEA_VIEW;
-      const y=SEA_DESKTOP?height-37:602;
+      const y=SEA_DESKTOP?height-37:596;
       this.label=this.scene.add.text(width/2,y,'FPS: AMOSTRANDO…',{
         fontFamily:'monospace',fontSize:SEA_DESKTOP?'12px':'11px',
         color:'#e5d0ac',align:'center',lineSpacing:3,
