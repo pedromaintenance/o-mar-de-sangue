@@ -306,7 +306,21 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 **Critérios da fase:** pelo menos três objetivos jogáveis distintos, mapa útil à decisão, falha/retirada bem definidas, nenhum bloqueio de missão e controles/CI protegidos.
 
-### 3.8 — Ferro, Pólvora e Sangue (proposto, não implementado)
+### 3.8 — Ferro, Pólvora e Sangue (primeiro marco em validação)
+
+**3.8a.0 — Salva Preparada, Recuo e Predadores do Mar (em validação, 17/10/2026):**
+
+- [x] Trocar disparo imediato por **segurar o comando** em teclado, Xbox e toque, com carga independente por bordo e cancelamento ao soltar.
+- [x] Iniciar em **2000 ms** e reduzir o tempo por `2000 × exp(-0,105 × nível de Serventes Treinados)`, preservando recarga/limites preexistentes.
+- [x] Barras do HUD exibem carga de bombordo/estibordo sem mudar suas posições ou áreas de toque.
+- [x] Recuo de cada salva proporcional ao poder de fogo e número de projéteis; **Escoras do Abismo** amortecem exponencialmente; navios inimigos sofrem recuo proporcional à massa.
+- [x] Navios inimigos carregam salvas com tempo inicial de 2 s na dificuldade 1 e progressão exponencial na dificuldade.
+- [x] Criaturas marinhas deixam de lançar projéteis: enguias, afogados, coral, caranguejo, tartaruga e Dagon investem fisicamente; Kraken mantém tentáculo próximo; fases de invocação de Dagon preservadas.
+- [x] Testes Node, HUD Chromium em três viewports, documentação e cache PWA v56; mantém save v4 e níveis de estaleiro.
+- [ ] CI verde no PR, squash merge, CI pós-merge e Pages publicados; **teste físico e balanceamento pendentes**.
+- [Especificação, cálculos e roteiro de QA](docs/gunnery-charge-recoil-3-8a.md).
+
+### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
 
 - **3.8a — Equipamentos ativos:** selecionar entre arpão, morteiro, fumaça e pólvora amaldiçoada, com usos, recargas e limites explícitos, sem desbalancear os canhões normais.
 - **3.8b — Abordagem naval:** opção após enfraquecer/imobilizar inimigos, com saquear, libertar cativos ou capturar, inclusive risco de perda e consequência política.
@@ -358,6 +372,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e publicar 3.7a.2 (Contrabando) após CI; depois iniciar 3.7a.3 (Caçada). Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Priorizar publicação de 3.8a.0 (salvas, recuo e predadores) mediante CI verde; depois retomar 3.7a.3 (Caçada), planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
