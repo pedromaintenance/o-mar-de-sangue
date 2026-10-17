@@ -30,8 +30,9 @@ Não é possível decidir cortar partículas com base nessa comparação absolut
 - [x] Novo `tests/fps-normalization-3-6l1.test.cjs`: sessões de diferentes durações, diferenças absolutas vs relativas, FX opcional, legados v1 e adulterações dos totais.
 - [x] Atualização dos contratos anteriores: `tests/performance-compare-3-6i.test.cjs`, `tests/effect-budget-3-6l.test.cjs`, `tests/port-visual.test.cjs`.
 - [x] `port-smoke` e `port-visual` no PR aprovados; squash merge `4b5ca20`.
-- [ ] Confirmar CI pós-merge na `main`.
-- [ ] Publicação Pages concluída; validação manual no navegador, PWA e celular físico.
+- [x] CI pós-merge na `main` aprovado ([run 39039034306](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39039034306)).
+- [x] GitHub Pages publicado ([run 39039056469](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39039056469)).
+- [ ] Validação manual no navegador, PWA e celular físico.
 
 ## Como testar no Pages
 
