@@ -1,6 +1,6 @@
 # O Mar de Sangue — 3.6i: Comparador Local de Relatórios FPS
 
-**Estado:** implementação concluída na branch; publicação depende dos dois jobs obrigatórios no GitHub Actions.
+**Estado:** integrada à `main` em 17/10/2026 pelo [PR #45](https://github.com/pedromaintenance/o-mar-de-sangue/pull/45) (squash `76e33ab`), com smoke e Chromium aprovados. Verificação física no Pages/PWA pendente.
 
 ## Objetivo
 
@@ -38,7 +38,7 @@ O comparador sinaliza quando:
 - [x] `tests/performance-compare-3-6i.test.cjs`: dois relatórios válidos, diferenças, avisos, arquivo fora do formato, limite de 180 janelas, números incorretos, isolamento de strings e ausência de acesso a saves/rede.
 - [x] `tests/port-ui-rebuild.test.cjs`: tabela de comparação, saída segura e progresso inalterado.
 - [x] `tests/port-visual.test.cjs`: seleção real de dois arquivos em Chromium 1600×900, 1280×720 e Android 390×844, tabela acessível, avisos, cancelamento, rejeição de JSON corrompido, sem overflow global nem mudança no save.
-- [ ] CI `port-smoke` e `port-visual` verdes; squash merge e deploy no Pages.
+- [x] CI `port-smoke` e `port-visual` aprovados; squash merge `76e33ab`.
 - [ ] Confirmação manual no Pages, Android e PWA física com relatórios reais.
 
 ## Próxima etapa — 3.6j
