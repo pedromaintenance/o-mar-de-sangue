@@ -357,6 +357,13 @@ const SEA_ISLANDS = {
                         (choice.hp<0&&s.shipHP<=Math.abs(choice.hp))));
             }
         }
+        // Static legend between decisions and the return control; this
+        // never creates a selectable option or changes pointer hitboxes.
+        root.add(s.add.text(x,top+height-91,
+            '↑↓ / DIRECIONAL: ESCOLHER · ENTER / A: CONFIRMAR · ESC / B: VOLTAR · TOQUE',{
+                fontFamily:'monospace',fontSize:SEA_DESKTOP?'10px':'9px',
+                color:'#d4bda3',align:'center',wordWrap:{width:width-38}
+            }).setOrigin(.5));
         this.screenButton(s,root,x,top+height-44,width-56,49,
             s.islandOutcome?'⚓  VOLTAR AO MAR':'◀  NÃO ATRACAR / VOLTAR', '',-1);
     },
