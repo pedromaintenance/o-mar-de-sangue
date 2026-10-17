@@ -48,7 +48,7 @@ const corrupted2=report(20,60,3,null);
 corrupted2.summary.updateFrames+=1;
 assert.throws(()=>c.parse(JSON.stringify(corrupted2)),/Contagens de quadros incompatíveis/);
 const changed=report(20,60,3,6);
-changed.samples[0].frames=0;
+changed.samples[0].frames=59;
 assert.throws(()=>c.parse(JSON.stringify(changed)),/Contagem de quadros incompatíveis/);
 const executable=source.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
 assert(!/SeaProfile\s*\.|\blocalStorage\b|\bfetch\s*\(|XMLHttpRequest/.test(executable));
