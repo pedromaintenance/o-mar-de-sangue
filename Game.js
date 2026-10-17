@@ -428,6 +428,7 @@ class Game extends Phaser.Scene {
         }
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
         this.createHUD();
+        SEA_PERFORMANCE.attach(this);
         SEA_WEATHER.init(this);
         SEA_ISLANDS.init(this);
         SEA_ATLAS.init(this);
@@ -444,6 +445,7 @@ class Game extends Phaser.Scene {
         };
         this.onDock = e => { if (!e?.repeat && !this.atlasOpen) SEA_ISLANDS.tryDock(this); };
         this.onAtlas = e => { if(!e?.repeat) SEA_ATLAS.toggle(this); };
+        this.onPerformance = e => {if(!e?.repeat) SEA_PERFORMANCE.toggle();};
         this.input.keyboard.on('keydown-SPACE', this.onBoth);
         this.input.keyboard.on('keydown-Q', this.onPort);
         this.input.keyboard.on('keydown-E', this.onStarboard);
@@ -451,6 +453,7 @@ class Game extends Phaser.Scene {
         this.input.keyboard.on('keydown-P', this.onPause);
         this.input.keyboard.on('keydown-F', this.onDock);
         this.input.keyboard.on('keydown-M', this.onAtlas);
+        this.input.keyboard.on('keydown-F3', this.onPerformance);
         this.onPauseMenuKey = e => {
             if (this.atlasOpen) {
                 if (e.code === 'ArrowDown' || e.code === 'ArrowRight') {
@@ -485,6 +488,8 @@ class Game extends Phaser.Scene {
             this.input.keyboard.off('keydown-P', this.onPause);
             this.input.keyboard.off('keydown-F', this.onDock);
             this.input.keyboard.off('keydown-M', this.onAtlas);
+            this.input.keyboard.off('keydown-F3', this.onPerformance);
+            SEA_PERFORMANCE.detach(this);
             this.input.keyboard.off('keydown', this.onPauseMenuKey);
         });
         // Eventos por pointer: soltar um dedo NÃO cancela o movimento dos demais.
@@ -1226,6 +1231,7 @@ class Game extends Phaser.Scene {
     }
 
     update(time, delta) {
+        SEA_PERFORMANCE.sample(delta);
         const pad = SEA_GAMEPAD.poll();
         SEA_MUSIC.tick(Math.min((delta || 16) / 1000, .05),
             SEA_MUSIC.resolveMood(this));
