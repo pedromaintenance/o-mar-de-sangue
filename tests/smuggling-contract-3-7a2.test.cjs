@@ -116,7 +116,7 @@ assert.equal(quiet.finishCalls[0][0],true);
 const captured=scene();
 assert.equal(c.init(captured,'smuggle'),true);
 captured.elapsed=10;
-captured.contract.suspicion=99;
+captured.contract.suspicion=99.8;
 c.update(captured,.05);
 assert.equal(captured.contract.intercepted,true);
 assert.equal(captured.contract.bounty,0);
