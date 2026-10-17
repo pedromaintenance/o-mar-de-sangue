@@ -99,6 +99,21 @@ assert.equal(ui.readable,false,'Default font mode must be unchanged');
 assert(ui.root.innerHTML.includes('data-action="readability"'));
 assert(ui.root.innerHTML.includes('data-action="performance"'));
 assert(ui.root.innerHTML.includes('data-action="export-fps"'));
+assert(ui.root.innerHTML.includes('data-action="compare-fps"'));
+ui.comparedFps={a:{view:'compact',sampleCount:30},b:{view:'desktop',sampleCount:20},
+ metrics:[{label:'FPS MÉDIO',unit:'fps',a:60,b:44,delta:-16}],
+ warnings:['Telas diferentes']};
+scene.page='fps-compare';ui.render('menu');
+assert(ui.root.innerHTML.includes('Comparação entre dois relatórios FPS'));
+assert(ui.root.innerHTML.includes('B − A'));
+assert(ui.root.innerHTML.includes('FPS MÉDIO'));
+assert(ui.root.innerHTML.includes('Telas diferentes'));
+const savedBeforeComparison=JSON.stringify(p);
+ui.action('menu');
+assert.equal(ui.comparedFps,null);
+assert.equal(JSON.stringify(p),savedBeforeComparison);
+scene.page='menu';ui.render();
+
 assert(ui.root.innerHTML.includes('disabled title="Ative o diagnóstico'));
 const mockReport={
   format:'mar-de-sangue-performance-report',schema:1,
