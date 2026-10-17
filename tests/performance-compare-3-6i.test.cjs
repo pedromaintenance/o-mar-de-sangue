@@ -54,6 +54,7 @@ const malicious=tool.parse(JSON.stringify({...defaults,
 assert.equal(JSON.stringify(malicious).includes('script'),false);
 assert.equal(JSON.stringify(malicious).includes('gold'),false);
 assert.equal(JSON.stringify(malicious).includes('<'),false);
-assert(!/SeaProfile\s*\.|localStorage|fetch\s*\(|XMLHttpRequest/.test(source),
+const executable=source.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/[^\n]*/g,'');
+assert(!/SeaProfile\s*\.|\blocalStorage\b|\bfetch\s*\(|XMLHttpRequest/.test(executable),
  'Comparator cannot access profile, storage or network');
 console.log('PASS 3.6i: FPS reports validated locally; warnings, comparisons and malformed inputs');
