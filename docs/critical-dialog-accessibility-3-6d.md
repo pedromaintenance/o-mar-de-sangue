@@ -1,6 +1,6 @@
 # O Mar de Sangue 3.6d — Acessibilidade dos diálogos críticos
 
-**Estado:** implementação na branch, CI pendente; sem alteração de save, economia, navegação naval ou áudio.
+**Estado:** integrada à `main` em 16/10/2026 via [PR #40](https://github.com/pedromaintenance/o-mar-de-sangue/pull/40), com smoke e Chromium aprovados. Sem alteração de save, economia, navegação naval ou áudio. Testes físicos pendentes.
 
 ## Melhoria entregue
 
@@ -23,7 +23,7 @@ A comparação e os avisos são exclusivamente apresentação. `SeaSaveTransfer.
 - [x] `tests/port-visual.test.cjs`: Chromium 1600×900, 1280×720 e Android 390×844; conferir cabeçalhos/células acessíveis, foco em Cancelar, Escape/B sem escrita e confirmação final anunciada.
 - [x] `tests/port-controller-navigation.test.cjs`: botão B elimina a confirmação pendente e retorna ao porto, sem aplicar restauração.
 - [x] Preservar regressões existentes de save, música, estaleiro, Atlas e PWA.
-- [ ] Aguardar `port-smoke` e `port-visual` verdes para integrar na `main`.
+- [x] `port-smoke` e `port-visual` concluídos com sucesso; squash merge `3a8e3a7`.
 - [ ] Testar leitor de tela e controle físico Xbox em dispositivo real.
 
 ## Próximos passos
