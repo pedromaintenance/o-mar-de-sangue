@@ -91,6 +91,63 @@ const {chromium}=require('playwright-core');
    assert.equal(await page.evaluate(()=>
      localStorage.getItem('carcaca.mar-de-sangue.v4')),profileBeforePerf);
    await page.screenshot({path:path.join('port-artifacts','mare-negra-3-2-'+label+'-hud.png'),fullPage:true});
+   // 3.6j: count *actual Phaser calls* in a live scene. The
+   // screenshot stays the same; no touch targets/physics are changed.
+   const weatherCache=await page.evaluate(()=>{
+     const scene=game.scene.getScene('Game'),w=SEA_WEATHER;
+     const keep={event:scene.seaEvent,curse:scene.curse,
+       frame:scene.seaWeatherFrame};
+     const stats={mist:0,overlay:0,label:0,bar:0,sky:0,pool:0};
+     const undo=[];
+     function spy(object,method,key){
+       const original=object[method];
+       object[method]=function(...args){
+         stats[key]++;
+         return original.apply(this,args);
+       };
+       undo.push(()=>{object[method]=original;});
+     }
+     spy(scene.seaMist,'setAlpha','mist');
+     spy(scene.seaOverlay,'setFillStyle','overlay');
+     spy(scene.seaWeatherLabel,'setText','label');
+     spy(scene.seaCurseBar,'clear','bar');
+     spy(scene.seaSky,'clear','sky');
+     spy(scene.seaPoolArt,'clear','pool');
+     try{
+       scene.seaEvent='calm';scene.curse=12;
+       scene.seaRenderedEvent=null;scene.seaRenderedLabel=null;
+       scene.seaRenderedCurseBar=null;scene.seaSkyHasContent=false;
+       scene.seaPoolArtActive=false;
+       scene.seaWeatherFrame=.13;w.render(scene,.016);
+       const afterFirst={...stats};
+       for(let i=0;i<80;i++){
+         scene.seaWeatherFrame=.13;w.render(scene,.016);
+       }
+       const afterStable={...stats};
+       scene.seaEvent='storm';scene.seaWeatherFrame=.13;
+       w.render(scene,.016);
+       const afterStorm={...stats};
+       scene.seaEvent='calm';scene.seaWeatherFrame=.13;
+       w.render(scene,.016);
+       return {afterFirst,afterStable,afterStorm,afterCalm:{...stats}};
+     }finally{
+       for(const restore of undo)restore();
+       scene.seaEvent=keep.event;scene.curse=keep.curse;
+       scene.seaWeatherFrame=.13;
+       scene.seaRenderedEvent=null;scene.seaRenderedLabel=null;
+       scene.seaRenderedCurseBar=null;scene.seaSkyHasContent=true;
+       w.render(scene,.016);
+       scene.seaWeatherFrame=keep.frame;
+     }
+   });
+   assert.deepEqual(weatherCache.afterStable,weatherCache.afterFirst,
+      label+': calm weather must not redraw unchanged graphics');
+   assert.equal(weatherCache.afterStorm.overlay,weatherCache.afterFirst.overlay+1,
+      label+': a weather transition must invalidate the overlay');
+   assert.equal(weatherCache.afterStorm.sky,weatherCache.afterFirst.sky+1,
+      label+': storm rain must still be drawn');
+   assert.equal(weatherCache.afterCalm.sky,weatherCache.afterStorm.sky+1,
+      label+': returning to calm must remove rain');
    const alert=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');
     const save={shipHP:s.shipHP,curse:s.curse,seaEvent:s.seaEvent};

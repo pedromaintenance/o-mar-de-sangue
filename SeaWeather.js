@@ -281,6 +281,12 @@ const SEA_WEATHER = {
         }).setScrollFactor(0).setDepth(112);
         s.seaCurseBar=s.add.graphics().setScrollFactor(0).setDepth(112);
         s.seaMist.setAlpha(.57);
+        // Scene-scoped presentation cache: never affects seaEvent/curse/physics.
+        s.seaRenderedEvent=null;
+        s.seaRenderedLabel=null;
+        s.seaRenderedCurseBar=null;
+        s.seaSkyHasContent=false;
+        s.seaPoolArtActive=false;
     },
     onSink(s,e,ramming=false) {
         if(s.ended||s.sinking)return;
@@ -332,6 +338,7 @@ const SEA_WEATHER = {
             s.seaPool={x,y,age:0,life:19};
         }else s.seaPool=null;
         s.seaPoolArt.clear();
+        s.seaPoolArtActive=false;
         s.announce('O MAR VIVO · '+this.names[next]);
     },
     update(s,dt){
@@ -399,14 +406,25 @@ const SEA_WEATHER = {
     render(s,dt){
         const ev=s.seaEvent;
         const fog=ev==='fog',storm=ev==='storm';
-        s.seaMist.setAlpha(fog?.92:storm?.74:.57);
-        if(fog)s.seaOverlay.setFillStyle(0x68747d,.13);
-        else if(storm)s.seaOverlay.setFillStyle(0x111522,.18);
-        else if(ev==='maelstrom')s.seaOverlay.setFillStyle(0x4c1629,.08);
-        else s.seaOverlay.setFillStyle(0x182633,0);
+        // Overlay/mist are constant for a weather state: do not write the
+        // same values to WebGL objects every Game.update().
+        if(s.seaRenderedEvent!==ev){
+            s.seaMist.setAlpha(fog?.92:storm?.74:.57);
+            if(fog)s.seaOverlay.setFillStyle(0x68747d,.13);
+            else if(storm)s.seaOverlay.setFillStyle(0x111522,.18);
+            else if(ev==='maelstrom')s.seaOverlay.setFillStyle(0x4c1629,.08);
+            else s.seaOverlay.setFillStyle(0x182633,0);
+            s.seaRenderedEvent=ev;
+        }
         const g=s.seaSky;
         if(s.seaWeatherFrame>.12){
-            s.seaWeatherFrame=0;g.clear();
+            s.seaWeatherFrame=0;
+            // Keep redrawing moving storm/fog lines; clear calm sky once.
+            if(storm||fog){
+                g.clear();s.seaSkyHasContent=true;
+            }else if(s.seaSkyHasContent){
+                g.clear();s.seaSkyHasContent=false;
+            }
             if(storm){
                 g.lineStyle(2,0xbdd2de,.28);
                 const lines=SEA_DESKTOP?86:38;
@@ -423,8 +441,10 @@ const SEA_WEATHER = {
                 }
             }
         }
-        const pool=s.seaPool,wp=s.seaPoolArt;wp.clear();
+        const pool=s.seaPool,wp=s.seaPoolArt;
         if(pool&&ev==='maelstrom'){
+            // Active whirlpool remains fully animated at the original cadence.
+            wp.clear();s.seaPoolArtActive=true;
             const radius=Math.min(1,pool.age/1.8)*150;
             for(let i=0;i<7;i++){
                 wp.lineStyle(i%2?3:4,i%2?0xe3a0ab:0x8b294b,.38);
@@ -438,14 +458,27 @@ const SEA_WEATHER = {
                 wp.fillStyle(0xedb5b2,.45);
                 wp.fillCircle(pool.x+Math.cos(a)*rr,pool.y+Math.sin(a)*rr,3.5);
             }
+        }else if(s.seaPoolArtActive){
+            wp.clear();s.seaPoolArtActive=false;
         }
         const text=this.names[ev]+(ev==='current'?
             (Math.abs(s.seaCurrent.x)>Math.abs(s.seaCurrent.y)?
                 (s.seaCurrent.x>0?' →':' ←'):(s.seaCurrent.y>0?' ↓':' ↑')):'');
-        s.seaWeatherLabel.setText(text+'  ·  MALDIÇÃO '+Math.round(s.curse)+'%');
-        const bar=s.seaCurseBar;bar.clear();
-        bar.fillStyle(0x17212c,.83).fillRect(16,133,154,5);
-        bar.fillStyle(s.curse>=75?0xe66c73:s.curse>=40?0xc7945d:0xb27c83,.90)
-            .fillRect(16,133,154*s.curse/100,5);
+        const label=text+'  ·  MALDIÇÃO '+Math.round(s.curse)+'%';
+        if(s.seaRenderedLabel!==label){
+            s.seaWeatherLabel.setText(label);
+            s.seaRenderedLabel=label;
+        }
+        const tint=s.curse>=75?0xe66c73:s.curse>=40?0xc7945d:0xb27c83;
+        // A sub-pixel bar change cannot alter the visible filled pixel.
+        // Invalidate on colour thresholds too (40% / 75%).
+        const pixels=Math.round(154*s.curse/100);
+        const barKey=tint+':'+pixels;
+        if(s.seaRenderedCurseBar!==barKey){
+            const bar=s.seaCurseBar;bar.clear();
+            bar.fillStyle(0x17212c,.83).fillRect(16,133,154,5);
+            bar.fillStyle(tint,.90).fillRect(16,133,pixels,5);
+            s.seaRenderedCurseBar=barKey;
+        }
     }
 };
