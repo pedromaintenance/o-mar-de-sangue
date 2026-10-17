@@ -43,7 +43,7 @@ const {chromium}=require('playwright-core');
    assert(pauseGuide.text.includes('ESC/P/B: VOLTAR'));
    assert.equal(pauseGuide.options.length,3,'Help copy cannot create an action');
    const lastPause=pauseGuide.options.at(-1);
-   assert(pauseGuide.bounds&&pauseGuide.bounds.top>lastPause.y+lastPause.h/2,
+   assert(pauseGuide.bounds&&pauseGuide.bounds.y>lastPause.y+lastPause.h/2,
      label+': pause guidance overlaps final button '+JSON.stringify({guide:pauseGuide.bounds,last:lastPause}));
    await page.screenshot({path:path.join('port-artifacts',
      'mare-negra-3-1-'+label+'-pause.png'),fullPage:true});
@@ -76,7 +76,7 @@ const {chromium}=require('playwright-core');
    assert.equal(islandGuide.options.length,4);
    const lastIsland=islandGuide.options.at(-1);
    assert(islandGuide.bounds&&
-      islandGuide.bounds.bottom<lastIsland.y-lastIsland.h/2,
+      (islandGuide.bounds.y+islandGuide.bounds.height)<lastIsland.y-lastIsland.h/2,
      label+': island help overlaps the return hitbox');
    await page.screenshot({path:path.join('port-artifacts',
      'mare-negra-3-1-'+label+'-island.png'),fullPage:true});
