@@ -7,7 +7,7 @@ assert.equal(png.readUInt32BE(16),480,'five 96px cells');
 assert.equal(png.readUInt32BE(20),96);
 assert(png.length>1000&&png.length<16000,'sparse optimized VFX atlas');
 const src=fs.readFileSync('SeaCannonChargeFx.js','utf8');
-const ctx={SEA_GUNNERY:{chargeMs:()=>2000}};
+const ctx={SEA_GUNNERY:{chargeMs:()=>2000},Phaser:{BlendModes:{ADD:1}}};
 vm.createContext(ctx);
 vm.runInContext(src+';this.fx=SEA_CHARGE_FX;',ctx);
 const fx=ctx.fx;
@@ -15,6 +15,7 @@ const objects=[];
 const makeSprite=()=>({
   frame:0,visible:true,scale:1,alpha:1,
   setScale(n){this.scale=n;return this},
+  setBlendMode(n){this.blendMode=n;return this},
   setAlpha(n){this.alpha=n;return this},
   setVisible(n){this.visible=n;return this},
   setFrame(n){this.frame=n;return this}
@@ -36,6 +37,10 @@ assert.equal(objects.length,2,'only two persistent sprites in scene');
 assert.equal(scene.playerVisual.children.length,2,'sprites track ship rotation');
 assert(objects[0].x<0&&objects[1].x>0,'correct physical broadside');
 assert(objects.every(s=>s.visible===false));
+assert(objects.every(s=>s.blendMode===ctx.Phaser.BlendModes.ADD),
+ 'spark sprites must use additive blending, not darken the red sea');
+assert(objects.every(s=>s.scale>.75&&s.alpha>=.85),
+ 'spark cores must be visible at the actual ship scale');
 fx.sync(scene);assert(objects.every(s=>s.visible===false));
 scene.cannonCharge.port=100;fx.sync(scene);
 assert(objects[0].visible&&!objects[1].visible);
