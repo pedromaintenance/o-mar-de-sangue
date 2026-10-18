@@ -1,6 +1,6 @@
 # 3.8a.4 — Horror de Coral: remoção da faixa de pixels soltos
 
-**Estado:** correção de asset na branch, aguardando aprovação completa do CI, integração e publicação.
+**Estado:** correção publicada em 18/10/2026 via [PR #56](https://github.com/pedromaintenance/o-mar-de-sangue/pull/56) (squash `686b0f7`). [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) aprovado ([run 39117992501](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39117992501)); PR e CI pós-merge aprovados ([run 39117992857](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39117992857)).
 
 ## Relato e diagnóstico
 
@@ -29,8 +29,8 @@ A automação temporária utilizada para reparar o binário na feature branch fo
 - [x] Conferência visual do PNG antigo e do PNG reparado: desaparece a faixa superior, mas cabeça, corais vermelhos, garras, corpo e tentáculos permanecem.
 - [x] `tests/coral-asset-3-8a4.test.cjs`: valida dimensões **323×302**, PNG RGBA8 não entrelaçado, assinatura e CRCs, scanlines descomprimidos, presença de pixels da criatura, uso de `v15-coral` em `Game.js` e inclusão no cache offline.
 - [x] `tests/mare-negra-hud-visual.test.cjs`: instancia o Horror de Coral na cena real do jogo e verifica textura, tamanho visual equivalente, raio físico 76, e salva uma captura por viewport (1600×900, 1280×720, 390×844).
-- [ ] Aprovar `port-smoke` e `port-visual` no PR e na `main` pós-merge.
-- [ ] Confirmar publicação no GitHub Pages e registrar links dos pipelines no roadmap.
+- [x] `port-smoke` e `port-visual` aprovados no PR e na `main` pós-merge ([run 39117992857](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39117992857)).
+- [x] GitHub Pages publicado ([run 39117992501](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39117992501)) e roadmap concluído.
 - [ ] Testar em dispositivo físico e confirmar ausência da faixa ao girar/avançar contra o navio.
 
 ## Proteções
