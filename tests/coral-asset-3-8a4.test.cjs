@@ -57,6 +57,7 @@ assert(game.includes("coral: { name: 'Horror de Coral'"),
 const worker=fs.readFileSync('sw.js','utf8');
 assert(worker.includes('./assets/v15/beast_coral.png'),
  'corrected sprite must remain in PWA offline cache');
-assert(worker.includes('v60-coral-crop-20261018'),
- 'PWA must invalidate stale cached image');
+const cacheVersion=Number(worker.match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
+assert(cacheVersion>=60,
+ 'PWA cache version must not regress below coral fix v60');
 console.log('PASS 3.8a.4: corrected full PNG, real alpha, image integrity, enemy mapping and offline cache');
