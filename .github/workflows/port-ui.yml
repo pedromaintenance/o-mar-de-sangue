@@ -56,6 +56,7 @@ on:
       - 'tests/gunnery-single-shot-3-8a1.test.cjs'
       - 'tests/braced-gunnery-3-8a2.test.cjs'
       - 'tests/cannon-charge-sparks-3-8a3.test.cjs'
+      - 'tests/cannon-sparks-luminous-3-8a5.test.cjs'
       - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/smuggling-contract-3-7a2.test.cjs'
       - 'tests/atlas-chart.test.cjs'
@@ -114,6 +115,7 @@ on:
       - 'tests/gunnery-single-shot-3-8a1.test.cjs'
       - 'tests/braced-gunnery-3-8a2.test.cjs'
       - 'tests/cannon-charge-sparks-3-8a3.test.cjs'
+      - 'tests/cannon-sparks-luminous-3-8a5.test.cjs'
       - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/smuggling-contract-3-7a2.test.cjs'
       - 'tests/atlas-chart.test.cjs'
@@ -167,6 +169,7 @@ jobs:
           node tests/braced-gunnery-3-8a2.test.cjs
           node --check SeaCannonChargeFx.js
           node tests/cannon-charge-sparks-3-8a3.test.cjs
+          node tests/cannon-sparks-luminous-3-8a5.test.cjs
           node tests/coral-asset-3-8a4.test.cjs
   port-visual:
     runs-on: ubuntu-latest
