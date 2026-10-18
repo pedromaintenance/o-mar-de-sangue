@@ -30,8 +30,8 @@ A melhoria `Serventes Treinados` continua diminuindo o **tempo de preparação**
 - [x] Cobertura de ESPAÇO/ambos os bordos, dois dedos no mesmo botão, mistura teclado+gatilho Xbox, níveis de cadência extremos, interrupção por pausa e toques curtos que não acumulam carga.
 - [x] Regressão de 3.8a.0 adaptada ao estado de rearme, preservando a preparação de 2 s e as regras de monstros.
 - [x] Verificação Chromium: disparar uma vez, manter segurado por mais dez segundos de simulação, soltar e rearmar; desktop e Android emulado.
-- [ ] CI `port-smoke` e `port-visual` verdes no PR e após merge.
-- [ ] GitHub Pages publicado e registrado no roadmap.
+- [x] CI `port-smoke` e `port-visual` verdes no PR e pós-merge ([run 39086251515](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39086251515)).
+- [x] [PR #53](https://github.com/pedromaintenance/o-mar-de-sangue/pull/53) integrado na `main` (squash `62a2532`); [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) publicado ([run 39086251234](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39086251234)), roadmap atualizado.
 - [ ] Teste físico de toque, Xbox e teclado; balancear o recuo depois da confirmação desta correção.
 
 **Comportamento esperado no teste manual:** segure Q por dois segundos, observe **um** disparo e o contador zerar. Se continuar segurando por mais dez segundos, não haverá outra salva. Solte Q e segure por mais dois segundos para disparar novamente. Repita com ESPAÇO e no celular.
