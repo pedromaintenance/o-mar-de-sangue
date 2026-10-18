@@ -322,6 +322,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Validar controle Xbox e Android físicos, PWA offline instalado e balanceamento dos níveis de carga/recuo.
 - [Especificação, cálculos e roteiro de QA](docs/gunnery-charge-recoil-3-8a.md).
 
+**3.8a.1 — Uma Salva por Acionamento (correção em validação, 17/10/2026):**
+
+- [x] Corrigir o disparo automático indesejado da 3.8a.0: **um único tiro por pressão e carga**, obrigatoriamente **soltar para rearmar**. Segurar indefinidamente não repete o tiro.
+- [x] Rearme independente por bordo para Q/E/ESPAÇO, gatilhos Xbox, botões de toque, fontes de input simultâneas e dois dedos no mesmo botão; sem perder a preparação exponencial de 2 segundos.
+- [x] Interromper cargas em pausa/Atlas/doca/blur sem conceder salvas gratuitas ou reiniciar carga na mesma pressão.
+- [x] Atualizar instruções de jogo/Diário, cache PWA v57, teste de regressão com 15 s pressionados, níveis altíssimos e validação Chromium.
+- [ ] CI verde no PR, squash merge, CI pós-merge e publicação confirmada no Pages.
+- [ ] Confirmar controles físicos e balanceamento com jogadores.
+- [Diagnóstico, protocolo de testes e nova regra](docs/gunnery-single-shot-3-8a1.md).
+
 ### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
 
 - **3.8a — Equipamentos ativos:** selecionar entre arpão, morteiro, fumaça e pólvora amaldiçoada, com usos, recargas e limites explícitos, sem desbalancear os canhões normais.
@@ -374,6 +384,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Priorizar publicação de 3.8a.0 (salvas, recuo e predadores) mediante CI verde; depois retomar 3.7a.3 (Caçada), planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Priorizar a correção 3.8a.1 (uma salva por acionamento), sem regressão do recoil ou monstros; depois retomar a 3.7a.3 (Caçada), ainda planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
