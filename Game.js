@@ -386,6 +386,8 @@ class Game extends Phaser.Scene {
         this.cannonCharge = {port:0,starboard:0};
         // Um único disparo por acionamento: soltar é obrigatório para rearmar.
         this.cannonNeedsRelease = {port:false,starboard:false};
+        this.cannonBracing = 0;
+        this.recoilVisual = 0;this.recoilDamping = 0;
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
@@ -520,8 +522,8 @@ class Game extends Phaser.Scene {
             (this.contract ? 'CONTRATO · '+SEA_CONTRACTS.offers[this.contract.id].title :
              this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
-                ? '\nWASD / SETAS: NAVEGAR · SEGURE Q/E PARA PREPARAR\nESPAÇO: DOIS BORDOS · SOLTE PARA REARMAR · ESC/P: PAUSA'
-                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nTOQUE NA CARTA PARA ABRIR O ATLAS\nSEGURE PARA CARREGAR · SOLTE PARA REARMAR'), {
+                ? '\nSEGURE Q/E ATÉ A SALVA · SOLTAR CANCELA A CARGA\nPREPARAR REDUZ VELOCIDADE · SOLTE PARA REARMAR'
+                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE ATÉ DISPARAR · SOLTAR CANCELA A CARGA\nCARREGAR DESACELERA · SOLTE PARA REARMAR'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
@@ -899,6 +901,7 @@ class Game extends Phaser.Scene {
             if(this.cannonCharge[side]>0)this.cannonNeedsRelease[side]=true;
             this.cannonCharge[side]=0;
         }
+        this.cannonBracing=0;
     }
     updateCannonCharge(dt,pad) {
         if(!this.cannonCharge||!this.keys||!this.shipStats)return;
@@ -927,6 +930,10 @@ class Game extends Phaser.Scene {
                 this.cannonNeedsRelease[side]=true;
             }
         }
+        // Only genuinely charging batteries slow the ship: holding after
+        // the single shot cannot apply a fresh penalty or auto-reload.
+        this.cannonBracing=Number(this.cannonCharge.port>0)+
+            Number(this.cannonCharge.starboard>0);
     }
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
@@ -961,6 +968,12 @@ class Game extends Phaser.Scene {
                 this.profile?.levels?.reforco||0,1.5);
             this.playerVelocity.x -= sign * rightX * recoil;
             this.playerVelocity.y -= sign * rightY * recoil;
+            // The player camera follows the hull, making tiny displacements
+            // hard to perceive. Brief hull lean + soft camera shake sell
+            // the impulse, without moving the collision volume or hitboxes.
+            this.recoilVisual=SEA_MATH.clamp((this.recoilVisual||0)-sign*recoil*.22,-24,24);
+            this.recoilDamping=Math.max(this.recoilDamping||0,.5);
+            this.cameras?.main?.shake?.(145,Math.min(.0038,.0016+recoil/26000));
             this.triggerCannonUiFx(sign < 0 ? 'port' : 'starboard');
         }
         if (fired) SEA_AUDIO.play('cannon', .85 + Math.min(.45, this.shipStats.balls * .11));
@@ -1008,6 +1021,8 @@ class Game extends Phaser.Scene {
         // Throttled visual update. Physics uses unmodified player/enemy positions.
         const t=this.elapsed;
         if(this.playerVisual) {
+            this.recoilVisual=(this.recoilVisual||0)*Math.exp(-8/60);
+            this.playerVisual.x=this.recoilVisual;
             this.playerVisual.y=Math.sin(t*3.5)*1.5;
             this.playerVisual.rotation=Math.sin(t*2.1)*.025;
         }
@@ -1346,18 +1361,25 @@ class Game extends Phaser.Scene {
         this.player.rotation += turn * this.shipStats.turnSpeed * dt;
         const faceX = Math.sin(this.player.rotation), faceY = -Math.cos(this.player.rotation);
         const up = throttle > 0.01, down = throttle < -0.01;
-        if (up) { this.playerVelocity.x += faceX * this.shipStats.accel * throttle * dt; this.playerVelocity.y += faceY * this.shipStats.accel * throttle * dt; }
-        if (down) { this.playerVelocity.x += faceX * 210 * throttle * dt; this.playerVelocity.y += faceY * 210 * throttle * dt; }
-        // Uma salva só sai quando o respectivo bordo completa a preparação.
+        // The charge is deliberate: steering works, but sails/thrust and
+        // top speed must be reduced while the gun crew braces for a salvo.
         this.updateCannonCharge(dt,pad);
+        const brace=SEA_GUNNERY.brace(this.cannonBracing||0);
+        if (up) { this.playerVelocity.x += faceX * this.shipStats.accel * throttle * brace.thrust * dt; this.playerVelocity.y += faceY * this.shipStats.accel * throttle * brace.thrust * dt; }
+        if (down) { this.playerVelocity.x += faceX * 210 * throttle * dt; this.playerVelocity.y += faceY * 210 * throttle * dt; }
         const vx = this.playerVelocity.x, vy = this.playerVelocity.y;
         const forward = vx * faceX + vy * faceY;
         const sideX = vx - forward * faceX, sideY = vy - forward * faceY;
-        const friction = Math.exp(-(up || down ? .58 : 1.28) * dt), lateral = Math.exp(-2.35 * dt);
+        const friction = Math.exp(-((up || down ? .58 : 1.28)+brace.drag)*dt);
+        // After a salvo, momentarily preserve lateral inertia; otherwise
+        // the original side drag erases the kick almost immediately.
+        const lateral = Math.exp(-(this.recoilDamping>0?.75:2.35)*dt);
+        this.recoilDamping=Math.max(0,(this.recoilDamping||0)-dt);
         this.playerVelocity.x = (forward * faceX + sideX * lateral) * friction;
         this.playerVelocity.y = (forward * faceY + sideY * lateral) * friction;
         const sp = Math.hypot(this.playerVelocity.x, this.playerVelocity.y);
-        if (sp > this.shipStats.maxSpeed) { this.playerVelocity.x *= this.shipStats.maxSpeed / sp; this.playerVelocity.y *= this.shipStats.maxSpeed / sp; }
+        const speedCap=this.shipStats.maxSpeed*brace.speed;
+        if (sp > speedCap) { this.playerVelocity.x *= speedCap / sp; this.playerVelocity.y *= speedCap / sp; }
         this.player.x += this.playerVelocity.x * dt;
         this.player.y += this.playerVelocity.y * dt;
         this.collideWorldBounds(this.player, true);
