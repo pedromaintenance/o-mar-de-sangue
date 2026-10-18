@@ -1,6 +1,6 @@
 # 3.8a.2 — Carregar exige manobra; recuo que se sente
 
-**Estado:** implementação em validação. Feedback do jogador após v57: o tempo de 2 segundos está bom, segurar deve continuar obrigatório, e o navio precisa **perder velocidade preparando a salva** e **sofrer recuo perceptível**.
+**Estado:** publicado em 17/10/2026 pelo [PR #54](https://github.com/pedromaintenance/o-mar-de-sangue/pull/54), squash `8f92a3e`, com [GitHub Pages confirmado](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39088831479). Feedback do jogador após v57: o tempo de 2 segundos está bom, segurar deve continuar obrigatório, e o navio precisa **perder velocidade preparando a salva** e **sofrer recuo perceptível**.
 
 ## Contrato do controle — sem mudança de intenção
 
@@ -48,8 +48,8 @@ Nenhum novo campo no save v4, nenhuma mudança nos níveis de estaleiro, contrat
 - [x] Teste `tests/braced-gunnery-3-8a2.test.cjs`: usa o trecho **real** de física de `Game.js`; verifica redução de velocidade, dois bordos, recuperação após cancelamento, recuo lateral prolongado, efeito visual e proteção contra tiros automáticos.
 - [x] `tests/mare-negra-hud-visual.test.cjs`: verifica barras de carga, 60% de limite para um bordo, deslocamento lateral e reação do casco com o Phaser real nas três resoluções.
 - [x] Suítes anteriores de save v4, regressão de não-metralhadora, resgate, contrabando, Atlas, menu, PWA e dispositivos no CI.
-- [ ] `port-smoke` e `port-visual` aprovados no PR e pós-merge na main.
-- [ ] GitHub Pages publicado e documentado no roadmap.
+- [x] `port-smoke` e `port-visual` aprovados no PR e pós-merge na main ([run 39088831585](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39088831585)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39088831479](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39088831479)) e roadmap atualizado.
 - [ ] Testar no teclado, Xbox e celular reais com navio parado e em movimento: soltar em 1 s, atirar em 2 s e segurar por 10 s após disparar; verificar recuo com e sem Escoras do Abismo e desaceleração em marcha.
 
 ## Acompanhamento
