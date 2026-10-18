@@ -70,15 +70,28 @@ const {chromium}=require('playwright-core');
    const volley=await page.evaluate(()=>{
      const s=game.scene.getScene('Game');
      for(let i=0;i<32;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
-     const shot=s.lastPortShot;
+     const firstShot=s.lastPortShot;
+     // A 10-second continuous hold must NOT produce another salvo, even
+     // when the ship has completed its cooldown.
+     for(let i=0;i<200;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
+     const heldShot=s.lastPortShot,heldCharge=s.cannonCharge.port,
+       heldLocked=s.cannonNeedsRelease.port;
      s.cannonPointers.delete('qa-port');s.updateCannonCharge(.01,{});
+     s.cannonPointers.set('qa-port-new','port');
+     for(let i=0;i<40;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
+     const shotAfterRepress=s.lastPortShot;
+     s.cannonPointers.delete('qa-port-new');s.updateCannonCharge(.01,{});
      s.scene.resume();
-     return {shot,starboardShot:s.lastStarboardShot,charge:s.cannonCharge.port,
-       v:{x:s.playerVelocity.x,y:s.playerVelocity.y}};
+     return {shot:firstShot,heldShot,heldCharge,heldLocked,
+       shotAfterRepress,starboardShot:s.lastStarboardShot,
+       charge:s.cannonCharge.port,v:{x:s.playerVelocity.x,y:s.playerVelocity.y}};
    });
-   assert(volley.shot>fireStart.shot&&
+   assert(volley.shot>fireStart.shot&&volley.heldShot===volley.shot&&
+     volley.heldCharge===0&&volley.heldLocked===true&&
+     volley.shotAfterRepress>volley.shot&&
      volley.starboardShot===-1000&&volley.charge===0,
-     label+': completed windup must fire one independent broadside '+JSON.stringify(volley));
+     label+': one salvo per hold and release-to-rearm, independent port broadside '+
+       JSON.stringify(volley));
    assert(Math.hypot(volley.v.x,volley.v.y)>0,
      label+': a broadside should transfer momentum to the hull');
    assert(before.quest.length>0&&before.badge.includes('MALDIÇÃO'));
