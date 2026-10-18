@@ -28,6 +28,34 @@ const {chromium}=require('playwright-core');
      !!game.scene.getScene('Game').player,{timeout:20000});
    const mode=await page.evaluate(()=>SEA_DESKTOP);
    assert.equal(mode,!isMobile,label+': device mode must match the simulated hardware');
+   // 3.8a.4 — the PNG used by the actual monster was cleaned, not
+   // replaced by the lower-resolution legacy Coral Horror placeholder.
+   const coral=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     const enemy=s.spawnEnemy('coral',480);
+     if(!enemy)throw Error('Could not spawn Coral Horror for visual test');
+     enemy.x=s.player.x+240;enemy.y=s.player.y+10;
+     enemy.ship.setPosition(enemy.x,enemy.y);
+     const img=s.textures.get('v15-coral').getSourceImage();
+     return {texture:enemy.ship.texture.key,width:img.width,height:img.height,
+       radius:enemy.radius,displayHeight:enemy.ship.displayHeight,id:enemy.id};
+   });
+   assert.equal(coral.texture,'v15-coral',label+': retain the approved V15 artwork');
+   assert.equal(coral.width,323);
+   assert.equal(coral.height,302,label+': floating strip must be absent');
+   assert.equal(coral.radius,76,label+': unchanged monster collision geometry');
+   assert(Math.abs(coral.displayHeight-76*2.25)<2,
+     label+': sprite stays scaled to its original collision radius');
+   await page.screenshot({path:path.join('port-artifacts',
+     label+'-coral-horror-clean-3-8a4.png'),fullPage:true});
+   await page.evaluate(id=>{
+     const s=game.scene.getScene('Game');
+     const enemy=s.enemies.find(e=>e.id===id);
+     if(enemy){
+       enemy.dead=true;enemy.ship?.destroy();enemy.wake?.destroy();
+       enemy.bar?.destroy();enemy.label?.destroy();
+     }
+   },coral.id);
    const before=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');
     s.updateHUD();

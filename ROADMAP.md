@@ -2,7 +2,7 @@
 
 **Identidade:** horror naval, horror cósmico e conflito político no universo da **Carcaça**.  
 **Plataforma atual:** jogo web estático (GitHub Pages), PWA offline, Phaser + porto HTML/CSS.  
-**Atualização:** 17 de outubro de 2026.  
+**Atualização:** 18 de outubro de 2026.  
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
 
 > **Princípio de desenvolvimento:** evoluir a experiência sem reescrever subsistemas que já funcionam. Separar apresentação de regras; preservar saves, acessibilidade básica, funcionamento offline, mouse/toque, teclado e controle Xbox. Toda interface nova deve passar por testes de regressão antes do merge.
@@ -356,6 +356,16 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39116274514](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39116274514)), com asset local e cache PWA v59.
 - [ ] Validar brilho e intensidade em dispositivo físico (desktop, Android, Xbox).
 - [Especificação do asset, implementação e testes](docs/cannon-fuse-sparks-3-8a3.md).
+
+**3.8a.4 — Horror de Coral: Correção do Sprite (implementado, em validação):**
+
+- [x] Identificar a causa no **PNG ativo** `assets/v15/beast_coral.png`, que continha uma faixa superior de pixels soltos (não em `assets/abyss/coral_horror.png` nem na lógica de colisão).
+- [x] **Corrigir o arquivo binário**, recortando exatamente 28 linhas contaminadas (**323×330 → 323×302**) sem mudar o corpo, os tentáculos ou o estilo do monstro. Guardar reparo reproduzível em `tools/repair_coral_png.py`.
+- [x] Manter textura `v15-coral`, raio 76, escala proporcional e todas as regras de spawn, combate e movimentação; não alterar save v4.
+- [x] Bump de cache offline **PWA v60**, teste Node de integridade PNG/CRC e teste visual do monstro real nas três resoluções.
+- [ ] Validar CI no PR e pós-merge, integrar à `main`, confirmar GitHub Pages.
+- [ ] Confirmar em desktop/celular físico que não há fragmentos soltos durante a rotação.
+- [Relatório de causa, correção e QA](docs/coral-horror-asset-fix-3-8a4.md).
 
 ### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
 

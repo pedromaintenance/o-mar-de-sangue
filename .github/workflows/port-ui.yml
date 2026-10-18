@@ -50,6 +50,8 @@ on:
       - 'SeaGunnery.js'
       - 'SeaCannonChargeFx.js'
       - 'assets/fx/cannon_charge_sparks.png'
+      - 'assets/v15/beast_coral.png'
+      - 'tests/coral-asset-3-8a4.test.cjs'
       - 'tests/gunnery-windup-3-8a.test.cjs'
       - 'tests/gunnery-single-shot-3-8a1.test.cjs'
       - 'tests/braced-gunnery-3-8a2.test.cjs'
@@ -106,6 +108,8 @@ on:
       - 'SeaGunnery.js'
       - 'SeaCannonChargeFx.js'
       - 'assets/fx/cannon_charge_sparks.png'
+      - 'assets/v15/beast_coral.png'
+      - 'tests/coral-asset-3-8a4.test.cjs'
       - 'tests/gunnery-windup-3-8a.test.cjs'
       - 'tests/gunnery-single-shot-3-8a1.test.cjs'
       - 'tests/braced-gunnery-3-8a2.test.cjs'
@@ -163,6 +167,7 @@ jobs:
           node tests/braced-gunnery-3-8a2.test.cjs
           node --check SeaCannonChargeFx.js
           node tests/cannon-charge-sparks-3-8a3.test.cjs
+          node tests/coral-asset-3-8a4.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
