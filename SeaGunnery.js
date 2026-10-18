@@ -8,9 +8,22 @@ const SEA_GUNNERY = Object.freeze({
     // O intervalo de recarga existente ainda limita salvas consecutivas.
     return 2000*Math.exp(-.105*n);
   },
+  // Armar canhões exige reduzir velas e firmar os pés no convés.
+  // Uma bateria a preparar: 60% da velocidade máxima; duas: 45%.
+  brace(speedSides=0) {
+    const sides=Math.max(0,Math.min(2,Math.floor(Number(speedSides)||0)));
+    return sides===0
+      ? {speed:1,thrust:1,drag:0}
+      : sides===1
+        ? {speed:.60,thrust:.55,drag:.9}
+        : {speed:.45,thrust:.38,drag:1.25};
+  },
   recoil(damage=0,balls=1,braces=0,mass=1) {
-    const power=Math.min(80,(8+Math.max(0,Number(damage)||0)*.24)*
-      Math.sqrt(Math.max(1,Number(balls)||1)));
+    // 3.8a.0 gave ~11 speed units to a basic ship: imperceptible
+    // because the lateral drag removes most of it in a few frames.
+    // A basic battery now transfers ~65 units of lateral velocity.
+    const power=Math.min(205,(16+Math.max(0,Number(damage)||0)*.38)*
+      Math.sqrt(Math.max(1,Number(balls)||1))*3.2);
     return power*Math.exp(-Math.max(0,Number(braces)||0)/11)/
       Math.sqrt(Math.max(.7,Number(mass)||1));
   },
