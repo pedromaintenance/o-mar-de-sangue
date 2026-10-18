@@ -1,6 +1,6 @@
 # 3.8a.5 — Faísca de Ignição Legível (correção do borrão escuro)
 
-**Estado:** implementação concluída na branch, publicação condicionada a `port-smoke` + `port-visual` verdes no PR.
+**Estado:** publicado em 18/10/2026 pelo [PR #57](https://github.com/pedromaintenance/o-mar-de-sangue/pull/57), squash `f6924ab`. [Pages aprovado](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39176430237); testes da main aprovados ([run 39176430439](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39176430439)).
 
 ## Sintoma
 
@@ -26,8 +26,8 @@ Havia **dois problemas combinados**:
 - [x] `tests/cannon-sparks-luminous-3-8a5.test.cjs` **decodifica todo o PNG em Node**, valida CRC de cada chunk, `zlib.inflate` dos dados `IDAT`, filtros de todas as linhas e pixels finais. Cada um dos cinco quadros deve ter núcleo luminoso, vasta área transparente e **zero pixels opacos escuros**.
 - [x] `tests/cannon-charge-sparks-3-8a3.test.cjs` passou a verificar também o modo aditivo e um tamanho visual mínimo.
 - [x] `tests/mare-negra-hud-visual.test.cjs` verifica a textura, o blend aditivo, a opacidade e a escala na cena Phaser real em **1600×900**, **1280×720** e **390×844**, mantendo a regressão de carga/cancelamento/recuo.
-- [ ] Aprovar `port-smoke` e `port-visual` no PR e na main após merge.
-- [ ] Confirmar Pages e registrar no roadmap.
+- [x] `port-smoke` e `port-visual` aprovados no PR e na main após merge ([run 39176430439](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39176430439)).
+- [x] [Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39176430237](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39176430237)); roadmap atualizado.
 - [ ] Validar subjetivamente em Chrome desktop, celular físico e PWA instalada; faíscas devem ser pequenas, nítidas, alaranjadas e nunca obscurecer o casco.
 
 ## Teste manual recomendado
