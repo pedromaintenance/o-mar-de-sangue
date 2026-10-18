@@ -333,14 +333,15 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Confirmar controles físicos e balanceamento com jogadores.
 - [Diagnóstico, protocolo de testes e nova regra](docs/gunnery-single-shot-3-8a1.md).
 
-**3.8a.2 — Preparação com Custo de Velocidade e Recuo Perceptível (em validação):**
+**3.8a.2 — Preparação com Custo de Velocidade e Recuo Perceptível (publicada em 17/10/2026):**
 
 - [x] **Manter o comando segurar**: só dispara após completar a carga (2 s inicialmente); soltar antes cancela, manter após a salva não gera outro tiro. Rearmar exige soltura e nova pressão, individualmente em cada bordo.
 - [x] **Custo tático real de preparar canhões**: com um bordo, velocidade máxima 60% e aceleração 55%; com dois bordos, 45% e 38%; arrasto extra apenas durante a preparação, sem alterar as condições de movimento fora dela.
 - [x] **Recuo físico perceptível**: aumentar de ~11 para ~65 unidades de impulso lateral no navio inicial; reduzir arrasto lateral por 0,5 s após a salva e adicionar breve inclinação do casco e tremor discreto de câmera.
 - [x] Manter recuo escalonado com dano/projéteis e mitigado por Escoras do Abismo; manter sprite/hitbox, progressão de estaleiro, save v4 e os monstros marinhos sem tiros.
 - [x] Atualizar orientações de tela e Diário, PWA offline v58, testes de física com Game.js real e QA visual nas três resoluções.
-- [ ] Aprovar testes do PR e pós-merge, integrar na main e confirmar publicação em GitHub Pages.
+- [x] [PR #54](https://github.com/pedromaintenance/o-mar-de-sangue/pull/54) integrado por squash (`8f92a3e`), com `port-smoke` e `port-visual` aprovados no PR e pós-merge ([run 39088831585](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39088831585)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39088831479](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39088831479)); cache offline v58.
 - [ ] Testar a sensação de perda de velocidade e recuo em teclado/Xbox/Android físicos e ajustar valores conforme feedback.
 - [Especificação e roteiro de QA](docs/braced-gunnery-recoil-3-8a2.md).
 
