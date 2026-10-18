@@ -652,9 +652,9 @@ const SEA_PORT_UI = {
   },
   help() {
     const entries=[
-      ['NAVEGAÇÃO','W / ↑ acelerar · S / ↓ frear / ré · A/D ou ←/→ virar · Escoras reduzem recuo das salvas'],
-      ['CANHÕES','Segure Q/E ou ESPAÇO para carregar e disparar UMA salva. Solte o comando e pressione novamente para preparar outra. Início: 2 segundos.'],
-      ['CONTROLE XBOX','Analógico esquerdo · segure LT/LB ou RT/RB para carregar uma salva · solte o gatilho para rearmar · A confirma · B retorna'],
+      ['NAVEGAÇÃO','W / ↑ acelerar · S / ↓ frear / ré · A/D ou ←/→ virar · Durante a preparação, a velocidade cai (mais com ambos os bordos). Escoras amortecem o recuo.'],
+      ['CANHÕES','SEGURE Q/E ou ESPAÇO até a salva sair (2 s no início). Soltar antes CANCELA. Segurar após o tiro não recarrega: solte e pressione novamente.'],
+      ['CONTROLE XBOX','Analógico esquerdo · segure LT/LB ou RT/RB ATÉ disparar; soltar antes cancela a preparação · solte após o tiro para rearmar · A confirma · B retorna'],
       ['DIÁRIOS E ENCONTROS','Em pausa, ilhas e Carta: setas / direcional para escolher, Enter / A para confirmar, ESC / B para voltar. Pausa: ESC / P / Menu. Carta: M / View. Atracação: F / A / toque.'],
       ['ABALROAMENTO','Velocidade e ângulo da proa determinam o impacto. Rochas danificam o casco.'],
       ['MISSÕES','Escolta, caçada, sobrevivência e chefes. A campanha avança após vitórias.'],
