@@ -345,14 +345,15 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Testar a sensação de perda de velocidade e recuo em teclado/Xbox/Android físicos e ajustar valores conforme feedback.
 - [Especificação e roteiro de QA](docs/braced-gunnery-recoil-3-8a2.md).
 
-**3.8a.3 — Faísca da Mecha dos Canhões (implementada, em validação):**
+**3.8a.3 — Faísca da Mecha dos Canhões (publicada em 18/10/2026):**
 
 - [x] Converter o atlas de faíscas aprovado em um PNG de produção **480×96**, cinco quadros transparentes de 96×96, otimizado em ~3,9 KB (`assets/fx/cannon_charge_sparks.png`).
 - [x] Animar a faísca gradualmente durante a **preparação ao segurar Q/E, ESPAÇO, Xbox e toque**, com posições separadas e discretas por bordo, acompanhando o navio, sem ocultar centro ou HUD.
 - [x] Apagar instantaneamente ao soltar antes do tiro, pausar, atracar ou abrir Atlas; impedir reativação enquanto o disparo único permanece travado, sem alterar o clarão de tiro existente.
 - [x] Renderizar somente dois sprites reutilizados (sem criação de partículas por quadro, sem tocar em `effectsLimit=48`), mantendo save v4, física, velocidade, inimigos e contratos intactos.
 - [x] Adicionar teste Node do PNG/quadros/cancelamento/orçamento, inspeção Chromium desktop/mobile, módulo JS isolado e cache offline PWA **v59**.
-- [ ] Aprovar CI do PR, integrar na `main`, confirmar Pages e registrar os links.
+- [x] PR [#55](https://github.com/pedromaintenance/o-mar-de-sangue/pull/55) integrado por squash (`922e850`), com **port-smoke/port-visual aprovados no PR e pós-merge na main** ([run 39116274770](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39116274770)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39116274514](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39116274514)), com asset local e cache PWA v59.
 - [ ] Validar brilho e intensidade em dispositivo físico (desktop, Android, Xbox).
 - [Especificação do asset, implementação e testes](docs/cannon-fuse-sparks-3-8a3.md).
 
