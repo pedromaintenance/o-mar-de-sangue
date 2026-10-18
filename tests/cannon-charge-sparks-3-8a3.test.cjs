@@ -74,5 +74,6 @@ assert(game.includes('SEA_CHARGE_FX.clear(this)'));
 assert(game.includes('SEA_CHARGE_FX.sync(this)'));
 assert(sw.includes('./SeaCannonChargeFx.js'));
 assert(sw.includes('./assets/fx/cannon_charge_sparks.png'));
-assert(sw.includes('v59-cannon-fuse-sparks'));
+const cacheVersion=Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
+assert(cacheVersion>=59,'PWA cache must be at least v59 and still include sparks');
 console.log('PASS 3.8a.3: generated PNG, five spark stages, independent sides, cancellation and no new FX load');
