@@ -1016,12 +1016,12 @@ class Game extends Phaser.Scene {
             onUpdate: tween => { if(spr.active) spr.setTexture('fx-'+kind+'-'+Math.min(3,Math.floor(tween.progress*4))); },
             onComplete:()=>{if(spr.active)spr.destroy();this.effectsActive=Math.max(0,this.effectsActive-1);}});
     }
-    animateWorldVisuals() {
+    animateWorldVisuals(dt=.016) {
         SEA_COMBAT.animate(this);
         // Throttled visual update. Physics uses unmodified player/enemy positions.
         const t=this.elapsed;
         if(this.playerVisual) {
-            this.recoilVisual=(this.recoilVisual||0)*Math.exp(-8/60);
+            this.recoilVisual=(this.recoilVisual||0)*Math.exp(-8*Math.max(0,Math.min(dt,.05)));
             this.playerVisual.x=this.recoilVisual;
             this.playerVisual.y=Math.sin(t*3.5)*1.5;
             this.playerVisual.rotation=Math.sin(t*2.1)*.025;
@@ -1397,7 +1397,7 @@ class Game extends Phaser.Scene {
         if (this.ended || this.sinking) return;
         this.speed = Math.round(this.playerVelocity.x * faceX + this.playerVelocity.y * faceY);
         this.paintEnemies();
-        this.animateWorldVisuals();
+        this.animateWorldVisuals(dt);
         this.updateShots(dt);
         if (this.sinking) return;
         SEA_CONTRACTS.update(this,dt);
