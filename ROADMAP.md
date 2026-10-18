@@ -322,13 +322,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Validar controle Xbox e Android físicos, PWA offline instalado e balanceamento dos níveis de carga/recuo.
 - [Especificação, cálculos e roteiro de QA](docs/gunnery-charge-recoil-3-8a.md).
 
-**3.8a.1 — Uma Salva por Acionamento (correção em validação, 17/10/2026):**
+**3.8a.1 — Uma Salva por Acionamento (correção publicada em 17/10/2026):**
 
 - [x] Corrigir o disparo automático indesejado da 3.8a.0: **um único tiro por pressão e carga**, obrigatoriamente **soltar para rearmar**. Segurar indefinidamente não repete o tiro.
 - [x] Rearme independente por bordo para Q/E/ESPAÇO, gatilhos Xbox, botões de toque, fontes de input simultâneas e dois dedos no mesmo botão; sem perder a preparação exponencial de 2 segundos.
 - [x] Interromper cargas em pausa/Atlas/doca/blur sem conceder salvas gratuitas ou reiniciar carga na mesma pressão.
 - [x] Atualizar instruções de jogo/Diário, cache PWA v57, teste de regressão com 15 s pressionados, níveis altíssimos e validação Chromium.
-- [ ] CI verde no PR, squash merge, CI pós-merge e publicação confirmada no Pages.
+- [x] PR [#53](https://github.com/pedromaintenance/o-mar-de-sangue/pull/53) integrado por squash (`62a2532`); `port-smoke` e `port-visual` verdes no PR e pós-merge na `main` ([run 39086251515](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39086251515)).
+- [x] Correção publicada no [GitHub Pages](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39086251234](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39086251234)); PWA cache v57 validado em Chromium.
 - [ ] Confirmar controles físicos e balanceamento com jogadores.
 - [Diagnóstico, protocolo de testes e nova regra](docs/gunnery-single-shot-3-8a1.md).
 
