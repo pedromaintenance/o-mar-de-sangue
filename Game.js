@@ -223,6 +223,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('boss-dagon', 'assets/v15/dagon_emerging.webp');
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
         this.load.image('fx-dagon-eye', 'assets/abyss/dagon_eye.png');
+        this.load.spritesheet('fx-cannon-charge', 'assets/fx/cannon_charge_sparks.png', {frameWidth:96,frameHeight:96,endFrame:4});
         this.load.image('fx-splash-0', 'assets/fx/splash_0.png');
         this.load.image('fx-splash-1', 'assets/fx/splash_1.png');
         this.load.image('fx-splash-2', 'assets/fx/splash_2.png');
@@ -415,6 +416,7 @@ class Game extends Phaser.Scene {
         this.player.add(this.playerVisual);
         this.playerWake = this.add.image(start.x,start.y,'fx-foam-0').setDepth(13).setAlpha(0).setScale(1.75);
         this.decorateUpgradedShip();
+        SEA_CHARGE_FX.init(this);
         this.playerHull = {
             ship: this.player, isPlayer: true, radius: this.hullRadius, mass: 1.5,
             get x() { return this.ship.x; }, set x(v) { this.ship.x = v; },
@@ -902,6 +904,7 @@ class Game extends Phaser.Scene {
             this.cannonCharge[side]=0;
         }
         this.cannonBracing=0;
+        SEA_CHARGE_FX.clear(this);
     }
     updateCannonCharge(dt,pad) {
         if(!this.cannonCharge||!this.keys||!this.shipStats)return;
@@ -934,6 +937,7 @@ class Game extends Phaser.Scene {
         // the single shot cannot apply a fresh penalty or auto-reload.
         this.cannonBracing=Number(this.cannonCharge.port>0)+
             Number(this.cannonCharge.starboard>0);
+        if(typeof SEA_CHARGE_FX!=='undefined')SEA_CHARGE_FX.sync(this);
     }
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
     // Bombordo = esquerda do capitão, estibordo = direita.
