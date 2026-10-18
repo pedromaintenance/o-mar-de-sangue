@@ -54,7 +54,7 @@ tick(10000);assert.equal(shots(),4,'space hold is two shots total');
 ship.keys.SPACE.isDown=false;tick(50);
 ship.keys.SPACE.isDown=true;tick(2000);
 assert.equal(shots(),6,'new Space press fires both again');
-ship.keys.SPACE.isDown=false;tick(50);
+ship.keys.SPACE.isDown=false;tick(400); // existing reload has time to clear
 // Touch: holding two fingers on one battery does not rearm on first lift.
 ship.profile.levels.cadencia=25;
 ship.cannonPointers.set('finger-1','port');
@@ -62,7 +62,7 @@ ship.cannonPointers.set('finger-2','port');
 tick(200);assert.equal(shots(),7);
 ship.cannonPointers.delete('finger-1');tick(5000);
 assert.equal(shots(),7,'releasing one of two fingers is not a full release');
-ship.cannonPointers.delete('finger-2');tick(50);
+ship.cannonPointers.delete('finger-2');tick(400);
 ship.cannonPointers.set('finger-3','port');
 tick(200);assert.equal(shots(),8);
 ship.cannonPointers.clear();tick(50);
