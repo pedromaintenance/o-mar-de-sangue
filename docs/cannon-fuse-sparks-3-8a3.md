@@ -1,6 +1,6 @@
 # 3.8a.3 — Faísca da Mecha: feedback visual da preparação
 
-**Situação:** entrega de VFX em validação de CI, aguardando merge e Pages. Não altera as regras de tiro da 3.8a.2.
+**Situação:** publicada em 18/10/2026 pelo [PR #55](https://github.com/pedromaintenance/o-mar-de-sangue/pull/55), squash `922e850`; CI PR e pós-merge aprovado ([run 39116274770](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39116274770)); [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39116274514](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39116274514)). Não altera as regras de tiro da 3.8a.2.
 
 ## Asset escolhido
 
@@ -30,8 +30,8 @@ Partimos do **atlas de faíscas gerado e aprovado pelo jogador**, com cinco est�
 - [x] `tests/cannon-charge-sparks-3-8a3.test.cjs`: verifica bytes e dimensões do PNG, cinco quadros, visibilidade por bordo, cancelamento, bloqueio após tiro, pausa/Atlas/doca e ausência de incremento de partículas/objetos durante a animação.
 - [x] `tests/mare-negra-hud-visual.test.cjs`: testa na cena Phaser real o sprite visível na primeira carga, o outro bordo oculto, ambos associados ao casco e desaparecimento após soltar. Exercita três tamanhos de tela.
 - [x] O teste regressivo de uma salva por pressão continua obrigatório no CI, assim como contratos, save, áudio e PWA.
-- [ ] `port-smoke` e `port-visual` aprovados no PR, CI pós-merge verde.
-- [ ] Merge, GitHub Pages e atualização conclusiva do roadmap.
+- [x] `port-smoke` e `port-visual` aprovados no PR e pós-merge ([run 39116274770](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39116274770)).
+- [x] PR integrado à main, GitHub Pages publicado e roadmap atualizado.
 - [ ] Inspeção visual em Android físico, desktop e controle Xbox para confirmar brilho discreto e legibilidade sobre o Mar de Sangue.
 
 **Roteiro manual:** inicie uma viagem, segure Q por ~1 segundo (faísca discreta à esquerda), segure até 2 segundos (mais intensa e clarão), continue segurando por 10 segundos (não deve reacender), solte e repita. Teste E e ESPAÇO. Segure e solte aos 0,5 segundo: faísca apaga e não ocorre tiro.
