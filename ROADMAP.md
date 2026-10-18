@@ -368,13 +368,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Confirmar em desktop/celular físico que não há fragmentos soltos durante a rotação.
 - [Relatório de causa, correção e QA](docs/coral-horror-asset-fix-3-8a4.md).
 
-**3.8a.5 — Faísca de Ignição Legível: correção do borrão escuro (em validação):**
+**3.8a.5 — Faísca de Ignição Legível: correção do borrão escuro (publicada em 18/10/2026):**
 
 - [x] Diagnosticar o sprite 3.8a.3: **PNG de produção com fluxo IDAT corrompido**, não detectado por verificação apenas do cabeçalho; fumaça escura e opacidade/escala reduzidas também prejudicavam o efeito.
 - [x] Substituir de fato o asset por **PNG RGBA 480×96 válido**, cinco quadros com faíscas douradas progressivas e transparência ampla, sem borrões pretos. Script de geração reproduzível em `tools/rebuild_cannon_sparks.py`, sprite final ~2,2 KB.
 - [x] Aplicar `Phaser.BlendModes.ADD` aos dois sprites reutilizados de bombordo/estibordo, aumentar discretamente escala/opacidade e preservar cancelamento, disparo único, controles e orçamento FX.
 - [x] Incluir teste **completo de decodificação PNG** (`CRC + IDAT + filtros + pixels`) e verificações de luz/alpha por quadro para evitar nova regressão, além de QA Phaser desktop/mobile; PWA v61.
-- [ ] Exigir CI verde no PR e pós-merge, publicar no Pages e registrar os links.
+- [x] [PR #57](https://github.com/pedromaintenance/o-mar-de-sangue/pull/57) integrado por squash (`f6924ab`); `port-smoke` e `port-visual` aprovados no PR e pós-merge na `main` ([run 39176430439](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39176430439)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39176430237](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39176430237)), PNG luminoso corrigido e PWA v61.
 - [ ] Validar em desktop e celular físico a legibilidade contra o Mar de Sangue sem poluir o combate.
 - [Relatório da falha, reparo e testes](docs/bright-cannon-sparks-3-8a5.md).
 
