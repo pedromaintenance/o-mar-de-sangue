@@ -345,6 +345,17 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Testar a sensação de perda de velocidade e recuo em teclado/Xbox/Android físicos e ajustar valores conforme feedback.
 - [Especificação e roteiro de QA](docs/braced-gunnery-recoil-3-8a2.md).
 
+**3.8a.3 — Faísca da Mecha dos Canhões (implementada, em validação):**
+
+- [x] Converter o atlas de faíscas aprovado em um PNG de produção **480×96**, cinco quadros transparentes de 96×96, otimizado em ~3,9 KB (`assets/fx/cannon_charge_sparks.png`).
+- [x] Animar a faísca gradualmente durante a **preparação ao segurar Q/E, ESPAÇO, Xbox e toque**, com posições separadas e discretas por bordo, acompanhando o navio, sem ocultar centro ou HUD.
+- [x] Apagar instantaneamente ao soltar antes do tiro, pausar, atracar ou abrir Atlas; impedir reativação enquanto o disparo único permanece travado, sem alterar o clarão de tiro existente.
+- [x] Renderizar somente dois sprites reutilizados (sem criação de partículas por quadro, sem tocar em `effectsLimit=48`), mantendo save v4, física, velocidade, inimigos e contratos intactos.
+- [x] Adicionar teste Node do PNG/quadros/cancelamento/orçamento, inspeção Chromium desktop/mobile, módulo JS isolado e cache offline PWA **v59**.
+- [ ] Aprovar CI do PR, integrar na `main`, confirmar Pages e registrar os links.
+- [ ] Validar brilho e intensidade em dispositivo físico (desktop, Android, Xbox).
+- [Especificação do asset, implementação e testes](docs/cannon-fuse-sparks-3-8a3.md).
+
 ### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
 
 - **3.8a — Equipamentos ativos:** selecionar entre arpão, morteiro, fumaça e pólvora amaldiçoada, com usos, recargas e limites explícitos, sem desbalancear os canhões normais.
@@ -397,6 +408,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar/publicar 3.8a.2 (carga com custo de velocidade e recuo perceptível); depois retomar 3.7a.3 (Caçada), ainda planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Validar e publicar 3.8a.3 (faíscas durante carga, sem poluição visual); depois retomar a 3.7a.3 (Caçada), ainda planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
