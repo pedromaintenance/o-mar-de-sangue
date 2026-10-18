@@ -53,7 +53,7 @@ function sim(){
 function advance(s,ms,pad={}){
  for(let i=0;i<ms;i+=50){
   let d=Math.min(50,ms-i);s.time.now+=d;
-  step.call(s,d/1000,pad);
+  step.call(s,d/1000,{x:0,y:0,...pad});
  }
 }
 const free=sim();free.playerVelocity.y=-180;
