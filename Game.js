@@ -904,7 +904,7 @@ class Game extends Phaser.Scene {
             this.cannonCharge[side]=0;
         }
         this.cannonBracing=0;
-        SEA_CHARGE_FX.clear(this);
+        if(typeof SEA_CHARGE_FX!=='undefined')SEA_CHARGE_FX.clear(this);
     }
     updateCannonCharge(dt,pad) {
         if(!this.cannonCharge||!this.keys||!this.shipStats)return;
