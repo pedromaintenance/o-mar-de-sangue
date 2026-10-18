@@ -333,6 +333,17 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Confirmar controles físicos e balanceamento com jogadores.
 - [Diagnóstico, protocolo de testes e nova regra](docs/gunnery-single-shot-3-8a1.md).
 
+**3.8a.2 — Preparação com Custo de Velocidade e Recuo Perceptível (em validação):**
+
+- [x] **Manter o comando segurar**: só dispara após completar a carga (2 s inicialmente); soltar antes cancela, manter após a salva não gera outro tiro. Rearmar exige soltura e nova pressão, individualmente em cada bordo.
+- [x] **Custo tático real de preparar canhões**: com um bordo, velocidade máxima 60% e aceleração 55%; com dois bordos, 45% e 38%; arrasto extra apenas durante a preparação, sem alterar as condições de movimento fora dela.
+- [x] **Recuo físico perceptível**: aumentar de ~11 para ~65 unidades de impulso lateral no navio inicial; reduzir arrasto lateral por 0,5 s após a salva e adicionar breve inclinação do casco e tremor discreto de câmera.
+- [x] Manter recuo escalonado com dano/projéteis e mitigado por Escoras do Abismo; manter sprite/hitbox, progressão de estaleiro, save v4 e os monstros marinhos sem tiros.
+- [x] Atualizar orientações de tela e Diário, PWA offline v58, testes de física com Game.js real e QA visual nas três resoluções.
+- [ ] Aprovar testes do PR e pós-merge, integrar na main e confirmar publicação em GitHub Pages.
+- [ ] Testar a sensação de perda de velocidade e recuo em teclado/Xbox/Android físicos e ajustar valores conforme feedback.
+- [Especificação e roteiro de QA](docs/braced-gunnery-recoil-3-8a2.md).
+
 ### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
 
 - **3.8a — Equipamentos ativos:** selecionar entre arpão, morteiro, fumaça e pólvora amaldiçoada, com usos, recargas e limites explícitos, sem desbalancear os canhões normais.
@@ -385,6 +396,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Priorizar a correção 3.8a.1 (uma salva por acionamento), sem regressão do recoil ou monstros; depois retomar a 3.7a.3 (Caçada), ainda planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+Validar/publicar 3.8a.2 (carga com custo de velocidade e recuo perceptível); depois retomar 3.7a.3 (Caçada), ainda planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
