@@ -1,4 +1,4 @@
-/* 3.8a.3 — Faísca da mecha dos canhões.
+/* 3.8a.5 — Faísca legível: RGBA válido + blend aditivo sem borrão.
  * Só apresentação: dois sprites persistentes, nenhum emissor de partículas
  * nem alteração na preparação, no recuo ou no orçamento de efeitos.
  */
@@ -10,9 +10,14 @@ const SEA_CHARGE_FX = Object.freeze({
         if (!s.playerVisual || !s.textures?.exists(this.key)) return false;
         const sprites = {};
         for (const side of this.sides) {
-            sprites[side] = s.add.image(this.positions[side], 0, this.key, 0)
-                .setScale(.44).setAlpha(.66).setVisible(false);
-            s.playerVisual.add(sprites[side]);
+            const sprite=s.add.image(this.positions[side], 0, this.key, 0)
+                .setScale(.82).setAlpha(.88).setVisible(false);
+            // Additive mixing makes a lit spark brighten the dark crimson sea
+            // instead of laying an opaque brown/black rectangle over the hull.
+            if(typeof Phaser!=='undefined' && sprite.setBlendMode)
+                sprite.setBlendMode(Phaser.BlendModes.ADD);
+            sprites[side]=sprite;
+            s.playerVisual.add(sprite);
         }
         s.chargeSparkSprites = sprites;
         return true;
@@ -38,8 +43,10 @@ const SEA_CHARGE_FX = Object.freeze({
             }
             const progress=Math.max(0,Math.min(.999,charge/required));
             const frame=Math.min(4,Math.floor(progress*5));
-            sprite.setFrame(frame).setAlpha(.54+progress*.26)
-                .setScale(.40+progress*.055).setVisible(true);
+            // The artwork itself grows in intensity: don't shrink the bright
+            // core back into an indistinct dot or lower its alpha too much.
+            sprite.setFrame(frame).setAlpha(.87+progress*.11)
+                .setScale(.82+progress*.065).setVisible(true);
         }
     }
 });

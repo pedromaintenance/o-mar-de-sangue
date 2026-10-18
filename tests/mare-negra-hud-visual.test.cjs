@@ -93,13 +93,19 @@ const {chromium}=require('playwright-core');
        speedCap:SEA_GUNNERY.brace(s.cannonBracing).speed,
        spark:{left:left?.visible,frame:left?.frame?.name||left?.frame?.index,
          right:right?.visible,count:s.playerVisual.list.filter(o=>
-           o.texture?.key==='fx-cannon-charge').length}};
+           o.texture?.key==='fx-cannon-charge').length,
+         blend:left?.blendMode,expectedBlend:Phaser.BlendModes.ADD,
+         scale:left?.scaleX,alpha:left?.alpha,
+         sourceWidth:s.textures.get('fx-cannon-charge').getSourceImage().width}};
    });
    assert(half.charge>200&&half.charge<1900&&
      half.portShot===fireStart.shot&&half.otherCharge===0&&
      half.bracing===1&&half.speedCap===.60&&
      half.spark?.left===true&&half.spark?.right===false&&
-     half.spark.count===2&&Number(half.spark.frame)>=0,
+     half.spark.count===2&&Number(half.spark.frame)>=0&&
+     half.spark.blend===half.spark.expectedBlend&&
+     half.spark.scale>.75&&half.spark.alpha>.85&&
+     half.spark.sourceWidth===480,
      label+': the first shot needs a held charge '+JSON.stringify(half));
    await page.screenshot({path:path.join('port-artifacts',
      'gunnery-3-8a-'+label+'-windup.png'),fullPage:true});
