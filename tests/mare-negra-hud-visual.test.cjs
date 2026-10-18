@@ -60,10 +60,12 @@ const {chromium}=require('playwright-core');
    const half=await page.evaluate(()=>{
      const s=game.scene.getScene('Game');
      return {charge:s.cannonCharge.port,portShot:s.lastPortShot,
-       otherCharge:s.cannonCharge.starboard};
+       otherCharge:s.cannonCharge.starboard,bracing:s.cannonBracing,
+       speedCap:SEA_GUNNERY.brace(s.cannonBracing).speed};
    });
    assert(half.charge>200&&half.charge<1900&&
-     half.portShot===fireStart.shot&&half.otherCharge===0,
+     half.portShot===fireStart.shot&&half.otherCharge===0&&
+     half.bracing===1&&half.speedCap===.60,
      label+': the first shot needs a held charge '+JSON.stringify(half));
    await page.screenshot({path:path.join('port-artifacts',
      'gunnery-3-8a-'+label+'-windup.png'),fullPage:true});
@@ -71,6 +73,9 @@ const {chromium}=require('playwright-core');
      const s=game.scene.getScene('Game');
      for(let i=0;i<32;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
      const firstShot=s.lastPortShot;
+     const kick=s.recoilVisual, kickVelocity=s.playerVelocity.x;
+     s.animateWorldVisuals(.05);
+     const hullLean=s.playerVisual.x;
      // A 10-second continuous hold must NOT produce another salvo, even
      // when the ship has completed its cooldown.
      for(let i=0;i<200;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
@@ -84,6 +89,7 @@ const {chromium}=require('playwright-core');
      s.scene.resume();
      return {shot:firstShot,heldShot,heldCharge,heldLocked,
        shotAfterRepress,starboardShot:s.lastStarboardShot,
+       kick,kickVelocity,hullLean,
        charge:s.cannonCharge.port,v:{x:s.playerVelocity.x,y:s.playerVelocity.y}};
    });
    assert(volley.shot>fireStart.shot&&volley.heldShot===volley.shot&&
@@ -92,8 +98,9 @@ const {chromium}=require('playwright-core');
      volley.starboardShot===-1000&&volley.charge===0,
      label+': one salvo per hold and release-to-rearm, independent port broadside '+
        JSON.stringify(volley));
-   assert(Math.hypot(volley.v.x,volley.v.y)>0,
-     label+': a broadside should transfer momentum to the hull');
+   assert(Math.hypot(volley.v.x,volley.v.y)>0&&
+     volley.kickVelocity>40&&volley.kick>8&&volley.hullLean>7,
+     label+': recoil should be physically and visually noticeable '+JSON.stringify(volley));
    assert(before.quest.length>0&&before.badge.includes('MALDIÇÃO'));
    assert.deepEqual(before.pause,{x:isMobile?412:454,y:78,w:120,h:40});
    assert.equal(before.x,isMobile?338:1154);assert.equal(before.y,239);
