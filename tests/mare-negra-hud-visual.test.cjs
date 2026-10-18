@@ -59,13 +59,19 @@ const {chromium}=require('playwright-core');
    assert.equal(fireStart.ms,2000,label+': level zero should start at 2 seconds');
    const half=await page.evaluate(()=>{
      const s=game.scene.getScene('Game');
+     const left=s.chargeSparkSprites?.port,right=s.chargeSparkSprites?.starboard;
      return {charge:s.cannonCharge.port,portShot:s.lastPortShot,
        otherCharge:s.cannonCharge.starboard,bracing:s.cannonBracing,
-       speedCap:SEA_GUNNERY.brace(s.cannonBracing).speed};
+       speedCap:SEA_GUNNERY.brace(s.cannonBracing).speed,
+       spark:{left:left?.visible,frame:left?.frame?.name||left?.frame?.index,
+         right:right?.visible,count:s.playerVisual.list.filter(o=>
+           o.texture?.key==='fx-cannon-charge').length}};
    });
    assert(half.charge>200&&half.charge<1900&&
      half.portShot===fireStart.shot&&half.otherCharge===0&&
-     half.bracing===1&&half.speedCap===.60,
+     half.bracing===1&&half.speedCap===.60&&
+     half.spark?.left===true&&half.spark?.right===false&&
+     half.spark.count===2&&Number(half.spark.frame)>=0,
      label+': the first shot needs a held charge '+JSON.stringify(half));
    await page.screenshot({path:path.join('port-artifacts',
      'gunnery-3-8a-'+label+'-windup.png'),fullPage:true});
@@ -82,6 +88,9 @@ const {chromium}=require('playwright-core');
      const heldShot=s.lastPortShot,heldCharge=s.cannonCharge.port,
        heldLocked=s.cannonNeedsRelease.port;
      s.cannonPointers.delete('qa-port');s.updateCannonCharge(.01,{});
+     const emberGone=!s.chargeSparkSprites.port.visible;
+     // The second side stays hidden throughout a port-only volley.
+     const starboardHidden=!s.chargeSparkSprites.starboard.visible;
      s.cannonPointers.set('qa-port-new','port');
      for(let i=0;i<40;i++){s.time.now+=50;s.updateCannonCharge(.05,{});}
      const shotAfterRepress=s.lastPortShot;
@@ -89,13 +98,14 @@ const {chromium}=require('playwright-core');
      s.scene.resume();
      return {shot:firstShot,heldShot,heldCharge,heldLocked,
        shotAfterRepress,starboardShot:s.lastStarboardShot,
-       kick,kickVelocity,hullLean,
+       kick,kickVelocity,hullLean,emberGone,starboardHidden,
        charge:s.cannonCharge.port,v:{x:s.playerVelocity.x,y:s.playerVelocity.y}};
    });
    assert(volley.shot>fireStart.shot&&volley.heldShot===volley.shot&&
      volley.heldCharge===0&&volley.heldLocked===true&&
      volley.shotAfterRepress>volley.shot&&
-     volley.starboardShot===-1000&&volley.charge===0,
+     volley.starboardShot===-1000&&volley.charge===0&&
+     volley.emberGone===true&&volley.starboardHidden===true,
      label+': one salvo per hold and release-to-rearm, independent port broadside '+
        JSON.stringify(volley));
    assert(Math.hypot(volley.v.x,volley.v.y)>0&&
