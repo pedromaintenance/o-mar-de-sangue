@@ -384,6 +384,8 @@ class Game extends Phaser.Scene {
         this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 62, deadzone: .12 };
         this.cannonPointers = new Map();
         this.cannonCharge = {port:0,starboard:0};
+        // Um único disparo por acionamento: soltar é obrigatório para rearmar.
+        this.cannonNeedsRelease = {port:false,starboard:false};
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
@@ -440,7 +442,8 @@ class Game extends Phaser.Scene {
         if (!SEA_DESKTOP) this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
         this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER,F,M');
-        this.onBoth = () => this.fire('both'); this.onPort = () => this.fire('port'); this.onStarboard = () => this.fire('starboard');
+        // Não vincular eventos de disparo imediato: updateCannonCharge
+        // é o único caminho do jogador e exige press→carga→tiro→release.
         this.onPause = () => {
             if (this.atlasOpen) { SEA_ATLAS.close(this); return; }
             if (this.islandDocked) SEA_ISLANDS.close(this);
@@ -517,8 +520,8 @@ class Game extends Phaser.Scene {
             (this.contract ? 'CONTRATO · '+SEA_CONTRACTS.offers[this.contract.id].title :
              this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
-                ? '\nWASD / SETAS: NAVEGAR  ·  Q/E: CANHÕES\nESPAÇO: DOIS BORDOS · M: CARTA · N: SOM · ESC/P: PAUSA'
-                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nTOQUE NA CARTA PARA ABRIR O ATLAS\nSEGURE O CANHÃO PARA DISPARAR'), {
+                ? '\nWASD / SETAS: NAVEGAR · SEGURE Q/E PARA PREPARAR\nESPAÇO: DOIS BORDOS · SOLTE PARA REARMAR · ESC/P: PAUSA'
+                : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nTOQUE NA CARTA PARA ABRIR O ATLAS\nSEGURE PARA CARREGAR · SOLTE PARA REARMAR'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
@@ -889,7 +892,13 @@ class Game extends Phaser.Scene {
     }
     resetCannonCharge() {
         if(!this.cannonCharge)return;
-        this.cannonCharge.port=0;this.cannonCharge.starboard=0;
+        // Pausa, Atlas, atracação e perda de foco interrompem a preparação.
+        // Não permitir que um botão ainda pressionado reinicie a carga
+        // ao fechar o modal; requer uma nova soltura.
+        for(const side of ['port','starboard']){
+            if(this.cannonCharge[side]>0)this.cannonNeedsRelease[side]=true;
+            this.cannonCharge[side]=0;
+        }
     }
     updateCannonCharge(dt,pad) {
         if(!this.cannonCharge||!this.keys||!this.shipStats)return;
@@ -901,13 +910,22 @@ class Game extends Phaser.Scene {
         };
         const required=SEA_GUNNERY.chargeMs(this.profile?.levels?.cadencia||0);
         for(const side of ['port','starboard']){
-            if(!pressed[side]){this.cannonCharge[side]=0;continue;}
+            if(!pressed[side]){
+                // Apenas a soltura completa de TODAS as fontes daquele bordo
+                // rearma a bateria (teclado + gamepad + múltiplos dedos).
+                this.cannonCharge[side]=0;
+                this.cannonNeedsRelease[side]=false;
+                continue;
+            }
+            if(this.cannonNeedsRelease[side])continue;
             this.cannonCharge[side]=Math.min(required,this.cannonCharge[side]+
                 Math.max(0,Math.min(dt,.05))*1000);
             const last=this[side==='port'?'lastPortShot':'lastStarboardShot'];
             if(SEA_GUNNERY.ready(this.cannonCharge[side],required,this.time.now,
-                    last,this.shipStats.reload)&&this.fire(side))
+                    last,this.shipStats.reload)&&this.fire(side)){
                 this.cannonCharge[side]=0;
+                this.cannonNeedsRelease[side]=true;
+            }
         }
     }
     // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.

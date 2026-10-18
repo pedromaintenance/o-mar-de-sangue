@@ -49,6 +49,7 @@ on:
       - 'SeaContracts.js'
       - 'SeaGunnery.js'
       - 'tests/gunnery-windup-3-8a.test.cjs'
+      - 'tests/gunnery-single-shot-3-8a1.test.cjs'
       - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/smuggling-contract-3-7a2.test.cjs'
       - 'tests/atlas-chart.test.cjs'
@@ -100,6 +101,7 @@ on:
       - 'SeaContracts.js'
       - 'SeaGunnery.js'
       - 'tests/gunnery-windup-3-8a.test.cjs'
+      - 'tests/gunnery-single-shot-3-8a1.test.cjs'
       - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/smuggling-contract-3-7a2.test.cjs'
       - 'tests/atlas-chart.test.cjs'
@@ -149,6 +151,7 @@ jobs:
           node tests/smuggling-contract-3-7a2.test.cjs
           node --check SeaGunnery.js
           node tests/gunnery-windup-3-8a.test.cjs
+          node tests/gunnery-single-shot-3-8a1.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:

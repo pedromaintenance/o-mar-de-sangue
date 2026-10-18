@@ -22,7 +22,8 @@ function method(name,next){
 const c={SEA_GUNNERY:g};vm.createContext(c);
 vm.runInContext('this.methods={'+method('resetCannonCharge','fire').replace('    updateCannonCharge(dt,pad)', '    ,updateCannonCharge(dt,pad)')+'};',c);
 const m=c.methods;let attempts=[];
-const ship={cannonCharge:{port:0,starboard:0},cannonPointers:new Map(),
+const ship={cannonCharge:{port:0,starboard:0},
+ cannonNeedsRelease:{port:false,starboard:false},cannonPointers:new Map(),
  time:{now:0},shipStats:{reload:360},profile:{levels:{cadencia:0,reforco:0}},
  keys:{Q:{isDown:false},E:{isDown:false},SPACE:{isDown:false}},
  lastPortShot:-1000,lastStarboardShot:-1000,

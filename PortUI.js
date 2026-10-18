@@ -653,8 +653,8 @@ const SEA_PORT_UI = {
   help() {
     const entries=[
       ['NAVEGAÇÃO','W / ↑ acelerar · S / ↓ frear / ré · A/D ou ←/→ virar · Escoras reduzem recuo das salvas'],
-      ['CANHÕES','Segure Q (bombordo), E (estibordo) ou ESPAÇO (ambos) para preparar o tiro. Início: 2 segundos; melhorias encurtam a carga.'],
-      ['CONTROLE XBOX','Analógico esquerdo · segure LT/LB para bombordo e RT/RB para estibordo · A confirma · B retorna'],
+      ['CANHÕES','Segure Q/E ou ESPAÇO para carregar e disparar UMA salva. Solte o comando e pressione novamente para preparar outra. Início: 2 segundos.'],
+      ['CONTROLE XBOX','Analógico esquerdo · segure LT/LB ou RT/RB para carregar uma salva · solte o gatilho para rearmar · A confirma · B retorna'],
       ['DIÁRIOS E ENCONTROS','Em pausa, ilhas e Carta: setas / direcional para escolher, Enter / A para confirmar, ESC / B para voltar. Pausa: ESC / P / Menu. Carta: M / View. Atracação: F / A / toque.'],
       ['ABALROAMENTO','Velocidade e ângulo da proa determinam o impacto. Rochas danificam o casco.'],
       ['MISSÕES','Escolta, caçada, sobrevivência e chefes. A campanha avança após vitórias.'],
