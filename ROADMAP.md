@@ -357,13 +357,14 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Validar brilho e intensidade em dispositivo físico (desktop, Android, Xbox).
 - [Especificação do asset, implementação e testes](docs/cannon-fuse-sparks-3-8a3.md).
 
-**3.8a.4 — Horror de Coral: Correção do Sprite (implementado, em validação):**
+**3.8a.4 — Horror de Coral: Correção do Sprite (publicada em 18/10/2026):**
 
 - [x] Identificar a causa no **PNG ativo** `assets/v15/beast_coral.png`, que continha uma faixa superior de pixels soltos (não em `assets/abyss/coral_horror.png` nem na lógica de colisão).
 - [x] **Corrigir o arquivo binário**, recortando exatamente 28 linhas contaminadas (**323×330 → 323×302**) sem mudar o corpo, os tentáculos ou o estilo do monstro. Guardar reparo reproduzível em `tools/repair_coral_png.py`.
 - [x] Manter textura `v15-coral`, raio 76, escala proporcional e todas as regras de spawn, combate e movimentação; não alterar save v4.
 - [x] Bump de cache offline **PWA v60**, teste Node de integridade PNG/CRC e teste visual do monstro real nas três resoluções.
-- [ ] Validar CI no PR e pós-merge, integrar à `main`, confirmar GitHub Pages.
+- [x] PR [#56](https://github.com/pedromaintenance/o-mar-de-sangue/pull/56) integrado por squash (`686b0f7`); `port-smoke` e `port-visual` aprovados no PR e pós-merge ([run 39117992857](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39117992857)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39117992501](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39117992501)), cache PWA v60.
 - [ ] Confirmar em desktop/celular físico que não há fragmentos soltos durante a rotação.
 - [Relatório de causa, correção e QA](docs/coral-horror-asset-fix-3-8a4.md).
 
