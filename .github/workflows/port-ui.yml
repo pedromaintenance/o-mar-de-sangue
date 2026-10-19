@@ -61,6 +61,8 @@ on:
       - 'tests/cannon-sparks-luminous-3-8a5.test.cjs'
       - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/smuggling-contract-3-7a2.test.cjs'
+      - 'tests/hunt-contract-3-7a3.test.cjs'
+      - 'tests/hunt-contract-visual-3-7a3.test.cjs'
       - 'tests/atlas-chart.test.cjs'
       - 'tests/atlas-chart-visual.test.cjs'
       - '.github/workflows/port-ui.yml'
@@ -122,6 +124,8 @@ on:
       - 'tests/cannon-sparks-luminous-3-8a5.test.cjs'
       - 'tests/rescue-contract-3-7a.test.cjs'
       - 'tests/smuggling-contract-3-7a2.test.cjs'
+      - 'tests/hunt-contract-3-7a3.test.cjs'
+      - 'tests/hunt-contract-visual-3-7a3.test.cjs'
       - 'tests/atlas-chart.test.cjs'
       - 'tests/atlas-chart-visual.test.cjs'
 jobs:
@@ -167,6 +171,7 @@ jobs:
           node --check SeaContracts.js
           node tests/rescue-contract-3-7a.test.cjs
           node tests/smuggling-contract-3-7a2.test.cjs
+          node tests/hunt-contract-3-7a3.test.cjs
           node --check SeaGunnery.js
           node tests/gunnery-windup-3-8a.test.cjs
           node tests/gunnery-single-shot-3-8a1.test.cjs
@@ -198,6 +203,7 @@ jobs:
           node tests/mare-negra-hud-visual.test.cjs
           node tests/political-parley-visual.test.cjs
           node tests/atlas-chart-visual.test.cjs
+          node tests/hunt-contract-visual-3-7a3.test.cjs
           node tests/pwa-offline-visual.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()

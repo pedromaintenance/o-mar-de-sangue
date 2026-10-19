@@ -131,7 +131,7 @@ assert.equal(c.update(idle,.1),undefined);
 assert(!/SeaProfile\s*\.|\blocalStorage\b|\bsessionStorage\b|\bfetch\s*\(/.test(contractSource));
 const game=fs.readFileSync('Game.js','utf8'),port=fs.readFileSync('PortUI.js','utf8');
 assert(game.includes('SEA_CONTRACTS.update(this,dt)'));
-assert(game.includes("['rescue','smuggle'].includes(data?.contract)"));
+assert(game.includes("['rescue','smuggle','hunt'].includes(data?.contract)"));
 assert(game.includes('contractBounty=won&&this.contract?.completed'));
 assert(port.includes("this.start('sandbox',id)"));
 assert(port.includes('ACEITAR CONTRABANDO'));

@@ -366,7 +366,7 @@ class Game extends Phaser.Scene {
         this.mode = data?.mode || p.mode || 'mission';
         this.stage = data?.stage || p.mission || 1;
         this.wave = 1;
-        this.contractId = this.mode==='sandbox' && ['rescue','smuggle'].includes(data?.contract) ? data.contract : null;
+        this.contractId = this.mode==='sandbox' && ['rescue','smuggle','hunt'].includes(data?.contract) ? data.contract : null;
     }
     create() {
         seaCenterCanvas(this.game);
@@ -1297,6 +1297,7 @@ class Game extends Phaser.Scene {
         if (enemy.boss) this.bossKills = (this.bossKills || 0) + 1;
         if (ramming) this.rammingSinks++;
         this.splash(enemy.x, enemy.y, 0xffc697, 16);
+        SEA_CONTRACTS.onSink(this,enemy);
     }
 
     collideWorldBounds(body, isPlayer = false) {
@@ -1452,6 +1453,7 @@ class Game extends Phaser.Scene {
     updateEnemies(dt) {
         for (const e of this.enemies) {
             if (e.dead) continue;
+            if(e.huntTarget&&SEA_CONTRACTS.evade(this,e,dt))continue;
             const distance = Math.max(.01, Phaser.Math.Distance.Between(e.x, e.y, this.player.x, this.player.y));
             const aim = Math.atan2(this.player.x - e.x, -(this.player.y - e.y));
             const sideAngle = Phaser.Math.Angle.Wrap(aim - e.heading);
@@ -1863,6 +1865,8 @@ class Game extends Phaser.Scene {
             report.contractBounty=contractBounty;
             report.contractCompleted=!!this.contract.completed;
             report.contractSeized=!!this.contract.intercepted;
+            report.contractEscaped=!!this.contract.escaped;
+            report.contractHunt=this.contract.id==='hunt';
             report.contractRoute=this.contract.route||null;
         }
         // Ir ao porto garante que todos os efeitos e eventos da cena sejam encerrados.

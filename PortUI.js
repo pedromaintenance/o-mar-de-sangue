@@ -175,7 +175,7 @@ const SEA_PORT_UI = {
     const profile=SeaProfile.load();
     scene.scene.start('Game',mode==='mission'?
       {mode:'mission',stage:profile.mission}:
-      {mode:'sandbox',...(['rescue','smuggle'].includes(contract)?{contract}:{})});
+      {mode:'sandbox',...(['rescue','smuggle','hunt'].includes(contract)?{contract}:{})});
   },
   notify(message) {
     if(!this.root)return;
@@ -240,7 +240,7 @@ const SEA_PORT_UI = {
     const [name,id]=value.split(':');
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='contracts'){this.goto('contracts');return;}
-    if(name==='contract'&&['rescue','smuggle'].includes(id)){
+    if(name==='contract'&&['rescue','smuggle','hunt'].includes(id)){
       if(scene.page!=='contracts')return;
       this.start('sandbox',id);return;
     }
@@ -606,7 +606,8 @@ const SEA_PORT_UI = {
         '</div></aside></div>';
   },
   contracts(){
-    const rescue=SEA_CONTRACTS.offers.rescue,smuggle=SEA_CONTRACTS.offers.smuggle;
+    const rescue=SEA_CONTRACTS.offers.rescue,smuggle=SEA_CONTRACTS.offers.smuggle,
+      hunt=SEA_CONTRACTS.offers.hunt;
     return '<main class="port-page port-page--narrow port-contracts" id="port-main">'+
       '<section class="port-warning" role="region" aria-labelledby="port-contract-title">'+
       '<span class="port-eyebrow">PACTOS, FISCALIZAÇÃO E SOBREVIVÊNCIA</span>'+
@@ -620,6 +621,9 @@ const SEA_PORT_UI = {
         'Entrega secreta: <strong>190 OURO</strong> e +12 maldição (suspeita abaixo de 60%). '+
         'Suborno na entrega: <strong>115 OURO</strong>. Suspeita em 100% confisca a carga.</p>'+
       this.button('contract:smuggle','ACEITAR CONTRABANDO','Escapar da inspeção e negociar a entrega','✥','')+
+      '<h2>'+this.text(hunt.title)+'</h2><p>'+this.text(hunt.description)+'</p>'+
+      '<p>PRÊMIO: <strong>'+this.num(hunt.bounty)+' OURO</strong> · somente se a presa for abatida antes da fuga.</p>'+
+      this.button('contract:hunt','ACEITAR CAÇADA','Investigar uma pista e interceptar uma fragata fugitiva','⚔','')+
       this.button('menu','VOLTAR AO PORTO','','←','')+
       '</section></main>';
   },
@@ -767,11 +771,16 @@ const SEA_PORT_UI = {
   result(r) {
     if(!r)return this.home(SeaProfile.load());
     const won=!!r.won,withdrawn=!!r.withdrawn;
-    const state=r.contractSeized?'CARGA APREENDIDA':won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
-    const desc=r.contractSeized?'A Corte confiscou a pólvora. O contrato não será pago.':won?'As velas ainda conhecem o caminho.':
+    const isHunt=!!r.contractHunt;
+    const state=r.contractSeized?'CARGA APREENDIDA':r.contractEscaped?'PRESA ESCAPOU':
+      isHunt&&won?'CAÇADA CONCLUÍDA':won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
+    const desc=r.contractSeized?'A Corte confiscou a pólvora. O contrato não será pago.':
+      r.contractEscaped?'A fragata abandonou o arquipélago. Nenhuma comissão será paga.':
+      isHunt&&won?'A presa foi encontrada e o capitão condenado não voltou ao mar.':won?'As velas ainda conhecem o caminho.':
       withdrawn?'Quem retorna ainda pode contar a história.':'O oceano nunca esquece os seus.';
     const data=[
-      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?'ENTREGUE':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
+      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?(isHunt?'ALVO ABATIDO':'ENTREGUE'):
+        r.contractEscaped?'FUGIU':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
         ['PRÊMIO DO CONTRATO',r.contractBounty||0],
         ...(r.contractRoute?[[ 'FORMA DA ENTREGA',r.contractRoute==='hidden'?'CLANDESTINA':'SUBORNO À CORTE' ]]:[])]:[]),
       ['OURO ENCONTRADO',r.collected],['OURO RECUPERADO',r.reward],

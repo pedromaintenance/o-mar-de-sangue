@@ -73,5 +73,7 @@ assert(game.includes('this.impulseButtonHitbox'),'visible impulse touch target')
 assert(game.includes("id: 'impulso'"),'dedicated yard upgrade');
 const html=fs.readFileSync('index.html','utf8'),sw=fs.readFileSync('sw.js','utf8');
 assert(html.indexOf('SeaImpulse.js')<html.indexOf('Game.js'));
-assert(sw.includes('"./SeaImpulse.js"')&&sw.includes('v62-naval-impulse'));
+assert(sw.includes('"./SeaImpulse.js"') &&
+ Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=62,
+ 'naval impulse must remain offline-cached in v62 and newer');
 console.log('PASS 3.8b: 10→2s exponential cooldown, R/X/touch debouncing, one impulse per press, cannon lock and PWA v62');

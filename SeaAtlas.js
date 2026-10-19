@@ -158,6 +158,15 @@ const SEA_ATLAS = {
             if(isl.id===s.chartWaypointId)
                 g.lineStyle(2,0xf2b86d,1).strokeCircle(mx,my,14);
         }
+        // One disclosed ship, not the location of any undiscovered island.
+        const fugitive=typeof SEA_CONTRACTS!=='undefined'?SEA_CONTRACTS.hunted(s):null;
+        if(fugitive){
+            const hx=L+fugitive.x*scaleX,hy=T+fugitive.y*scaleY;
+            g.lineStyle(2,0xe2ad70,.95).strokeCircle(hx,hy,8);
+            g.lineStyle(1,0xf0d6ac,.95).strokeCircle(hx,hy,12);
+            g.fillStyle(0xf0b67a,1).fillCircle(hx,hy,3.5);
+            txt(cx,top+(desktop?507:446),'✦ PRESA MARCADA: FRAGATA EM MOVIMENTO · '+Math.max(0,Math.ceil(s.contract.escapeAt-(s.elapsed||0)))+'s',desktop?12:10,'#e5bc88',{mono:true});
+        }
         const px=L+s.player.x*scaleX,py=T+s.player.y*scaleY;
         // The sailor's green arrow uses the actual heading; no route
         // guidance/waypoints are invented on the captain's behalf.

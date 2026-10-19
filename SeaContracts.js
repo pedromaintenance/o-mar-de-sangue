@@ -6,11 +6,25 @@ const SEA_CONTRACTS = {
   offers:Object.freeze({
     rescue:Object.freeze({title:'RESGATE DOS AFOGADOS',bounty:125,
       description:'Recolha sobreviventes de um naufrágio e conduza-os a um santuário de Deméter. Fuja dos navios hostis: o contrato só paga após a entrega.'}),
+    hunt:Object.freeze({title:'A CAÇADA DOS CONDENADOS',bounty:240,
+      description:'Investigue um naufrágio, siga o rastro de uma fragata da Corte e intercepte o capitão antes que atravesse os limites do arquipélago. A presa não espera por ninguém.'}),
     smuggle:Object.freeze({title:'PÓLVORA SEM BANDEIRA',bounty:190,
       description:'Leve pólvora clandestina a uma ruína da Costa Sul. A fiscalização da Corte pode confiscar a carga. Navegue discretamente ou suborne os agentes no destino.'})
   }),
   init(s,id) {
     s.contract=null;
+    if(id==='hunt'){
+      const wrecks=s.islands.filter(i=>i.kind==='wreck');
+      if(!wrecks.length)return false;
+      const center={x:s.W/2,y:s.H/2};
+      const clue=[...wrecks].sort((a,b)=>
+        Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y)||a.id-b.id)[0];
+      s.contract={id:'hunt',clueId:clue.id,phase:'clue',completed:false,
+        escaped:false,targetEnemyId:null,escapeAt:0,exitX:null,exitY:null,
+        bounty:this.offers.hunt.bounty};
+      this.mark(s);
+      return true;
+    }
     if(id==='smuggle'){
       const center={x:s.W/2,y:s.H/2};
       // Reuse known physical ruins, never generate a new unreachable site.
@@ -41,6 +55,8 @@ const SEA_CONTRACTS = {
   target(s) {
     const c=s.contract;
     if(!c||c.completed)return null;
+    if(c.id==='hunt')return c.phase==='clue'?
+      s.islands.find(i=>i.id===c.clueId)||null:null;
     const id=c.id==='smuggle'?c.destinationId:
       c.phase==='pickup'?c.pickupId:c.shelterId;
     return s.islands.find(i=>i.id===id)||null;
@@ -58,6 +74,13 @@ const SEA_CONTRACTS = {
   status(s) {
     const c=s.contract;
     if(!c)return '';
+    if(c.id==='hunt'){
+      if(c.completed)return 'CAÇADA CONCLUÍDA · ALVO ABATIDO';
+      if(c.escaped)return 'CAÇADA FRACASSADA · A FRAGATA ESCAPOU';
+      if(c.phase==='clue')return 'CAÇADA · INVESTIGUE O NAUFRÁGIO MARCADO NA CARTA';
+      const remaining=Math.max(0,Math.ceil(c.escapeAt-(s.elapsed||0)));
+      return 'CAÇADA · INTERCEPTE A FRAGATA · '+remaining+'s PARA FUGA';
+    }
     if(c.id==='smuggle'){
       if(c.intercepted)return 'CARGA APREENDIDA PELA CORTE';
       if(c.completed)return 'CONTRABANDO ENTREGUE · RETORNE AO PORTO';
@@ -70,6 +93,9 @@ const SEA_CONTRACTS = {
   options(s,island) {
     const c=s.contract,target=this.target(s);
     if(!c||!target||!island||island.id!==target.id)return null;
+    if(c.id==='hunt')return [{id:'hunt-clue',contractAction:'hunt-clue',
+      name:'INVESTIGAR OS ÚLTIMOS REGISTROS',
+      hint:'Revelar a fragata fugitiva na Carta · iniciar perseguição'}];
     if(c.id==='smuggle')return [
       {id:'smuggle-hidden',contractAction:'smuggle-hidden',
         name:'ENTREGAR SEM SER VISTO',
@@ -86,8 +112,19 @@ const SEA_CONTRACTS = {
   },
   update(s,dt) {
     const c=s.contract;
-    if(!c||c.id!=='smuggle'||c.completed||c.intercepted||s.ended||s.sinking)
+    if(!c||s.ended||s.sinking)return;
+    if(c.id==='hunt'){
+      if(c.phase!=='chase'||c.completed||c.escaped)return;
+      const target=this.hunted(s);
+      if(target&&Math.hypot(target.x-c.exitX,target.y-c.exitY)<105||
+          (s.elapsed||0)>=c.escapeAt){
+        c.escaped=true;c.phase='escaped';c.bounty=0;
+        s.announce?.('A FRAGATA PASSOU O LIMITE DO ARQUIPÉLAGO · CAÇADA PERDIDA');
+        s.finish?.(false,true);
+      }
       return;
+    }
+    if(c.id!=='smuggle'||c.completed||c.intercepted)return;
     const delta=Math.max(0,Math.min(Number(dt)||0,.1));
     if(s.elapsed<6||!s.player||!delta)return;
     if(!c.inspectorSpawned){
@@ -114,11 +151,88 @@ const SEA_CONTRACTS = {
       s.finish?.(false,true);
     }
   },
+  hunted(s) {
+    const c=s.contract;
+    if(c?.id!=='hunt'||c.phase!=='chase')return null;
+    return s.enemies?.find(e=>e.id===c.targetEnemyId&&!e.dead)||null;
+  },
+  launch(s) {
+    const c=s.contract;
+    if(c?.id!=='hunt'||c.phase!=='clue')return false;
+    const enemy=s.spawnEnemy?.('fragata',640);
+    if(!enemy)return false;
+    // Named fugitive, not a generic mission kill. The exit lies on the
+    // opposite edge, so the player has a meaningful interception window.
+    enemy.huntTarget=true;
+    enemy.hp=Math.round(enemy.hp*1.25);
+    enemy.maxhp=enemy.hp;
+    enemy.reward=Math.round(enemy.reward*.7);
+    enemy.label?.setText('✦ CAPITÃO CONDENADO · FRAGATA');
+    const escapeEast=enemy.x<s.W/2;
+    c.exitX=escapeEast?s.W-105:105;
+    c.exitY=Math.max(125,Math.min(s.H-125,enemy.y));
+    c.targetEnemyId=enemy.id;
+    c.phase='chase';
+    c.escapeAt=(s.elapsed||0)+105;
+    s.chartWaypointId=null;
+    s.announce?.('A CARTA MARCOU UMA PRESA EM MOVIMENTO · 105s PARA INTERCEPTAR');
+    return true;
+  },
+  evade(s,e,dt) {
+    if(!e||e.dead||!e.huntTarget)return false;
+    const c=s.contract;
+    if(c?.id!=='hunt'||c.phase!=='chase')return false;
+    const dx=c.exitX-e.x,dy=c.exitY-e.y;
+    // Use the original vessel's movement conventions and world collisions.
+    const desired=Math.atan2(dx,-dy);
+    const delta=typeof Phaser!=='undefined'?
+      Phaser.Math.Angle.Wrap(desired-e.heading):
+      Math.atan2(Math.sin(desired-e.heading),Math.cos(desired-e.heading));
+    const turn=Math.max(-1.45*dt,Math.min(1.45*dt,delta));
+    e.heading+=turn;
+    const throttle=Math.hypot(s.player.x-e.x,s.player.y-e.y)<580?1.25:1;
+    e.vx+=Math.sin(e.heading)*190*throttle*dt;
+    e.vy-=Math.cos(e.heading)*190*throttle*dt;
+    if(typeof SEA_WEATHER!=='undefined')SEA_WEATHER.enemyCurrent(s,e,dt);
+    const drag=Math.exp(-1.25*dt);
+    e.vx*=drag;e.vy*=drag;
+    const speed=Math.hypot(e.vx,e.vy);
+    const limit=Math.min(170,Math.max(135,e.speed*1.25));
+    if(speed>limit){e.vx*=limit/speed;e.vy*=limit/speed;}
+    e.x+=e.vx*dt;e.y+=e.vy*dt;
+    s.collideWorldBounds?.(e);
+    for(const island of s.islands||[]){
+      s.collideRock?.(e,island,false);
+      if(e.dead)break;
+    }
+    return true;
+  },
+  onSink(s,e) {
+    const c=s.contract;
+    if(c?.id!=='hunt'||c.phase!=='chase'||c.completed||c.escaped||
+      !e||!e.huntTarget||e.id!==c.targetEnemyId)return false;
+    c.completed=true;c.phase='complete';
+    s.announce?.('O CAPITÃO CONDENADO AFUNDOU · RECOMPENSA DA CAÇADA');
+    s.finish?.(true);
+    return true;
+  },
   apply(s,choice) {
     const c=s.contract,target=this.target(s);
     if(!c||!choice||!target||s.islandSelected?.id!==target.id||
        (c.phase==='pickup'&&s.islandVisits?.has(target.id))||c.completed||
        c.intercepted)return false;
+    if(c.id==='hunt'){
+      if(choice.contractAction!=='hunt-clue'||c.phase!=='clue')return false;
+      if(!this.launch(s)){
+        s.islandError='NÃO FOI POSSÍVEL LOCALIZAR A FRAGATA · TENTE NOVAMENTE';
+        return false;
+      }
+      s.islandOutcome='Um diário de bordo registra o capitão foragido.\n'+
+        'A Carta revela sua posição atual. Navegue rápido: a presa foge para além do arquipélago.';
+      s.islandVisits.add(target.id);s.islandChoiceIndex=0;s.islandError='';
+      s.updateHUD?.();
+      return true;
+    }
     if(c.id==='smuggle'){
       // A visited ruin can still receive cargo; c.completed prevents replay.
       const hidden=choice.contractAction==='smuggle-hidden';
