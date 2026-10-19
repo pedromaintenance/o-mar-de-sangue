@@ -65,7 +65,7 @@ scene.ended=true;scene.elapsed+=100;scene.keys.R.isDown=false;
 func.call(scene,.016,{just:{}});
 scene.keys.R.isDown=true;
 assert.equal(func.call(scene,.016,{just:{}}),false,'game over cannot activate');
-for(const control of ['pad.just?.[2]','this.impulseTapQueued','this.keys?.R?.isDown'])
+for(const control of ['pad?.just?.[2]','this.impulseTapQueued','this.keys?.R?.isDown'])
  assert(game.includes(control),'controls missing: '+control);
 assert(game.includes('SEA_IMPULSE.speedFactor(this.impulseRemaining||0)'));
 assert(game.includes('if(this.impulseRemaining>0){'),'gun charge disabled while boosting');
