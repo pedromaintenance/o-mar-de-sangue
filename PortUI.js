@@ -771,7 +771,7 @@ const SEA_PORT_UI = {
   result(r) {
     if(!r)return this.home(SeaProfile.load());
     const won=!!r.won,withdrawn=!!r.withdrawn;
-    const isHunt=r.contractTitle===SEA_CONTRACTS.offers.hunt.title;
+    const isHunt=!!r.contractHunt;
     const state=r.contractSeized?'CARGA APREENDIDA':r.contractEscaped?'PRESA ESCAPOU':
       isHunt&&won?'CAÇADA CONCLUÍDA':won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
     const desc=r.contractSeized?'A Corte confiscou a pólvora. O contrato não será pago.':
