@@ -1,6 +1,6 @@
 # 3.7a.3 — A Caçada dos Condenados
 
-**Estado:** implementação inicial em teste. Ainda não publicada na `main`.
+**Estado:** publicada em 18/10/2026 pelo [PR #59](https://github.com/pedromaintenance/o-mar-de-sangue/pull/59), squash `e3bfd44`. CI PR e pós-merge aprovado ([run 39190646695](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39190646695)); [GitHub Pages confirmado](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39190647027).
 
 ## Objetivo de gameplay
 
@@ -45,8 +45,8 @@ Terceiro contrato da Costa Sul, diferente da missão comum `hunt` (contar fragat
 - [x] Implementar seleção no Porto, pista real, fragata identificável e fuga ativa.
 - [x] Aplicar recompensa condicionada ao alvo exato e cancelar na fuga.
 - [x] Preservar `SeaProfile` v4 e as outras duas opções de contrato.
-- [ ] CI `port-smoke` e `port-visual` aprovados no PR e pós-merge.
-- [ ] GitHub Pages publicado e roadmap concluído.
+- [x] CI `port-smoke` e `port-visual` aprovados no PR e pós-merge ([run 39190646695](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39190646695)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39190647027](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39190647027)); roadmap concluído.
 - [ ] Testar fisicamente a janela de 105 s e ajustar distância/velocidade de fuga segundo playtests, sem prometer dificuldade perfeita por testes emulados.
 
 ### Roteiro de playtest
