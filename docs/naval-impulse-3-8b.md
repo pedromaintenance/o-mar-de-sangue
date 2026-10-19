@@ -1,6 +1,6 @@
 # 3.8b.0 — Arrancada Naval e Mestres da Arrancada
 
-**Estado:** implementação submetida a QA. Não alterar ou declarar publicação antes de CI verde, merge e Pages confirmados.
+**Estado:** publicada em 18/10/2026, [PR #58](https://github.com/pedromaintenance/o-mar-de-sangue/pull/58), squash `aa59e7f`. Testes PR/pós-merge aprovados ([run 39185589085](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39185589085)); [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39185589073](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39185589073)).
 
 ## Proposta de gameplay
 
@@ -49,8 +49,8 @@ O intervalo **se aproxima exponencialmente de 2 segundos e nunca é menor do que
 
 - [x] Verificações novas de fórmula 10→2, um impulso por acionamento, recarga, teclado, Xbox e toque, cancelamento de canhões e compatibilidade de backup antigo.
 - [x] Teste de navegador em três resoluções para localizar o botão, acionar impulso e validar a janela de cooldown; mantém QA do canhão.
-- [ ] PR aprovado com `port-smoke` e `port-visual` verdes, merge e pós-merge.
-- [ ] Publicação no Pages confirmada.
+- [x] PR #58 aprovado com `port-smoke` e `port-visual` verdes; squash merge em `main` e CI pós-merge verde ([run 39185589085](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39185589085)).
+- [x] Publicação no Pages confirmada ([run 39185589073](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39185589073)).
 - [ ] Testes manuais: celular físico, Xbox, confronto de abalroamento, rochas/bordas e custos de melhoria nos níveis superiores.
 
 **Balanceamento intencional:** o impulso dá vantagem de velocidade, mas aumenta o risco de colisão. Não multiplica diretamente o dano de abalroamento; o dano existente depende da velocidade real e do ângulo da proa. Ajustar apenas com feedback de jogabilidade, sem alterar silenciosamente o risco físico.
