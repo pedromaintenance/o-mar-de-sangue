@@ -29,11 +29,16 @@ const SEA_SAVE_TRANSFER = {
         throw Error('Valor inválido no progresso: '+field);
     }
     const ids=SEA_UPGRADES.map(x=>x.id);
-    if(!this.sameKeys(value.levels,ids))
+    // The 15th upgrade is optional ONLY for backups created before 3.8b.
+    // Unknown extra keys and absent older fields are still rejected.
+    const oldIds=ids.filter(id=>id!=='impulso');
+    if(!this.sameKeys(value.levels,ids) &&
+       !this.sameKeys(value.levels,oldIds))
       throw Error('A lista de melhorias não corresponde ao save v4.');
     const levels={};
     for(const id of ids) {
-      const level=value.levels[id];
+      const level=id==='impulso' && !Object.hasOwn(value.levels,id)
+        ? 0 : value.levels[id];
       if(typeof level!=='number'||!Number.isSafeInteger(level)||
           level<0||level>999999)
         throw Error('Nível inválido: '+id);

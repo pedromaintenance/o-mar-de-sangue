@@ -3,6 +3,7 @@ const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/st
 const game=fs.readFileSync('Game.js','utf8');
 const source=fs.readFileSync('SeaGunnery.js','utf8');
 const ctx={SEA_MATH:{clamp:(n,a,b)=>Math.max(a,Math.min(b,n))},
+ SEA_IMPULSE:{speedFactor:()=>1},
  SEA_AUDIO:{play(){}}
 };vm.createContext(ctx);
 vm.runInContext(source+';this.g=SEA_GUNNERY;',ctx);

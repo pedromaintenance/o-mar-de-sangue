@@ -50,9 +50,10 @@ for(const desktop of [false,true]){
  const SEA_WEATHER={names:{calm:'MAR SERENO',storm:'TEMPESTADE RUBRA'}};
  const SEA_ATLAS={navigation:()=>null};
  const SEA_GUNNERY={chargeMs:()=>2000};
+ const SEA_IMPULSE={cooldown:()=>10};
  const build=new Function('SEA_DESKTOP','SEA_VIEW','SEA_MISSION_TITLES','SEA_MATH',
-   'SEA_WEATHER','SEA_ATLAS','SEA_GUNNERY','return ({'+createHUD+','+updateHUD+'});');
- const ui=build(SEA_DESKTOP,SEA_VIEW,SEA_MISSION_TITLES,SEA_MATH,SEA_WEATHER,SEA_ATLAS,SEA_GUNNERY);
+   'SEA_WEATHER','SEA_ATLAS','SEA_GUNNERY','SEA_IMPULSE','return ({'+createHUD+','+updateHUD+'});');
+ const ui=build(SEA_DESKTOP,SEA_VIEW,SEA_MISSION_TITLES,SEA_MATH,SEA_WEATHER,SEA_ATLAS,SEA_GUNNERY,SEA_IMPULSE);
  ui.createHUD.call(s);
  assert.deepEqual(s.pauseButtonHitbox,{x:desktop?454:412,y:78,w:120,h:40});
  assert.equal(rects.find(e=>e.args[2]===SEA_VIEW.width&&e.args[3]===SEA_VIEW.height)
