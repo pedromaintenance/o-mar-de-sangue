@@ -386,6 +386,18 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - **3.8c — Danos localizados:** velas, leme e canhões com efeitos temporários e telegráficos, evitando simulação excessivamente complexa.
 - **Dependência:** testes de interface e de IA, preservação das hitboxes touch/Xbox e economia/recompensas não exploráveis.
 
+### 3.8b — Arrancada Naval (em validação, 18/10/2026)
+
+- [x] **Botão IMPULSO**, com `R` no teclado, `X` no controle Xbox e botão próprio no toque/mouse (desktop 613,77; celular 240,616).
+- [x] Impulso de **0,7 segundo**, multiplicador máximo **1,85×** do teto normal, impulso imediato para escapar/abalroar sem invulnerabilidade; desacelera gradualmente até a velocidade normal.
+- [x] **Recarga de 10 segundos** inicialmente, diminuindo com a melhoria **Mestres da Arrancada** no Estaleiro/Motor conforme `T(n)=2+8×exp(-0,13n)`, com limite assintótico de **2 segundos**.
+- [x] Prevenir repetições de entrada e recargas ilegais, interromper preparação de canhões ao impulsionar, preservar risco físico e colisões preexistentes.
+- [x] Preservar **save v4** e aceitar imports legados de 14 melhorias e novos de 15, sem alteração de progresso; PWA **v62**.
+- [x] Testes Node para matemática/input/save e Chromium nas resoluções 1600×900, 1280×720 e 390×844, incluindo alvo tátil e cooldown.
+- [ ] CI do PR + pós-merge, publicação confirmada em Pages e documentação final.
+- [ ] Validação física de teclado, controle Xbox, touch, abalroamentos e riscos da aceleração.
+- [Especificação, fórmulas, compatibilidade e testes](docs/naval-impulse-3-8b.md).
+
 ### 3.9 — Os Homens do Convés (proposto, não implementado)
 
 - **3.9a — Oficiais:** timoneiro, artilheiro, carpinteiro e navegador com função tática distinta. Preferir dois ou três slots com decisões relevantes a dezenas de atributos.
