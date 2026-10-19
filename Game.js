@@ -1865,6 +1865,7 @@ class Game extends Phaser.Scene {
             report.contractBounty=contractBounty;
             report.contractCompleted=!!this.contract.completed;
             report.contractSeized=!!this.contract.intercepted;
+            report.contractEscaped=!!this.contract.escaped;
             report.contractRoute=this.contract.route||null;
         }
         // Ir ao porto garante que todos os efeitos e eventos da cena sejam encerrados.
