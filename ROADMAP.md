@@ -382,8 +382,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 ### 3.8 — Ferro, Pólvora e Sangue (próximas armas/abordagem planejadas)
 
 - **3.8a — Equipamentos ativos:** selecionar entre arpão, morteiro, fumaça e pólvora amaldiçoada, com usos, recargas e limites explícitos, sem desbalancear os canhões normais.
-- **3.8b — Abordagem naval:** opção após enfraquecer/imobilizar inimigos, com saquear, libertar cativos ou capturar, inclusive risco de perda e consequência política.
-- **3.8c — Danos localizados:** velas, leme e canhões com efeitos temporários e telegráficos, evitando simulação excessivamente complexa.
+- **3.8c — Abordagem naval:** opção após enfraquecer/imobilizar inimigos, com saquear, libertar cativos ou capturar, inclusive risco de perda e consequência política.
+- **3.8d — Danos localizados:** velas, leme e canhões com efeitos temporários e telegráficos, evitando simulação excessivamente complexa.
 - **Dependência:** testes de interface e de IA, preservação das hitboxes touch/Xbox e economia/recompensas não exploráveis.
 
 ### 3.8b — Arrancada Naval (em validação, 18/10/2026)
