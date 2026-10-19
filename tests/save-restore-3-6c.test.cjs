@@ -3,7 +3,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
 const source=fs.readFileSync('SeaSaveTransfer.js','utf8');
 const game=fs.readFileSync('Game.js','utf8');
 const ids=[...game.matchAll(/\{ id: '([^']+)', icon:/g)].map(m=>m[1]);
-assert.equal(ids.length,14,'Expected canonical 14 upgrades');
+assert.equal(ids.length,15,'Expected canonical 15 upgrades');
+assert(ids.includes('impulso'),'new cooldown skill must be an explicit yard upgrade');
 const levels=Object.fromEntries(ids.map(id=>[id,0]));
 const original={version:4,gold:715,levels:{...levels,casco:2},
   sorties:14,wins:8,losses:5,kills:36,rammings:2,earned:1862,
@@ -24,6 +25,10 @@ const wrap=(profile=imported)=>JSON.stringify({format:'mar-de-sangue-captain-bac
  schema:4,exportedAt:'2026-10-16T18:44:18.000Z',profile});
 const parsed=t.parse(wrap());
 assert.deepEqual(JSON.parse(JSON.stringify(parsed.profile)),imported);
+const oldV4={...imported,levels:Object.fromEntries(Object.entries(imported.levels).filter(([k])=>k!=='impulso'))};
+const migrated=t.parse(wrap(oldV4)).profile;
+assert.equal(migrated.levels.impulso,0,'old v4 backup restores with free impulse level 0');
+assert.deepEqual(JSON.parse(JSON.stringify(migrated)),imported,'pre-impulse v4 progress preserved');
 assert.equal(parsed.exportedAt,'2026-10-16T18:44:18.000Z');
 const old=store.get(save);
 function bad(payload,pattern){
