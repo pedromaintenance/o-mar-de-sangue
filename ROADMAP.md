@@ -298,7 +298,7 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Teste físico Android/Xbox/PWA e balanceamento após relatos de jogabilidade.
 - [Documentação de regras, riscos, QA e limites](docs/contracts-smuggling-3-7a2.md).
 
-**3.7a.3 — A Caçada dos Condenados (implementada, em validação):**
+**3.7a.3 — A Caçada dos Condenados (publicada em 18/10/2026):**
 
 - [x] Adicionar terceiro contrato da Costa Sul: **investigar um naufrágio → descobrir a fragata fugitiva → interceptá-la e afundá-la antes de escapar**.
 - [x] Alvo único com +25% casco, nome próprio, IA de fuga rumo à borda oposta e aceleração ao ser perseguido; **105 segundos** após ler a pista para capturá-lo.
@@ -306,7 +306,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [x] Concluir com **240 ouro somente após destruir o alvo exato**; fuga ou prazo esgotado encerram o contrato sem comissão. Não há sistema de captura/rendição nesta etapa — fica reservado à Abordagem Naval 3.8c.
 - [x] Preservar sandbox, missões anteriores, resgate, contrabando, save v4, controladores e PWA offline v63.
 - [x] Testes de regras e anti-replay para pista, fuga, alvo errado, prazo e ausência de escrita no save.
-- [ ] Aprovar CI do PR e pós-merge; integrar `main` e confirmar Pages.
+- [x] [PR #59](https://github.com/pedromaintenance/o-mar-de-sangue/pull/59) integrado por squash (`e3bfd44`); `port-smoke` e `port-visual` verdes no PR e pós-merge da `main` ([run 39190646695](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39190646695)).
+- [x] [GitHub Pages publicado](https://pedromaintenance.github.io/o-mar-de-sangue/) ([run 39190647027](https://github.com/pedromaintenance/o-mar-de-sangue/actions/runs/39190647027)) com PWA offline v63.
 - [ ] Testar dificuldade e legibilidade em desktop, Android e controle físico.
 - [Especificação e roteiro de QA](docs/contracts-hunt-3-7a3.md).
 
