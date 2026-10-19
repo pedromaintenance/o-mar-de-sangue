@@ -69,6 +69,43 @@ const {chromium}=require('playwright-core');
     };
    });
    assert(before.hud.includes('CASCO')&&before.hud.includes('OURO')&&before.hud.includes('NÓS'));
+   // 3.8b: touch target and keyboard/gamepad burst in the real Phaser scene.
+   const dash=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     const hit=s.impulseButtonHitbox;
+     s.scene.pause();
+     s.elapsed=0;s.lastImpulseAt=-1000;s.impulseRemaining=0;
+     s.keys.R.isDown=false;s.impulseKeyHeld=false;
+     s.profile.levels.impulso=0;
+     const start=s.handleCaptainPointer(hit.x,hit.y);
+     const fired=s.updateImpulse(.016,{just:{}});
+     const velocity=Math.hypot(s.playerVelocity.x,s.playerVelocity.y);
+     const cap=s.shipStats.maxSpeed*SEA_IMPULSE.speedFactor(s.impulseRemaining);
+     s.updateHUD();
+     const labelAtBurst=s.impulseButtonText.text;
+     s.elapsed=9.8;
+     const tooSoon=s.updateImpulse(.05,{just:{2:true}});
+     s.elapsed=10;
+     const padFired=s.updateImpulse(.05,{just:{2:true}});
+     s.impulseRemaining=0;
+     s.scene.resume();
+     return {hit,start,fired,velocity,cap,labelAtBurst,tooSoon,padFired,
+       cooldown:SEA_IMPULSE.cooldown(0)};
+   });
+   assert(dash.hit&&dash.hit.x===(isMobile?240:613)&&
+     dash.hit.y===(isMobile?616:77)&&dash.start&&dash.fired&&
+     dash.velocity>0&&dash.velocity<=dash.cap+1&&
+     dash.labelAtBurst.includes('ARRANCADA')&&!dash.tooSoon&&
+     dash.padFired&&dash.cooldown===10,
+     label+': one impulse per tap, no cooldown bypass '+JSON.stringify(dash));
+   await page.screenshot({path:path.join('port-artifacts',
+     label+'-naval-impulse-3-8b.png'),fullPage:true});
+   // Reset the test's temporary impulse state before the cannon regression.
+   await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     s.impulseRemaining=0;s.lastImpulseAt=-1000;s.elapsed=0;
+     s.playerVelocity.x=0;s.playerVelocity.y=0;
+   });
    // 3.8a: hold a cannon input in a running Phaser scene, then observe
    // the charging meter and first volley. No instant-fire on touchstart.
    const fireStart=await page.evaluate(()=>{
