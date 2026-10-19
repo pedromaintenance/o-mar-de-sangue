@@ -57,7 +57,18 @@ const {chromium}=require('playwright-core');
    assert(after.docked&&after.available>=2);
    assert.equal(after.phase,'chase');assert(after.prey);
    assert.equal(after.present,1);assert.equal(after.bounty,240);
-   assert.deepEqual(after.known,[before.clue]);
+   assert(after.known.includes(before.clue),'clue remains charted');
+   // Navigation naturally discovers nearby islands; the contract cannot
+   // disclose any remote island beyond the ship radar's ordinary reach.
+   const fair=await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     return [...s.chartDiscovered].every(id=>{
+       const island=s.islands.find(i=>i.id===id);
+       return id===s.contract.clueId ||
+         Math.hypot(island.x-s.player.x,island.y-s.player.y)<=s.shipStats.radar+island.radius;
+     });
+   });
+   assert(fair,'contract must not expose distant islands');
    assert.equal(after.marked,null);
    assert(after.objective.includes('PARA FUGA'));
    const chart=await page.evaluate(()=>{
@@ -71,7 +82,7 @@ const {chromium}=require('playwright-core');
        prey:!!prey,known:[...s.chartDiscovered],atlas:s.atlasOpen};
    });
    assert(chart.opened&&chart.atlas&&chart.marked&&chart.prey);
-   assert.deepEqual(chart.known,[before.clue]);
+   assert(chart.known.includes(before.clue),'the clue is still on the map');
    await page.screenshot({path:path.join('port-artifacts',tag+'-moving-prey-chart.png'),fullPage:true});
    const done=await page.evaluate(()=>{
      const s=game.scene.getScene('Game');
