@@ -771,11 +771,16 @@ const SEA_PORT_UI = {
   result(r) {
     if(!r)return this.home(SeaProfile.load());
     const won=!!r.won,withdrawn=!!r.withdrawn;
-    const state=r.contractSeized?'CARGA APREENDIDA':won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
-    const desc=r.contractSeized?'A Corte confiscou a pólvora. O contrato não será pago.':won?'As velas ainda conhecem o caminho.':
+    const isHunt=r.contractTitle===SEA_CONTRACTS.offers.hunt.title;
+    const state=r.contractSeized?'CARGA APREENDIDA':r.contractEscaped?'PRESA ESCAPOU':
+      isHunt&&won?'CAÇADA CONCLUÍDA':won?'MISSÃO CUMPRIDA':withdrawn?'DE VOLTA AO PORTO':'O MAR TE RECLAMOU';
+    const desc=r.contractSeized?'A Corte confiscou a pólvora. O contrato não será pago.':
+      r.contractEscaped?'A fragata abandonou o arquipélago. Nenhuma comissão será paga.':
+      isHunt&&won?'A presa foi encontrada e o capitão condenado não voltou ao mar.':won?'As velas ainda conhecem o caminho.':
       withdrawn?'Quem retorna ainda pode contar a história.':'O oceano nunca esquece os seus.';
     const data=[
-      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?'ENTREGUE':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
+      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?(isHunt?'ALVO ABATIDO':'ENTREGUE'):
+        r.contractEscaped?'FUGIU':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
         ['PRÊMIO DO CONTRATO',r.contractBounty||0],
         ...(r.contractRoute?[[ 'FORMA DA ENTREGA',r.contractRoute==='hidden'?'CLANDESTINA':'SUBORNO À CORTE' ]]:[])]:[]),
       ['OURO ENCONTRADO',r.collected],['OURO RECUPERADO',r.reward],
