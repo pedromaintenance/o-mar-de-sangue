@@ -83,7 +83,7 @@ assert(!/SeaProfile\.|localStorage|sessionStorage|\bfetch\s*\(/.test(code['SeaCo
 assert(code['Game.js'].includes('contractBounty=won&&this.contract?.completed'));
 assert(code['Game.js'].includes("['rescue','smuggle','hunt'].includes(data?.contract)"));
 assert(code['Game.js'].includes("if (this.contract)return SEA_CONTRACTS.status(this)"));
-assert(code['PortUI.js'].includes("['rescue','smuggle'].includes(id)"));
+assert(code['PortUI.js'].includes("['rescue','smuggle','hunt'].includes(id)"));
 assert(code['PortUI.js'].includes("this.start('sandbox',id)"));
 assert(code['index.html'].indexOf('SeaContracts.js')>code['index.html'].indexOf('SeaAtlas.js'));
 assert(code['index.html'].indexOf('SeaContracts.js')<code['index.html'].indexOf('Game.js'));
