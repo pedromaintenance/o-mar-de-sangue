@@ -48,6 +48,8 @@ on:
       - 'SeaAtlas.js'
       - 'SeaContracts.js'
       - 'SeaGunnery.js'
+      - 'SeaImpulse.js'
+      - 'tests/naval-impulse-3-8b.test.cjs'
       - 'SeaCannonChargeFx.js'
       - 'assets/fx/cannon_charge_sparks.png'
       - 'assets/v15/beast_coral.png'
@@ -107,6 +109,8 @@ on:
       - 'SeaAtlas.js'
       - 'SeaContracts.js'
       - 'SeaGunnery.js'
+      - 'SeaImpulse.js'
+      - 'tests/naval-impulse-3-8b.test.cjs'
       - 'SeaCannonChargeFx.js'
       - 'assets/fx/cannon_charge_sparks.png'
       - 'assets/v15/beast_coral.png'
@@ -167,6 +171,8 @@ jobs:
           node tests/gunnery-windup-3-8a.test.cjs
           node tests/gunnery-single-shot-3-8a1.test.cjs
           node tests/braced-gunnery-3-8a2.test.cjs
+          node --check SeaImpulse.js
+          node tests/naval-impulse-3-8b.test.cjs
           node --check SeaCannonChargeFx.js
           node tests/cannon-charge-sparks-3-8a3.test.cjs
           node tests/cannon-sparks-luminous-3-8a5.test.cjs
