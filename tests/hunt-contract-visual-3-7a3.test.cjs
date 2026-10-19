@@ -93,8 +93,10 @@ const {chromium}=require('playwright-core');
        bounty:s.contract.bounty,version:SeaProfile.load().version};
    });
    assert(done.finished&&done.bounty===240&&done.version===4);
-   await page.locator('#sea-port-ui .port-result').waitFor({timeout:20000})
-     .catch(async()=>page.locator('#sea-port-ui [data-action="menu"]').first().waitFor({timeout:10000}));
+   await page.locator('#sea-port-ui .port-page--result').waitFor({timeout:20000});
+   const outcome=await page.locator('#sea-port-ui .port-page--result').innerText();
+   assert(outcome.includes('CAÇADA CONCLUÍDA')&&outcome.includes('ALVO ABATIDO')&&
+     outcome.includes('240'),tag+': explicit hunt-specific results');
    assert.equal(errors.length,0,tag+': '+JSON.stringify(errors));
    console.log('PASS 3.7a.3: '+tag+' contract, clue, marker and victory');
    await page.close();
