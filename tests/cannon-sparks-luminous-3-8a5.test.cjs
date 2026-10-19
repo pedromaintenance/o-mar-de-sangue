@@ -73,5 +73,6 @@ assert(fx.includes('Phaser.BlendModes.ADD'),'light must brighten the scene');
 assert(fx.includes('cannonNeedsRelease'),'held button cannot restart effects');
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('./assets/fx/cannon_charge_sparks.png'));
-assert(sw.includes('v61-luminous-fuse-20261018'));
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=61,
+ 'PWA cache must preserve luminous sparks on later releases');
 console.log('PASS 3.8a.5: full PNG CRC/IDAT/filters, five bright transparent frames, additive blend and cache v61');
