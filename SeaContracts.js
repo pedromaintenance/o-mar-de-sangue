@@ -25,7 +25,7 @@ const SEA_CONTRACTS = {
       this.mark(s);
       return true;
     }
-    if(id==='smuggle'){ 
+    if(id==='smuggle'){
       const center={x:s.W/2,y:s.H/2};
       // Reuse known physical ruins, never generate a new unreachable site.
       const distance=i=>Math.hypot(i.x-center.x,i.y-center.y);
@@ -227,7 +227,7 @@ const SEA_CONTRACTS = {
         s.islandError='NÃO FOI POSSÍVEL LOCALIZAR A FRAGATA · TENTE NOVAMENTE';
         return false;
       }
-      s.islandOutcome='Um diário de bordo registra o capitão foragido.\\n'+
+      s.islandOutcome='Um diário de bordo registra o capitão foragido.\n'+
         'A Carta revela sua posição atual. Navegue rápido: a presa foge para além do arquipélago.';
       s.islandVisits.add(target.id);s.islandChoiceIndex=0;s.islandError='';
       s.updateHUD?.();
