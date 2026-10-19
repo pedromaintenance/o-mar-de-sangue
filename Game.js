@@ -66,6 +66,7 @@ const SEA_UPGRADES = [
     { id: 'blindagem', icon: '◈', name: 'Placas de Golzdov', desc: 'Reduz dano de projéteis e rochas', base: 85, factor: 1.52, group: 'casco' },
     { id: 'velas', icon: '▲', name: 'Velas Escarlates', desc: '+20 velocidade e aceleração', base: 30, factor: 1.46, group: 'motor' },
     { id: 'leme', icon: '⌁', name: 'Leme Ancestral', desc: 'Curvas mais rápidas', base: 25, factor: 1.44, group: 'motor' },
+    { id: 'impulso', icon: '➶', name: 'Mestres da Arrancada', desc: 'Recarga do impulso: 10s, tende exponencialmente a 2s', base: 75, factor: 1.55, group: 'motor' },
     { id: 'canhoes', icon: '✹', name: 'Canhões Rúnicos', desc: '+7 dano por bola de canhão', base: 40, factor: 1.49, group: 'armas' },
     { id: 'cadencia', icon: '❖', name: 'Serventes Treinados', desc: 'Reduz exponencialmente a preparação do tiro (2s inicialmente)', base: 65, factor: 1.54, group: 'armas' },
     { id: 'bateria', icon: '☷', name: 'Baterias Geminadas', desc: 'Mais projéteis por bordo a cada 3 níveis', base: 120, factor: 1.58, group: 'armas' },
@@ -389,6 +390,8 @@ class Game extends Phaser.Scene {
         this.cannonNeedsRelease = {port:false,starboard:false};
         this.cannonBracing = 0;
         this.recoilVisual = 0;this.recoilDamping = 0;
+        this.impulseRemaining=0;this.lastImpulseAt=-1000;
+        this.impulseKeyHeld=false;this.impulseTapQueued=false;
         this.shots = []; this.enemies = []; this.islands = []; this.treasures = [];
         this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
@@ -524,7 +527,7 @@ class Game extends Phaser.Scene {
             (this.contract ? 'CONTRATO · '+SEA_CONTRACTS.offers[this.contract.id].title :
              this.mode === 'mission' ? `MISSÃO ${this.stage}` : 'SANDBOX INFINITO') +
             (SEA_DESKTOP
-                ? '\nSEGURE Q/E ATÉ A SALVA · SOLTAR CANCELA A CARGA\nPREPARAR REDUZ VELOCIDADE · SOLTE PARA REARMAR'
+                ? '\nSEGURE Q/E ATÉ A SALVA · SOLTAR CANCELA A CARGA\nR: IMPULSO PARA FUGIR OU ABALROAR · X NO XBOX'
                 : '\nARRASTE O ANALÓGICO PARA NAVEGAR!\nSEGURE ATÉ DISPARAR · SOLTAR CANCELA A CARGA\nCARREGAR DESACELERA · SOLTE PARA REARMAR'), {
                 fontFamily: 'Georgia', fontSize: '15px', color: '#ffe4bc', align: 'center', lineSpacing: 6,
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
@@ -729,6 +732,24 @@ class Game extends Phaser.Scene {
         coin.add(sparkle);
         this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,sparkle});
     }
+    updateImpulse(dt,pad) {
+        const held=!!this.keys?.R?.isDown;
+        const pressed=(held&&!this.impulseKeyHeld)||!!pad?.just?.[2]||!!this.impulseTapQueued;
+        this.impulseKeyHeld=held;this.impulseTapQueued=false;
+        this.impulseRemaining=Math.max(0,(this.impulseRemaining||0)-Math.max(0,dt));
+        if(!pressed||this.ended||this.sinking||this.atlasOpen||this.pausedByCaptain||this.islandDocked)return false;
+        if(!SEA_IMPULSE.ready(this.elapsed,this.lastImpulseAt,this.profile?.levels?.impulso||0))return false;
+        this.lastImpulseAt=this.elapsed;this.impulseRemaining=SEA_IMPULSE.duration;
+        const fx=Math.sin(this.player.rotation),fy=-Math.cos(this.player.rotation);
+        this.playerVelocity.x+=fx*SEA_IMPULSE.thrust(this.shipStats.maxSpeed);
+        this.playerVelocity.y+=fy*SEA_IMPULSE.thrust(this.shipStats.maxSpeed);
+        const sp=Math.hypot(this.playerVelocity.x,this.playerVelocity.y),cap=this.shipStats.maxSpeed*SEA_IMPULSE.speedFactor(this.impulseRemaining);
+        if(sp>cap){this.playerVelocity.x*=cap/sp;this.playerVelocity.y*=cap/sp;}
+        this.resetCannonCharge();
+        this.cannonNeedsRelease.port=true;this.cannonNeedsRelease.starboard=true;
+        this.cameras?.main?.shake?.(110,.0011);
+        return true;
+    }
     createHUD() {
         this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 532 : 480, 101, 0x080e12, .97).setScrollFactor(0).setDepth(90);
         this.add.rectangle(SEA_DESKTOP ? 266 : 240, 51, SEA_DESKTOP ? 524 : 472, 93, 0x11171a, .92).setStrokeStyle(1, 0x715b45, .9).setScrollFactor(0).setDepth(91);
@@ -754,6 +775,13 @@ class Game extends Phaser.Scene {
         this.add.text(ph.x,ph.y,'☰ PAUSA',{
             fontFamily:'Georgia',fontSize:'16px',fontStyle:'bold',color:'#f3d6b5'
         }).setOrigin(.5).setDepth(112).setScrollFactor(0);
+        // O botão existe em desktop e mobile; o toque nativo passa pelo roteador.
+        const ib=this.impulseButtonHitbox={x:SEA_DESKTOP?613:240,y:SEA_DESKTOP?77:616,w:102,h:44};
+        this.add.rectangle(ib.x,ib.y,ib.w,ib.h,0x253035,.94)
+            .setStrokeStyle(2,0xc89b64,.94).setScrollFactor(0).setDepth(112);
+        this.impulseButtonText=this.add.text(ib.x,ib.y,'IMPULSO · R',{
+            fontFamily:'monospace',fontSize:'12px',fontStyle:'bold',color:'#f3d6a8',align:'center'
+        }).setOrigin(.5).setScrollFactor(0).setDepth(113);
         if (!SEA_DESKTOP) this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
             fontFamily: 'monospace', fontSize: '10px', color: '#bbab93',
             stroke: '#101720', strokeThickness: 3
@@ -892,6 +920,7 @@ class Game extends Phaser.Scene {
         this.resetCannonCharge();
         this.releaseJoystick();
         this.cannonPointers?.clear();
+        this.impulseTapQueued=false;
         this.updateCannonHighlights();
     }
     resetCannonCharge() {
@@ -908,6 +937,11 @@ class Game extends Phaser.Scene {
     }
     updateCannonCharge(dt,pad) {
         if(!this.cannonCharge||!this.keys||!this.shipStats)return;
+        if(this.impulseRemaining>0){
+            this.resetCannonCharge();
+            this.cannonNeedsRelease.port=true;this.cannonNeedsRelease.starboard=true;
+            return;
+        }
         const pressed={
             port:!!(this.keys.Q.isDown||this.keys.SPACE.isDown||pad?.port||
                 [...(this.cannonPointers?.values()||[])].includes('port')),
@@ -1356,6 +1390,7 @@ class Game extends Phaser.Scene {
         }
         if (this.waveElapsed > .065) { this.waveElapsed = 0; this.drawSea(this.elapsed); }
         SEA_PIXEL.seaUpdate(this,dt);
+        this.updateImpulse(dt,pad);
         const keyboardTurn = Number(this.keys.RIGHT.isDown || this.keys.D.isDown) -
             Number(this.keys.LEFT.isDown || this.keys.A.isDown);
         const keyboardThrottle = Number(this.keys.UP.isDown || this.keys.W.isDown) -
@@ -1382,7 +1417,7 @@ class Game extends Phaser.Scene {
         this.playerVelocity.x = (forward * faceX + sideX * lateral) * friction;
         this.playerVelocity.y = (forward * faceY + sideY * lateral) * friction;
         const sp = Math.hypot(this.playerVelocity.x, this.playerVelocity.y);
-        const speedCap=this.shipStats.maxSpeed*brace.speed;
+        const speedCap=this.shipStats.maxSpeed*brace.speed*SEA_IMPULSE.speedFactor(this.impulseRemaining||0);
         if (sp > speedCap) { this.playerVelocity.x *= speedCap / sp; this.playerVelocity.y *= speedCap / sp; }
         this.player.x += this.playerVelocity.x * dt;
         this.player.y += this.playerVelocity.y * dt;
@@ -1680,6 +1715,11 @@ class Game extends Phaser.Scene {
     }
     updateHUD() {
         this.hud.setText(`CASCO ${Math.ceil(this.shipHP)}/${SEA_MATH.nice(this.maxShipHP)}   OURO ${SEA_MATH.nice(this.gold)}   NÓS ${Math.abs(this.speed | 0)}`);
+        if(this.impulseButtonText){
+            const cd=SEA_IMPULSE.cooldown(this.profile?.levels?.impulso||0);
+            const remaining=Math.max(0,cd-(this.elapsed-this.lastImpulseAt));
+            this.impulseButtonText.setText(this.impulseRemaining>0?'➶ ARRANCADA':remaining>0?`IMPULSO ${remaining.toFixed(1)}s`:'➶ IMPULSO');
+        }
         this.quest.setText(this.objectiveText());
         // Keep unusually long mission text away from the fixed pause button.
         this.quest.setScale(Math.max(.78,Math.min(1,(SEA_DESKTOP?370:320)/Math.max(1,this.quest.width))));
@@ -1777,6 +1817,10 @@ class Game extends Phaser.Scene {
         }
         if (inside(this.pauseButtonHitbox)) {
             this.toggleCaptainMenu();
+            return true;
+        }
+        if(inside(this.impulseButtonHitbox)){
+            this.impulseTapQueued=true;
             return true;
         }
         return false;
