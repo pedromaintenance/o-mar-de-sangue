@@ -298,7 +298,17 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 - [ ] Teste físico Android/Xbox/PWA e balanceamento após relatos de jogabilidade.
 - [Documentação de regras, riscos, QA e limites](docs/contracts-smuggling-3-7a2.md).
 
-**3.7a.3 — Caçada (planejado):** alvo identificável no Atlas após obtenção de pista, critérios de captura/abate e recompensas; não repetir simplesmente a missão atual de fragatas.
+**3.7a.3 — A Caçada dos Condenados (implementada, em validação):**
+
+- [x] Adicionar terceiro contrato da Costa Sul: **investigar um naufrágio → descobrir a fragata fugitiva → interceptá-la e afundá-la antes de escapar**.
+- [x] Alvo único com +25% casco, nome próprio, IA de fuga rumo à borda oposta e aceleração ao ser perseguido; **105 segundos** após ler a pista para capturá-lo.
+- [x] Indicar na Carta a posição real do navio marcado, sem revelar outras ilhas nem criar autopiloto.
+- [x] Concluir com **240 ouro somente após destruir o alvo exato**; fuga ou prazo esgotado encerram o contrato sem comissão. Não há sistema de captura/rendição nesta etapa — fica reservado à Abordagem Naval 3.8c.
+- [x] Preservar sandbox, missões anteriores, resgate, contrabando, save v4, controladores e PWA offline v63.
+- [x] Testes de regras e anti-replay para pista, fuga, alvo errado, prazo e ausência de escrita no save.
+- [ ] Aprovar CI do PR e pós-merge; integrar `main` e confirmar Pages.
+- [ ] Testar dificuldade e legibilidade em desktop, Android e controle físico.
+- [Especificação e roteiro de QA](docs/contracts-hunt-3-7a3.md).
 
 **3.7b — Eventos dinâmicos (planejado):** navios pedindo socorro, perseguições, encontros com sobreviventes/cultistas/Corte e decisões com impacto em rota, risco e recursos. Criar limites de frequência para preservar combate e exploração.
 
