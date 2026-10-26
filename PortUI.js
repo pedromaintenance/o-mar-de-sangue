@@ -778,6 +778,15 @@ const SEA_PORT_UI = {
       r.contractEscaped?'A fragata abandonou o arquipélago. Nenhuma comissão será paga.':
       isHunt&&won?'A presa foi encontrada e o capitão condenado não voltou ao mar.':won?'As velas ainda conhecem o caminho.':
       withdrawn?'Quem retorna ainda pode contar a história.':'O oceano nunca esquece os seus.';
+    const chronicle=Array.isArray(r.politicalChronicle)?
+      r.politicalChronicle.filter(entry=>entry&&typeof entry.text==='string').slice(0,8):[];
+    const chronicleHtml=chronicle.length?
+      '<section class="port-chronicle" role="region" aria-label="Crônica política da expedição">'+
+        '<h2>AS MARCAS DA VIAGEM</h2>'+
+        '<p>O mar se lembra das escolhas, mesmo que a expedição termine aqui.</p>'+
+        '<ol>'+chronicle.map(entry=>'<li><strong>'+this.text(entry.text)+
+        '</strong><span>'+this.text(entry.terms||'Consequência registrada')+
+        '</span></li>').join('')+'</ol></section>':'';
     const data=[
       ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?(isHunt?'ALVO ABATIDO':'ENTREGUE'):
         r.contractEscaped?'FUGIU':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
@@ -794,7 +803,7 @@ const SEA_PORT_UI = {
       '<h1>'+this.text(state)+'</h1><p>'+this.text(desc)+'</p></div>'+
       '<div class="port-result-grid">'+data.map(([title,value])=>
         '<div><span>'+this.text(title)+'</span><strong>'+(typeof value==='string'?this.text(value):this.num(value))+'</strong></div>').join('')+
-      '</div><div class="port-result-actions">'+
+      '</div>'+chronicleHtml+'<div class="port-result-actions">'+
         this.button('yard:armas','MELHORAR O NAVIO','Abrir estaleiro','⚒','')+
         this.button(r.contractTitle?'contracts':'next',r.contractTitle?'OUTRO CONTRATO':r.mode==='mission'?'PRÓXIMA MISSÃO':'NOVA JORNADA','Voltar ao Mar de Sangue','⚔','port-choice--primary')+
         this.button('menu','MENU PRINCIPAL','','←','')+
