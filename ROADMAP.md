@@ -35,7 +35,7 @@
 - [x] Nove continuações condicionais: três histórias de origem × três decisões anteriores; cada continuação oferece duas respostas novas.
 - [x] Pistas reveladas na Carta dos Náufragos, sem spoilers de ilhas alheias nem alteração de waypoint de contrato/jogador.
 - [x] Utilizar ilhas preexistentes ainda não visitadas, nunca objetivos de contratos, outros eventos políticos ou lugares já atribuídos.
-- [x] Narrativa e consequências na Crônica Política do Diário, sem reputação persistente e sem obrigação de compatibilidade com saves de teste.
+- [x] Narrativa e consequências na Crônica Política do Diário **e na tela de resultados do Porto**, sem reputação persistente e sem obrigação de compatibilidade com saves de teste.
 - [x] Limitar a uma continuação por decisão original; impedir replay, perseguições duplicadas e narrativas recursivas.
 - [x] Incluir teste Node de nove ramificações e teste visual das três linhas narrativas em desktop/mobile paisagem.
 - [ ] Confirmar `port-smoke`, `port-visual`, publicação no Pages após merge e testes manuais de balanceamento. QA físico Android/Xbox permanece aberto.
