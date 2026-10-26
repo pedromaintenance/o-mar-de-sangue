@@ -130,7 +130,8 @@ assert(!/SeaProfile\s*\.|localStorage|sessionStorage|fetch\s*\(/.test(read('SeaP
 const atlas=read('SeaAtlas.js'),game=read('Game.js'),sw=read('sw.js');
 assert(atlas.includes('ECO POLÍTICO')&&atlas.includes('politicalEcho'));
 assert(game.includes('SEA_POLITICAL_EVENTS.init(this)')&&game.includes('SEA_POLITICAL_EVENTS.update(this)'));
-assert(sw.includes('v67-political-echoes'));
+const cacheVersion=Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
+assert(Number.isFinite(cacheVersion)&&cacheVersion>=67,'PWA cache must be at least v67');
 const uiCtx={SEA_MATH:{nice:v=>String(v)}};
 vm.createContext(uiCtx);
 vm.runInContext(read('PortUI.js')+';this.port=SEA_PORT_UI;',uiCtx);
