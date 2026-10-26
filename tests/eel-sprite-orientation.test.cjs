@@ -16,7 +16,8 @@ assert(!game.includes('v15-eel')&&!game.includes('foe-eel'),'no legacy eel textu
 assert(game.includes("this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp'"));
 assert(game.includes('frameWidth:512, frameHeight:565, endFrame:3'));
 assert(game.includes("enguia:'eel-swim'"));
-assert(game.includes("type==='enguia'?0:undefined"),'initialize first frame not sheet as full image');
+assert(/type==='enguia'\?0:[A-Za-z_$][A-Za-z_$0-9]*/.test(game),
+ 'Eel must start with frame 0 even when another enemy has custom frames');
 assert(game.includes("e.ship.setFrame(frame)"),'swim loop must actually update Phaser frame');
 assert(game.includes("e.eelFrame!==frame"),'avoid redundant frame changes on every tick');
 assert(game.includes("e.type==='ariete'&&e.ship.texture.key==='v15-ram'"));
