@@ -76,9 +76,9 @@ const SEA_UI = {
         // A voyage's political act remains legible after leaving the coast.
         // Do not infer permanent reputation or disclose an undiscovered event.
         const pact=SEA_ISLANDS.politicalRecord(scene);
-        label(top+325,pact.title,desktop?13:12,
+        label(top+318,pact.title,desktop?12:11,
             pact.agreed?'#d7b18b':'#999a91',true,w-70);
-        label(top+345,pact.detail,desktop?11:10,'#b9b0a2',false,w-65);
+        label(top+348,pact.detail,desktop?10:9,'#b9b0a2',false,w-65);
         const mk=(cy,text,onTap,tone='navy')=>{
             // Keep the original selectable centers, size and structure for
             // the existing Game.js controller, touch and keyboard handlers.
