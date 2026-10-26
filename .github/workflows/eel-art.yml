@@ -1,0 +1,57 @@
+name: Animated eel and ram orientation
+on:
+  push:
+    branches: [main, fix/eel-animated-bow-orientation]
+    paths:
+      - 'Game.js'
+      - 'sw.js'
+      - 'assets/v15/beast_eel_swim.webp'
+      - 'assets/v15/beast_eel.png'
+      - 'assets/abyss/abyss_eel.png'
+      - 'tests/eel-sprite-orientation.test.cjs'
+      - 'tests/eel-sprite-visual.test.cjs'
+      - '.github/workflows/eel-art.yml'
+  pull_request:
+    paths:
+      - 'Game.js'
+      - 'sw.js'
+      - 'assets/v15/beast_eel_swim.webp'
+      - 'assets/v15/beast_eel.png'
+      - 'assets/abyss/abyss_eel.png'
+      - 'tests/eel-sprite-orientation.test.cjs'
+      - 'tests/eel-sprite-visual.test.cjs'
+      - '.github/workflows/eel-art.yml'
+permissions:
+  contents: read
+jobs:
+  eel-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check Game.js
+          node tests/eel-sprite-orientation.test.cjs
+  eel-phaser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Inspect real Phaser sprites in Chromium
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/eel-browser.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/eel-sprite-visual.test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eel-bow-orientation-screenshots
+          path: port-artifacts/eel-ram-orientation-*.png
+          if-no-files-found: ignore
