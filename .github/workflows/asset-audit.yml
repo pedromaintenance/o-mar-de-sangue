@@ -1,0 +1,44 @@
+name: Asset Audit Gallery
+on:
+  pull_request:
+    paths:
+      - 'asset-audit.html'
+      - 'sw.js'
+      - 'tests/asset-audit.test.cjs'
+      - 'tests/asset-audit-visual.test.cjs'
+      - '.github/workflows/asset-audit.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'asset-audit.html'
+      - 'sw.js'
+      - 'tests/asset-audit.test.cjs'
+      - 'tests/asset-audit-visual.test.cjs'
+      - '.github/workflows/asset-audit.yml'
+permissions:
+  contents: read
+jobs:
+  static-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node tests/asset-audit.test.cjs
+  browser-gallery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Run gallery in Chromium
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/audit-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/asset-audit-visual.test.cjs
