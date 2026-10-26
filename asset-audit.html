@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#100e13">
+<title>Arquivo de Assets · O Mar de Sangue</title>
+<meta name="description" content="Auditoria dos assets visuais, sonoros e gráficos de O Mar de Sangue: referências, integridade, dimensões e pré-cache.">
+<style>
+:root{color-scheme:dark;--bg:#0d0f13;--panel:#181b20;--panel2:#202329;--line:#403b3a;--edge:#755c52;--red:#ba5158;--gold:#d8b487;--text:#eee0d1;--sub:#b3a59c;--green:#a1bfa7;--warn:#deb18d;--font:Georgia,"Times New Roman",serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse 95% 45% at 50% -10%,#43252a 0%,#17171c 45%,var(--bg) 100%);color:var(--text);font:15px/1.5 system-ui,Segoe UI,sans-serif;min-width:290px}
+a{color:var(--gold)}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #f4d2a2;outline-offset:3px}
+header{padding:30px clamp(17px,4vw,60px) 26px;border-bottom:1px solid var(--edge);background:linear-gradient(100deg,#21191c88,#15181c88);position:relative;overflow:hidden}
+header:after{content:"✺";position:absolute;font-size:210px;line-height:1;right:5%;top:-65px;color:#8b434015;pointer-events:none}
+.eyebrow{color:#e2a5a1;letter-spacing:.23em;font:700 11px/1.5 monospace;text-transform:uppercase}.masthead{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+h1{font:700 clamp(31px,5vw,54px)/1.09 var(--font);margin:10px 0 7px;letter-spacing:.012em}h1 em{font-style:normal;color:#d9ac97}
+.lede{max-width:840px;margin:12px 0 0;color:#ccbfb5;font-size:14px}
+.links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.links a,.ghost-btn{display:inline-flex;gap:6px;align-items:center;border:1px solid #66544a;border-radius:5px;padding:9px 12px;background:#2b2526;color:#ead8c5;text-decoration:none;font:700 12px/1.2 monospace;letter-spacing:.03em}
+.links a:hover,.ghost-btn:hover{background:#433033;border-color:#d0a47e}
+.shell{max-width:1700px;margin:auto;padding:22px clamp(14px,3.2vw,48px) 70px}
+.statusline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:17px;color:var(--sub);font-size:12px}
+.pill{border:1px solid #625346;border-radius:99px;padding:4px 9px;background:#272122;color:#e6ccae;font:700 11px monospace}.pill.ok{border-color:#517b69;color:#b9dcc5;background:#1a2a24}.pill.warn{border-color:#8b6350;color:#ffcea4}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:11px;margin-bottom:18px}
+.stat{border:1px solid var(--line);border-top:2px solid #936757;background:linear-gradient(#242329,#17191e);border-radius:5px;padding:13px 15px;min-width:0}
+.stat strong{display:block;font:700 clamp(22px,3vw,34px)/1.15 var(--font);color:var(--gold)}.stat span{display:block;color:#bbaea6;font-size:11px;letter-spacing:.04em;margin-top:4px}
+.toolbar{display:grid;grid-template-columns:minmax(210px,2fr) repeat(3,minmax(145px,1fr)) auto;gap:10px;align-items:end;padding:16px;border:1px solid var(--line);border-radius:6px;background:#1b1d22;margin-bottom:12px}
+.field label{display:block;text-transform:uppercase;letter-spacing:.13em;font:700 10px monospace;color:#c1ada3;margin-bottom:6px}
+.field input,.field select{width:100%;height:40px;border:1px solid #655b57;background:#0d1115;color:var(--text);border-radius:4px;padding:0 10px}
+.actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.action{background:#332528;color:#f3decb;border:1px solid #81675a;border-radius:4px;padding:10px 12px;font:700 12px monospace;min-height:40px;white-space:nowrap}
+.action:hover{background:#523438}.action.secondary{background:#22272a;border-color:#555b59}.action[aria-pressed="true"]{background:#753a42;border-color:#d5aa85}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 17px;font-size:12px;color:var(--sub)}
+.filters label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}.filters input{accent-color:#af5156}
+.results-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px}.results-head h2{font:700 19px var(--font);margin:0}.muted{color:var(--sub);font-size:12px}.results-head .actions{justify-content:flex-end}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:13px}
+.asset{background:linear-gradient(#22252b,#161a20);border:1px solid #484141;border-radius:6px;overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.asset:hover{border-color:#b98a69;box-shadow:0 5px 26px #0007}
+.preview{display:flex;justify-content:center;align-items:center;position:relative;min-height:174px;height:174px;background:#13191d;overflow:hidden;cursor:pointer;border:0;width:100%;padding:14px}
+.checker .preview,.checker .detail-media{background-color:#333;background-image:linear-gradient(45deg,#444 25%,transparent 25%),linear-gradient(-45deg,#444 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#444 75%),linear-gradient(-45deg,transparent 75%,#444 75%);background-size:22px 22px;background-position:0 0,0 11px,11px -11px,-11px 0}
+.preview img{max-width:100%;max-height:100%;object-fit:contain;image-rendering:auto;filter:drop-shadow(0 3px 12px #0007)}
+.pixel img,.pixel .detail-media img{image-rendering:pixelated}
+.asset:hover .preview img{transform:scale(1.045);transition:transform .2s}
+.preview .filetype{border:1px solid #7d6552;background:#271d22;border-radius:4px;padding:12px 14px;color:var(--gold);font:700 22px var(--font)}
+.preview .unavailable{color:#e9ac9e;font:700 12px monospace;text-align:center}
+.asset-info{padding:12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.asset-name{font:700 14px/1.3 var(--font);color:#efdfce;overflow-wrap:anywhere}
+.asset-path{font:11px/1.5 monospace;color:#b5a5a0;overflow-wrap:anywhere;min-height:30px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;min-height:24px}.chip{display:inline-block;font:700 10px/1.5 monospace;padding:2px 6px;border:1px solid #78675a;color:#ddc5ac;border-radius:3px;background:#2b2729}
+.chip.direct{border-color:#5d8e74;color:#bde0c3;background:#1c2e27}.chip.cache{border-color:#816b4c;color:#d9bc93}.chip.unclear{border-color:#755d63;color:#beaab1}.chip.fail{border-color:#a35257;color:#efacaa}
+.asset-foot{border-top:1px solid #3f3c3c;padding-top:9px;display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:auto}
+.asset-meta{font:11px monospace;color:#bfae9c}.mini{border:1px solid #675c55;border-radius:4px;padding:5px 8px;background:#29272a;color:#e5d1be;font:11px monospace}
+.mini:hover{border-color:#ceae8a}
+.gallery.list{display:flex;flex-direction:column}.gallery.list .asset{display:grid;grid-template-columns:120px minmax(0,1fr)}.gallery.list .preview{height:110px;min-height:110px}.gallery.list .asset-info{padding:12px 15px}.gallery.list .asset-path{min-height:0}.gallery.list .asset-foot{border:0;padding:0}
+.more-wrap{text-align:center;margin-top:25px}
+.empty{text-align:center;border:1px dashed #7a5b50;background:#191b20;padding:45px 12px;color:#d3b7a1;border-radius:5px}
+.alerts{border:1px solid #6f514e;background:#2b2225;padding:15px 18px;border-radius:6px;margin-top:25px;color:#ddc9b9}
+.alerts h2{font:700 19px var(--font);margin:0 0 6px}.alerts summary{cursor:pointer;font-weight:700}.alerts ul{font:12px/1.8 monospace;overflow-wrap:anywhere;padding-left:20px}
+dialog{padding:0;background:#15181d;color:var(--text);border:1px solid #a38169;border-radius:8px;width:min(900px,calc(100vw - 24px));max-height:calc(100dvh - 28px);box-shadow:0 15px 70px #000d}
+dialog::backdrop{background:#050609d9;backdrop-filter:blur(6px)}
+.detail-head{padding:18px 20px;border-bottom:1px solid #554942;display:flex;justify-content:space-between;gap:12px}
+.detail-head h2{font:700 24px var(--font);margin:0;overflow-wrap:anywhere}
+.close{align-self:start;background:#392529;color:#efc5ad;border:1px solid #916c62;border-radius:4px;font:700 20px monospace;width:38px;height:38px}
+.detail-body{padding:17px 20px 25px;overflow:auto;max-height:calc(100dvh - 120px)}
+.detail-media{min-height:270px;max-height:450px;display:flex;justify-content:center;align-items:center;background:#101418;border:1px solid #413d3b;border-radius:5px;padding:14px;margin-bottom:15px;overflow:auto}
+.detail-media img{display:block;max-height:400px;max-width:100%;width:auto;height:auto;object-fit:contain}
+.detail-media audio{width:min(650px,100%)}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.detail-pair{padding:10px;border:1px solid #403a37;background:#1f2126;min-width:0}.detail-pair small{display:block;color:#b2a398;text-transform:uppercase;letter-spacing:.1em;font:10px monospace;margin-bottom:4px}.detail-pair strong{font:12px/1.5 monospace;overflow-wrap:anywhere}
+.detail-links{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}.refs{margin-top:15px;border-top:1px solid #554942;padding-top:12px}.refs h3{font:700 18px var(--font);margin:0 0 10px}.refs ol{padding-left:24px;font:12px/1.7 monospace;overflow-wrap:anywhere}
+footer{border-top:1px solid #4d3a38;padding:25px 15px 38px;text-align:center;color:#988e87;font:12px/1.8 system-ui;margin-top:32px}
+@media(max-width:1060px){.toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar .search{grid-column:1/-1}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:620px){header{padding:23px 16px}.shell{padding:15px 11px 35px}.stats{grid-template-columns:repeat(2,1fr);gap:7px}.stat{padding:9px}.toolbar{grid-template-columns:1fr;padding:11px}.toolbar .search{grid-column:auto}.gallery{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.preview{height:137px;min-height:137px;padding:9px}.asset-info{padding:9px}.asset-name{font-size:12px}.asset-path{font-size:10px}.asset-foot{align-items:flex-start}.chip{font-size:9px}.mini{font-size:10px}.detail-grid{grid-template-columns:1fr}.detail-head h2{font-size:19px}.detail-body{padding:13px}.gallery.list .asset{grid-template-columns:100px minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body class="checker pixel">
+<header>
+<div class="masthead">
+  <div><div class="eyebrow">CARCAÇA · INVENTÁRIO DE RECURSOS · PRÉ-ALFA</div>
+  <h1>O Arquivo <em>dos Assets</em></h1>
+  <p class="lede">Uma lupa sobre os navios, monstros, cenários, efeitos e sons de <strong>O Mar de Sangue</strong>. Inspecione o que existe, onde é referenciado e o que merece revisão — sem alterar um único arquivo do jogo.</p></div>
+  <nav class="links" aria-label="Navegação"><a href="./index.html">↖ Voltar ao jogo</a><a href="https://github.com/pedromaintenance/o-mar-de-sangue" target="_blank" rel="noopener noreferrer">Repositório ↗</a></nav>
+</div>
+</header>
+<main class="shell">
+<div class="statusline" role="status" aria-live="polite"><span id="source-status" class="pill">Carregando inventário…</span><span id="source-detail">Consultando a árvore de arquivos e o cache offline.</span><button type="button" id="reload" class="mini">↻ Reexaminar</button></div>
+<section class="stats" aria-label="Resumo da auditoria">
+ <div class="stat"><strong id="k-total">—</strong><span>Arquivos de mídia catalogados</span></div>
+ <div class="stat"><strong id="k-used">—</strong><span>Referências diretas ao código</span></div>
+ <div class="stat"><strong id="k-cache">—</strong><span>Arquivos no pré-cache</span></div>
+ <div class="stat"><strong id="k-review">—</strong><span>Uso não confirmado</span></div>
+ <div class="stat"><strong id="k-size">—</strong><span>Tamanho conhecido</span></div>
+</section>
+<section class="toolbar" aria-label="Filtros dos assets">
+ <div class="field search"><label for="search">Buscar nome, caminho ou referência</label><input id="search" type="search" autocomplete="off" placeholder="Ex.: kraken, navio, fx, Game.js…"></div>
+ <div class="field"><label for="category">Categoria</label><select id="category"><option value="all">Todas as categorias</option></select></div>
+ <div class="field"><label for="usage">Evidência de uso</label><select id="usage"><option value="all">Qualquer situação</option><option value="direct">Referenciado no código</option><option value="cached">Somente pré-cache / possível dinâmico</option><option value="unconfirmed">Sem referência localizada</option><option value="notcached">Fora do cache offline</option></select></div>
+ <div class="field"><label for="order">Ordenar</label><select id="order"><option value="name">Nome A–Z</option><option value="folder">Pasta A–Z</option><option value="size">Maior arquivo</option><option value="kind">Formato</option></select></div>
+ <div class="actions"><button id="grid-view" class="action" aria-pressed="true" type="button" title="Exibir grade">▦</button><button id="list-view" class="action secondary" aria-pressed="false" type="button" title="Exibir lista">☷</button></div>
+</section>
+<div class="filters">
+ <label><input type="checkbox" id="checker" checked> Fundo quadriculado (transparência)</label>
+ <label><input type="checkbox" id="pixel" checked> Pixel art sem suavização</label>
+ <label><input type="checkbox" id="hide-icons"> Ocultar ícones PWA</label>
+ <span id="filter-count" aria-live="polite"></span>
+ <div class="actions"><button class="mini" id="export-json" type="button">↓ JSON</button><button class="mini" id="export-csv" type="button">↓ CSV</button></div>
+</div>
+<section aria-label="Galeria dos arquivos">
+ <div class="results-head"><h2>Inventário visual e sonoro</h2><span class="muted">Clique em um arquivo para ver detalhes, dimensões e referências.</span></div>
+ <div id="gallery" class="gallery" aria-live="off"></div>
+ <div class="more-wrap"><button type="button" id="more" class="action secondary" hidden>Mostrar mais arquivos</button></div>
+</section>
+<section class="alerts" aria-label="Achados da auditoria">
+ <h2>Diagnóstico e limitações</h2>
+ <p id="diagnostic-summary" class="muted">O inventário tenta consultar a árvore pública do repositório. Se a API do GitHub não estiver disponível, utiliza o pré-cache e as referências diretas dos scripts.</p>
+ <details><summary>Possíveis referências a arquivos ausentes</summary><ul id="missing-list"><li>Aguardando análise…</li></ul></details>
+ <details><summary>Arquivos binários idênticos (SHA Git)</summary><ul id="duplicate-list"><li>Disponível com a árvore do GitHub.</li></ul></details>
+ <p class="muted">“Sem referência” não significa “não utilizado”: nomes e caminhos podem ser montados dinamicamente. Um arquivo no pré-cache também não é prova de que aparece na jogabilidade. A contagem de integridade só é feita ao abrir ou carregar as miniaturas; não equivale a um teste de renderização dentro do Phaser.</p>
+</section>
+</main>
+<dialog id="detail" aria-label="Detalhes do asset">
+ <div class="detail-head"><div><div class="eyebrow" id="detail-type">INSPEÇÃO</div><h2 id="detail-title"></h2></div><button class="close" id="detail-close" aria-label="Fechar detalhes" type="button">×</button></div>
+ <div class="detail-body"><div id="detail-media" class="detail-media"></div>
+  <div class="detail-grid" id="detail-grid"></div><div class="detail-links" id="detail-links"></div>
+  <div class="refs"><h3>Referências e evidências</h3><div id="detail-references"></div></div>
+ </div>
+</dialog>
+<footer>O MAR DE SANGUE · CARCAÇA · FERRAMENTA DE AUDITORIA · Nenhum dado é enviado ou modificado no jogo.<br>
+ O catálogo consulta arquivos públicos do repositório e do próprio GitHub Pages. Os diagnósticos são indícios técnicos, não decisões automáticas de exclusão.</footer>
+<script>
+(function(){
+'use strict';
+const REPO='pedromaintenance/o-mar-de-sangue';
+const ROOT='https://github.com/'+REPO+'/blob/main/';
+const TREE='https://api.github.com/repos/'+REPO+'/git/trees/main?recursive=1';
+const MEDIA=/\.(png|jpe?g|webp|gif|svg|bmp|avif|ico|flac|mp3|ogg|wav|m4a|aac|mp4|webm|woff2?|ttf|otf)$/i;
+const IMAGE=/\.(png|jpe?g|webp|gif|svg|bmp|avif|ico)$/i;
+const AUDIO=/\.(flac|mp3|ogg|wav|m4a|aac)$/i;
+const VIDEO=/\.(mp4|webm)$/i;
+const FONT=/\.(woff2?|ttf|otf)$/i;
+const CODE_EXT=/\.(js|css|html|webmanifest)$/i;
+const $=id=>document.getElementById(id);
+const STATE={assets:[],filtered:[],sources:[],precache:new Set(),github:false,loaded:0,pageSize:48,view:'grid',missing:[],duplicates:[]};
+const fileURL=path=>'./'+path.split('/').map(encodeURIComponent).join('/');
+const normalize=path=>{try{return decodeURIComponent(String(path||'').replace(/^\.\//,'').replace(/^\/+/,''))}catch(_){return String(path||'').replace(/^\.\//,'')}};
+const ext=path=>(path.match(/\.([^.\/]+)$/)||[])[1]?.toLowerCase()||'';
+const isMedia=path=>MEDIA.test(path);
+const bytes=v=>!Number.isFinite(v)?'Desconhecido':v>=1048576?(v/1048576).toFixed(2)+' MB':v>=1024?(v/1024).toFixed(1)+' KB':v+' B';
+function category(path){
+ if(path.startsWith('icons/'))return 'Ícones PWA';
+ if(path.startsWith('assets/abyss/'))return 'Horror abissal';
+ if(path.startsWith('assets/sprites/'))return 'Navios e sprites';
+ if(path.startsWith('assets/islands/'))return 'Ilhas e locais';
+ if(path.startsWith('assets/fx/'))return 'Efeitos visuais';
+ if(path.startsWith('assets/tiles/'))return 'Mar e texturas';
+ if(path.startsWith('assets/v15/')){
+  if(/ship_/.test(path))return 'Navios V15';
+  if(/beast_|dagon_/.test(path))return 'Criaturas V15';
+  return 'Efeitos V15';
+ }
+ if(path.startsWith('assets/ui/'))return 'Interface';
+ if(path.startsWith('assets/upgrades/'))return 'Melhorias';
+ if(path.startsWith('assets/items/'))return 'Itens e tesouros';
+ if(AUDIO.test(path))return 'Áudio e música';
+ if(VIDEO.test(path))return 'Vídeo';
+ if(FONT.test(path))return 'Fontes';
+ if(path.startsWith('assets/'))return 'Outros assets';
+ return 'Outros recursos';
+}
+function download(name,content,mime){
+ const blob=new Blob([content],{type:mime});const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),15000);
+}
+async function getText(path){
+ const r=await fetch(fileURL(path),{cache:'no-store'});
+ if(!r.ok)throw Error(path+' retornou HTTP '+r.status);
+ return r.text();
+}
+function precacheFrom(text){
+ const match=text.match(/const ASSETS\s*=\s*(\[[\s\S]*?\]);/);
+ if(!match)return [];
+ try{return JSON.parse(match[1]).map(normalize).filter(x=>x&&x!=='.')}
+ catch(_){return []}
+}
+function codePaths(index){
+ const scripts=[...index.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)]
+   .map(x=>normalize(x[1])).filter(x=>CODE_EXT.test(x)&&!x.includes('phaser.min'));
+ const sheets=[...index.matchAll(/<link\b[^>]*\bhref=["']([^"']+\.css)["']/gi)]
+   .map(x=>normalize(x[1]));
+ return [...new Set(['index.html','manifest.webmanifest',...scripts,...sheets])];
+}
+async function sourceTexts(index){
+ const paths=codePaths(index);let cursor=0;
+ const results=[];
+ const workers=Array.from({length:Math.min(5,paths.length)},async()=>{
+  while(cursor<paths.length){
+   const path=paths[cursor++];
+   try{results.push({path,text:path==='index.html'?index:await getText(path)})}
+   catch(error){results.push({path,text:'',error:String(error.message||error)})}
+  }
+ });
+ await Promise.all(workers);return results;
+}
+function explicitReferences(sources){
+ const refs=new Map();
+ // The scanner catches concrete path literals; constructed paths are NOT
+ // marked as definitively used. Percent-encoded filenames are normalized.
+ const pattern=/(?:\.\/)?(?:assets|icons)\/[a-z0-9À-ÿ_%+().\-\/ ]+\.(?:png|jpe?g|webp|gif|svg|bmp|avif|ico|flac|mp3|ogg|wav|m4a|aac|mp4|webm|woff2?|ttf|otf)/gi;
+ for(const source of sources){
+  if(!source.text)continue;
+  // Image references in CSS, JS, HTML and manifest; scripts can also use
+  // string literals around paths, so avoid spanning quotes or newlines.
+  const lines=source.text.split('\n');
+  for(let i=0;i<lines.length;i++){
+   let line=lines[i];
+   // Explicit paths can have spaces within audio filenames, but cannot span
+   // quotes; run the regex on each quoted/string context.
+   const parts=line.split(/["'<>]/);
+   for(const part of parts){
+    pattern.lastIndex=0;
+    for(const hit of part.matchAll(pattern)){
+     const path=normalize(hit[0]);
+     if(!isMedia(path))continue;
+     if(!refs.has(path))refs.set(path,[]);
+     if(!refs.get(path).some(x=>x.path===source.path&&x.line===i+1))
+      refs.get(path).push({path:source.path,line:i+1});
+    }
+   }
+  }
+ }
+ return refs;
+}
+function assetOf(path){return {path,name:path.split('/').pop(),extension:ext(path),category:category(path),size:null,sha:null,precache:false,refs:[],availability:'unknown',dimensions:null,source:'catalog'};}
+async function inventory(){
+ $('source-status').textContent='Carregando…';$('source-status').className='pill';
+ $('source-detail').textContent='Lendo scripts, manifesto, pré-cache e árvore do repositório.';
+ let precache=[],index='',sources=[],tree=[],treeOk=false,problems=[];
+ try{precache=precacheFrom(await getText('sw.js'))}
+ catch(e){problems.push('Pré-cache: '+e.message)}
+ try{index=await getText('index.html');sources=await sourceTexts(index)}
+ catch(e){problems.push('Scripts: '+e.message)}
+ try{
+  const response=await fetch(TREE,{headers:{Accept:'application/vnd.github+json'},cache:'no-store',signal:AbortSignal.timeout(12000)});
+  if(!response.ok)throw Error('GitHub API HTTP '+response.status);
+  const data=await response.json();
+  if(!Array.isArray(data.tree)||data.truncated)throw Error('Árvore incompleta ou truncada');
+  tree=data.tree.filter(x=>x.type==='blob'&&isMedia(x.path));
+  treeOk=true;
+ }catch(e){problems.push('Árvore GitHub: '+(e.message||e))}
+ const refs=explicitReferences(sources);
+ const map=new Map();
+ for(const file of tree){
+  const a=assetOf(file.path);a.size=file.size??null;a.sha=file.sha??null;a.source='tree';map.set(a.path,a);
+ }
+ for(const path of precache.filter(isMedia)){
+  if(!map.has(path))map.set(path,assetOf(path));
+  map.get(path).precache=true;
+ }
+ for(const [path,usage] of refs){
+  if(!map.has(path))map.set(path,assetOf(path));
+  map.get(path).refs=usage;
+ }
+ STATE.github=treeOk;STATE.precache=new Set(precache);
+ STATE.sources=sources;STATE.assets=[...map.values()];
+ STATE.missing=treeOk?[...refs.keys()].filter(path=>!tree.some(f=>f.path===path)):[];
+ const bySha=new Map();
+ for(const a of STATE.assets){
+  if(!a.sha)continue;
+  if(!bySha.has(a.sha))bySha.set(a.sha,[]);
+  bySha.get(a.sha).push(a.path);
+ }
+ STATE.duplicates=[...bySha.values()].filter(paths=>paths.length>1);
+ updateCategory();refresh();renderFindings(problems);
+ $('source-status').textContent=treeOk?'Inventário completo: GitHub':'Inventário parcial: modo contingência';
+ $('source-status').className=treeOk?'pill ok':'pill warn';
+ $('source-detail').textContent=treeOk?
+  'Árvore pública do repositório + referências locais + pré-cache do Pages.':
+  'API indisponível: mídia encontrada no cache ou nos scripts. Arquivos sem referência podem não aparecer.';
+}
+function status(a){
+ if(a.refs.length)return 'direct';
+ if(a.precache)return 'cached';
+ return 'unconfirmed';
+}
+function usageName(a){
+ if(a.refs.length)return 'Citado no código';
+ if(a.precache)return 'Somente pré-cache';
+ return 'Sem referência localizada';
+}
+function updateCategory(){
+ const select=$('category'),current=select.value;
+ const categories=[...new Set(STATE.assets.map(a=>a.category))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+ select.replaceChildren(new Option('Todas as categorias','all'),...categories.map(cat=>new Option(cat,cat)));
+ select.value=categories.includes(current)?current:'all';
+}
+function applyFilters(){
+ const q=$('search').value.trim().toLocaleLowerCase('pt-BR');
+ const cat=$('category').value,use=$('usage').value,hideIcons=$('hide-icons').checked;
+ let list=STATE.assets.filter(a=>{
+  if(hideIcons&&a.category==='Ícones PWA')return false;
+  if(cat!=='all'&&a.category!==cat)return false;
+  if(use==='direct'&&!a.refs.length)return false;
+  if(use==='cached'&&!(a.precache&&!a.refs.length))return false;
+  if(use==='unconfirmed'&&(a.refs.length||a.precache))return false;
+  if(use==='notcached'&&a.precache)return false;
+  if(q&&!([a.name,a.path,a.category,a.extension,...a.refs.map(r=>r.path)].join(' ').toLocaleLowerCase('pt-BR').includes(q)))return false;
+  return true;
+ });
+ const locale=(a,b)=>a.localeCompare(b,'pt-BR',{numeric:true,sensitivity:'base'});
+ const order=$('order').value;
+ list.sort((a,b)=>order==='size'?(b.size??-1)-(a.size??-1)||locale(a.path,b.path):
+  order==='folder'?locale(a.path,b.path):
+  order==='kind'?locale(a.extension,b.extension)||locale(a.name,b.name):
+  locale(a.name,b.name));
+ STATE.filtered=list;STATE.loaded=0;
+ $('filter-count').textContent=list.length+' / '+STATE.assets.length+' arquivos';
+}
+function refresh(){
+ applyFilters();
+ const all=STATE.assets,total=all.length,used=all.filter(a=>a.refs.length).length,cached=all.filter(a=>a.precache).length;
+ const review=all.filter(a=>!a.refs.length).length;
+ $('k-total').textContent=total.toLocaleString('pt-BR');
+ $('k-used').textContent=used;
+ $('k-cache').textContent=cached;
+ $('k-review').textContent=review;
+ const known=all.filter(a=>Number.isFinite(a.size));
+ $('k-size').textContent=known.length?bytes(known.reduce((s,a)=>s+a.size,0)):'—';
+ $('k-size').title=known.length+'/'+total+' tamanhos conhecidos na árvore';
+ $('gallery').className='gallery'+(STATE.view==='list'?' list':'');
+ $('gallery').replaceChildren();
+ showMore();
+}
+function elt(tag,className,txt){
+ const n=document.createElement(tag);if(className)n.className=className;
+ if(txt!==undefined)n.textContent=txt;return n;
+}
+function chip(text,cls){return elt('span','chip '+(cls||''),text)}
+function showMore(){
+ const chunk=STATE.filtered.slice(STATE.loaded,STATE.loaded+STATE.pageSize);
+ const frag=document.createDocumentFragment();
+ for(const a of chunk)frag.append(card(a));
+ $('gallery').append(frag);STATE.loaded+=chunk.length;
+ $('more').hidden=STATE.loaded>=STATE.filtered.length;
+ $('more').textContent='Mostrar mais · '+(STATE.filtered.length-STATE.loaded)+' restantes';
+ if(!STATE.filtered.length){$('gallery').append(elt('div','empty','Nenhum asset corresponde aos filtros.')); }
+}
+function preview(a,container,detail){
+ if(IMAGE.test(a.path)){
+  const img=elt('img');
+  img.alt=a.name;img.loading=detail?'eager':'lazy';img.decoding='async';img.src=fileURL(a.path);
+  img.onload=()=>{
+   a.dimensions={width:img.naturalWidth,height:img.naturalHeight};
+   a.availability='ok';
+   if(detail)renderDetailMeta(a);
+  };
+  img.onerror=()=>{a.availability='failed';container.replaceChildren(elt('span','unavailable','Arquivo não pôde ser carregado.'));if(detail)renderDetailMeta(a)};
+  container.append(img);
+ }else if(AUDIO.test(a.path)&&detail){
+  const audio=elt('audio');audio.controls=true;audio.preload='none';audio.src=fileURL(a.path);container.append(audio);
+ }else if(VIDEO.test(a.path)&&detail){
+  const video=elt('video');video.controls=true;video.preload='none';video.src=fileURL(a.path);video.style.maxWidth='100%';video.style.maxHeight='400px';container.append(video);
+ }else container.append(elt('span','filetype',(AUDIO.test(a.path)?'♫ ':FONT.test(a.path)?'Aa ':VIDEO.test(a.path)?'▶ ':'◇ ')+a.extension.toUpperCase()));
+}
+function card(a){
+ const root=elt('article','asset');
+ const see=elt('button','preview');see.type='button';see.setAttribute('aria-label','Examinar '+a.path);
+ preview(a,see,false);see.addEventListener('click',()=>openDetail(a));
+ const box=elt('div','asset-info');
+ box.append(elt('div','asset-name',a.name),elt('div','asset-path',a.path));
+ const chips=elt('div','chips');
+ chips.append(chip(a.category),chip(a.extension.toUpperCase()),chip(usageName(a),status(a)==='direct'?'direct':status(a)==='cached'?'cache':'unclear'));
+ if(!a.precache)chips.append(chip('Fora do pré-cache','fail'));
+ box.append(chips);
+ const foot=elt('div','asset-foot');foot.append(elt('span','asset-meta',bytes(a.size)));
+ const more=elt('button','mini','Inspecionar ↗');more.type='button';more.addEventListener('click',()=>openDetail(a));foot.append(more);box.append(foot);
+ root.append(see,box);return root;
+}
+function pair(label,value){
+ const p=elt('div','detail-pair');p.append(elt('small',null,label),elt('strong',null,value));return p;
+}
+function renderDetailMeta(a){
+ const grid=$('detail-grid');grid.replaceChildren(
+  pair('Caminho',a.path),pair('Categoria',a.category),
+  pair('Arquivo',a.extension.toUpperCase()),pair('Tamanho',bytes(a.size)),
+  pair('Dimensões',a.dimensions?a.dimensions.width+' × '+a.dimensions.height+' px':'Não verificadas'),
+  pair('Pré-cache offline',a.precache?'Sim, listado no Service Worker':'Não localizado'),
+  pair('Referências diretas',String(a.refs.length)),
+  pair('SHA Git',a.sha||'Indisponível'),
+  pair('Carregamento neste navegador',a.availability==='ok'?'Imagem carregada':a.availability==='failed'?'Falha ao carregar':'Ainda não verificado')
+ );
+}
+function openDetail(a){
+ $('detail-type').textContent=a.category+' · '+a.extension.toUpperCase();
+ $('detail-title').textContent=a.name;
+ $('detail-media').replaceChildren();preview(a,$('detail-media'),true);
+ renderDetailMeta(a);
+ const links=$('detail-links');links.replaceChildren();
+ const source=elt('a','ghost-btn','Abrir asset ↗');source.href=fileURL(a.path);source.target='_blank';source.rel='noopener noreferrer';
+ const git=elt('a','ghost-btn','Ver no GitHub ↗');git.href=ROOT+a.path.split('/').map(encodeURIComponent).join('/');git.target='_blank';git.rel='noopener noreferrer';
+ const copy=elt('button','ghost-btn','Copiar caminho');copy.type='button';copy.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(a.path);copy.textContent='Copiado ✓'}
+  catch(_){copy.textContent='Caminho: '+a.path}
+ });
+ links.append(source,git,copy);
+ const refs=$('detail-references');refs.replaceChildren();
+ if(a.refs.length){
+  const list=elt('ol');
+  for(const ref of a.refs){
+   const li=elt('li'),url=ROOT+ref.path+'#L'+ref.line,link=elt('a',null,ref.path+':'+ref.line);
+   link.href=url;link.target='_blank';link.rel='noopener noreferrer';li.append(link);list.append(li);
+  }
+  refs.append(list);
+ }else refs.append(elt('p','muted',a.precache?
+  'Presente no pré-cache, mas nenhum caminho literal foi localizado nas fontes carregadas. Pode ser montado dinamicamente ou ser um recurso legado.':
+  'Nenhuma referência literal foi localizada nas fontes carregadas. Investigar antes de concluir que não é usado.'));
+ if(!$('detail').open)$('detail').showModal();
+}
+function renderFindings(problems){
+ const missing=$('missing-list');missing.replaceChildren();
+ if(!STATE.github)missing.append(elt('li',null,'Validação de existência requer acesso à árvore do GitHub.'));
+ else if(!STATE.missing.length)missing.append(elt('li',null,'Nenhum caminho literal de mídia ausente foi identificado na árvore.'));
+ else for(const path of STATE.missing)missing.append(elt('li',null,path));
+ const dupe=$('duplicate-list');dupe.replaceChildren();
+ if(!STATE.github)dupe.append(elt('li',null,'SHA não disponível sem consulta à árvore do GitHub.'));
+ else if(!STATE.duplicates.length)dupe.append(elt('li',null,'Nenhum par com SHA idêntico na árvore consultada.'));
+ else for(const group of STATE.duplicates)dupe.append(elt('li',null,group.join(' ↔ ')));
+ const srcFailures=STATE.sources.filter(s=>s.error).map(s=>s.path+': '+s.error);
+ $('diagnostic-summary').textContent=STATE.github?
+  'Análise concluída contra a árvore pública do GitHub. '+STATE.assets.length+' arquivos de mídia; '+
+   STATE.missing.length+' caminho(s) referenciado(s) ausente(s); '+STATE.duplicates.length+
+   ' grupo(s) binário(s) duplicado(s).'+(srcFailures.length?' Fontes não lidas: '+srcFailures.join(', '):''):
+  'Modo parcial: '+problems.join(' · ')+'; '+STATE.assets.length+' arquivos de mídia identificados. O catálogo pode estar incompleto.';
+}
+function exported(){return STATE.filtered.map(a=>({
+ path:a.path,name:a.name,category:a.category,extension:a.extension,
+ size_bytes:a.size,sha:a.sha,precache:a.precache,
+ reference_status:usageName(a),references:a.refs,
+ dimensions:a.dimensions,availability:a.availability
+}))}
+$('search').addEventListener('input',refresh);
+for(const id of ['category','usage','order','hide-icons'])$(id).addEventListener('change',refresh);
+$('checker').addEventListener('change',e=>document.body.classList.toggle('checker',e.target.checked));
+$('pixel').addEventListener('change',e=>document.body.classList.toggle('pixel',e.target.checked));
+for(const view of ['grid','list'])$(view+'-view').addEventListener('click',()=>{
+ STATE.view=view;$('grid-view').setAttribute('aria-pressed',String(view==='grid'));
+ $('list-view').setAttribute('aria-pressed',String(view==='list'));refresh();
+});
+$('more').addEventListener('click',showMore);
+$('reload').addEventListener('click',inventory);
+$('export-json').addEventListener('click',()=>download('mar-de-sangue-assets-auditoria.json',JSON.stringify({
+ repository:REPO,inventory_complete:STATE.github,generated_at:new Date().toISOString(),
+ assets:exported(),missing_references:STATE.missing,duplicate_binary_groups:STATE.duplicates
+},null,2),'application/json;charset=utf-8'));
+$('export-csv').addEventListener('click',()=>{
+ const rows=[['path','category','extension','size_bytes','precache','references','sha']];
+ for(const a of STATE.filtered)rows.push([a.path,a.category,a.extension,a.size??'',a.precache,
+  a.refs.map(r=>r.path+':'+r.line).join('; '),a.sha||'']);
+ const csv='\ufeff'+rows.map(cols=>cols.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ download('mar-de-sangue-assets-auditoria.csv',csv,'text/csv;charset=utf-8');
+});
+$('detail-close').addEventListener('click',()=>$('detail').close());
+$('detail').addEventListener('click',e=>{if(e.target===$('detail'))$('detail').close()});
+inventory().catch(error=>{
+ $('source-status').textContent='Falha de carregamento';$('source-status').className='pill warn';
+ $('source-detail').textContent=String(error.message||error);
+ $('gallery').replaceChildren(elt('p','empty','Não foi possível ler o catálogo. Recarregue a página.'));
+});
+})();
+</script>
+</body>
+</html>
