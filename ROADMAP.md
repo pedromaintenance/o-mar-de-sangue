@@ -28,6 +28,19 @@
 - [ ] Verificar publicação efetiva no GitHub Pages e testar gameplay em dispositivos Android/Xbox físicos. Não declarar QA físico aprovado sem execução real.
 
 
+## Sprint 01b — A Ressaca das Escolhas (implementado em branch; QA/merge pendentes)
+
+**Objetivo:** fazer com que escolhas políticas deixem consequências narrativas reconhecíveis em outros lugares do arquipélago, ainda na mesma viagem. [Especificação e roteiro](docs/sprint01b-ressaca-das-escolhas.md).
+
+- [x] Nove continuações condicionais: três histórias de origem × três decisões anteriores; cada continuação oferece duas respostas novas.
+- [x] Pistas reveladas na Carta dos Náufragos, sem spoilers de ilhas alheias nem alteração de waypoint de contrato/jogador.
+- [x] Utilizar ilhas preexistentes ainda não visitadas, nunca objetivos de contratos, outros eventos políticos ou lugares já atribuídos.
+- [x] Narrativa e consequências na Crônica Política do Diário **e na tela de resultados do Porto**, sem reputação persistente e sem obrigação de compatibilidade com saves de teste.
+- [x] Limitar a uma continuação por decisão original; impedir replay, perseguições duplicadas e narrativas recursivas.
+- [x] Incluir teste Node de nove ramificações e teste visual das três linhas narrativas em desktop/mobile paisagem.
+- [ ] Confirmar `port-smoke`, `port-visual`, publicação no Pages após merge e testes manuais de balanceamento. QA físico Android/Xbox permanece aberto.
+
+
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
 
 > **Princípio de desenvolvimento:** avançar em blocos jogáveis sem quebrar subsistemas já aprovados. Separar apresentação de regras; preservar acessibilidade básica, funcionamento offline, mouse/toque, teclado e controle Xbox. **Em pré-alfa, os saves de teste podem ser reiniciados e os esquemas de dados redesenhados.** Toda interface nova deve passar por testes de regressão antes do merge.

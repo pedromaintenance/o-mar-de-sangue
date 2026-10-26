@@ -139,7 +139,11 @@ const SEA_ATLAS = {
             const visited=s.islandVisits?.has(isl.id);
             const color=visited?0x667074:(this.colors[isl.kind]||0xa88e7a);
             g.fillStyle(0x050b0d,1).fillCircle(mx,my,5);
-            if(isl.kind==='parley'&&!visited){
+            if(isl.politicalEcho&&!isl.politicalEcho.resolved&&!visited){
+                // Political aftershocks are known through a clue, not map-wide discovery.
+                g.lineStyle(2,0xe1b879,1).strokeCircle(mx,my,9);
+                g.fillStyle(0xe1b879,1).fillRect(mx-3,my-3,6,6);
+            }else if(isl.kind==='parley'&&!visited){
                 g.lineStyle(1,0xe5b780,.95).strokeCircle(mx,my,7);
                 g.fillStyle(color,1).fillRect(mx-3,my-3,6,6);
             }else if(isl.kind==='daegon'&&!visited) {
@@ -179,8 +183,9 @@ const SEA_ATLAS = {
         txt(L+14,T+13,'N',12,'#e1c99f',{bold:true});
         const visitedCount=Array.from(s.chartDiscovered).filter(id=>s.islandVisits?.has(id)).length;
         const focused=known.find(i=>i.id===s.atlasFocusedId);
-        const title=nav?this.kindNames[nav.island.kind]||'ILHA':
-            focused?this.kindNames[focused.kind]||'ILHA':null;
+        const labelFor=island=>island?.politicalEcho&&!island.politicalEcho.resolved?
+            'ECO POLÍTICO':this.kindNames[island?.kind]||'ILHA';
+        const title=nav?labelFor(nav.island):focused?labelFor(focused):null;
         txt(cx,top+(desktop?525:463),
             nav?'◆ DESTINO MARCADO: '+title+' #'+nav.island.id:
                 focused?'MARCO EM FOCO: '+title+' #'+focused.id:

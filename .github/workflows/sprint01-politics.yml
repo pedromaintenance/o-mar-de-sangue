@@ -9,6 +9,7 @@ on:
       - 'index.html'
       - 'sw.js'
       - 'tests/political-events-sprint01.test.cjs'
+      - 'tests/political-echoes-sprint01b.test.cjs'
       - '.github/workflows/sprint01-politics.yml'
   push:
     branches:
@@ -22,6 +23,7 @@ on:
       - 'index.html'
       - 'sw.js'
       - 'tests/political-events-sprint01.test.cjs'
+      - 'tests/political-echoes-sprint01b.test.cjs'
       - '.github/workflows/sprint01-politics.yml'
 permissions:
   contents: read
@@ -38,4 +40,6 @@ jobs:
           node --check Game.js
           node --check sw.js
       - name: Run encounter contract regressions
-        run: node tests/political-events-sprint01.test.cjs
+        run: |
+          node tests/political-events-sprint01.test.cjs
+          node tests/political-echoes-sprint01b.test.cjs

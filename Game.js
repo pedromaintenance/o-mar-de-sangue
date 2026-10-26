@@ -1871,6 +1871,10 @@ class Game extends Phaser.Scene {
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
             collected: SEA_MATH.safe(this.gold + commission + contractBounty), kills: this.kills,
             rammings: this.rammingSinks, islands: this.islandVisits?.size || 0 });
+        // The after-action chronicle is passed to Port in memory, not the save.
+        report.politicalChronicle=(this.politicalEvents||[]).slice(0,8).map(entry=>({
+            text:String(entry.text||''),terms:String(entry.terms||'')
+        }));
         if(this.contract){
             report.contractTitle=SEA_CONTRACTS.offers[this.contract.id].title;
             report.contractBounty=contractBounty;
