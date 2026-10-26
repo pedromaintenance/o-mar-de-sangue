@@ -35,7 +35,7 @@ const {chromium}=require('playwright-core');
    });
    assert.equal(before.open,false);
    assert(before.count<before.total,'Fog of discovery should initially conceal some islands');
-   assert.deepEqual(before.hit,{x:mobile?390:1198,y:187,w:80,h:80});
+   assert.deepEqual(before.hit,{x:1198,y:187,w:80,h:80}); // unified 1280×720 landscape
    // Real pointer routing at the existing radar, not a new joystick overlay.
    const opened=await page.evaluate(()=>{
     const s=game.scene.getScene('Game');

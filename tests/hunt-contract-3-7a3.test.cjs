@@ -120,5 +120,6 @@ assert(txt['Game.js'].includes('SEA_CONTRACTS.evade(this,e,dt)'));
 assert(txt['Game.js'].includes("['rescue','smuggle','hunt'].includes(data?.contract)"));
 assert(txt['PortUI.js'].includes("this.button('contract:hunt'"));
 assert(txt['SeaAtlas.js'].includes('SEA_CONTRACTS.hunted(s)'));
-assert(txt['sw.js'].includes('v63-condemned-hunt'));
+const swVersion=Number(txt['sw.js'].match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
+assert(Number.isFinite(swVersion)&&swVersion>=63,'Cache must retain or supersede hunt version v63');
 console.log('PASS 3.7a.3: clue, moving wanted target, anti-replay, payout/escape and v4 isolation');

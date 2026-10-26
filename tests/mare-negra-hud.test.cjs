@@ -14,9 +14,15 @@ const createHUD=method('createHUD','createTouchControls');
 const updateHUD=method('updateHUD','drawRadar');
 const input=src.slice(src.indexOf('    createTouchControls() {'),
   src.indexOf('    isNativeTouchPointer(',src.indexOf('    createTouchControls() {')));
-assert(input.includes('x: 106, y: 702, radius: 82'),'Joystick touch coordinates changed');
-assert(input.includes('x: 342, y: 702, radius: 48'),'Left cannon touch target changed');
-assert(input.includes('x: 432, y: 702, radius: 48'),'Right cannon touch target changed');
+// The 26/10 landscape HUD moved all input hitboxes into the 1280x720 canvas.
+assert(input.includes('const jc={x:140,y:576}, port={x:1051,y:548}, starboard={x:1158,y:548}'),
+  'Landscape HUD joystick and cannon centers changed unexpectedly');
+assert(input.includes('joystick:{x:jc.x,y:jc.y,radius:94}'),
+  'Joystick must keep the enlarged landscape touch radius');
+assert(input.includes('port:{x:port.x,y:port.y,radius:48}'),
+  'Port cannon touch radius changed unexpectedly');
+assert(input.includes('starboard:{x:starboard.x,y:starboard.y,radius:48}'),
+  'Starboard cannon touch radius changed unexpectedly');
 assert(!src.includes('getElementById("hud")'),'HUD should be Phaser-only');
 for(const desktop of [false,true]){
  const rects=[],texts=[],draws=[];

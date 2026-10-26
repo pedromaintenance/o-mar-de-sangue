@@ -19,7 +19,7 @@ async function scenario(initialController){
  service.register=async()=>{registers++;return {waiting:null,update:async()=>{checks++}};};
  const win=new Target();win.location={reload(){reloads++}};
  const nav={onLine:true,serviceWorker:service};
- const doc={getElementById:id=>els[id]};
+ const doc=new Target();doc.getElementById=id=>els[id];
  const ctx={window:win,navigator:nav,document:doc,console};
  vm.createContext(ctx);
  vm.runInContext(src+';this.pwa=SEA_PWA;',ctx);

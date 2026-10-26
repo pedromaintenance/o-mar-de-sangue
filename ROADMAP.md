@@ -2,10 +2,34 @@
 
 **Identidade:** horror naval, horror cósmico e conflito político no universo da **Carcaça**.  
 **Plataforma atual:** jogo web estático (GitHub Pages), PWA offline, Phaser + porto HTML/CSS.  
-**Atualização:** 18 de outubro de 2026.  
+**Atualização:** 26 de outubro de 2026.  
+**Fase do produto:** **PRÉ-ALFA**. GitHub Pages é ambiente público de testes, **não lançamento comercial**.  
+
+## Política de desenvolvimento — pré-alfa (decisão de produto de 26/10/2026)
+
+- **Prioridade absoluta:** qualidade final do jogo, diversão, coesão narrativa, regressão funcional e arquitetura sustentável.
+- **Saves de teste são descartáveis:** não exigir retrocompatibilidade v3/v4 ou migração automática como condição para aprovar uma mecânica nova. Se o modelo de dados mudar, é permitido zerar o progresso experimental, desde que isso seja comunicado na entrega e o salvamento da versão atual funcione.
+- **Estabilidade NÃO significa imutabilidade:** preservar funcionalidades aprovadas, controles, PWA offline, testes e capacidade de rollback via Git, mas permitir refatorar esquemas, combate, progressão e regras para melhorar a experiência.
+- **Limite da regra:** ao entrar em beta com testadores externos, reavaliar política de resets; no lançamento efetivo, formalizar compatibilidade e migração de saves.
+- **Definição de pronto:** uma entrega precisa ser jogável, passar regressões e ter riscos conhecidos declarados. Checklists históricos que exigem preservação do save v4 descrevem decisões das versões antigas, e **não têm precedência** sobre esta política.
+
+## Sprint 01 — Ecos da Maré Sangrenta (em desenvolvimento)
+
+**Objetivo:** colocar narrativa e consequências políticas no núcleo da navegação. Incremento pequeno: três encontros políticos em ilhas já existentes, três decisões cada, recursos/ameaças perceptíveis e crônica da expedição no Diário do Capitão. Sem pontuação permanente de reputação neste sprint.
+
+- [x] Encontro de refugiados perseguidos pela Corte, com proteção, delação ou informação de navegação.
+- [x] Comboio de contrabando, com colaboração, denúncia ou recuperação de mapas.
+- [x] Ritual kuo-toa, com resgate de prisioneiros, roubo de pólvora ou pacto sobrenatural.
+- [x] Limite de frequência: no máximo uma ocorrência de cada encontro por expedição, sem repetição de prêmios nem interrupção constante da navegação.
+- [x] Consequências imediatas explícitas e, quando indicado, perseguição hostil retardada após sair da ilha; crônica consultável na pausa.
+- [x] Preservar contratos anteriores, combate, controles, offline, atlas e save funcional; compatibilidade histórica de saves não é requisito.
+- [x] Testes de lógica/anti-replay e CI Node para os três eventos; [especificação técnica](docs/sprint01-ecos-da-mare.md).
+- [ ] Aprovar testes visuais/Chromium do PR, integrar à `main`, conferir a atualização publicada no Pages. Testes físicos Android/Xbox continuam pendentes e exigem execução real.
+
+
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
 
-> **Princípio de desenvolvimento:** evoluir a experiência sem reescrever subsistemas que já funcionam. Separar apresentação de regras; preservar saves, acessibilidade básica, funcionamento offline, mouse/toque, teclado e controle Xbox. Toda interface nova deve passar por testes de regressão antes do merge.
+> **Princípio de desenvolvimento:** avançar em blocos jogáveis sem quebrar subsistemas já aprovados. Separar apresentação de regras; preservar acessibilidade básica, funcionamento offline, mouse/toque, teclado e controle Xbox. **Em pré-alfa, os saves de teste podem ser reiniciados e os esquemas de dados redesenhados.** Toda interface nova deve passar por testes de regressão antes do merge.
 
 ## Onde estamos
 
@@ -455,6 +479,6 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 
 ## Próxima execução sugerida
 
-Validar e publicar 3.8a.3 (faíscas durante carga, sem poluição visual); depois retomar a 3.7a.3 (Caçada), ainda planejada. Em paralelo, testar 3.6k/3.6l/3.6l.1 no Pages e PWA física, coletando relatórios FPS comparáveis (calmaria vs. combate/temporal), incluindo média/pico FX e quadros no limite. Só iniciar 3.6m se os dados justificarem intervenção visual. Reputação 3.3b continua aguardando regras aprovadas e migração v4→v5.
+**Executar Sprint 01 — Ecos da Maré Sangrenta**, priorizando narrativa política e diversidade de encontros, sem interromper a validação do HUD paisagem de 26/10. Sprint 02 (captura e especializações temporárias) e Sprint 03 (reputação persistente e possíveis mudanças do save) dependem de avaliação separada. A migração v4→v5 não é pré-requisito em pré-alfa.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.

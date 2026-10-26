@@ -107,8 +107,9 @@ const {chromium}=require('playwright-core');
    });
    assert(journal.paused&&journal.options===3,
      'Captain journal must keep three original actions');
-   assert(journal.labels.some(t=>t.includes('NOMES ENTREGUES · CORTE FEÉRICA')));
-   assert(journal.labels.some(t=>t.includes('Termos: ouro +60 · maldição +15')));
+   assert(journal.labels.some(t=>t.includes('CRÔNICA POLÍTICA · 1 DECISÃO')));
+   assert(journal.labels.some(t=>t.includes('TRÊS BANDEIRAS: VENDER OS NOMES')));
+   assert(journal.labels.some(t=>t.includes('+60 ouro · +15 maldição')));
    assert.equal(journal.choice,'tribute','Diary cannot erase the political decision');
    assert.equal(journal.save,before.originalSave,'Diary must not alter save');
    await page.screenshot({path:path.join('port-artifacts',

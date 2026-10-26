@@ -45,6 +45,9 @@ on:
       - 'tests/mare-negra-hud-visual.test.cjs'
       - 'tests/political-parley.test.cjs'
       - 'tests/political-parley-visual.test.cjs'
+      - 'SeaPoliticalEvents.js'
+      - 'tests/political-events-sprint01.test.cjs'
+      - 'tests/political-events-visual-sprint01.test.cjs'
       - 'SeaAtlas.js'
       - 'SeaContracts.js'
       - 'SeaGunnery.js'
@@ -108,6 +111,9 @@ on:
       - 'tests/mare-negra-hud-visual.test.cjs'
       - 'tests/political-parley.test.cjs'
       - 'tests/political-parley-visual.test.cjs'
+      - 'SeaPoliticalEvents.js'
+      - 'tests/political-events-sprint01.test.cjs'
+      - 'tests/political-events-visual-sprint01.test.cjs'
       - 'SeaAtlas.js'
       - 'SeaContracts.js'
       - 'SeaGunnery.js'
@@ -166,6 +172,8 @@ jobs:
           node tests/mare-negra-overlays.test.cjs
           node tests/mare-negra-hud.test.cjs
           node tests/political-parley.test.cjs
+          node --check SeaPoliticalEvents.js
+          node tests/political-events-sprint01.test.cjs
           node --check SeaAtlas.js
           node tests/atlas-chart.test.cjs
           node --check SeaContracts.js
@@ -202,6 +210,7 @@ jobs:
           node tests/mare-negra-overlays-visual.test.cjs
           node tests/mare-negra-hud-visual.test.cjs
           node tests/political-parley-visual.test.cjs
+          node tests/political-events-visual-sprint01.test.cjs
           node tests/atlas-chart-visual.test.cjs
           node tests/hunt-contract-visual-3-7a3.test.cjs
           node tests/pwa-offline-visual.test.cjs
