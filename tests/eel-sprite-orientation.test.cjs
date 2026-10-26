@@ -26,5 +26,6 @@ assert(game.includes("Math.sin(e.heading) * thrust")&&game.includes("Math.cos(e.
  'Movement and physics still derive only from heading');
 assert(sw.includes('"./assets/v15/beast_eel_swim.webp"'));
 assert(!sw.includes('beast_eel.png')&&!sw.includes('abyss_eel.png'));
-assert(sw.includes('v69-eel-swim'),'PWA precache revision is required');
+const cacheVersion=Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
+assert(Number.isFinite(cacheVersion)&&cacheVersion>=69,'PWA version must not regress below eel revision 69');
 console.log('PASS eel source: original-size 4 frames, stale files deleted, heading and ram rendering isolated');
