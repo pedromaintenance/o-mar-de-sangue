@@ -244,9 +244,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('v15-dagon', 'assets/v15/dagon_emerging.webp');
         this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
         this.load.image('v15-drowned', 'assets/v15/beast_drowned.png');
-        // Animated serpent: 4 x 128 px, original art has the HEAD AT THE BOTTOM.
+        // Original-resolution transparent serpent sheet: 4 frames, 512 × 565 px each.
+        // Its head is at the BOTTOM: paintEnemies offsets its artwork by 180 degrees.
         this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp', {
-            frameWidth:128, frameHeight:141, endFrame:3
+            frameWidth:512, frameHeight:565, endFrame:3
         });
         this.load.image('v15-coral', 'assets/v15/beast_coral.png');
         this.load.image('v15-fx-0', 'assets/v15/fx_frame_00.png');
