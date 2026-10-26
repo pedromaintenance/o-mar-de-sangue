@@ -69,6 +69,8 @@ html, body, #app-shell, #game-container, #game-container canvas {
 #fullscreen-btn {position:fixed;right:12px;bottom:12px;z-index:9997;border:1px solid #c39b6b;
  background:#25161ee8;color:#f2d6b1;padding:8px 12px;border-radius:7px;font:600 12px Georgia,serif}
 #landscape-tip[hidden],#fullscreen-btn[hidden]{display:none!important}
+/* O porto funciona em retrato; a orientação paisagem só é exigida ao navegar. */
+body.port-ui-open #landscape-tip{display:none!important}
 #landscape-tip{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;
  justify-content:center;text-align:center;padding:30px;background:#100e14ed;color:#f1d3ae;
  font:700 23px/1.5 Georgia,serif}
