@@ -65,3 +65,38 @@ const SEA_PWA = {
     }
 };
 if(typeof window!=='undefined')SEA_PWA.init();
+
+/* Instalação não pode ser forçada pelo navegador. Após gesto do usuário,
+ * solicita tela cheia e bloqueio horizontal quando as APIs permitirem. */
+(function(){
+ if(typeof window==='undefined')return;
+ const isTouch=()=>/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||'')||
+     !!window.matchMedia?.('(pointer:coarse)').matches;
+ const installed=()=>window.matchMedia?.('(display-mode:standalone)').matches||
+     window.matchMedia?.('(display-mode:fullscreen)').matches||navigator.standalone===true;
+ const tip=document.getElementById('landscape-tip');
+ const full=document.getElementById('fullscreen-btn');
+ const refresh=()=>{
+     if(tip)tip.hidden=!isTouch()||window.innerWidth>window.innerHeight;
+     if(full)full.hidden=!isTouch()||!!document.fullscreenElement||installed();
+ };
+ async function immersive(){
+     if(!document.fullscreenElement&&document.documentElement.requestFullscreen)
+         try{await document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(_){}
+     if(screen.orientation?.lock)
+         try{await screen.orientation.lock('landscape');}catch(_){}
+     refresh();
+ }
+ if(full)full.addEventListener('click',immersive);
+ window.addEventListener('resize',refresh);
+ window.addEventListener('orientationchange',refresh);
+ document.addEventListener('fullscreenchange',refresh);
+ window.addEventListener('appinstalled',refresh);
+ // Apenas gestos reais: o navegador rejeita fullscreen/rotation automáticos.
+ document.addEventListener('pointerdown',function once(e){
+     if(!isTouch()||(!e.target.closest('#game-container')&&!e.target.closest('.port-ui')))return;
+     document.removeEventListener('pointerdown',once);
+     immersive();
+ },{passive:true});
+ refresh();
+})();

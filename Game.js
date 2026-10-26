@@ -13,10 +13,12 @@
 // Modo desktop: canvas horizontal real, sem controles móveis sobrepostos.
 // Usa o dispositivo (mouse/teclado), não só a proporção da janela,
 // para evitar esconder os comandos num celular em paisagem.
-const SEA_DESKTOP = typeof window !== 'undefined' &&
-    !(typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '')) &&
-    !!window.matchMedia?.('(pointer: fine)').matches;
-const SEA_VIEW = SEA_DESKTOP ? { width: 1280, height: 720 } : { width: 480, height: 800 };
+// A disposição 16:9 é comum ao PC e ao telefone; apenas a entrada varia.
+const SEA_DESKTOP = true;
+const SEA_TOUCH = typeof window !== 'undefined' && (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') ||
+    !!window.matchMedia?.('(pointer: coarse)').matches);
+const SEA_VIEW = { width: 1280, height: 720 };
 
 const SEA_GAMEPAD = {
     previous: [], lastId: null,
@@ -300,6 +302,8 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('treasure-crate', 'assets/items/treasure_crate.png');
         this.load.image('treasure-chest', 'assets/items/treasure_chest.png');
         this.load.image('command-console-analog', 'assets/ui/command_console_analog.png');
+        this.load.image('hud-helm-landscape', 'assets/ui/hud-helm-landscape.png');
+        this.load.image('hud-combat-landscape', 'assets/ui/hud-combat-landscape.png');
         this.load.image('upgrade-hull', 'assets/upgrades/upgrade_hull.png');
         this.load.image('upgrade-sails', 'assets/upgrades/upgrade_sails.png');
         this.load.image('upgrade-guns', 'assets/upgrades/upgrade_guns.png');
@@ -383,7 +387,7 @@ class Game extends Phaser.Scene {
         this.lastRockContact = -1000; this.lastShot = -1000;
         this.lastPortShot = -1000; this.lastStarboardShot = -1000; this.lastDamageTime = -1000;
         // Controle independente por dedo: a mão do leme não impede a dos canhões.
-        this.joystick = { id: null, x: 0, y: 0, centerX: 106, centerY: 702, radius: 62, deadzone: .12 };
+        this.joystick = { id: null, x: 0, y: 0, centerX: 140, centerY: 576, radius: 55, deadzone: .12 };
         this.cannonPointers = new Map();
         this.cannonCharge = {port:0,starboard:0};
         // Um único disparo por acionamento: soltar é obrigatório para rearmar.
@@ -446,7 +450,7 @@ class Game extends Phaser.Scene {
         SEA_CONTRACTS.init(this,this.contractId);
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
-        if (!SEA_DESKTOP) this.createTouchControls();
+        this.createTouchControls();
         if (this.bossAlert) this.announce(this.bossAlert);
         this.keys = this.input.keyboard.addKeys('UP,DOWN,LEFT,RIGHT,W,A,S,D,SPACE,Q,E,R,ESC,P,ENTER,F,M');
         // Não vincular eventos de disparo imediato: updateCannonCharge
@@ -515,7 +519,7 @@ class Game extends Phaser.Scene {
         this.input.on('pointermove', p => { if (!this.isNativeTouchPointer(p)) this.touchMove(p); });
         this.input.on('pointerup', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
         this.input.on('pointerupoutside', p => { if (!this.isNativeTouchPointer(p)) this.touchEnd(p); });
-        if (!SEA_DESKTOP) this.installNativeTouch();
+        if (SEA_TOUCH) this.installNativeTouch();
         this.onLoseFocus = () => this.touchReset();
         window.addEventListener('blur', this.onLoseFocus);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -776,12 +780,12 @@ class Game extends Phaser.Scene {
             fontFamily:'Georgia',fontSize:'16px',fontStyle:'bold',color:'#f3d6b5'
         }).setOrigin(.5).setDepth(112).setScrollFactor(0);
         // O botão existe em desktop e mobile; o toque nativo passa pelo roteador.
-        const ib=this.impulseButtonHitbox={x:SEA_DESKTOP?613:240,y:SEA_DESKTOP?77:616,w:102,h:44};
-        this.add.rectangle(ib.x,ib.y,ib.w,ib.h,0x253035,.94)
-            .setStrokeStyle(2,0xc89b64,.94).setScrollFactor(0).setDepth(112);
-        this.impulseButtonText=this.add.text(ib.x,ib.y,'IMPULSO · R',{
-            fontFamily:'monospace',fontSize:'12px',fontStyle:'bold',color:'#f3d6a8',align:'center'
-        }).setOrigin(.5).setScrollFactor(0).setDepth(113);
+        const ib=this.impulseButtonHitbox={x:1104,y:630,w:94,h:94};
+        // O botão de impulso é parte do HUD de combate. Texto de recarga discreto.
+        this.impulseButtonText=this.add.text(1104,699,'',{
+            fontFamily:'monospace',fontSize:'11px',fontStyle:'bold',color:'#f3d6a8',align:'center',
+            backgroundColor:'#101014aa',padding:{x:3,y:1}
+        }).setOrigin(.5).setScrollFactor(0).setDepth(114);
         if (!SEA_DESKTOP) this.add.text(240, 566, 'ANALÓGICO: RUMO / PROPULSÃO    •    CANHÕES LATERAIS', {
             fontFamily: 'monospace', fontSize: '10px', color: '#bbab93',
             stroke: '#101720', strokeThickness: 3
@@ -800,27 +804,31 @@ class Game extends Phaser.Scene {
         }).setScrollFactor(0).setDepth(112);
     }
     createTouchControls() {
-        // Arte e zonas de toque partilham EXATAMENTE as mesmas coordenadas.
-        // 480×220 centralizado em (240, 690): joystick (106,702), canhões (342,702)/(432,702).
-        this.add.image(240, 690, 'command-console-analog').setScrollFactor(0).setDepth(102);
-        const knobShadow = this.add.circle(108, 706, 31, 0x140d0c, .58)
-            .setStrokeStyle(3, 0x4b2d1e, .8).setScrollFactor(0).setDepth(110);
-        const knob = this.add.circle(106, 702, 29, 0x704d2b, 1)
-            .setStrokeStyle(4, 0xc79058, .96).setScrollFactor(0).setDepth(111);
-        const inner = this.add.circle(106, 702, 13, 0x25303d, .92)
-            .setStrokeStyle(2, 0xd8b17a, .8).setScrollFactor(0).setDepth(112);
-        this.joystick.knob = knob;
-        this.joystick.shadow = knobShadow;
-        this.joystick.inner = inner;
-        this.cannonHighlights = {
-            port: this.add.circle(342, 702, 42, 0xffb35d, 0).setScrollFactor(0).setDepth(108),
-            starboard: this.add.circle(432, 702, 42, 0xffb35d, 0).setScrollFactor(0).setDepth(108)
+        // HUDs separados: os desenhos podem ser redimensionados sem mudar as áreas de toque.
+        // Em desktop, aparecem também para manter a identidade visual unificada.
+        this.add.image(140, 573, 'hud-helm-landscape')
+            .setDisplaySize(270, 270).setScrollFactor(0).setDepth(102).setAlpha(.94);
+        this.add.image(1104, 576, 'hud-combat-landscape')
+            .setDisplaySize(320, 240).setScrollFactor(0).setDepth(102).setAlpha(.96);
+        const jc={x:140,y:576}, port={x:1051,y:548}, starboard={x:1158,y:548};
+        this.joystick.centerX=jc.x; this.joystick.centerY=jc.y; this.joystick.radius=55;
+        const shadow=this.add.circle(jc.x+2,jc.y+4,25,0x140d0c,.66)
+            .setScrollFactor(0).setDepth(110);
+        const knob=this.add.circle(jc.x,jc.y,24,0x704d2b,1)
+            .setStrokeStyle(3,0xc79058,.96).setScrollFactor(0).setDepth(111);
+        const inner=this.add.circle(jc.x,jc.y,10,0x25303d,.92)
+            .setStrokeStyle(2,0xd8b17a,.8).setScrollFactor(0).setDepth(112);
+        this.joystick.knob=knob;this.joystick.shadow=shadow;this.joystick.inner=inner;
+        this.cannonHighlights={
+            port:this.add.circle(port.x,port.y,38,0xffb35d,0).setScrollFactor(0).setDepth(108),
+            starboard:this.add.circle(starboard.x,starboard.y,38,0xffb35d,0).setScrollFactor(0).setDepth(108)
         };
-        // Suporte à depuração automatizada do layout; não interfere com inputs.
-        this.touchLayout = { joystick: { x: 106, y: 702, radius: 82 },
-            port: { x: 342, y: 702, radius: 48 },
-            starboard: { x: 432, y: 702, radius: 48 } };
-        this.cannonUiFx = { port: { x: 342, y: 702 }, starboard: { x: 432, y: 702 } };
+        this.touchLayout={
+            joystick:{x:jc.x,y:jc.y,radius:94},
+            port:{x:port.x,y:port.y,radius:48},
+            starboard:{x:starboard.x,y:starboard.y,radius:48}
+        };
+        this.cannonUiFx={port,starboard};
     }
     isNativeTouchPointer(pointer) {
         const event = pointer?.event;
@@ -1720,7 +1728,7 @@ class Game extends Phaser.Scene {
         if(this.impulseButtonText){
             const cd=SEA_IMPULSE.cooldown(this.profile?.levels?.impulso||0);
             const remaining=Math.max(0,cd-(this.elapsed-this.lastImpulseAt));
-            this.impulseButtonText.setText(this.impulseRemaining>0?'➶ ARRANCADA':remaining>0?`IMPULSO ${remaining.toFixed(1)}s`:'➶ IMPULSO');
+            this.impulseButtonText.setText(this.impulseRemaining>0?'ARRANCADA':remaining>0?`${remaining.toFixed(1)}s`:'PRONTO');
         }
         this.quest.setText(this.objectiveText());
         // Keep unusually long mission text away from the fixed pause button.

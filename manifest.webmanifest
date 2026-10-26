@@ -1,13 +1,13 @@
 {
   "name": "O Mar de Sangue",
   "short_name": "Mar de Sangue",
-  "description": "Combate naval na Carcaça: navegue pelo Mar de Sangue, saqueie tesouros e enfrente a Corte sombria.",
+  "description": "O Mar de Sangue — aventura naval sombria em paisagem, com controles de leme e canhões.",
   "start_url": "./index.html",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#180d15",
   "theme_color": "#220f18",
-  "orientation": "any",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -22,5 +22,9 @@
       "purpose": "any maskable"
     }
   ],
-  "id": "./"
+  "id": "./",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ]
 }
