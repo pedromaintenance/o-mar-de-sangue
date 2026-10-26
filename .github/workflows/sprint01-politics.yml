@@ -1,0 +1,41 @@
+name: Sprint 01 — Political Encounters
+on:
+  pull_request:
+    paths:
+      - 'SeaPoliticalEvents.js'
+      - 'SeaIslands.js'
+      - 'SeaMenus.js'
+      - 'Game.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/political-events-sprint01.test.cjs'
+      - '.github/workflows/sprint01-politics.yml'
+  push:
+    branches:
+      - main
+      - feat/prealpha-sprint01-political-encounters
+    paths:
+      - 'SeaPoliticalEvents.js'
+      - 'SeaIslands.js'
+      - 'SeaMenus.js'
+      - 'Game.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/political-events-sprint01.test.cjs'
+      - '.github/workflows/sprint01-politics.yml'
+permissions:
+  contents: read
+jobs:
+  political-encounters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check SeaPoliticalEvents.js
+          node --check SeaIslands.js
+          node --check SeaMenus.js
+          node --check Game.js
+          node --check sw.js
+      - name: Run encounter contract regressions
+        run: node tests/political-events-sprint01.test.cjs
