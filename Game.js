@@ -217,7 +217,6 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-admiral', 'assets/sprites/enemy_admiral.png');
         this.load.image('foe-cult', 'assets/abyss/cult_barge.png');
         this.load.image('foe-dreadnought', 'assets/abyss/dreadnought.png');
-        this.load.image('foe-eel', 'assets/abyss/abyss_eel.png');
         this.load.image('foe-drowned', 'assets/abyss/drowned_choir.png');
         this.load.image('foe-coral', 'assets/abyss/coral_horror.png');
         this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
@@ -245,7 +244,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('v15-dagon', 'assets/v15/dagon_emerging.webp');
         this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
         this.load.image('v15-drowned', 'assets/v15/beast_drowned.png');
-        this.load.image('v15-eel', 'assets/v15/beast_eel.png');
+        // Animated serpent: 4 x 128 px, original art has the HEAD AT THE BOTTOM.
+        this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp', {
+            frameWidth:128, frameHeight:141, endFrame:3
+        });
         this.load.image('v15-coral', 'assets/v15/beast_coral.png');
         this.load.image('v15-fx-0', 'assets/v15/fx_frame_00.png');
         this.load.image('v15-fx-1', 'assets/v15/fx_frame_01.png');
@@ -688,7 +690,7 @@ class Game extends Phaser.Scene {
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
-            enguia:'foe-eel', afogados:'foe-drowned', coral:'foe-coral',
+            enguia:'eel-swim', afogados:'foe-drowned', coral:'foe-coral',
             caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'boss-dagon' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
@@ -696,12 +698,12 @@ class Game extends Phaser.Scene {
             fragata:'v15-royal', bombardeiro:'v15-chapel', espectral:'v15-spectral',
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
             nauabissal:'v15-merchant', kraken:'v15-kraken', dagon:'v15-dagon',
-            enguia:'v15-eel', afogados:'v15-drowned', coral:'v15-coral' };
+            afogados:'v15-drowned', coral:'v15-coral' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
         const sourceH = this.textures.get(tex).getSourceImage().height || 160;
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const ship = this.add.image(pos.x, pos.y, tex)
+        const ship = this.add.image(pos.x, pos.y, tex, type==='enguia'?0:undefined)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
@@ -1086,6 +1088,11 @@ class Game extends Phaser.Scene {
             if(!near) {e.ship.setVisible(false);e.wake?.setVisible(false);if(e.bar)e.bar.setVisible(false);if(e.label)e.label.setVisible(false);continue;}
             e.ship.setVisible(true);e.wake?.setVisible(true);if(e.bar)e.bar.setVisible(true);if(e.label)e.label.setVisible(true);
             const pulse=Math.sin(t*(e.boss?2.35:3.4)+e.visualPhase);
+            if(e.type==='enguia' && e.ship.texture.key==='eel-swim'){
+                // This is a four-frame swim loop; animation never rotates the physics body.
+                const frame=Math.floor((t*5.5+e.visualPhase)%4);
+                if(e.eelFrame!==frame){e.ship.setFrame(frame);e.eelFrame=frame;}
+            }
             if(e.isMonster) {
                 const dx=(e.type==='enguia'? .045: .012)*pulse;
                 e.ship.setScale(e.spriteScale*(1+dx),e.spriteScale*(1-dx*.48));
@@ -1607,7 +1614,14 @@ class Game extends Phaser.Scene {
             if (e.dead) continue;
             // O Dagon emerge da água: seu horizonte permanece horizontal.
             // A direção de ataque e a física continuam usando e.heading.
-            e.ship.setPosition(e.x, e.y).setRotation(e.type==='dagon'?0:e.heading);
+            // Gameplay headings are measured from image-UP (0°).
+            // The new eel and the V15 ram ship are drawn with the HEAD/BOW
+            // at image-BOTTOM. Turn ONLY these render sprites 180°; physics,
+            // charges, collision normals, wake and heading remain untouched.
+            const artFacesDown=e.type==='enguia'||
+                (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
+            e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:
+                e.heading+(artFacesDown?Math.PI:0));
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
             e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - width/2-1, e.y - e.radius - 32, width+2, 8);
