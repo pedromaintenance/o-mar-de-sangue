@@ -3,6 +3,7 @@
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const vm=require('node:vm');
+const crypto=require('node:crypto');
 const file='assets/v15/beast_dagon.png';
 assert(fs.existsSync(file),
   'Missing beast_dagon.png. Upload the exact user-provided RGBA sheet before merging.');
@@ -10,6 +11,9 @@ const data=fs.readFileSync(file);
 assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','PNG signature');
 assert.equal(data.readUInt32BE(16),2048,'4 frames must be 512px wide each');
 assert.equal(data.readUInt32BE(20),682,'Frame height must remain 682px');
+assert.equal(crypto.createHash('sha256').update(data).digest('hex'),
+ '753756d67c7bc8570c3998e83a88042b62ed6ad6b5b8f2b8e2bd9217afcd9ac4',
+ 'The committed art must match the exact original file attached by the user');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
 assert(game.includes("this.load.spritesheet('dagon-animated', 'assets/v15/beast_dagon.png'"),
