@@ -131,4 +131,20 @@ const atlas=read('SeaAtlas.js'),game=read('Game.js'),sw=read('sw.js');
 assert(atlas.includes('ECO POLÍTICO')&&atlas.includes('politicalEcho'));
 assert(game.includes('SEA_POLITICAL_EVENTS.init(this)')&&game.includes('SEA_POLITICAL_EVENTS.update(this)'));
 assert(sw.includes('v67-political-echoes'));
+const uiCtx={SEA_MATH:{nice:v=>String(v)}};
+vm.createContext(uiCtx);
+vm.runInContext(read('PortUI.js')+';this.port=SEA_PORT_UI;',uiCtx);
+const html=uiCtx.port.result({
+ won:true,withdrawn:false,mode:'sandbox',collected:42,reward:35,kills:0,
+ rammings:0,bank:35,wave:1,islands:4,
+ politicalChronicle:[{text:'DECISÃO <script>',terms:'<img src=x>'},
+                     {text:'CONSEQUÊNCIA',terms:'+12 casco'}]
+});
+assert(html.includes('AS MARCAS DA VIAGEM'));
+assert(html.includes('DECISÃO &lt;script&gt;')&&!html.includes('<script>'),
+  'Chronicle must escape injected markup');
+assert(html.includes('&lt;img src=x&gt;')&&!html.includes('<img src=x>'));
+assert(html.includes('CONSEQUÊNCIA'));
+assert(read('Game.js').includes('report.politicalChronicle=(this.politicalEvents||[])'),
+  'Voyage decisions must reach Port results without writing profile');
 console.log('PASS Sprint 01b: nine branching echoes, two-choice UI, delayed pursuit, no spoilers, contract isolation, no duplicates');
