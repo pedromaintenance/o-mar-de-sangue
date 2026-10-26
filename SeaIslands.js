@@ -215,9 +215,17 @@ const SEA_ISLANDS = {
             return result;
         }
         if(s.islandVisits.has(s.islandSelected.id))return false;
-        if(choice.politicalEvent && (typeof SEA_POLITICAL_EVENTS==='undefined' ||
-            !SEA_POLITICAL_EVENTS.encounter(s,s.islandSelected) ||
-            choice.politicalEvent!==s.islandSelected.politicalEventId))return false;
+        if((choice.politicalEvent||choice.politicalEcho) &&
+            typeof SEA_POLITICAL_EVENTS==='undefined')return false;
+        if(choice.politicalEvent && (s.islandSelected.politicalEventId!==choice.politicalEvent ||
+            !SEA_POLITICAL_EVENTS.events[choice.politicalEvent]?.choices.some(c=>
+                c.id===choice.id)))return false;
+        if(choice.politicalEcho){
+            const echo=SEA_POLITICAL_EVENTS.echoEncounter(s,s.islandSelected);
+            if(!echo||s.islandSelected.politicalEcho?.resolved||
+                s.islandSelected.politicalEcho?.source!==choice.politicalEcho||
+                !echo.choices.some(c=>c.id===choice.id))return false;
+        }
         if(choice.cost&&s.gold<choice.cost){
             s.islandError='OURO INSUFICIENTE PARA ESTA ESCOLHA';
             this.render(s);
@@ -290,6 +298,8 @@ const SEA_ISLANDS = {
         }
         if(choice.politicalEvent && typeof SEA_POLITICAL_EVENTS!=='undefined')
             SEA_POLITICAL_EVENTS.record(s,choice,changes);
+        if(choice.politicalEcho && typeof SEA_POLITICAL_EVENTS!=='undefined')
+            SEA_POLITICAL_EVENTS.resolveEcho(s,choice,changes);
         const result=changes.join('  ·  ')||'Os ventos mudaram.';
         s.islandOutcome=choice.outcome?choice.outcome+'\n'+result:result;
         s.lastDamageTime=s.time.now;
@@ -301,8 +311,10 @@ const SEA_ISLANDS = {
         return true;
     },
     screenButton(s,root,x,y,w,h,name,detail,index,disabled=false,choice=null) {
+        // Return is dynamically after 2 or 3 decisions, never hard-coded slot 3.
         const selected=index>=0?index===s.islandChoiceIndex:
-            (s.islandOutcome?s.islandChoiceIndex===0:s.islandChoiceIndex===3);
+            (s.islandOutcome?s.islandChoiceIndex===0:
+                s.islandChoiceIndex===s.islandOptions.length);
         const bg=disabled?0x131a1d:selected?0x392025:0x161e21;
         const edge=disabled?0x534844:selected?0xc3a078:0x655343;
         root.add(s.add.rectangle(x,y,w,h,bg,.97).setStrokeStyle(selected?3:2,edge,.95));
