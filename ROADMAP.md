@@ -13,7 +13,7 @@
 - **Limite da regra:** ao entrar em beta com testadores externos, reavaliar política de resets; no lançamento efetivo, formalizar compatibilidade e migração de saves.
 - **Definição de pronto:** uma entrega precisa ser jogável, passar regressões e ter riscos conhecidos declarados. Checklists históricos que exigem preservação do save v4 descrevem decisões das versões antigas, e **não têm precedência** sobre esta política.
 
-## Sprint 01 — Ecos da Maré Sangrenta (em desenvolvimento)
+## Sprint 01 — Ecos da Maré Sangrenta (integrado à main; validação física pendente)
 
 **Objetivo:** colocar narrativa e consequências políticas no núcleo da navegação. Incremento pequeno: três encontros políticos em ilhas já existentes, três decisões cada, recursos/ameaças perceptíveis e crônica da expedição no Diário do Capitão. Sem pontuação permanente de reputação neste sprint.
 
@@ -24,7 +24,8 @@
 - [x] Consequências imediatas explícitas e, quando indicado, perseguição hostil retardada após sair da ilha; crônica consultável na pausa.
 - [x] Preservar contratos anteriores, combate, controles, offline, atlas e save funcional; compatibilidade histórica de saves não é requisito.
 - [x] Testes de lógica/anti-replay e CI Node para os três eventos; [especificação técnica](docs/sprint01-ecos-da-mare.md).
-- [ ] Aprovar testes visuais/Chromium do PR, integrar à `main`, conferir a atualização publicada no Pages. Testes físicos Android/Xbox continuam pendentes e exigem execução real.
+- [x] Testes visuais/Chromium de regressão, incluindo os três encontros em três viewports, aprovados no PR #60 (CI `port-smoke`, `port-visual`, `Sprint 01 — Political Encounters` verdes). Integração à `main` via squash merge `e0ccdd6` em 26/10/2026.
+- [ ] Verificar publicação efetiva no GitHub Pages e testar gameplay em dispositivos Android/Xbox físicos. Não declarar QA físico aprovado sem execução real.
 
 
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
