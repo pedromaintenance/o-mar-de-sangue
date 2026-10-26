@@ -709,8 +709,9 @@ class Game extends Phaser.Scene {
             (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
+        const dagonInitialFrame=type==='dagon'?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
-            (type==='enguia'||type==='dagon')?0:undefined)
+            type==='enguia'?0:dagonInitialFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
