@@ -62,6 +62,7 @@ const SEA_POLITICAL_EVENTS = {
     }),
     init(s) {
         s.politicalThreats=[];
+        for(const island of s.islands||[])delete island.politicalEventId;
         // One event per theme, seeded by voyage/stage, at existing landmarks.
         // Contract targets are excluded before placement, including future
         // sanctuary delivery sites. Kind and island id NEVER change.
