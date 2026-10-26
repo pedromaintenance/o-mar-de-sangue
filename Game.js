@@ -222,7 +222,11 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
         this.load.image('foe-turtle', 'assets/abyss/temple_turtle.png');
         this.load.image('boss-kraken', 'assets/abyss/kraken.png');
-        this.load.image('boss-dagon', 'assets/v15/dagon_emerging.webp');
+        // Arauto de Dagon: spritesheet fornecida pelo criador (4 x 512×682).
+        // Carregada uma vez; ele não altera a orientação visual ao navegar.
+        this.load.spritesheet('dagon-animated', 'assets/v15/beast_dagon.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
         this.load.image('fx-dagon-eye', 'assets/abyss/dagon_eye.png');
         this.load.spritesheet('fx-cannon-charge', 'assets/fx/cannon_charge_sparks.png', {frameWidth:96,frameHeight:96,endFrame:4});
@@ -241,7 +245,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('v15-flagship', 'assets/v15/ship_flagship.png');
         this.load.image('v15-wrecked', 'assets/v15/ship_wrecked.png');
         this.load.image('v15-kraken', 'assets/v15/beast_kraken.png');
-        this.load.image('v15-dagon', 'assets/v15/dagon_emerging.webp');
+        // O novo Dagon usa exclusivamente a textura dagon-animated.
         this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
         this.load.image('v15-drowned', 'assets/v15/beast_drowned.png');
         // Original-resolution transparent serpent sheet: 4 frames, 512 × 565 px each.
@@ -692,19 +696,21 @@ class Game extends Phaser.Scene {
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
             enguia:'eel-swim', afogados:'foe-drowned', coral:'foe-coral',
-            caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'boss-dagon' })[type] || 'foe-sloop';
+            caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'dagon-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
         const v15Visuals = { patrulha:'v15-sloop', corsario:'v15-blood', ariete:'v15-ram',
             fragata:'v15-royal', bombardeiro:'v15-chapel', espectral:'v15-spectral',
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
-            nauabissal:'v15-merchant', kraken:'v15-kraken', dagon:'v15-dagon',
+            nauabissal:'v15-merchant', kraken:'v15-kraken', dagon:'dagon-animated',
             afogados:'v15-drowned', coral:'v15-coral' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
-        const sourceH = this.textures.get(tex).getSourceImage().height || 160;
+        const sourceH = type==='dagon' && tex==='dagon-animated' ? 682 :
+            (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const ship = this.add.image(pos.x, pos.y, tex, type==='enguia'?0:undefined)
+        const ship = this.add.image(pos.x, pos.y, tex,
+            (type==='enguia'||type==='dagon')?0:undefined)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
@@ -1089,6 +1095,15 @@ class Game extends Phaser.Scene {
             if(!near) {e.ship.setVisible(false);e.wake?.setVisible(false);if(e.bar)e.bar.setVisible(false);if(e.label)e.label.setVisible(false);continue;}
             e.ship.setVisible(true);e.wake?.setVisible(true);if(e.bar)e.bar.setVisible(true);if(e.label)e.label.setVisible(true);
             const pulse=Math.sin(t*(e.boss?2.35:3.4)+e.visualPhase);
+            if(e.type==='dagon' && e.ship.texture.key==='dagon-animated'){
+                // Quatro quadros em sequência, sem aplicar heading à imagem.
+                // Apenas a textura muda; IA, redemoinhos e conjurações continuam intactos.
+                const frame=Math.floor((t*4+e.visualPhase)%4);
+                if(e.dagonFrame!==frame){
+                    e.ship.setFrame(frame);
+                    e.dagonFrame=frame;
+                }
+            }
             if(e.type==='enguia' && e.ship.texture.key==='eel-swim'){
                 // This is a four-frame swim loop; animation never rotates the physics body.
                 const frame=Math.floor((t*5.5+e.visualPhase)%4);
