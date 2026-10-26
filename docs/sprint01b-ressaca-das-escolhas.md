@@ -28,6 +28,7 @@ Cada uma das três histórias existentes pode gerar um segundo ato, definido pel
 - A Carta distingue um **ECO POLÍTICO** conhecido e pendente; ao resolver a situação, a marca especial desaparece.
 - São permitidas até três continuações na viagem (uma por origem). **Não** existe geração recursiva de eventos.
 - A solução de um eco registra uma nova decisão na crônica, aplica consequências com os atributos já existentes e pode criar uma perseguição hostil da Corte ou do culto conforme a escolha.
+- Ao regressar ao Porto, a tela de resultados mostra a **crônica completa desta viagem** (até oito decisões, incluindo as consequências), sem gravar histórico permanente nos saves. O Diário durante o percurso mantém os três registros mais recentes.
 - Uma continuação não é repetível: uma única visita, uma única consequência, nenhuma forma de duplicar ouro, dano, radar ou perseguição.
 - Se todas as ilhas adequadas já foram visitadas ou estão reservadas para contratos, o eco **não** é criado, sem travar a expedição.
 - Nada disso persiste como reputação entre expedições: a reputação duradoura permanece escopo reservado ao Sprint 03.
