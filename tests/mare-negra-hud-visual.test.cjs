@@ -27,7 +27,7 @@ const {chromium}=require('playwright-core');
    await page.waitForFunction(()=>game.scene.isActive('Game')&&
      !!game.scene.getScene('Game').player,{timeout:20000});
    const mode=await page.evaluate(()=>SEA_DESKTOP);
-   assert.equal(mode,!isMobile,label+': device mode must match the simulated hardware');
+   assert.equal(mode,true,label+': 26/10 unified landscape canvas must be 1280x720 on all devices');
    // 3.8a.4 — the PNG used by the actual monster was cleaned, not
    // replaced by the lower-resolution legacy Coral Horror placeholder.
    const coral=await page.evaluate(()=>{
@@ -92,8 +92,8 @@ const {chromium}=require('playwright-core');
      return {hit,start,fired,velocity,cap,labelAtBurst,tooSoon,padFired,
        cooldown:SEA_IMPULSE.cooldown(0)};
    });
-   assert(dash.hit&&dash.hit.x===(isMobile?240:613)&&
-     dash.hit.y===(isMobile?616:77)&&dash.start&&dash.fired&&
+   assert(dash.hit&&dash.hit.x===1104&&
+     dash.hit.y===630&&dash.start&&dash.fired&&
      dash.velocity>0&&dash.velocity<=dash.cap+1&&
      dash.labelAtBurst.includes('ARRANCADA')&&!dash.tooSoon&&
      dash.padFired&&dash.cooldown===10,
@@ -183,13 +183,11 @@ const {chromium}=require('playwright-core');
      volley.kickVelocity>40&&volley.kick>8&&volley.hullLean>7,
      label+': recoil should be physically and visually noticeable '+JSON.stringify(volley));
    assert(before.quest.length>0&&before.badge.includes('MALDIÇÃO'));
-   assert.deepEqual(before.pause,{x:isMobile?412:454,y:78,w:120,h:40});
-   assert.equal(before.x,isMobile?338:1154);assert.equal(before.y,239);
-   if(isMobile){
-    assert.deepEqual(before.touch?.joystick,{x:106,y:702,radius:82});
-    assert.deepEqual(before.touch?.port,{x:342,y:702,radius:48});
-    assert.deepEqual(before.touch?.starboard,{x:432,y:702,radius:48});
-   }
+   assert.deepEqual(before.pause,{x:454,y:78,w:120,h:40});
+   assert.equal(before.x,1154);assert.equal(before.y,239);
+   assert.deepEqual(before.touch?.joystick,{x:140,y:576,radius:94});
+   assert.deepEqual(before.touch?.port,{x:1051,y:548,radius:48});
+   assert.deepEqual(before.touch?.starboard,{x:1158,y:548,radius:48});
    // 3.6k: validate deterministic sea cache inside a real running Phaser
    // scene and prove that same-tick draws make no redundant hash calls.
    const pixelCacheTest=await page.evaluate(()=>{
@@ -217,7 +215,7 @@ const {chromium}=require('playwright-core');
        pixel.seaFrame(scene,scene.seaPixelT);
      }
    });
-   const pointCount=isMobile?110:190;
+   const pointCount=190; // SEA_DESKTOP remains true in unified landscape mode
    assert.equal(pixelCacheTest.initial,3*pointCount+22);
    assert.equal(pixelCacheTest.stable,0);
    assert.equal(pixelCacheTest.changed,pointCount);
@@ -250,18 +248,15 @@ const {chromium}=require('playwright-core');
    assert(telemetry.text.includes('FX '),
      label+': enabled telemetry must display the FX budget');
    assert.equal(telemetry.depth,145);
-   assert.equal(telemetry.position.x,isMobile?240:640);
-   assert.equal(telemetry.position.y,isMobile?580:683);
-   assert(telemetry.box.x>=0&&
-     telemetry.box.x+telemetry.box.width<=(isMobile?480:1280),
-     label+': telemetry outside canvas width');
-   if(isMobile){
-     assert(telemetry.box.y+telemetry.box.height<620,
-       label+': telemetry overlaps joystick and cannon control panel');
-   }
+   assert.equal(telemetry.position.x,640);
+   assert.equal(telemetry.position.y,683);
+   assert(telemetry.box.x>=0&&telemetry.box.x+telemetry.box.width<=1280,
+     label+': telemetry outside landscape canvas width');
+   assert(telemetry.box.y+telemetry.box.height<=720,
+     label+': telemetry outside landscape canvas height');
    assert.equal(telemetry.save,profileBeforePerf);
    assert.equal(telemetry.preference,'1');
-   assert.deepEqual(telemetry.pause,{x:isMobile?412:454,y:78,w:120,h:40});
+   assert.deepEqual(telemetry.pause,{x:454,y:78,w:120,h:40});
    await page.screenshot({path:path.join('port-artifacts',
      'mare-negra-3-6g-'+label+'-fps.png'),fullPage:true});
    await page.keyboard.press('F3');
