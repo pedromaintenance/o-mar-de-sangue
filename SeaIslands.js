@@ -94,7 +94,7 @@ const SEA_ISLANDS = {
         // Three Banners site. Never treat the temporary ledger as reputation.
         const log=Array.isArray(s?.politicalEvents)?s.politicalEvents:[];
         if(log.length)return {
-            title:'CRÔNICA POLÍTICA · '+log.length+' DECISÃO'+(log.length===1?'':'ÕES'),
+            title:'CRÔNICA POLÍTICA · '+log.length+' '+(log.length===1?'DECISÃO':'DECISÕES'),
             detail:log.slice(-3).map(entry=>entry.text+' · '+entry.terms).join('\n'),
             agreed:true
         };
