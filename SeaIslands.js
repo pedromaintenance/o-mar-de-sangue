@@ -92,6 +92,12 @@ const SEA_ISLANDS = {
     politicalRecord(s) {
         // Before an encounter there is deliberately no hint of the hidden
         // Three Banners site. Never treat the temporary ledger as reputation.
+        const log=Array.isArray(s?.politicalEvents)?s.politicalEvents:[];
+        if(log.length)return {
+            title:'CRÔNICA POLÍTICA · '+log.length+' DECISÃO'+(log.length===1?'':'ÕES'),
+            detail:log.slice(-3).map(entry=>entry.text+' · '+entry.terms).join('\n'),
+            agreed:true
+        };
         const note=this.politicalNotes[s?.politicalChoice];
         return note ? { ...note, agreed:true } : {
             title:'REGISTRO POLÍTICO · NENHUM ACORDO',
@@ -112,6 +118,7 @@ const SEA_ISLANDS = {
         // Voyage-only narrative decision: intentionally not stored in SeaProfile.
         s.politicalLedger = { sobreviventes:0, corte:0, culto:0 };
         s.politicalChoice = null;
+        s.politicalEvents = []; // Crônica desta expedição, não reputação.
         s.anchorButton = s.add.rectangle(SEA_DESKTOP ? SEA_VIEW.width-123 : 240,
             SEA_DESKTOP ? 296 : 517,190,42,0x182321,.97)
             .setStrokeStyle(2,0xa58b64,.92).setScrollFactor(0).setDepth(190).setVisible(false);
@@ -208,6 +215,9 @@ const SEA_ISLANDS = {
             return result;
         }
         if(s.islandVisits.has(s.islandSelected.id))return false;
+        if(choice.politicalEvent && (typeof SEA_POLITICAL_EVENTS==='undefined' ||
+            !SEA_POLITICAL_EVENTS.encounter(s,s.islandSelected) ||
+            choice.politicalEvent!==s.islandSelected.politicalEventId))return false;
         if(choice.cost&&s.gold<choice.cost){
             s.islandError='OURO INSUFICIENTE PARA ESTA ESCOLHA';
             this.render(s);
@@ -272,7 +282,14 @@ const SEA_ISLANDS = {
         if(s.islandSelected.kind==='parley' && choice.faction){
             s.politicalLedger[choice.faction]=1;
             s.politicalChoice=choice.id;
+            s.politicalEvents.push({
+                eventId:'parley',choiceId:choice.id,faction:choice.faction,
+                text:'TRÊS BANDEIRAS: '+choice.name,
+                terms:changes.join(' · ')||'Acordo firmado'
+            });
         }
+        if(choice.politicalEvent && typeof SEA_POLITICAL_EVENTS!=='undefined')
+            SEA_POLITICAL_EVENTS.record(s,choice,changes);
         const result=changes.join('  ·  ')||'Os ventos mudaram.';
         s.islandOutcome=choice.outcome?choice.outcome+'\n'+result:result;
         s.lastDamageTime=s.time.now;
@@ -307,6 +324,8 @@ const SEA_ISLANDS = {
         const island=s.islandSelected;
         if(!island)return;
         const type=island.kind;
+        const event=typeof SEA_POLITICAL_EVENTS!=='undefined'?
+            SEA_POLITICAL_EVENTS.encounter(s,island):null;
         const x=SEA_VIEW.width/2,ymid=SEA_VIEW.height/2;
         const top=SEA_DESKTOP?30:62,width=SEA_DESKTOP?620:448,height=SEA_DESKTOP?650:668;
         const root=s.add.container(0,0).setScrollFactor(0).setDepth(430);
@@ -325,7 +344,7 @@ const SEA_ISLANDS = {
             fontFamily:'monospace',fontSize:SEA_DESKTOP?'15px':'11px',
             color:'#b89d78'
         }).setOrigin(.5));
-        root.add(s.add.text(x,top+68,this.titles[type],{
+        root.add(s.add.text(x,top+68,event?.title||this.titles[type],{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'29px':'22px',
             fontStyle:'bold',color:'#e6d0b2',align:'center',wordWrap:{width:width-35}
         }).setOrigin(.5));
@@ -334,7 +353,7 @@ const SEA_ISLANDS = {
             const sourceHeight=s.textures.get(asset).getSourceImage().height||256;
             root.add(s.add.image(x,top+161,asset).setScale((SEA_DESKTOP?146:129)/sourceHeight));
         }
-        root.add(s.add.text(x,top+262,this.lore[type],{
+        root.add(s.add.text(x,top+262,event?.lore||this.lore[type],{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',
             color:'#d6c6b7',align:'center',lineSpacing:5,wordWrap:{width:width-52}
         }).setOrigin(.5));
@@ -354,13 +373,13 @@ const SEA_ISLANDS = {
             }).setOrigin(.5));
         }else{
             const contractActions=typeof SEA_CONTRACTS!=='undefined'?SEA_CONTRACTS.options(s,island):null;
-            const actions=contractActions||this.choices[type];
+            const actions=contractActions||event?.choices||this.choices[type];
             root.add(s.add.text(x,top+328,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
                 fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#d68c86':'#aba99d'
             }).setOrigin(.5));
             for(let i=0;i<actions.length;i++){
                 const choice=actions[i];
-                const hint=type==='parley'&&choice.faction
+                const hint=(type==='parley'||event)&&choice.faction
                     ? '['+this.factionLabels[choice.faction]+'] '+choice.hint
                     : choice.hint;
                 this.screenButton(s,root,x,top+385+i*72,width-48,63,
