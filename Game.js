@@ -448,6 +448,7 @@ class Game extends Phaser.Scene {
         SEA_ISLANDS.init(this);
         SEA_ATLAS.init(this);
         SEA_CONTRACTS.init(this,this.contractId);
+        SEA_POLITICAL_EVENTS.init(this);
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
         this.createTouchControls();
@@ -1449,6 +1450,8 @@ class Game extends Phaser.Scene {
         this.updateShots(dt);
         if (this.sinking) return;
         SEA_CONTRACTS.update(this,dt);
+        if (this.ended) return;
+        SEA_POLITICAL_EVENTS.update(this);
         if (this.ended) return;
         this.collectTreasures(dt);
         this.progressBattle(dt);
