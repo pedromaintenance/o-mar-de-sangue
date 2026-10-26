@@ -1,0 +1,30 @@
+name: Dagon — original four-frame sprite
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - sw.js
+      - assets/v15/beast_dagon.png
+      - tests/dagon-four-frame.test.cjs
+      - .github/workflows/dagon-four-frame.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - sw.js
+      - assets/v15/beast_dagon.png
+      - tests/dagon-four-frame.test.cjs
+permissions:
+  contents: read
+jobs:
+  verify-art-and-animation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source and original sprite dimensions
+        run: |
+          node --check Game.js
+          node tests/dagon-four-frame.test.cjs
