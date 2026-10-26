@@ -17,13 +17,14 @@
 
 **Objetivo:** colocar narrativa e consequências políticas no núcleo da navegação. Incremento pequeno: três encontros políticos em ilhas já existentes, três decisões cada, recursos/ameaças perceptíveis e crônica da expedição no Diário do Capitão. Sem pontuação permanente de reputação neste sprint.
 
-- [ ] Encontro de refugiados perseguidos pela Corte, com proteção, delação ou informação de navegação.
-- [ ] Comboio de contrabando, com colaboração, denúncia ou recuperação de mapas.
-- [ ] Ritual kuo-toa, com resgate de prisioneiros, roubo de pólvora ou pacto sobrenatural.
-- [ ] Limite de frequência: no máximo uma ocorrência de cada encontro por expedição, sem repetição de prêmios nem interrupção constante da navegação.
-- [ ] Consequências imediatas explícitas e, quando indicado, perseguição hostil retardada após sair da ilha; crônica consultável na pausa.
-- [ ] Preservar contratos anteriores, combate, controles, offline, atlas e save funcional; compatibilidade histórica de saves não é requisito.
-- [ ] Testes de lógica/anti-replay, testes visuais, CI e inspeção no Pages; testes físicos só podem ser marcados como concluídos após execução real.
+- [x] Encontro de refugiados perseguidos pela Corte, com proteção, delação ou informação de navegação.
+- [x] Comboio de contrabando, com colaboração, denúncia ou recuperação de mapas.
+- [x] Ritual kuo-toa, com resgate de prisioneiros, roubo de pólvora ou pacto sobrenatural.
+- [x] Limite de frequência: no máximo uma ocorrência de cada encontro por expedição, sem repetição de prêmios nem interrupção constante da navegação.
+- [x] Consequências imediatas explícitas e, quando indicado, perseguição hostil retardada após sair da ilha; crônica consultável na pausa.
+- [x] Preservar contratos anteriores, combate, controles, offline, atlas e save funcional; compatibilidade histórica de saves não é requisito.
+- [x] Testes de lógica/anti-replay e CI Node para os três eventos; [especificação técnica](docs/sprint01-ecos-da-mare.md).
+- [ ] Aprovar testes visuais/Chromium do PR, integrar à `main`, conferir a atualização publicada no Pages. Testes físicos Android/Xbox continuam pendentes e exigem execução real.
 
 
 **Responsabilidade:** itens marcados como planejados são propostas; ainda não foram implementados ou aprovados como recursos.
