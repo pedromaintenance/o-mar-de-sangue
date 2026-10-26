@@ -61,10 +61,14 @@ const {chromium}=require('playwright-core');
      assert.deepEqual(result.eelSource,{width:2048,height:565});
      assert(result.frameCount>=5,'Phaser frame count includes base+4 animation frames');
      assert.deepEqual(result.frameSize,{w:512,h:565});
-     assert(Math.abs(result.eelRotation-Math.PI)<.001);
-     assert(Math.abs(result.ramRotation-Math.PI)<.001);
-     assert(Math.abs(result.eelQuarter-1.5*Math.PI)<.001);
-     assert(Math.abs(result.ramQuarter-1.5*Math.PI)<.001);
+     // Phaser wraps rotations into [-PI, PI]; compare cyclic angles.
+     const angularError=(actual,target)=>Math.abs(Math.atan2(
+       Math.sin(actual-target),Math.cos(actual-target)));
+     console.log('Asset rotations:',JSON.stringify(result));
+     assert(angularError(result.eelRotation,Math.PI)<.001);
+     assert(angularError(result.ramRotation,Math.PI)<.001);
+     assert(angularError(result.eelQuarter,1.5*Math.PI)<.001);
+     assert(angularError(result.ramQuarter,1.5*Math.PI)<.001);
      assert.equal(result.eelHeadingAfter,Math.PI/2);
      assert.equal(result.ramHeadingAfter,Math.PI/2);
      assert(new Set(result.eelFrames.map(String)).size>=3,
