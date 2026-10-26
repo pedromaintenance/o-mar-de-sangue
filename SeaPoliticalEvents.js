@@ -167,7 +167,7 @@ const SEA_POLITICAL_EVENTS = {
     },
     echoEncounter(s,island) {
         const data=island?.politicalEcho;
-        if(!data||s.islandVisits?.has(island.id))return null;
+        if(!data)return null;
         const group=this.echoes[data.source];
         const echo=group?.[data.originalChoice];
         if(!echo||island.kind!==group.kind)return null;
@@ -205,7 +205,8 @@ const SEA_POLITICAL_EVENTS = {
     },
     resolveEcho(s,choice,changes) {
         const site=s.islandSelected,echo=this.echoEncounter(s,site);
-        if(!echo||choice.politicalEcho!==site.politicalEcho.source||
+        if(!echo||site.politicalEcho.resolved||
+           choice.politicalEcho!==site.politicalEcho.source||
             !echo.choices.some(c=>c.id===choice.id))return false;
         s.politicalEvents.push({
             eventId:'echo:'+site.politicalEcho.source,choiceId:choice.id,
@@ -215,7 +216,7 @@ const SEA_POLITICAL_EVENTS = {
         if(choice.pursuit)this.pursue(s,choice.pursuit);
         // A resolved rumor should no longer dominate the navigator's waypoint.
         if(s.chartWaypointId===site.id)s.chartWaypointId=null;
-        delete site.politicalEcho;
+        site.politicalEcho.resolved=true;
         return true;
     },
     pursue(s,type) {
