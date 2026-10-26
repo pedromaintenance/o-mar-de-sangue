@@ -13,7 +13,7 @@ const {chromium}=require('playwright-core');
  try{
   for(const [label,width,height,isMobile] of [
     ['wide',1600,900,false],['desktop',1280,720,false],
-    ['android',390,844,true]]){
+    ['android-landscape',844,390,true]]){
    const page=await browser.newPage({
      viewport:{width,height},deviceScaleFactor:1,isMobile,hasTouch:isMobile,
      userAgent:isMobile?
