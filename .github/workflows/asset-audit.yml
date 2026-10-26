@@ -42,3 +42,9 @@ jobs:
           trap 'kill $SERVER_PID' EXIT
           sleep 2
           node tests/asset-audit-visual.test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: asset-audit-screenshots
+          path: port-artifacts/audit-*.png
+          if-no-files-found: ignore
