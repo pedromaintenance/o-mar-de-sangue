@@ -83,6 +83,19 @@ const {chromium}=require('playwright-core');
    assert(diary.labels.some(s=>s.includes('CONSEQUÊNCIA:')));
    await page.screenshot({path:path.join('port-artifacts',
      'sprint01b-'+label+'-six-decisions.png'),fullPage:true});
+   await page.evaluate(()=>{
+     const s=game.scene.getScene('Game');
+     s.toggleCaptainMenu();
+     s.finish(false,true);
+   });
+   await page.locator('.port-chronicle li').first().waitFor({timeout:15000});
+   assert.equal(await page.locator('.port-chronicle li').count(),6,
+     'All six choices must survive the return to port as a voyage result');
+   assert(await page.locator('.port-chronicle').textContent().then(t=>
+     t.includes('CONSEQUÊNCIA')&&t.includes('REFUGIADOS:')),
+     'Port needs the first act and the later consequences');
+   await page.screenshot({path:path.join('port-artifacts',
+     'sprint01b-'+label+'-port-chronicle.png'),fullPage:true});
    if(errors.length)throw Error(label+' Phaser errors: '+errors.join(' | '));
    await page.close();
    console.log('PASS political follow-up Phaser '+label);
