@@ -58,6 +58,11 @@ on:
       - 'SeaCannonChargeFx.js'
       - 'assets/fx/cannon_charge_sparks.png'
       - 'assets/v15/beast_coral.png'
+      - 'assets/v15/beast_eel_swim.webp'
+      - 'assets/v15/beast_eel.png'
+      - 'assets/abyss/abyss_eel.png'
+      - 'tests/eel-sprite-orientation.test.cjs'
+      - 'tests/eel-sprite-visual.test.cjs'
       - 'tests/coral-asset-3-8a4.test.cjs'
       - 'tests/gunnery-windup-3-8a.test.cjs'
       - 'tests/gunnery-single-shot-3-8a1.test.cjs'
@@ -126,6 +131,11 @@ on:
       - 'SeaCannonChargeFx.js'
       - 'assets/fx/cannon_charge_sparks.png'
       - 'assets/v15/beast_coral.png'
+      - 'assets/v15/beast_eel_swim.webp'
+      - 'assets/v15/beast_eel.png'
+      - 'assets/abyss/abyss_eel.png'
+      - 'tests/eel-sprite-orientation.test.cjs'
+      - 'tests/eel-sprite-visual.test.cjs'
       - 'tests/coral-asset-3-8a4.test.cjs'
       - 'tests/gunnery-windup-3-8a.test.cjs'
       - 'tests/gunnery-single-shot-3-8a1.test.cjs'
@@ -195,6 +205,7 @@ jobs:
           node tests/cannon-charge-sparks-3-8a3.test.cjs
           node tests/cannon-sparks-luminous-3-8a5.test.cjs
           node tests/coral-asset-3-8a4.test.cjs
+          node tests/eel-sprite-orientation.test.cjs
   port-visual:
     runs-on: ubuntu-latest
     steps:
@@ -220,6 +231,7 @@ jobs:
           node tests/atlas-chart-visual.test.cjs
           node tests/hunt-contract-visual-3-7a3.test.cjs
           node tests/pwa-offline-visual.test.cjs
+          node tests/eel-sprite-visual.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
