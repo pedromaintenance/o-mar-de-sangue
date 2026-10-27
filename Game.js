@@ -480,10 +480,8 @@ class Game extends Phaser.Scene {
         // Primeira aparição garantida no roteiro; depois entra no conjunto aleatório.
         if (this.mode === 'mission' && this.stage === 7) this.spawnEnemy('recife', 720);
         // Só existe um tentáculo errante no mar aberto; ele guarda o encontro com o Kraken.
-        if (this.mode === 'sandbox' && !this.contractId) {
-            this.spawnEnemy('tentaculo', 1000);
-            this.spawnEnemy('olho_dagon', 1250);
-        }
+        if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('tentaculo', 1000);
+        if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('olho_dagon', 1250);
         if (this.objective === 'boss') {
             const bossTypes = ['almirante','kraken','dagon','nauabissal'];
             this.missionBoss = bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
@@ -1878,7 +1876,7 @@ class Game extends Phaser.Scene {
             // esteira e ataques continuam sem alterações.
             const artFacesDown=e.type==='enguia'||e.type==='coral'||e.type==='recife'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
-            e.ship.setPosition(e.x,e.y).setRotation((e.type==='dagon'||e.type==='olho_dagon')?0:
+            e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:e.type==='olho_dagon'?0:
                 e.heading+(artFacesDown?Math.PI:0));
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
