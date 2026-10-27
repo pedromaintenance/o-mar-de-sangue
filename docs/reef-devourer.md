@@ -5,8 +5,8 @@ O jogo carregava `assets/abyss/coral_horror.png` em `foe-coral`, mas no mapeamen
 
 ## Nova criatura
 - ID do inimigo: **`recife`**; nome: **Recife Devorador**.
-- Asset canônico: `assets/abyss/coral_horror.png`, substituído pelo PNG enviado **sem qualquer modificação**, RGBA 2048×682, quatro quadros 512×682 a 4 FPS.
-- SHA-256 do original: `f1702259836c17771d3de50c28acdd35ba915fd858bb5cef5b0ef323540b3431`.
+- Asset canônico: `assets/abyss/coral_horror.png`, substituído pelo PNG corrigido enviado em 27/10/2026 **sem qualquer modificação**, RGBA 2048×682, quatro quadros 512×682 a 4 FPS.
+- SHA-256 do original: `9e66dc99d52f52893f5dcf2f9ed090781db795508d02b3c0d544127091ba12e5`.
 - Textura Phaser independente `reef-devourer-animated`, com orientação de boca na parte inferior do sprite: correção visual +PI sem mudar o heading físico.
 - HP 198; velocidade 72; ataque 27; recompensa base 90; raio 89; massa 2,45; cooldown de ataque 3100 ms. Monstro robusto de perseguição e investida corpo a corpo.
 - O Horror de Coral V15 (`coral`) continua com seus próprios atributos e `coral-animated`, sem mudanças.
@@ -17,4 +17,4 @@ O jogo carregava `assets/abyss/coral_horror.png` em `foe-coral`, mas no mapeamen
 - Os chefes, as missões do Kraken e o tentáculo sentinela não são alterados.
 
 ## Verificações
-Teste de integridade do arquivo, registro independente, quadros, loop visual, aparição nas modalidades, preservação do Coral V15 e cache PWA **v80**.
+Teste de integridade do arquivo, registro independente, quadros, loop visual, aparição nas modalidades, preservação do Coral V15 e cache PWA **v81**.

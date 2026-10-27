@@ -14,7 +14,7 @@ assert.equal(png.readUInt32BE(16),2048,'four original 512px horizontal frames');
 assert.equal(png.readUInt32BE(20),682,'original frame height');
 assert.deepEqual([...png.subarray(24,29)],[8,6,0,0,0],'RGBA8');
 assert.equal(crypto.createHash('sha256').update(png).digest('hex'),
- 'f1702259836c17771d3de50c28acdd35ba915fd858bb5cef5b0ef323540b3431',
+ '9e66dc99d52f52893f5dcf2f9ed090781db795508d02b3c0d544127091ba12e5',
  'Never overwrite or reprocess the uploaded original');
 const original=fs.readFileSync('assets/v15/beast_coral.png');
 assert.equal(crypto.createHash('sha256').update(original).digest('hex'),
