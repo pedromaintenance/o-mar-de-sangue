@@ -253,7 +253,11 @@ class SeaBoot extends Phaser.Scene {
         this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp', {
             frameWidth:512, frameHeight:565, endFrame:3
         });
-        this.load.image('v15-coral', 'assets/v15/beast_coral.png');
+        // Horror de Coral: quatro quadros horizontais do original (512 × 682 cada).
+        // A PROA fica embaixo no desenho; paintEnemies alinha somente a arte.
+        this.load.spritesheet('coral-animated', 'assets/v15/beast_coral.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         this.load.image('v15-fx-0', 'assets/v15/fx_frame_00.png');
         this.load.image('v15-fx-1', 'assets/v15/fx_frame_01.png');
         this.load.image('v15-fx-2', 'assets/v15/fx_frame_02.png');
@@ -695,7 +699,7 @@ class Game extends Phaser.Scene {
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
-            enguia:'eel-swim', afogados:'foe-drowned', coral:'foe-coral',
+            enguia:'eel-swim', afogados:'foe-drowned', coral:'coral-animated',
             caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'dagon-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
@@ -703,15 +707,18 @@ class Game extends Phaser.Scene {
             fragata:'v15-royal', bombardeiro:'v15-chapel', espectral:'v15-spectral',
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
             nauabissal:'v15-merchant', kraken:'v15-kraken', dagon:'dagon-animated',
-            afogados:'v15-drowned', coral:'v15-coral' };
+            afogados:'v15-drowned', coral:'coral-animated' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
-        const sourceH = type==='dagon' && tex==='dagon-animated' ? 682 :
+        // Spritesheet source height is ONE frame; four frames are side by side.
+        const animated682 = (type==='dagon' && tex==='dagon-animated') ||
+            (type==='coral' && tex==='coral-animated');
+        const sourceH = animated682 ? 682 :
             (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const dagonInitialFrame=type==='dagon'?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='coral')?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
-            type==='enguia'?0:dagonInitialFrame)
+            type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
@@ -1104,6 +1111,11 @@ class Game extends Phaser.Scene {
                     e.ship.setFrame(frame);
                     e.dagonFrame=frame;
                 }
+            }
+            if(e.type==='coral' && e.ship.texture.key==='coral-animated'){
+                // Coral pulsa em quatro quadros, sem modificar colisões, IA ou rumo.
+                const frame=Math.floor((t*4+e.visualPhase)%4);
+                if(e.coralFrame!==frame){e.ship.setFrame(frame);e.coralFrame=frame;}
             }
             if(e.type==='enguia' && e.ship.texture.key==='eel-swim'){
                 // This is a four-frame swim loop; animation never rotates the physics body.
@@ -1632,10 +1644,10 @@ class Game extends Phaser.Scene {
             // O Dagon emerge da água: seu horizonte permanece horizontal.
             // A direção de ataque e a física continuam usando e.heading.
             // Gameplay headings are measured from image-UP (0°).
-            // The new eel and the V15 ram ship are drawn with the HEAD/BOW
-            // at image-BOTTOM. Turn ONLY these render sprites 180°; physics,
-            // charges, collision normals, wake and heading remain untouched.
-            const artFacesDown=e.type==='enguia'||
+            // Enguia, Horror de Coral e aríete V15 têm PROA na parte inferior
+            // da arte. Somente o sprite recebe +PI; física, rumo, colisões,
+            // esteira e ataques continuam sem alterações.
+            const artFacesDown=e.type==='enguia'||e.type==='coral'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
             e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:
                 e.heading+(artFacesDown?Math.PI:0));

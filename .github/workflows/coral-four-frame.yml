@@ -1,0 +1,32 @@
+name: Coral Horror — original four-frame sprite
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - sw.js
+      - assets/v15/beast_coral.png
+      - tests/coral-asset-3-8a4.test.cjs
+      - .github/workflows/coral-four-frame.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - sw.js
+      - assets/v15/beast_coral.png
+      - tests/coral-asset-3-8a4.test.cjs
+permissions:
+  contents: read
+jobs:
+  coral-asset-and-orientation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check Game.js
+          node tests/coral-asset-3-8a4.test.cjs
+          node tests/eel-sprite-orientation.test.cjs
+          node tests/dagon-four-frame.test.cjs
+          node tests/pwa-cache-contract.test.cjs
