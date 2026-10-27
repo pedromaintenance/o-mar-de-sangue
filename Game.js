@@ -247,7 +247,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('v15-kraken', 'assets/v15/beast_kraken.png');
         // O novo Dagon usa exclusivamente a textura dagon-animated.
         this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
-        this.load.image('v15-drowned', 'assets/v15/beast_drowned.png');
+        // Cortejo dos Afogados original: quatro quadros lado a lado, 512×682 cada.
+        this.load.spritesheet('v15-drowned', 'assets/v15/beast_drowned.png', {
+            frameWidth:512,frameHeight:682,endFrame:3
+        });
         // Original-resolution transparent serpent sheet: 4 frames, 512 × 565 px each.
         // Its head is at the BOTTOM: paintEnemies offsets its artwork by 180 degrees.
         this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp', {
@@ -710,8 +713,9 @@ class Game extends Phaser.Scene {
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
         const dagonInitialFrame=type==='dagon'?0:undefined;
+        const drownedInitialFrame=type==='afogados'?0:dagonInitialFrame;
         const ship = this.add.image(pos.x, pos.y, tex,
-            type==='enguia'?0:dagonInitialFrame)
+            type==='enguia'?0:drownedInitialFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
             cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
@@ -1103,6 +1107,15 @@ class Game extends Phaser.Scene {
                 if(e.dagonFrame!==frame){
                     e.ship.setFrame(frame);
                     e.dagonFrame=frame;
+                }
+            }
+            if(e.type==='afogados' && e.ship.texture.key==='v15-drowned'){
+                // Alterne a ilustração sem mudar a IA, rotação, colisões ou
+                // transparência espectral já aplicadas aos Afogados.
+                const frame=Math.floor((t*4.2+e.visualPhase)%4);
+                if(e.drownedFrame!==frame){
+                    e.ship.setFrame(frame);
+                    e.drownedFrame=frame;
                 }
             }
             if(e.type==='enguia' && e.ship.texture.key==='eel-swim'){
