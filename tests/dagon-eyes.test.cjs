@@ -1,0 +1,27 @@
+/* Dagon Eyes: original art, emergence, projectiles, curse and sandbox boss. */
+'use strict';
+const fs=require('node:fs'), assert=require('node:assert/strict'), crypto=require('node:crypto'), vm=require('node:vm');
+const png=fs.readFileSync('assets/abyss/dagon_eye.png');
+assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+assert.equal(png.readUInt32BE(16),2048);
+assert.equal(png.readUInt32BE(20),682);
+assert.equal(crypto.createHash('sha256').update(png).digest('hex'),'e2da0569020b4a54bd38626723488ad7ce23a0dcef102b4b992ce689ab22cd0a');
+const game=fs.readFileSync('Game.js','utf8');new vm.Script(game);
+assert(game.includes("this.load.spritesheet('dagon-eye-animated', 'assets/abyss/dagon_eye.png'"));
+assert(game.includes("frameWidth:512,frameHeight:682,endFrame:3"));
+assert(game.includes("olho_dagon: { name: 'Olho de Dagon'"));
+assert(game.includes("if(type==='dagon') this.spawnDagonEyes(3)"));
+assert(game.includes("{fromDagon:true}"));
+assert(game.includes("e.eyeHidden=frame<2"));
+assert(game.includes("this.dagonEyeFire(e,distance)"));
+assert(game.includes("shot.dagonEyeCurse=25"));
+assert(game.includes("this.curse=Math.min(100,(this.curse||0)+p.dagonEyeCurse)"));
+assert(game.includes("this.summonSandboxDagon(e)"));
+assert(game.includes("this.spawnEnemy('dagon',640,{fromEye:true})"));
+assert(game.includes("this.mode === 'sandbox' && type === 'dagon' && !options.fromEye"));
+assert(game.includes("this.spawnEnemy('olho_dagon', 1250)"));
+assert(game.includes("(e.type==='dagon'||e.type==='olho_dagon')?0:"));
+const sw=fs.readFileSync('sw.js','utf8');
+assert(sw.includes('"./assets/abyss/dagon_eye.png"'));
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=82);
+console.log('PASS Dagon eyes original 2048x682, 4 frames, fixed facing, curse +25 and sandbox summons');
