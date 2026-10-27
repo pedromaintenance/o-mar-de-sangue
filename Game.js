@@ -109,6 +109,7 @@ const SEA_FOES = {
     enguia: { name: 'Enguia das Profundezas', hp: 77, speed: 183, atk: 16, reward: 39, radius: 52, mass: .78, range: 168, cooldown: 2500, pattern: 'chase' },
     afogados: { name: 'Cortejo dos Afogados', hp: 100, speed: 125, atk: 18, reward: 53, radius: 60, mass: .91, range: 335, cooldown: 1900, pattern: 'flank' },
     coral: { name: 'Horror de Coral', hp: 143, speed: 64, atk: 22, reward: 62, radius: 76, mass: 1.65, range: 480, cooldown: 2250, pattern: 'sniper' },
+    recife: { name: 'Recife Devorador', hp: 198, speed: 72, atk: 27, reward: 90, radius: 89, mass: 2.45, range: 145, cooldown: 3100, pattern: 'ram' },
     caranguejo: { name: 'Guardião Caranguejo', hp: 196, speed: 92, atk: 22, reward: 75, radius: 84, mass: 2.8, range: 145, cooldown: 5000, pattern: 'ram' },
     tartaruga: { name: 'Templo-Tartaruga', hp: 268, speed: 58, atk: 28, reward: 109, radius: 102, mass: 3.6, range: 445, cooldown: 2400, pattern: 'broadside' },
     tentaculo: { name: 'Tentáculo Errante', hp: 145, speed: 95, atk: 20, reward: 64, radius: 73, mass: 2.2, range: 185, cooldown: 3250, pattern: 'tentacle' },
@@ -223,7 +224,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-cult', 'assets/abyss/cult_barge.png');
         this.load.image('foe-dreadnought', 'assets/abyss/dreadnought.png');
         this.load.image('foe-drowned', 'assets/abyss/drowned_choir.png');
-        this.load.image('foe-coral', 'assets/abyss/coral_horror.png');
+        // Recife Devorador: novo monstro, independente do Horror de Coral V15.
+        this.load.spritesheet('reef-devourer-animated', 'assets/abyss/coral_horror.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
         this.load.image('foe-turtle', 'assets/abyss/temple_turtle.png');
         this.load.image('boss-kraken', 'assets/abyss/kraken.png');
@@ -470,6 +474,8 @@ class Game extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, .095, .095);
         const startingFoes = this.mode === 'mission' ? (this.objective === 'boss' ? 5 : 7) : 6;
         for (let i = 0; i < startingFoes; i++) this.spawnEnemy(this.chooseFoe(i), 430 + i * 95);
+        // Primeira aparição garantida no roteiro; depois entra no conjunto aleatório.
+        if (this.mode === 'mission' && this.stage === 7) this.spawnEnemy('recife', 720);
         // Só existe um tentáculo errante no mar aberto; ele guarda o encontro com o Kraken.
         if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('tentaculo', 1000);
         if (this.objective === 'boss') {
@@ -710,6 +716,7 @@ class Game extends Phaser.Scene {
         if (rank >= 4) pool.push('espectral','afogados');
         if (rank >= 5) pool.push('cultista');
         if (rank >= 6) pool.push('galeao','coral');
+        if (rank >= 7) pool.push('recife');
         if (rank >= 8) pool.push('caranguejo');
         if (rank >= 10) pool.push('tartaruga');
         return pool[(Math.floor(Math.random() * pool.length) + (seed % 2)) % pool.length];
@@ -758,7 +765,7 @@ class Game extends Phaser.Scene {
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
-            enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated',
+            enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated',
             caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
@@ -766,19 +773,20 @@ class Game extends Phaser.Scene {
             fragata:'v15-royal', bombardeiro:'v15-chapel', espectral:'v15-spectral',
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
             nauabissal:'v15-merchant', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated',
-            afogados:'drowned-animated', coral:'coral-animated' };
+            afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='dagon' && tex==='dagon-animated') ||
             (type==='coral' && tex==='coral-animated') ||
+            (type==='recife' && tex==='reef-devourer-animated') ||
             (type==='afogados' && tex==='drowned-animated') ||
             (type==='kraken' && tex==='kraken-animated') ||
             (type==='tentaculo' && tex==='tentacle-animated');
         const sourceH = animated682 ? 682 :
             (this.textures.get(tex).getSourceImage().height || 160);
-        const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','tentaculo','kraken','dagon'].includes(type);
+        const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='afogados'||type==='kraken'||type==='tentaculo')?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo')?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -1194,6 +1202,11 @@ class Game extends Phaser.Scene {
                 // Quatro quadros animados, sem mudar rotação, colisões, IA ou ataques.
                 const frame=Math.floor((t*4+e.visualPhase)%4);
                 if(e.drownedFrame!==frame){e.ship.setFrame(frame);e.drownedFrame=frame;}
+            }
+            if(e.type==='recife' && e.ship.texture.key==='reef-devourer-animated'){
+                // Boca, tentáculos e bolhas da criatura independente, sem afetar a física.
+                const frame=Math.floor((t*4+e.visualPhase)%4);
+                if(e.reefFrame!==frame){e.ship.setFrame(frame);e.reefFrame=frame;}
             }
             if(e.type==='coral' && e.ship.texture.key==='coral-animated'){
                 // Coral pulsa em quatro quadros, sem modificar colisões, IA ou rumo.
@@ -1899,6 +1912,8 @@ class Game extends Phaser.Scene {
                 this.waveClock -= 52; this.wave++; this.currentDifficulty = this.wave;
                 this.shipHP = Math.min(this.maxShipHP, this.shipHP + Math.max(8, this.maxShipHP * .10));
                 this.announce(`ONDA ${this.wave} · AS SOMBRAS SE FORTALECEM`);
+                // A estreia no sandbox é garantida na onda 3, com encontros aleatórios depois.
+                if (this.wave === 3) this.spawnEnemy('recife', 610);
                 if (this.wave % 5 === 0) {
                     const bosses=['almirante','dagon','nauabissal'];
                     const selected=bosses[(this.wave / 5 - 1) % bosses.length];

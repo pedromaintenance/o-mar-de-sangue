@@ -1,0 +1,34 @@
+name: Reef Devourer — four-frame independent coral monster
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - sw.js
+      - assets/abyss/coral_horror.png
+      - tests/reef-devourer-four-frame.test.cjs
+      - .github/workflows/reef-devourer.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - sw.js
+      - assets/abyss/coral_horror.png
+      - tests/reef-devourer-four-frame.test.cjs
+permissions:
+  contents: read
+jobs:
+  reef-monster-and-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check Game.js
+          node tests/reef-devourer-four-frame.test.cjs
+          node tests/coral-asset-3-8a4.test.cjs
+          node tests/kraken-rebirth-cycle.test.cjs
+          node tests/tentacle-kraken-events.test.cjs
+          node tests/spinning-coin-eight-frame.test.cjs
+          node tests/pwa-cache-contract.test.cjs
