@@ -90,7 +90,7 @@ const SEA_PIXEL = {
     const storm=scene.seaEvent==='storm';
     const fog=scene.seaEvent==='fog';
     const cursed=scene.curse>=65;
-    const count=scene.seaV3Active?(SEA_DESKTOP?64:36):(SEA_DESKTOP?190:110);
+    const count=SEA_DESKTOP?190:110;
     // Pixel locations are deterministic for a given viewport; recomputing
     // their hashes every paint cannot move the sea. Keep the cache local to
     // the Phaser scene and invalidate it on viewport/count changes.

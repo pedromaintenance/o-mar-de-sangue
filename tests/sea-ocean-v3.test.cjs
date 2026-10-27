@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const src=fs.readFileSync('SeaOceanV3.js','utf8');
 function exercise(desktop){
- const ctx={SEA_DESKTOP:desktop,SEA_VIEW:{width:desktop?1280:480,height:desktop?720:800},Phaser:{Textures:{FilterMode:{NEAREST:'nearest'}}}};
+ const ctx={SEA_DESKTOP:true,SEA_TOUCH:!desktop,SEA_VIEW:{width:desktop?1280:480,height:desktop?720:800},Phaser:{Textures:{FilterMode:{NEAREST:'nearest'}}}};
  vm.createContext(ctx);vm.runInContext(src+';this.ocean=SEA_OCEAN_V3;',ctx);const ocean=ctx.ocean;
  const requests=[],textures={};
  const scene={game:{renderer:desktop?{gl:{MAX_TEXTURE_SIZE:4096,getParameter(){return 4096}}}:{}},

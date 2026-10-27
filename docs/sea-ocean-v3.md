@@ -13,7 +13,7 @@ A água agora vem dos pacotes **`mar_de_sangue_agua_v3_escura_chunks_1024`** e *
 ## Integração
 
 - `SeaOceanV3.js` cria uma malha reciclável ancorada nas coordenadas do mundo. A ordem de chunks é determinística, independente da câmera, da fase e da sessão.
-- No desktop com WebGL e textura máxima de pelo menos 4096, carrega **4 atlas animados**; todos usam o mesmo quadro, a cada 160 ms.
+- Em dispositivos sem toque com WebGL e textura máxima de pelo menos 4096, carrega **4 atlas animados**; todos usam o mesmo quadro, a cada 160 ms.
 - Em celular, Canvas ou GPU mais limitada, usa **4 WebP estáticos** e mantém o movimento das camadas sutis de espuma/névoa. Isso economiza memória gráfica e preserva resposta dos controles.
 - Carregamento com fallback: se faltar um dos quatro arquivos, o jogo usa as texturas antigas, sem afetar movimentação, IA, colisões, inimigos e salvamentos.
 - `sw.js` precacheia somente os WebP estáticos e o código; os atlas maiores entram no cache em tempo de execução quando de fato carregados.

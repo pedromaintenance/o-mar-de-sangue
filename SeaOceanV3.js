@@ -20,7 +20,7 @@ const SEA_OCEAN_V3 = {
     preload(scene) {
         const gl = scene.game?.renderer?.gl;
         const maxTexture = gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 0;
-        this.animated = !!SEA_DESKTOP && !!gl && maxTexture >= 4096;
+        this.animated = !SEA_TOUCH && !!gl && maxTexture >= 4096;
         for (let i = 1; i <= 4; i++) {
             const path = 'assets/tiles/sea-v3/sea_chunk_0'+i+'_';
             if (this.animated) {
