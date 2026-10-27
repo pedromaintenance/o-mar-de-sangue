@@ -747,8 +747,8 @@ class Game extends Phaser.Scene {
         if (this.mode === 'sandbox' && type === 'kraken' && !options.fromTentacle) return null;
         if (this.mode === 'sandbox' && type === 'dagon' && !options.fromEye) return null;
         if (this.mode === 'sandbox' && type === 'olho_dagon' &&
-            (this.contractId || this.sandboxDagonTriggered ||
-            this.enemies.some(e => !e.dead && e.sandboxDagonEye))) return null;
+            (!options.fromDagon && (this.contractId || this.sandboxDagonTriggered ||
+            this.enemies.some(e => !e.dead && e.sandboxDagonEye)))) return null;
         if (this.mode === 'sandbox' && type === 'tentaculo' &&
             (this.contractId || this.sandboxKrakenTriggered ||
             this.enemies.some(e => !e.dead && e.sandboxSentinel))) return null;
@@ -810,7 +810,7 @@ class Game extends Phaser.Scene {
             lastRockContact: -1000, lastRamming: -1000, specialPhase: 0, dead: false,
             maxRange: f.range, cooldownBase: f.cooldown, pattern: f.pattern, elite, boss: elite, bar: null };
         enemy.sandboxSentinel = this.mode==='sandbox' && type==='tentaculo';
-        enemy.sandboxDagonEye = this.mode==='sandbox' && type==='olho_dagon';
+        enemy.sandboxDagonEye = this.mode==='sandbox' && type==='olho_dagon' && !options.fromDagon;
         if(type==='olho_dagon') {enemy.eyeBornAt=this.elapsed;enemy.eyeHidden=true;enemy.eyeFrame=0;}
         enemy.spriteScale = ship.scaleX;
         enemy.visualPhase = id * 1.39;
@@ -1448,6 +1448,7 @@ class Game extends Phaser.Scene {
             // Abalroar o tentáculo é atacá-lo; sofrer seu impacto é ser atingido.
             if (enemy.sandboxSentinel) this.summonSandboxKraken(enemy);
             if (enemy.sandboxDagonEye) this.summonSandboxDagon(enemy);
+            if (enemy.type==='olho_dagon' && playerHit) this.curse=Math.min(100,(this.curse||0)+25);
             this.impactFX(hitX, hitY, closingSpeed,
                 `ABALROAMENTO -${playerHit ? Math.round(pd * (1 - this.shipStats.ramProtection)) : 0} / -${Math.round(ed * this.shipStats.ramDamage)}`);
             if (enemy.hp <= 0) this.sinkEnemy(enemy, true);
@@ -1638,9 +1639,10 @@ class Game extends Phaser.Scene {
         SEA_ISLANDS.update(this,dt);
         for (let i = 0; i < this.enemies.length; i++) {
             const e = this.enemies[i]; if (e.dead) continue;
-            this.collideShips(this.playerHull, e);
+            if(!(e.type==='olho_dagon' && e.eyeHidden))this.collideShips(this.playerHull, e);
             if (this.ended) break;
-            for (let j = i + 1; j < this.enemies.length; j++) if (!this.enemies[j].dead) this.collideShips(e, this.enemies[j]);
+            for (let j = i + 1; j < this.enemies.length; j++) if (!this.enemies[j].dead && !(e.type==='olho_dagon'&&e.eyeHidden) &&
+                !(this.enemies[j].type==='olho_dagon'&&this.enemies[j].eyeHidden)) this.collideShips(e, this.enemies[j]);
         }
         if (this.ended || this.sinking) return;
         this.speed = Math.round(this.playerVelocity.x * faceX + this.playerVelocity.y * faceY);
@@ -1768,7 +1770,7 @@ class Game extends Phaser.Scene {
         if (distance < 840) SEA_AUDIO.play('enemy', e.boss ? .8 : .46, distance);
     }
     spawnDagonEyes(count=3) {
-        for(let i=0;i<count;i++)this.spawnEnemy('olho_dagon',440+i*115);
+        for(let i=0;i<count;i++)this.spawnEnemy('olho_dagon',440+i*115,{fromDagon:true});
     }
     summonSandboxDagon(eye) {
         if(this.mode!=='sandbox'||this.contractId||!eye?.sandboxDagonEye||
