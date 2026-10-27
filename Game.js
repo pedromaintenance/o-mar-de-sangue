@@ -114,6 +114,7 @@ const SEA_FOES = {
     tartaruga: { name: 'Templo-Tartaruga', hp: 268, speed: 58, atk: 28, reward: 109, radius: 102, mass: 3.6, range: 445, cooldown: 2400, pattern: 'broadside' },
     tentaculo: { name: 'Tentáculo Errante', hp: 145, speed: 95, atk: 20, reward: 64, radius: 73, mass: 2.2, range: 185, cooldown: 3250, pattern: 'tentacle' },
     kraken: { name: 'KRAKEN — O Abismo Desperta', hp: 690, speed: 61, atk: 53, reward: 380, radius: 166, mass: 7.5, range: 380, cooldown: 2750, pattern: 'tentacle' },
+    olho_dagon: { name: 'Olho de Dagon', hp: 138, speed: 83, atk: 18, reward: 75, radius: 74, mass: 1.8, range: 590, cooldown: 2300, pattern: 'eye' },
     dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 176, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
 };
 const SeaProfile = {
@@ -237,7 +238,7 @@ class SeaBoot extends Phaser.Scene {
             frameWidth:512, frameHeight:682, endFrame:3
         });
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
-        this.load.image('fx-dagon-eye', 'assets/abyss/dagon_eye.png');
+        this.load.spritesheet('dagon-eye-animated', 'assets/abyss/dagon_eye.png', {frameWidth:512,frameHeight:682,endFrame:3});
         this.load.spritesheet('fx-cannon-charge', 'assets/fx/cannon_charge_sparks.png', {frameWidth:96,frameHeight:96,endFrame:4});
         this.load.image('fx-splash-0', 'assets/fx/splash_0.png');
         this.load.image('fx-splash-1', 'assets/fx/splash_1.png');
@@ -418,6 +419,8 @@ class Game extends Phaser.Scene {
         this.gold = 0; this.kills = 0; this.bossKills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
         this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
         this.sandboxKrakenTriggered = false; // Kraken atualmente desperto no sandbox.
+        this.sandboxDagonTriggered = false;
+        this.nextDagonEyeSpawnAt = 0;
         this.nextTentacleSpawnAt = 0;
         this.sandboxTentacleRebirthFrom = null; // Posição da última derrota do Kraken.
         this.elapsed = 0; this.waveElapsed = 0; this.ended = false; this.pausedByCaptain = false;
@@ -477,7 +480,10 @@ class Game extends Phaser.Scene {
         // Primeira aparição garantida no roteiro; depois entra no conjunto aleatório.
         if (this.mode === 'mission' && this.stage === 7) this.spawnEnemy('recife', 720);
         // Só existe um tentáculo errante no mar aberto; ele guarda o encontro com o Kraken.
-        if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('tentaculo', 1000);
+        if (this.mode === 'sandbox' && !this.contractId) {
+            this.spawnEnemy('tentaculo', 1000);
+            this.spawnEnemy('olho_dagon', 1250);
+        }
         if (this.objective === 'boss') {
             const bossTypes = ['almirante','kraken','dagon','nauabissal'];
             this.missionBoss = bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
@@ -739,6 +745,10 @@ class Game extends Phaser.Scene {
         const f = SEA_FOES[type]; if (!f) return null;
         // Nenhum evento, onda ou contrato invoca o Kraken no sandbox diretamente.
         if (this.mode === 'sandbox' && type === 'kraken' && !options.fromTentacle) return null;
+        if (this.mode === 'sandbox' && type === 'dagon' && !options.fromEye) return null;
+        if (this.mode === 'sandbox' && type === 'olho_dagon' &&
+            (this.contractId || this.sandboxDagonTriggered ||
+            this.enemies.some(e => !e.dead && e.sandboxDagonEye))) return null;
         if (this.mode === 'sandbox' && type === 'tentaculo' &&
             (this.contractId || this.sandboxKrakenTriggered ||
             this.enemies.some(e => !e.dead && e.sandboxSentinel))) return null;
@@ -766,7 +776,7 @@ class Game extends Phaser.Scene {
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
             enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated',
-            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated' })[type] || 'foe-sloop';
+            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated', olho_dagon:'dagon-eye-animated', olho_dagon:'dagon-eye-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
         const v15Visuals = { patrulha:'v15-sloop', corsario:'v15-blood', ariete:'v15-ram',
@@ -776,7 +786,8 @@ class Game extends Phaser.Scene {
             afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
-        const animated682 = (type==='dagon' && tex==='dagon-animated') ||
+        const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
+            (type==='dagon' && tex==='dagon-animated') ||
             (type==='coral' && tex==='coral-animated') ||
             (type==='recife' && tex==='reef-devourer-animated') ||
             (type==='afogados' && tex==='drowned-animated') ||
@@ -784,9 +795,9 @@ class Game extends Phaser.Scene {
             (type==='tentaculo' && tex==='tentacle-animated');
         const sourceH = animated682 ? 682 :
             (this.textures.get(tex).getSourceImage().height || 160);
-        const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon'].includes(type);
+        const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo')?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon')?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -799,6 +810,8 @@ class Game extends Phaser.Scene {
             lastRockContact: -1000, lastRamming: -1000, specialPhase: 0, dead: false,
             maxRange: f.range, cooldownBase: f.cooldown, pattern: f.pattern, elite, boss: elite, bar: null };
         enemy.sandboxSentinel = this.mode==='sandbox' && type==='tentaculo';
+        enemy.sandboxDagonEye = this.mode==='sandbox' && type==='olho_dagon';
+        if(type==='olho_dagon') {enemy.eyeBornAt=this.elapsed;enemy.eyeHidden=true;enemy.eyeFrame=0;}
         enemy.spriteScale = ship.scaleX;
         enemy.visualPhase = id * 1.39;
         enemy.isMonster = supernatural;
@@ -814,6 +827,7 @@ class Game extends Phaser.Scene {
             backgroundColor: '#131720bd', padding: { x: 2, y: 2 }
         }).setOrigin(.5).setDepth(24);
         this.enemies.push(enemy);
+        if(type==='dagon') this.spawnDagonEyes(3);
         return enemy;
     }
     dropTreasure(x, y, fromEnemy = false, value = 14) {
@@ -1188,6 +1202,14 @@ class Game extends Phaser.Scene {
                     e.dagonFrame=frame;
                 }
             }
+            if(e.type==='olho_dagon' && e.ship.texture.key==='dagon-eye-animated'){
+                // 0 submerso, 1 emerge, 2/3 visível alternando para atacar.
+                // Retorno 1 -> 0 representa o mergulho; sprite nunca gira.
+                const phase=((t-e.eyeBornAt+e.visualPhase*.3)%9+9)%9;
+                const frame=phase<1.1?0:phase<1.65?1:phase<6.55?(Math.floor(phase*3)%2?3:2):phase<7.15?1:0;
+                e.eyeHidden=frame<2;
+                if(e.eyeFrame!==frame){e.ship.setFrame(frame);e.eyeFrame=frame;}
+            }
             if(e.type==='tentaculo' && e.ship.texture.key==='tentacle-animated'){
                 const frame=Math.floor((t*4+e.visualPhase)%4);
                 if(e.tentacleFrame!==frame){e.ship.setFrame(frame);e.tentacleFrame=frame;}
@@ -1221,7 +1243,7 @@ class Game extends Phaser.Scene {
             if(e.isMonster) {
                 const dx=(e.type==='enguia'? .045: .012)*pulse;
                 e.ship.setScale(e.spriteScale*(1+dx),e.spriteScale*(1-dx*.48));
-                e.ship.setAlpha(e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1);
+                e.ship.setAlpha(e.type==='olho_dagon' && e.eyeHidden ? (e.eyeFrame===0?.32:.78) : e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1);
             } else {
                 e.ship.setScale(e.spriteScale);
                 e.ship.setAlpha(1);
@@ -1425,6 +1447,7 @@ class Game extends Phaser.Scene {
             enemy.hp = Math.max(0, enemy.hp - Math.round(ed * this.shipStats.ramDamage));
             // Abalroar o tentáculo é atacá-lo; sofrer seu impacto é ser atingido.
             if (enemy.sandboxSentinel) this.summonSandboxKraken(enemy);
+            if (enemy.sandboxDagonEye) this.summonSandboxDagon(enemy);
             this.impactFX(hitX, hitY, closingSpeed,
                 `ABALROAMENTO -${playerHit ? Math.round(pd * (1 - this.shipStats.ramProtection)) : 0} / -${Math.round(ed * this.shipStats.ramDamage)}`);
             if (enemy.hp <= 0) this.sinkEnemy(enemy, true);
@@ -1458,6 +1481,14 @@ class Game extends Phaser.Scene {
                 remnant.label?.destroy();
             }
             this.announce('O KRAKEN RECUOU · SUA SOMBRA VOLTARÁ A VAGAR PELO MAR');
+        }
+        if (enemy.sandboxDagonEye && !this.sandboxDagonTriggered) this.nextDagonEyeSpawnAt=this.elapsed+12;
+        if (enemy.type==='dagon' && this.mode==='sandbox' && this.sandboxDagonTriggered) {
+            this.sandboxDagonTriggered=false;
+            this.nextDagonEyeSpawnAt=this.elapsed+7;
+            for (const eye of this.enemies) if(!eye.dead && eye.type==='olho_dagon') {
+                eye.dead=true;eye.ship?.destroy();eye.wake?.destroy();eye.bar?.destroy();eye.label?.destroy();
+            }
         }
         if (enemy.sandboxSentinel && !this.sandboxKrakenTriggered)
             this.nextTentacleSpawnAt = this.elapsed + 12;
@@ -1638,6 +1669,7 @@ class Game extends Phaser.Scene {
             const sideAngle = Phaser.Math.Angle.Wrap(aim - e.heading);
             const aggressive = e.isMonster || ['ram','chase','tentacle'].includes(e.pattern);
             const tentacleRoaming = e.sandboxSentinel && distance > 410;
+            const eyeRoaming = e.sandboxDagonEye && distance > 430;
             const kiting = !e.isMonster && e.pattern === 'sniper' && distance < e.maxRange * .52;
             let desired;
             if (aggressive) desired = aim;
@@ -1648,11 +1680,11 @@ class Game extends Phaser.Scene {
                 if (e.pattern === 'boss' || e.pattern === 'abyss') desired += .14;
             }
             if (kiting) desired = aim + Math.PI;
-            if (tentacleRoaming) desired = e.heading + Math.sin(this.elapsed*.65+e.visualPhase)*.035;
+            if (tentacleRoaming || eyeRoaming) desired = e.heading + Math.sin(this.elapsed*.65+e.visualPhase)*.035;
             if (distance < (e.isMonster?1400:850)) {
                 const diff = Phaser.Math.Angle.Wrap(desired - e.heading);
                 e.heading += SEA_MATH.clamp(diff, -1.75 * dt, 1.75 * dt);
-                const throttle = tentacleRoaming ? .55 : aggressive ? 1 : distance > e.maxRange * .75 ? .8 : distance < 135 ? .38 : .57;
+                const throttle = (tentacleRoaming || eyeRoaming) ? .55 : aggressive ? 1 : distance > e.maxRange * .75 ? .8 : distance < 135 ? .38 : .57;
                 const thrust=e.isMonster?260:180;
                 e.vx += Math.sin(e.heading) * thrust * throttle * dt;
                 e.vy -= Math.cos(e.heading) * thrust * throttle * dt;
@@ -1661,7 +1693,12 @@ class Game extends Phaser.Scene {
                     // Criaturas investem e chocam-se contra o casco; nenhuma
                     // arma de projéteis pode ser emitida por este ramo.
                     e.chargeMs=0;
-                    if(distance<e.radius+this.hullRadius+105&&e.cooldown<=0){
+                    if(e.type==='olho_dagon') {
+                        if(!e.eyeHidden && distance<e.maxRange && e.cooldown<=0){
+                            this.dagonEyeFire(e,distance);
+                            e.cooldown=e.cooldownBase*(.85+Math.random()*.3);
+                        }
+                    }else if(distance<e.radius+this.hullRadius+105&&e.cooldown<=0){
                         if(e.type==='kraken')this.tentacleAttack(e);
                         else if(e.type==='tentaculo')this.tentacleStrike(e);
                         else this.monsterLunge(e,distance);
@@ -1729,6 +1766,28 @@ class Game extends Phaser.Scene {
         e.vx-=fireDX*impulse;e.vy-=fireDY*impulse;
         this.splash(e.x + fireDX * 29, e.y + fireDY * 29, e.boss ? 0xffac83 : 0xc8a8bd, 7);
         if (distance < 840) SEA_AUDIO.play('enemy', e.boss ? .8 : .46, distance);
+    }
+    spawnDagonEyes(count=3) {
+        for(let i=0;i<count;i++)this.spawnEnemy('olho_dagon',440+i*115);
+    }
+    summonSandboxDagon(eye) {
+        if(this.mode!=='sandbox'||this.contractId||!eye?.sandboxDagonEye||
+            this.sandboxDagonTriggered||this.ended)return null;
+        const boss=this.spawnEnemy('dagon',640,{fromEye:true});
+        if(!boss)return null;
+        this.sandboxDagonTriggered=true;
+        this.announce('O OLHO TESTEMUNHOU · DAGON DESPERTOU!');
+        this.burst(eye.x,eye.y,'violet',2.3);
+        return boss;
+    }
+    dagonEyeFire(e,distance) {
+        if(e.dead||e.eyeHidden||this.ended)return;
+        const dx=(this.player.x-e.x)/Math.max(1,distance);
+        const dy=(this.player.y-e.y)/Math.max(1,distance);
+        this.makeShot(e.x+dx*28,e.y+dy*28,dx*355,dy*355,false,e.atk,2.1);
+        const shot=this.shots[this.shots.length-1];
+        if(shot)shot.dagonEyeCurse=25;
+        this.splash(e.x,e.y,0xff415e,9);
     }
     summonSandboxKraken(tentacle) {
         if (this.mode !== 'sandbox' || this.contractId || !tentacle?.sandboxSentinel ||
@@ -1817,7 +1876,7 @@ class Game extends Phaser.Scene {
             // esteira e ataques continuam sem alterações.
             const artFacesDown=e.type==='enguia'||e.type==='coral'||e.type==='recife'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
-            e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:
+            e.ship.setPosition(e.x,e.y).setRotation((e.type==='dagon'||e.type==='olho_dagon')?0:
                 e.heading+(artFacesDown?Math.PI:0));
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
@@ -1845,10 +1904,11 @@ class Game extends Phaser.Scene {
             }
             if (!hit && p.friendly) {
                 for (const e of this.enemies) {
-                    if (e.dead) continue;
+                    if (e.dead || (e.type==='olho_dagon' && e.eyeHidden)) continue;
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; e.hp = Math.max(0, e.hp - p.damage);
                         if(e.sandboxSentinel) this.summonSandboxKraken(e);
+                        if(e.sandboxDagonEye) this.summonSandboxDagon(e);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
                         SEA_COMBAT.hitEnemy(this, e, p.x, p.y, p.damage);
                         this.splash(p.x, p.y, 0xffdfb4, 9);
@@ -1857,7 +1917,16 @@ class Game extends Phaser.Scene {
                     }
                 }
             } else if (!hit && this.segmentNear(p.px, p.py, p.x, p.y, this.player.x, this.player.y, this.hullRadius)) {
-                hit = true; this.damageShip(p.damage, p.x, p.y, 'cannon');
+                hit = true;
+                const hurt=this.damageShip(p.damage,p.x,p.y,'cannon');
+                if(hurt && p.dagonEyeCurse){
+                    this.curse=Math.min(100,(this.curse||0)+p.dagonEyeCurse);
+                    this.announce('OLHO DE DAGON · MALDIÇÃO +'+p.dagonEyeCurse+'%');
+                    if(this.mode==='sandbox'&&!this.sandboxDagonTriggered){
+                        const witness=this.enemies.find(e=>!e.dead&&e.sandboxDagonEye);
+                        if(witness)this.summonSandboxDagon(witness);
+                    }
+                }
             }
             if (hit || p.ttl <= 0 || p.x < 0 || p.y < 0 || p.x > this.W || p.y > this.H) {
                 p.object.destroy(); this.shots.splice(i, 1);
@@ -1895,6 +1964,12 @@ class Game extends Phaser.Scene {
                 this.nextSpawnTime=this.elapsed+7;
             }
         } else if (this.mode === 'sandbox') {
+            // Ciclos independentes: tentáculo/Kraken e olho/Dagon.
+            if(!this.sandboxDagonTriggered && this.elapsed>=this.nextDagonEyeSpawnAt &&
+                !this.enemies.some(e=>e.sandboxDagonEye&&!e.dead)){
+                const eye=this.spawnEnemy('olho_dagon',1150);
+                this.nextDagonEyeSpawnAt=this.elapsed+(eye?15:3);
+            }
             // Ciclo sandbox: tentáculo solitário -> Kraken -> novo tentáculo distante.
             if (!this.sandboxKrakenTriggered && this.elapsed >= this.nextTentacleSpawnAt &&
                 !this.enemies.some(e => e.sandboxSentinel && !e.dead)) {
@@ -1915,7 +1990,7 @@ class Game extends Phaser.Scene {
                 // A estreia no sandbox é garantida na onda 3, com encontros aleatórios depois.
                 if (this.wave === 3) this.spawnEnemy('recife', 610);
                 if (this.wave % 5 === 0) {
-                    const bosses=['almirante','dagon','nauabissal'];
+                    const bosses=['almirante','nauabissal'];
                     const selected=bosses[(this.wave / 5 - 1) % bosses.length];
                     this.spawnEnemy(selected, 530);
                     this.announce(`ONDA ${this.wave} · ${SEA_FOES[selected].name}`);
