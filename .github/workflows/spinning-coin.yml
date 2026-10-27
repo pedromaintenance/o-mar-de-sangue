@@ -1,0 +1,34 @@
+name: Spinning Pirate Coin — eight-frame animation
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - sw.js
+      - assets/items/treasure_coin.png
+      - tests/spinning-coin-eight-frame.test.cjs
+      - tests/floating-chest-four-frame.test.cjs
+      - .github/workflows/spinning-coin.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - sw.js
+      - assets/items/treasure_coin.png
+      - tests/spinning-coin-eight-frame.test.cjs
+      - tests/floating-chest-four-frame.test.cjs
+permissions:
+  contents: read
+jobs:
+  coin-and-loot-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check Game.js
+          node tests/spinning-coin-eight-frame.test.cjs
+          node tests/floating-chest-four-frame.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+          node tests/kraken-rebirth-cycle.test.cjs
