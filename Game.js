@@ -326,7 +326,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('island-wreck', 'assets/islands/island_wreck.png');
         this.load.image('treasure-coin', 'assets/items/treasure_coin.png');
         this.load.image('treasure-crate', 'assets/items/treasure_crate.png');
-        this.load.image('treasure-chest', 'assets/items/treasure_chest.png');
+        // Baú amaldiçoado flutuante: quatro quadros RGBA horizontais de 512 x 682.
+        this.load.spritesheet('treasure-chest', 'assets/items/treasure_chest.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         this.load.image('command-console-analog', 'assets/ui/command_console_analog.png');
         this.load.image('hud-helm-landscape', 'assets/ui/hud-helm-landscape.png');
         this.load.image('hud-combat-landscape', 'assets/ui/hud-combat-landscape.png');
@@ -666,7 +669,10 @@ class Game extends Phaser.Scene {
         for (let i = 0; i < 16; i++) {
             const x = rng.between(120, this.W - 120), y = rng.between(120, this.H - 120);
             if (this.islands.some(isl => Math.hypot(isl.x - x, isl.y - y) < isl.radius + 60)) continue;
-            const s = this.add.image(x, y, i % 2 ? 'treasure-crate' : 'treasure-chest').setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3).setScale((0.42 + (i % 3) * .06) * 1.6);
+            const kind = i % 2 ? 'treasure-crate' : 'treasure-chest';
+            const s = this.add.image(x, y, kind, kind==='treasure-chest'?0:undefined)
+                .setDepth(.2).setAlpha(.34).setRotation((i % 7) * .3)
+                .setScale((0.42 + (i % 3) * .06) * (kind==='treasure-chest'?.22:1.6));
             this.flotsam.push({ sprite: s, y, phase: i*.63 });
         }
         const border = this.add.graphics().setDepth(2).lineStyle(6, 0xba8c77, .36);
@@ -802,11 +808,15 @@ class Game extends Phaser.Scene {
     dropTreasure(x, y, fromEnemy = false, value = 14) {
         const coin=this.add.container(x,y).setDepth(8);
         const kind=fromEnemy?'treasure-chest':((Math.floor(x+y+value)%3===0)?'treasure-crate':'treasure-coin');
-        const scaleMap={'treasure-coin':.68,'treasure-crate':.84,'treasure-chest':1.0};
-        coin.add(this.add.image(0,0,kind).setScale(scaleMap[kind]||.38).setAngle(((x+y)%18)-9));
+        // O baú mantém proporções no jogo apesar do novo quadro-fonte de 512x682.
+        const scaleMap={'treasure-coin':.68,'treasure-crate':.84,'treasure-chest':.22};
+        const sprite=this.add.image(0,0,kind,kind==='treasure-chest'?0:undefined)
+            .setScale(scaleMap[kind]||.38).setAngle(((x+y)%18)-9);
+        coin.add(sprite);
         const sparkle=this.add.image(0,-22,'fx-gold-0').setScale(fromEnemy?1.02:.72).setAlpha(.72);
         coin.add(sparkle);
-        this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,sparkle});
+        this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,
+            sparkle,chestSprite:kind==='treasure-chest'?sprite:null,chestFrame:0});
     }
     updateImpulse(dt,pad) {
         const held=!!this.keys?.R?.isDown;
@@ -1218,7 +1228,13 @@ class Game extends Phaser.Scene {
             if(!f.sprite.active)continue;
             const near=SEA_VISUALS.distance2(f.sprite.x,f.y,this.player.x,this.player.y)<750*750;
             f.sprite.setVisible(near);
-            if(near)f.sprite.y=f.y+Math.sin(t*1.9+f.phase)*2;
+            if(near){
+                f.sprite.y=f.y+Math.sin(t*1.9+f.phase)*2;
+                if(f.sprite.texture.key==='treasure-chest'){
+                    const frame=Math.floor((t*4+f.phase)%4);
+                    if(f.chestFrame!==frame){f.sprite.setFrame(frame);f.chestFrame=frame;}
+                }
+            }
         }
         for(const loot of this.treasures){
             if(loot.taken || !loot.coin?.active)continue;
@@ -1226,6 +1242,10 @@ class Game extends Phaser.Scene {
             loot.coin.setVisible(near);
             if(near){
                 loot.coin.y=loot.y-5+Math.sin(t*2.5+loot.phase)*3;
+                if(loot.chestSprite?.active){
+                    const frame=Math.floor((t*4+loot.phase)%4);
+                    if(loot.chestFrame!==frame){loot.chestSprite.setFrame(frame);loot.chestFrame=frame;}
+                }
                 if(loot.sparkle)loot.sparkle.setTexture(SEA_VISUALS.cyclic('gold',t+loot.phase)).setAlpha(.55+.3*Math.sin(t*3+loot.phase)**2);
             }
         }
