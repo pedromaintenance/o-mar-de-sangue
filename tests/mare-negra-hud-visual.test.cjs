@@ -36,13 +36,16 @@ const {chromium}=require('playwright-core');
      if(!enemy)throw Error('Could not spawn Coral Horror for visual test');
      enemy.x=s.player.x+240;enemy.y=s.player.y+10;
      enemy.ship.setPosition(enemy.x,enemy.y);
-     const img=s.textures.get('v15-coral').getSourceImage();
+     const img=s.textures.get('coral-animated').getSourceImage();
      return {texture:enemy.ship.texture.key,width:img.width,height:img.height,
+       frameWidth:enemy.ship.frame.width,frameHeight:enemy.ship.frame.height,
        radius:enemy.radius,displayHeight:enemy.ship.displayHeight,id:enemy.id};
    });
-   assert.equal(coral.texture,'v15-coral',label+': retain the approved V15 artwork');
-   assert.equal(coral.width,323);
-   assert.equal(coral.height,302,label+': floating strip must be absent');
+   assert.equal(coral.texture,'coral-animated',label+': retain the approved animated V15 artwork');
+   assert.equal(coral.width,2048);
+   assert.equal(coral.frameWidth,512);
+   assert.equal(coral.frameHeight,682);
+   assert.equal(coral.height,682,label+': the full four-frame sprite must load');
    assert.equal(coral.radius,76,label+': unchanged monster collision geometry');
    assert(Math.abs(coral.displayHeight-76*2.25)<2,
      label+': sprite stays scaled to its original collision radius');
