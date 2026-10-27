@@ -12,7 +12,13 @@ assert(src&&src.length>4000,'Catalog script missing');
 new vm.Script(src,{filename:'asset-audit.html'});
 const cache=JSON.parse(sw.match(/const ASSETS=(\[[^\n]*\]);/)[1]);
 const visuals=cache.filter(p=>/\.(png|jpe?g|webp|svg|gif)$/i.test(p));
-assert(visuals.length>=110,'Current precache should expose game image catalog');
+assert(visuals.length>=100,'Current precache should expose game image catalog');
+assert(cache.includes('./assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png'),
+ 'Ship evolution spritesheet must be in offline inventory');
+assert(!cache.includes('./assets/sprites/player_ship.png'),
+ 'Old procedural ship must not remain in offline inventory');
+assert(!cache.some(p=>p.startsWith('./assets/upgrades/')),
+ 'Removed procedural overlays must not remain in offline inventory');
 assert(cache.includes('./asset-audit.html'),'Audit must be accessible offline');
 const cacheVersion=Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
 assert(Number.isFinite(cacheVersion)&&cacheVersion>=68,'Audit requires cache v68 or newer');
