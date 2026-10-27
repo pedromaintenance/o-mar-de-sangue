@@ -307,10 +307,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp', {
             frameWidth:512, frameHeight:565, endFrame:3
         });
-        // Horror de Coral: quatro quadros horizontais do original (512 × 682 cada).
-        // A PROA fica embaixo no desenho; paintEnemies alinha somente a arte.
+        // Horror de Coral submerso: 4 quadros RGBA originais, 512 × 644.
+        // Criatura de orientação fixa: nunca segue o rumo de navegação.
         this.load.spritesheet('coral-animated', 'assets/v15/beast_coral.png', {
-            frameWidth:512, frameHeight:682, endFrame:3
+            frameWidth:512, frameHeight:644, endFrame:3
         });
         this.load.image('v15-fx-0', 'assets/v15/fx_frame_00.png');
         this.load.image('v15-fx-1', 'assets/v15/fx_frame_01.png');
@@ -816,13 +816,12 @@ class Game extends Phaser.Scene {
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
             (type==='dagon' && tex==='dagon-animated') ||
-            (type==='coral' && tex==='coral-animated') ||
             (type==='recife' && tex==='reef-devourer-animated') ||
             (type==='afogados' && tex==='drowned-animated') ||
             (type==='kraken' && tex==='kraken-animated') ||
             (type==='tentaculo' && tex==='tentacle-animated');
-        const sourceH = animated682 ? 682 :
-            (this.textures.get(tex).getSourceImage().height || 160);
+        const sourceH = type==='coral' && tex==='coral-animated' ? 644 :
+            animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
         const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon'||(type==='cultista'&&tex==='cult-barge-animated'))?0:undefined;
@@ -1269,7 +1268,7 @@ class Game extends Phaser.Scene {
                 if(e.reefFrame!==frame){e.ship.setFrame(frame);e.reefFrame=frame;}
             }
             if(e.type==='coral' && e.ship.texture.key==='coral-animated'){
-                // Coral pulsa em quatro quadros, sem modificar colisões, IA ou rumo.
+                // Coral submerso pulsa em quatro quadros, sempre com rotação visual 0°.
                 const frame=Math.floor((t*4+e.visualPhase)%4);
                 if(e.coralFrame!==frame){e.ship.setFrame(frame);e.coralFrame=frame;}
             }
@@ -1947,12 +1946,14 @@ class Game extends Phaser.Scene {
             // O Dagon emerge da água: seu horizonte permanece horizontal.
             // A direção de ataque e a física continuam usando e.heading.
             // Gameplay headings are measured from image-UP (0°).
-            // Enguia, Horror de Coral, Recife Devorador e aríete V15 têm PROA na parte inferior
-            // da arte. Somente o sprite recebe +PI; física, rumo, colisões,
-            // esteira e ataques continuam sem alterações.
-            const artFacesDown=e.type==='enguia'||e.type==='coral'||e.type==='recife'||e.type==='cultista'||
+            // A enguia, o Recife Devorador e o aríete V15 recebem +PI
+            // somente no sprite. Horror de Coral, Dagon e Olho de Dagon
+            // NÃO GIRAM: seus quadros mantêm sempre 0°, independentemente do heading.
+            // Física, rumo, colisões, esteira e ataques permanecem intactos.
+            const artFacesDown=e.type==='enguia'||e.type==='recife'||e.type==='cultista'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
-            e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:e.type==='olho_dagon'?0:
+            e.ship.setPosition(e.x,e.y).setRotation(
+                e.type==='coral'?0:e.type==='dagon'?0:e.type==='olho_dagon'?0:
                 e.heading+(artFacesDown?Math.PI:0));
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
