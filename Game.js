@@ -234,7 +234,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('boss-kraken', 'assets/abyss/kraken.png');
         // Arauto de Dagon: spritesheet fornecida pelo criador (4 x 512×682).
         // Carregada uma vez; ele não altera a orientação visual ao navegar.
-        this.load.spritesheet('dagon-animated', 'assets/v15/dagon_emerging.png', {
+        this.load.spritesheet('dagon-animated', 'assets/abyss/dagon.png', {
             frameWidth:512, frameHeight:682, endFrame:3
         });
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
