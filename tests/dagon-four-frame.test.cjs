@@ -24,7 +24,7 @@ assert(game.includes("dagon:'dagon-animated'"),'Spawn must select four-frame art
 assert(game.includes("type==='dagon' && e.ship.texture.key==='dagon-animated'"),
   'Visual update must cycle Dagon frames');
 assert(game.includes("e.ship.setFrame(frame)"),'Frame progression required');
-assert(game.includes("e.type==='dagon'?0:"),'Never rotate Dagon with heading');
+assert(game.includes("(e.type==='dagon'||e.type==='olho_dagon')?0:"),'Never rotate Dagon or its eyes with heading');
 assert(game.includes("if(e.type==='dagon'){")&&game.includes("this.spawnEnemy('afogados'"),
   'Existing Dagon summons must remain active');
 assert(game.includes("this.spawnEnemy('coral'"),'Second summon phase must remain');
