@@ -1,0 +1,33 @@
+name: Drowned Choir — four original animation frames
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - sw.js
+      - assets/v15/beast_drowned.png
+      - tests/drowned-four-frame.test.cjs
+      - .github/workflows/drowned-four-frame.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - sw.js
+      - assets/v15/beast_drowned.png
+      - tests/drowned-four-frame.test.cjs
+permissions:
+  contents: read
+jobs:
+  drowned-asset-and-regressions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          node --check Game.js
+          node tests/drowned-four-frame.test.cjs
+          node tests/coral-asset-3-8a4.test.cjs
+          node tests/eel-sprite-orientation.test.cjs
+          node tests/dagon-four-frame.test.cjs
+          node tests/pwa-cache-contract.test.cjs

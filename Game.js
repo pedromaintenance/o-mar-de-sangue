@@ -247,7 +247,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('v15-kraken', 'assets/v15/beast_kraken.png');
         // O novo Dagon usa exclusivamente a textura dagon-animated.
         this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
-        this.load.image('v15-drowned', 'assets/v15/beast_drowned.png');
+        // Cortejo dos Afogados: original RGBA, quatro quadros horizontais de 512 x 682.
+        this.load.spritesheet('drowned-animated', 'assets/v15/beast_drowned.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         // Original-resolution transparent serpent sheet: 4 frames, 512 × 565 px each.
         // Its head is at the BOTTOM: paintEnemies offsets its artwork by 180 degrees.
         this.load.spritesheet('eel-swim', 'assets/v15/beast_eel_swim.webp', {
@@ -699,7 +702,7 @@ class Game extends Phaser.Scene {
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
-            enguia:'eel-swim', afogados:'foe-drowned', coral:'coral-animated',
+            enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated',
             caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'boss-kraken', dagon:'dagon-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
@@ -707,16 +710,17 @@ class Game extends Phaser.Scene {
             fragata:'v15-royal', bombardeiro:'v15-chapel', espectral:'v15-spectral',
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
             nauabissal:'v15-merchant', kraken:'v15-kraken', dagon:'dagon-animated',
-            afogados:'v15-drowned', coral:'coral-animated' };
+            afogados:'drowned-animated', coral:'coral-animated' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='dagon' && tex==='dagon-animated') ||
-            (type==='coral' && tex==='coral-animated');
+            (type==='coral' && tex==='coral-animated') ||
+            (type==='afogados' && tex==='drowned-animated');
         const sourceH = animated682 ? 682 :
             (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='coral')?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='afogados')?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -1111,6 +1115,11 @@ class Game extends Phaser.Scene {
                     e.ship.setFrame(frame);
                     e.dagonFrame=frame;
                 }
+            }
+            if(e.type==='afogados' && e.ship.texture.key==='drowned-animated'){
+                // Quatro quadros animados, sem mudar rotação, colisões, IA ou ataques.
+                const frame=Math.floor((t*4+e.visualPhase)%4);
+                if(e.drownedFrame!==frame){e.ship.setFrame(frame);e.drownedFrame=frame;}
             }
             if(e.type==='coral' && e.ship.texture.key==='coral-animated'){
                 // Coral pulsa em quatro quadros, sem modificar colisões, IA ou rumo.
