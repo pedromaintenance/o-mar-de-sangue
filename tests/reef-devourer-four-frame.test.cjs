@@ -42,8 +42,10 @@ assert(game.includes("e.type==='recife' && e.ship.texture.key==='reef-devourer-a
 assert(game.includes("Math.floor((t*4+e.visualPhase)%4)"));
 assert(game.includes("e.reefFrame!==frame")&&game.includes("e.ship.setFrame(frame)"),
  'Four-frame visual loop must actually progress');
-assert(game.includes("e.type==='enguia'||e.type==='coral'||"),
- 'Existing bow-down correction remains exclusive to existing coral');
+assert(game.includes("e.type==='enguia'||e.type==='coral'||e.type==='recife'||"),
+ 'Both coral monsters have downward-facing art; +PI is visual only');
+assert(game.includes("e.heading+(artFacesDown?Math.PI:0)"),
+ 'Rotation correction must never change physics heading');
 assert(game.includes("if (rank >= 7) pool.push('recife')"),
  'New monster must be in random encounters');
 assert(game.includes("this.mode === 'mission' && this.stage === 7) this.spawnEnemy('recife', 720)"),
@@ -55,5 +57,5 @@ assert(game.includes("if(e.type==='kraken')this.tentacleAttack(e)"),
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/abyss/coral_horror.png"'),'Precache replacement at existing path');
 assert(sw.includes('"./assets/v15/beast_coral.png"'),'Keep other coral precached');
-assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=79,'Bump offline revision');
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=80,'Bump offline revision');
 console.log('PASS independent Recife Devorador, original Coral preserved, animation, both modes, PWA');
