@@ -16,10 +16,10 @@ assert.deepEqual([...png.subarray(24,29)],[8,6,0,0,0],'RGBA8');
 assert.equal(crypto.createHash('sha256').update(png).digest('hex'),
  '9e66dc99d52f52893f5dcf2f9ed090781db795508d02b3c0d544127091ba12e5',
  'Never overwrite or reprocess the uploaded original');
-const original=fs.readFileSync('assets/v15/beast_coral.png');
-assert.equal(crypto.createHash('sha256').update(original).digest('hex'),
- '2185dc6e69c8b00e97fe4922d609edeac9d4ba75f1c4613220ca5059e348462e',
- 'Original V15 Horror de Coral must remain untouched');
+const newCoral=fs.readFileSync('assets/v15/beast_coral.png');
+assert.equal(crypto.createHash('sha256').update(newCoral).digest('hex'),
+ 'd5e53e77468d1771095c0ba8e1b94e6723704e598d9ebae417636c3de7b5876f',
+ 'Horror de Coral must use the new uploaded submerged artwork; the independent reef remains unchanged');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
 assert(game.includes("this.load.spritesheet('reef-devourer-animated', 'assets/abyss/coral_horror.png'"),
@@ -42,8 +42,10 @@ assert(game.includes("e.type==='recife' && e.ship.texture.key==='reef-devourer-a
 assert(game.includes("Math.floor((t*4+e.visualPhase)%4)"));
 assert(game.includes("e.reefFrame!==frame")&&game.includes("e.ship.setFrame(frame)"),
  'Four-frame visual loop must actually progress');
-assert(game.includes("e.type==='enguia'||e.type==='coral'||e.type==='recife'||"),
- 'Both coral monsters have downward-facing art; +PI is visual only');
+assert(game.includes("e.type==='enguia'||e.type==='recife'||"),
+ 'Reef Devourer still rotates to heading; Coral remains fixed at zero');
+assert(game.includes("e.type==='coral'?0:"),
+ 'New Horror de Coral uses fixed visual orientation');
 assert(game.includes("e.heading+(artFacesDown?Math.PI:0)"),
  'Rotation correction must never change physics heading');
 assert(game.includes("if (rank >= 7) pool.push('recife')"),
@@ -58,4 +60,4 @@ const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/abyss/coral_horror.png"'),'Precache replacement at existing path');
 assert(sw.includes('"./assets/v15/beast_coral.png"'),'Keep other coral precached');
 assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=80,'Bump offline revision');
-console.log('PASS independent Recife Devorador, original Coral preserved, animation, both modes, PWA');
+console.log('PASS independent Recife Devorador preserved, new fixed-facing Horror de Coral, both modes, PWA');

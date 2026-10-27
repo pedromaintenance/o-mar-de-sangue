@@ -41,11 +41,11 @@ const {chromium}=require('playwright-core');
        frameWidth:enemy.ship.frame.width,frameHeight:enemy.ship.frame.height,
        radius:enemy.radius,displayHeight:enemy.ship.displayHeight,id:enemy.id};
    });
-   assert.equal(coral.texture,'coral-animated',label+': retain the approved animated V15 artwork');
+   assert.equal(coral.texture,'coral-animated',label+': load the new Coral submerso sheet');
    assert.equal(coral.width,2048);
    assert.equal(coral.frameWidth,512);
-   assert.equal(coral.frameHeight,682);
-   assert.equal(coral.height,682,label+': the full four-frame sprite must load');
+   assert.equal(coral.frameHeight,644);
+   assert.equal(coral.height,644,label+': the new four-frame sheet must load');
    assert.equal(coral.radius,76,label+': unchanged monster collision geometry');
    assert(Math.abs(coral.displayHeight-76*2.25)<2,
      label+': sprite stays scaled to its original collision radius');
