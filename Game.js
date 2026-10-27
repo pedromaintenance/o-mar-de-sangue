@@ -241,6 +241,7 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('sea-blood', 'assets/tiles/sea_blood.png');
         this.load.image('sea-foam', 'assets/tiles/sea_foam.png');
         this.load.image('sea-mist', 'assets/tiles/sea_mist.png');
+        SEA_OCEAN_V3.preload(this);
         // Atlas: proa para baixo; 4 linhas × 5 colunas, 260×360 px, vão de 40 px.
         this.load.spritesheet('player-ship-stages',
             'assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png',
@@ -640,6 +641,14 @@ class Game extends Phaser.Scene {
         this.updateHUD();
     }
     createSeaLayers() {
+        // A água V3 fica ancorada no mundo; espuma e névoa são camadas sutis.
+        if (SEA_OCEAN_V3.create(this)) {
+            this.seaBlood = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.10);
+            this.seaFoam = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.17);
+            this.seaMist = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-mist').setScrollFactor(0).setDepth(-107).setAlpha(.24);
+            return;
+        }
+        // Fallback para falha de carregamento dos chunks WebP.
         this.seaBase = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-base').setScrollFactor(0).setDepth(-110);
         this.seaBlood = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-blood').setScrollFactor(0).setDepth(-109).setAlpha(.85);
         this.seaFoam = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-foam').setScrollFactor(0).setDepth(-108).setAlpha(.56);
@@ -715,8 +724,13 @@ class Game extends Phaser.Scene {
     drawSea(t) {
         if (!this.seaBase) return;
         const sx = this.cameras.main.scrollX || 0, sy = this.cameras.main.scrollY || 0;
-        this.seaBase.tilePositionX = sx * .18 + t * 9;
-        this.seaBase.tilePositionY = sy * .10 + t * 6;
+        if (this.seaV3Active) {
+            SEA_OCEAN_V3.update(this, t);
+        } else {
+            this.seaBase.tilePositionX = sx * .18 + t * 9;
+            this.seaBase.tilePositionY = sy * .10 + t * 6;
+        }
+        // Camadas antigas preservadas com opacidade menor sobre o novo oceano.
         this.seaBlood.tilePositionX = sx * .25 + t * 16;
         this.seaBlood.tilePositionY = sy * .16 + t * 10;
         this.seaFoam.tilePositionX = sx * .40 + t * 20;

@@ -1,0 +1,61 @@
+name: Sea Ocean V3
+on:
+  pull_request:
+    paths:
+      - 'SeaOceanV3.js'
+      - 'Game.js'
+      - 'SeaPixelPolish.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'assets/tiles/sea-v3/**'
+      - 'tests/sea-ocean-v3.test.cjs'
+      - '.github/workflows/sea-ocean-v3.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'SeaOceanV3.js'
+      - 'Game.js'
+      - 'SeaPixelPolish.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'assets/tiles/sea-v3/**'
+      - 'tests/sea-ocean-v3.test.cjs'
+      - '.github/workflows/sea-ocean-v3.yml'
+permissions:
+  contents: read
+jobs:
+  sea-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check SeaOceanV3.js
+      - run: node --check Game.js
+      - run: node tests/sea-ocean-v3.test.cjs
+      - run: node tests/pwa-cache-contract.test.cjs
+      - run: node tests/procedural-sea-cache-3-6k.test.cjs
+
+  browser-visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Validate ocean scene desktop + mobile
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/sea-v3-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/sea-ocean-v3-visual.test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sea-ocean-v3-visuals
+          path: port-artifacts/sea-ocean-v3-*.png
+          if-no-files-found: ignore
