@@ -20,7 +20,9 @@ assert(game.includes("this.load.spritesheet('kraken-animated', 'assets/v15/beast
 assert(/frameWidth:512,\s*frameHeight:682,\s*endFrame:3/.test(game),'load four frames');
 assert(game.includes("kraken:'kraken-animated'"), 'Kraken spawn picks animated texture');
 assert(game.includes("type==='kraken' && tex==='kraken-animated'"), 'scale using one frame height');
-assert(game.includes("type==='dagon'||type==='coral'||type==='afogados'||type==='kraken'"), 'frame zero on spawn');
+const frameZero=game.match(/const initialMonsterFrame=\(([^)]*)\)\?0:undefined;/)?.[1]||'';
+for(const type of ['dagon','coral','recife','afogados','kraken'])
+ assert(frameZero.includes("type==='"+type+"'"), 'Frame zero on spawn for '+type);
 assert(game.includes("if(e.type==='kraken' && e.ship.texture.key==='kraken-animated')"), 'animate in visual loop');
 assert(game.includes('e.krakenFrame!==frame')&&game.includes('e.ship.setFrame(frame)'), 'cycle frames only as needed');
 assert(!game.includes("this.load.image('v15-kraken'"), 'remove former static texture');
