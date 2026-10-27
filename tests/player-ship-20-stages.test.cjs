@@ -1,0 +1,55 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const game=fs.readFileSync('Game.js','utf8');
+const menu=fs.readFileSync('SeaMenus.js','utf8');
+const port=fs.readFileSync('PortUI.js','utf8');
+const sw=fs.readFileSync('sw.js','utf8');
+const manifest=JSON.parse(fs.readFileSync('assets/player/mar_de_sangue_navio_proa_baixo_manifest.json','utf8'));
+const ids=Array.from(game.matchAll(/\{ id: '([^']+)', icon:/g),x=>x[1]);
+assert.equal(ids.length,15);
+const begin=game.indexOf('const SEA_PLAYER_SHIP = {');
+const end=game.indexOf('\n};',begin);
+assert(begin>=0 && end>begin);
+const context={};
+vm.runInNewContext('const SEA_UPGRADES='+JSON.stringify(ids.map(id=>({id})))+
+  ';const SEA_MATH={clamp:(v,a,b)=>Math.max(a,Math.min(b,v))};'+
+  game.slice(begin,end+3)+';this.stage=SEA_PLAYER_SHIP;',context);
+const stages=context.stage;
+const all=n=>Object.fromEntries(ids.map(id=>[id,n]));
+assert.equal(stages.stage(all(0)),1);
+assert.equal(stages.stage(all(1)),1);
+assert.equal(stages.stage(all(2)),2);
+assert.equal(stages.stage(all(19)),19);
+assert.equal(stages.stage(all(20)),20);
+assert.equal(stages.stage(all(200)),20);
+const lagger=all(20);lagger[ids[0]]=7;
+assert.equal(stages.stage(lagger),7);
+assert.equal(stages.progress(lagger).missing,1);
+assert.equal(stages.progress(all(20)).next,null);
+const missing=all(20);delete missing[ids[0]];
+assert.equal(stages.stage(missing),1);
+assert.equal(stages.progress(all(0)).missing,15);
+assert.equal(manifest.orientation.bow,'down');
+assert.equal(manifest.sprites.length,20);
+assert.equal(manifest.grid.frame_width,260);
+assert.equal(manifest.grid.frame_height,360);
+assert.equal(manifest.grid.horizontal_gap,40);
+assert.equal(manifest.grid.vertical_gap,40);
+const png=fs.readFileSync('assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png');
+assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a');
+assert.equal(png.readUInt32BE(16),1460);
+assert.equal(png.readUInt32BE(20),1560);
+assert.match(game,/this\.load\.spritesheet\('player-ship-stages'/);
+assert.match(game,/spacing: 40, endFrame: 19/);
+assert.match(game,/SEA_PLAYER_SHIP\.stage\(this\.profile\.levels\) - 1/);
+assert.match(game,/setRotation\(Math\.PI\)/);
+assert.match(menu,/player-ship-stages/);
+assert.match(port,/SEA_PLAYER_SHIP\.progress\(p\.levels\)/);
+for(const src of [game,sw]){
+  assert(!src.includes('assets/sprites/player_ship.png'));
+  assert(!src.includes('assets/upgrades/upgrade_'));
+}
+assert(sw.includes('assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png'));
+console.log('OK: 20 estágios, mínimo dos 15 upgrades, proa para baixo, cache e ausência das camadas procedurais.');

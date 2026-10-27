@@ -46,6 +46,8 @@ function makeScene(){
 function load(desktop){
  const ctx={SEA_VIEW:{width:desktop?1280:480,height:720},SEA_DESKTOP:desktop,
    SEA_MATH:{nice:v=>String(Math.floor(v))},
+   SEA_PLAYER_SHIP:{frameHeight:360,stage:()=>1},
+   SeaProfile:{load:()=>({levels:{}})},
    SEA_WEATHER:{names:{calm:'MAR SERENO'}},
    SEA_AUDIO:{enabled:true,toggle(){this.enabled=!this.enabled;return this.enabled;}},
    };

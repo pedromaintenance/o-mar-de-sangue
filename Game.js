@@ -117,6 +117,30 @@ const SEA_FOES = {
     olho_dagon: { name: 'Olho de Dagon', hp: 138, speed: 83, atk: 18, reward: 75, radius: 74, mass: 1.8, range: 590, cooldown: 2300, pattern: 'eye' },
     dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 176, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
 };
+
+/** Quinze melhorias independentes; aparência limitada a 20 estágios.
+ *  Níveis 0/1 exibem o casco inicial. Cada novo quadro exige que a
+ *  MELHORIA MAIS BAIXA alcance aquele nível. Saves antigos permanecem válidos.
+ */
+const SEA_PLAYER_SHIP = {
+    frameWidth: 260, frameHeight: 360, frameCount: 20,
+    weakest(levels) {
+        return Math.min(...SEA_UPGRADES.map(u =>
+            Math.max(0, Math.floor(Number(levels?.[u.id]) || 0))));
+    },
+    stage(levels) {
+        return SEA_MATH.clamp(this.weakest(levels), 1, this.frameCount);
+    },
+    progress(levels) {
+        const weakest = this.weakest(levels);
+        const stage = SEA_MATH.clamp(weakest, 1, this.frameCount);
+        const next = stage < this.frameCount ? stage + 1 : null;
+        const missing = next === null ? 0 : SEA_UPGRADES.filter(u =>
+            Math.max(0, Math.floor(Number(levels?.[u.id]) || 0)) < next).length;
+        return { stage, weakest, next, missing };
+    }
+};
+
 const SeaProfile = {
     defaults() { const levels = {}; for (const x of SEA_UPGRADES) levels[x.id] = 0;
         return { version: 4, gold: 55, levels, sorties: 0, wins: 0, losses: 0, kills: 0, rammings: 0, earned: 0, best: 0,
@@ -158,8 +182,11 @@ const SeaProfile = {
         if (!u) return { ok: false, error: 'Melhoria não encontrada' };
         const cost = this.price(u, p.levels[id]);
         if (p.gold < cost) return { ok: false, error: 'Ouro insuficiente' };
+        const previousStage = SEA_PLAYER_SHIP.stage(p.levels);
         p.gold -= cost; p.levels[id]++; this.store(p);
-        return { ok: true, level: p.levels[id], gold: p.gold, cost };
+        const stage = SEA_PLAYER_SHIP.stage(p.levels);
+        return { ok: true, level: p.levels[id], gold: p.gold, cost,
+            stage, evolved: stage > previousStage };
     },
     selectMode(mode) { const p = this.load(); p.mode = mode; this.store(p); },
     settle(opts) {
@@ -214,7 +241,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('sea-blood', 'assets/tiles/sea_blood.png');
         this.load.image('sea-foam', 'assets/tiles/sea_foam.png');
         this.load.image('sea-mist', 'assets/tiles/sea_mist.png');
-        this.load.image('player-ship', 'assets/sprites/player_ship.png');
+        // Atlas: proa para baixo; 4 linhas × 5 colunas, 260×360 px, vão de 40 px.
+        this.load.spritesheet('player-ship-stages',
+            'assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png',
+            { frameWidth: 260, frameHeight: 360, spacing: 40, endFrame: 19 });
         this.load.image('foe-sloop', 'assets/sprites/enemy_court_ship.png');
         this.load.image('foe-galleon', 'assets/sprites/enemy_galleon.png');
         this.load.image('foe-ram', 'assets/sprites/enemy_ram.png');
@@ -341,10 +371,6 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('command-console-analog', 'assets/ui/command_console_analog.png');
         this.load.image('hud-helm-landscape', 'assets/ui/hud-helm-landscape.png');
         this.load.image('hud-combat-landscape', 'assets/ui/hud-combat-landscape.png');
-        this.load.image('upgrade-hull', 'assets/upgrades/upgrade_hull.png');
-        this.load.image('upgrade-sails', 'assets/upgrades/upgrade_sails.png');
-        this.load.image('upgrade-guns', 'assets/upgrades/upgrade_guns.png');
-        this.load.image('upgrade-ram', 'assets/upgrades/upgrade_ram.png');
 
         const cx = this.scale.width / 2;
         const cy = this.scale.height / 2;
@@ -455,16 +481,18 @@ class Game extends Phaser.Scene {
         SEA_PIXEL.seaInit(this);
         this.buildWorld();
         const start = this.findWaterSpot(this.W / 2, this.H / 2, 400);
-        this.player = this.add.container(start.x, start.y).setDepth(20);
-        const playerScale = (this.hullRadius * 2.25) / this.textures.get('player-ship').getSourceImage().height;
-        this.playerSprite = this.add.image(0, 0, 'player-ship').setScale(playerScale);
-        this.upgradeLayer = this.add.container(0, 0);
+        // Começa navegando rumo ao sul: a proa aparece para BAIXO na tela.
+        // A física usa 0 = norte, por isso a imagem recebe π localmente.
+        this.player = this.add.container(start.x, start.y).setDepth(20).setRotation(Math.PI);
+        const playerScale = (this.hullRadius * 2.25) / SEA_PLAYER_SHIP.frameHeight;
+        this.playerSprite = this.add.image(0, 0, 'player-ship-stages',
+            SEA_PLAYER_SHIP.stage(this.profile.levels) - 1)
+            .setScale(playerScale).setRotation(Math.PI);
         this.playerVisual = this.add.container(0, 0);
-        this.playerVisual.add([this.playerSprite, this.upgradeLayer]);
+        this.playerVisual.add(this.playerSprite);
         SEA_COMBAT.init(this);
         this.player.add(this.playerVisual);
         this.playerWake = this.add.image(start.x,start.y,'fx-foam-0').setDepth(13).setAlpha(0).setScale(1.75);
-        this.decorateUpgradedShip();
         SEA_CHARGE_FX.init(this);
         this.playerHull = {
             ship: this.player, isPlayer: true, radius: this.hullRadius, mass: 1.5,
@@ -594,38 +622,6 @@ class Game extends Phaser.Scene {
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
         this.tweens.add({ targets: tip, alpha: 0, delay: 3700, duration: 950, onComplete: () => tip.destroy() });
         this.updateHUD();
-    }
-    decorateUpgradedShip() {
-        const lv = this.profile.levels;
-        if (!this.upgradeLayer || !this.playerSprite) return;
-        this.upgradeLayer.removeAll(true);
-        const scale = this.playerSprite.scaleX || 1;
-        const addOverlay = (key, tint = null, alpha = 1, extraScale = 1) => {
-            const img = this.add.image(0, 0, key).setScale(scale * extraScale).setAlpha(alpha);
-            if (tint !== null) img.setTint(tint);
-            this.upgradeLayer.add(img);
-            return img;
-        };
-        const hullScore = (lv.casco || 0) + (lv.blindagem || 0);
-        if (hullScore > 0) {
-            const tint = hullScore >= 24 ? 0xffd08a : hullScore >= 12 ? 0xe6bd82 : 0xcaa27d;
-            addOverlay('upgrade-hull', tint, Math.min(.96, .48 + hullScore * .03));
-        }
-        const sailScore = (lv.velas || 0);
-        if (sailScore > 0) {
-            const tint = sailScore >= 18 ? 0xffd37d : sailScore >= 9 ? 0xf1c06e : 0xdca0a8;
-            addOverlay('upgrade-sails', tint, Math.min(.95, .35 + sailScore * .05));
-        }
-        const gunScore = (lv.canhoes || 0) + (lv.bateria || 0);
-        if (gunScore > 0) {
-            const tint = gunScore >= 20 ? 0x1e2632 : 0x111923;
-            addOverlay('upgrade-guns', tint, Math.min(.98, .45 + gunScore * .03));
-        }
-        const ramScore = (lv.esporao || 0);
-        if (ramScore > 0) {
-            const tint = ramScore >= 16 ? 0xffd388 : ramScore >= 8 ? 0xd6dee8 : 0xb3c1cf;
-            addOverlay('upgrade-ram', tint, Math.min(.98, .5 + ramScore * .05));
-        }
     }
     createSeaLayers() {
         this.seaBase = this.add.tileSprite(SEA_VIEW.width / 2, SEA_VIEW.height / 2, SEA_VIEW.width, SEA_VIEW.height, 'sea-base').setScrollFactor(0).setDepth(-110);
@@ -1088,7 +1084,7 @@ class Game extends Phaser.Scene {
             Number(this.cannonCharge.starboard>0);
         if(typeof SEA_CHARGE_FX!=='undefined')SEA_CHARGE_FX.sync(this);
     }
-    // A proa agora aponta para cima; canhões disparam perpendicularmente ao rumo.
+    // Rumo/colisão continuam físicos; o atlas tem proa para baixo e só a rotação visual é compensada.
     // Bombordo = esquerda do capitão, estibordo = direita.
     fire(side = 'both') {
         if (!this.player || this.ended || this.sinking || this.pausedByCaptain || this.islandDocked || this.atlasOpen) return false;

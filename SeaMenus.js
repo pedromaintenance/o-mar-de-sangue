@@ -37,9 +37,10 @@ const SEA_UI = {
                 ornament.fillStyle(0x171317,1);ornament.fillCircle(cx,cy,1);
             }
         }
-        const stamp=scene.add.image(x,top+62,'player-ship').setAlpha(.095);
-        const hi=scene.textures.get('player-ship').getSourceImage().height||160;
-        stamp.setScale(125/hi);add(stamp);
+        const stamp=scene.add.image(x,top+62,'player-ship-stages',
+            SEA_PLAYER_SHIP.stage(scene.profile?.levels || SeaProfile.load().levels)-1)
+            .setAlpha(.095);
+        stamp.setScale(125/SEA_PLAYER_SHIP.frameHeight);add(stamp);
         const label=(yy,value,size=16,color='#d7ccba',bold=false,wrap=w-65)=>{
             return add(scene.add.text(x,yy,value,{
                 fontFamily:'Georgia',fontSize:size+'px',
