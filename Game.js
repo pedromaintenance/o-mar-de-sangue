@@ -751,7 +751,8 @@ class Game extends Phaser.Scene {
             (this.contractId || this.sandboxKrakenTriggered ||
             this.enemies.some(e => !e.dead && e.sandboxSentinel))) return null;
         // Prioridade ao chefe invocado; evita perder o gatilho com a fila cheia.
-        if (this.enemies.filter(e => !e.dead).length >= 29 && !options.fromTentacle) return null;
+        if (this.enemies.filter(e => !e.dead).length >= 29 &&
+            !options.fromTentacle && !options.fromEye && !options.fromDagon) return null;
         const px = this.player?.x ?? this.W / 2, py = this.player?.y ?? this.H / 2;
         const rebirth = this.mode==='sandbox' && type==='tentaculo' && options.rebirthFrom;
         let pos = rebirth ? this.findSandboxTentacleRebirthPosition(options.rebirthFrom,f.radius) : null;
