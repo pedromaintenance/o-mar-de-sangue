@@ -8,6 +8,8 @@ on:
       - assets/v15/beast_dagon.png
       - assets/v15/dagon_emerging.webp
       - tests/dagon-four-frame.test.cjs
+      - tests/dagon-eyes.test.cjs
+      - assets/abyss/dagon_eye.png
       - .github/workflows/dagon-four-frame.yml
   push:
     branches: [main]
@@ -32,3 +34,4 @@ jobs:
         run: |
           node --check Game.js
           node tests/dagon-four-frame.test.cjs
+          node tests/dagon-eyes.test.cjs
