@@ -1812,10 +1812,10 @@ class Game extends Phaser.Scene {
             // O Dagon emerge da água: seu horizonte permanece horizontal.
             // A direção de ataque e a física continuam usando e.heading.
             // Gameplay headings are measured from image-UP (0°).
-            // Enguia, Horror de Coral e aríete V15 têm PROA na parte inferior
+            // Enguia, Horror de Coral, Recife Devorador e aríete V15 têm PROA na parte inferior
             // da arte. Somente o sprite recebe +PI; física, rumo, colisões,
             // esteira e ataques continuam sem alterações.
-            const artFacesDown=e.type==='enguia'||e.type==='coral'||
+            const artFacesDown=e.type==='enguia'||e.type==='coral'||e.type==='recife'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
             e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:
                 e.heading+(artFacesDown?Math.PI:0));
