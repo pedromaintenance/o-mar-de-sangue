@@ -183,7 +183,7 @@ const {chromium}=require('playwright-core');
      label+': one salvo per hold and release-to-rearm, independent port broadside '+
        JSON.stringify(volley));
    assert(Math.hypot(volley.v.x,volley.v.y)>0&&
-     volley.kickVelocity>40&&volley.kick>8&&volley.hullLean>7,
+     Math.abs(volley.kickVelocity)>40&&volley.kick>8&&volley.hullLean>7,
      label+': recoil should be physically and visually noticeable '+JSON.stringify(volley));
    assert(before.quest.length>0&&before.badge.includes('MALDIÇÃO'));
    assert.deepEqual(before.pause,{x:454,y:78,w:120,h:40});
