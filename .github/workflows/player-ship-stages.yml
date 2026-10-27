@@ -1,0 +1,42 @@
+name: Player Ship 20 Stages
+on:
+  pull_request:
+    paths:
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'SeaMenus.js'
+      - 'sw.js'
+      - 'assets/player/**'
+      - 'tests/player-ship-20-stages.test.cjs'
+      - '.github/workflows/player-ship-stages.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'SeaMenus.js'
+      - 'sw.js'
+      - 'assets/player/**'
+      - 'tests/player-ship-20-stages.test.cjs'
+      - '.github/workflows/player-ship-stages.yml'
+permissions:
+  contents: read
+jobs:
+  ship-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check Game.js
+          node --check PortUI.js
+          node --check SeaMenus.js
+          node --check sw.js
+      - name: Stage progression, assets and cache
+        run: node --test tests/player-ship-20-stages.test.cjs
+      - name: Existing shipyard and cache contracts
+        run: node --test tests/port-ui-rebuild.test.cjs tests/port-controller-navigation.test.cjs tests/pwa-cache-contract.test.cjs
