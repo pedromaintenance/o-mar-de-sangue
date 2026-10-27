@@ -407,8 +407,9 @@ class Game extends Phaser.Scene {
         this.playerVelocity = { x: 0, y: 0 }; this.hullRadius = 68;
         this.gold = 0; this.kills = 0; this.bossKills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
         this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
-        this.sandboxKrakenTriggered = false;
+        this.sandboxKrakenTriggered = false; // Kraken atualmente desperto no sandbox.
         this.nextTentacleSpawnAt = 0;
+        this.sandboxTentacleRebirthFrom = null; // Posição da última derrota do Kraken.
         this.elapsed = 0; this.waveElapsed = 0; this.ended = false; this.pausedByCaptain = false;
         this.gracePeriod = 3.0; // tempo para orientar o navio antes do primeiro ataque
         this.resultsBanked = false; this.speed = 0; this.lastImpact = -1000;
@@ -704,6 +705,20 @@ class Game extends Phaser.Scene {
         if (rank >= 10) pool.push('tartaruga');
         return pool[(Math.floor(Math.random() * pool.length) + (seed % 2)) % pool.length];
     }
+    findSandboxTentacleRebirthPosition(origin, radius) {
+        // A próxima manifestação nasce longe do Kraken derrotado e do jogador.
+        // Percorre o MAR INTEIRO: não reaparece instantaneamente na mesma batalha.
+        for (let tries=0; tries<120; tries++) {
+            const x=115+Math.random()*(this.W-230);
+            const y=115+Math.random()*(this.H-230);
+            if (Math.hypot(x-origin.x,y-origin.y)<1100) continue;
+            if (Math.hypot(x-this.player.x,y-this.player.y)<850) continue;
+            if (this.islands.some(isl=>Math.hypot(isl.x-x,isl.y-y)<isl.radius+radius+44)) continue;
+            if (this.enemies.some(e=>!e.dead&&Math.hypot(e.x-x,e.y-y)<110)) continue;
+            return {x,y};
+        }
+        return null; // Não sacrifica distância/segurança se o mapa estiver ocupado.
+    }
     spawnEnemy(type = 'patrulha', spacing = 450, options = {}) {
         const f = SEA_FOES[type]; if (!f) return null;
         // Nenhum evento, onda ou contrato invoca o Kraken no sandbox diretamente.
@@ -714,8 +729,9 @@ class Game extends Phaser.Scene {
         // Prioridade ao chefe invocado; evita perder o gatilho com a fila cheia.
         if (this.enemies.filter(e => !e.dead).length >= 29 && !options.fromTentacle) return null;
         const px = this.player?.x ?? this.W / 2, py = this.player?.y ?? this.H / 2;
-        let pos = null;
-        for (let tries = 0; tries < 34; tries++) {
+        const rebirth = this.mode==='sandbox' && type==='tentaculo' && options.rebirthFrom;
+        let pos = rebirth ? this.findSandboxTentacleRebirthPosition(options.rebirthFrom,f.radius) : null;
+        for (let tries = 0; !rebirth && tries < 34; tries++) {
             const angle = Math.random() * 2 * Math.PI;
             const d = spacing + Math.random() * 260;
             const x = SEA_MATH.clamp(px + Math.cos(angle) * d, 115, this.W - 115);
@@ -725,6 +741,7 @@ class Game extends Phaser.Scene {
             if (this.enemies.some(e => !e.dead && Math.hypot(e.x - x, e.y - y) < 110)) continue;
             pos = { x, y }; break;
         }
+        if (!pos && rebirth) return null; // Nova tentativa segura na próxima atualização.
         if (!pos) pos = this.findWaterSpot(this.W / 2, this.H / 2, f.radius + 40);
         const scaleDifficulty = 1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .24 : .12);
         const elite = ['almirante','nauabissal','kraken','dagon'].includes(type);
@@ -1383,6 +1400,23 @@ class Game extends Phaser.Scene {
     sinkEnemy(enemy, ramming = false) {
         if (enemy.dead) return;
         enemy.dead = true;
+        if (this.mode==='sandbox' && !this.contractId && enemy.type==='kraken' &&
+            this.sandboxKrakenTriggered) {
+            // Derrotar o chefe encerra apenas este ciclo, não a lenda do Kraken.
+            this.sandboxKrakenTriggered = false;
+            this.sandboxTentacleRebirthFrom = {x:enemy.x,y:enemy.y};
+            this.nextTentacleSpawnAt = this.elapsed + 5;
+            // O tentáculo que acordou o Kraken não pode permanecer como cópia viva.
+            for (const remnant of this.enemies) {
+                if (remnant.dead || !remnant.sandboxSentinel) continue;
+                remnant.dead = true;
+                remnant.ship?.destroy();
+                remnant.wake?.destroy();
+                remnant.bar?.destroy();
+                remnant.label?.destroy();
+            }
+            this.announce('O KRAKEN RECUOU · SUA SOMBRA VOLTARÁ A VAGAR PELO MAR');
+        }
         if (enemy.sandboxSentinel && !this.sandboxKrakenTriggered)
             this.nextTentacleSpawnAt = this.elapsed + 12;
         SEA_WEATHER.onSink(this, enemy, ramming);
@@ -1819,11 +1853,18 @@ class Game extends Phaser.Scene {
                 this.nextSpawnTime=this.elapsed+7;
             }
         } else if (this.mode === 'sandbox') {
-            // Mantém um único tentáculo errante até a convocação do Kraken.
+            // Ciclo sandbox: tentáculo solitário -> Kraken -> novo tentáculo distante.
             if (!this.sandboxKrakenTriggered && this.elapsed >= this.nextTentacleSpawnAt &&
                 !this.enemies.some(e => e.sandboxSentinel && !e.dead)) {
-                this.spawnEnemy('tentaculo', 980);
-                this.nextTentacleSpawnAt = this.elapsed + 14;
+                const origin = this.sandboxTentacleRebirthFrom;
+                const next = this.spawnEnemy('tentaculo', 980, origin ? {rebirthFrom:origin} : {});
+                if (next) {
+                    this.sandboxTentacleRebirthFrom = null;
+                    this.nextTentacleSpawnAt = this.elapsed + 14;
+                    if (origin) this.announce('UM TENTÁCULO SOLITÁRIO EMERGIU EM OUTRAS ÁGUAS');
+                } else {
+                    this.nextTentacleSpawnAt = this.elapsed + 2;
+                }
             }
             if (this.waveClock > 52) {
                 this.waveClock -= 52; this.wave++; this.currentDifficulty = this.wave;
