@@ -4,7 +4,9 @@ on:
     paths:
       - Game.js
       - sw.js
+      - assets/v15/dagon_emerging.png
       - assets/v15/beast_dagon.png
+      - assets/v15/dagon_emerging.webp
       - tests/dagon-four-frame.test.cjs
       - .github/workflows/dagon-four-frame.yml
   push:
@@ -12,7 +14,9 @@ on:
     paths:
       - Game.js
       - sw.js
+      - assets/v15/dagon_emerging.png
       - assets/v15/beast_dagon.png
+      - assets/v15/dagon_emerging.webp
       - tests/dagon-four-frame.test.cjs
 permissions:
   contents: read
