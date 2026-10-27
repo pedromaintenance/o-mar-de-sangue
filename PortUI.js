@@ -255,7 +255,9 @@ const SEA_PORT_UI = {
     if(name==='help'||name==='reset'){this.goto(name);return;}
     if(name==='buy'){
       const result=SeaProfile.buy(id);
-      if(result.ok){this.render('buy:'+id);this.notify('Melhoria adquirida. O estaleiro foi atualizado.');}
+      if(result.ok){this.render('buy:'+id);this.notify(result.evolved ?
+        'A nau evoluiu para o estágio '+result.stage+'/20!' :
+        'Melhoria adquirida. A evolução depende da menor melhoria.');}
       else this.notify(result.error||'Não foi possível concluir a compra.');
       return;
     }
@@ -631,10 +633,15 @@ const SEA_PORT_UI = {
     const group=this.scene?.yardGroup||'armas';
     const tabs=[['casco','CASCO'],['motor','NAVEGAÇÃO'],['armas','ARMAMENTO'],['apoio','APOIO']];
     const list=SEA_UPGRADES.filter(u=>u.group===group);
+    const visual=SEA_PLAYER_SHIP.progress(p.levels);
     return '<main class="port-page" id="port-main">'+
       '<div class="port-page__header"><span class="port-eyebrow">FERRARIA, MADEIRA E RUNAS</span>'+
         '<h1>O ESTALEIRO</h1><p>Não existe teto para a ambição. Apenas um preço crescente.</p>'+
-        '<div class="port-page__balance">◈ COFRE DO CAPITÃO <strong>'+this.num(p.gold)+'</strong></div></div>'+
+        '<div class="port-page__balance">◈ COFRE DO CAPITÃO <strong>'+this.num(p.gold)+'</strong></div>'+
+        '<div class="port-ship-evolution" role="status">NAVIO · ESTÁGIO <strong>'+this.num(visual.stage)+'/20</strong>'+
+          '<p>'+(visual.next===null?'EVOLUÇÃO VISUAL CONCLUÍDA · melhorias continuam ilimitadas.':
+            'Próximo estágio: todas as melhorias no nível '+this.num(visual.next)+
+            ' · '+this.num(visual.missing)+' de '+this.num(SEA_UPGRADES.length)+' ainda abaixo do requisito.')+'</p></div></div>'+
       '<nav class="port-tabs" aria-label="Grupos de melhorias">'+
         '<span class="port-tabs__hint" aria-hidden="true">LB / Q ◀ TROCAR ABA ▶ RB / E</span>'+
         tabs.map(([id,label])=>'<button type="button" tabindex="-1" data-nav="pointer" data-action="yard:'+id+'" '+

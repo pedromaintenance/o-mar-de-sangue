@@ -1,0 +1,406 @@
+{
+  "name": "Mar de Sangue — Navio do Jogador — Progressão 20 Níveis",
+  "version": "proa-para-baixo-01",
+  "source": "redesenhado do zero, sem reutilizar o barco inicial anterior",
+  "orientation": {
+    "bow": "down",
+    "stern": "up",
+    "perspective": "top-down fixed"
+  },
+  "order": "row-major, left-to-right, top-to-bottom",
+  "sprite_sheet": "mar_de_sangue_navio_proa_baixo_20_evolucoes.png",
+  "sheet_size": {
+    "width": 1460,
+    "height": 1560
+  },
+  "grid": {
+    "rows": 4,
+    "columns": 5,
+    "frame_width": 260,
+    "frame_height": 360,
+    "horizontal_gap": 40,
+    "vertical_gap": 40
+  },
+  "sprites": [
+    {
+      "level": 1,
+      "name": "Casco inicial",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_01.png",
+      "row": 0,
+      "column": 0,
+      "sprite_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 2,
+      "name": "Madeirame reforçado",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_02.png",
+      "row": 0,
+      "column": 1,
+      "sprite_rect": {
+        "x": 300,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 3,
+      "name": "Cabine protegida",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_03.png",
+      "row": 0,
+      "column": 2,
+      "sprite_rect": {
+        "x": 600,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 4,
+      "name": "Lanternas de navegação",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_04.png",
+      "row": 0,
+      "column": 3,
+      "sprite_rect": {
+        "x": 900,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 5,
+      "name": "Primeiros estandartes",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_05.png",
+      "row": 0,
+      "column": 4,
+      "sprite_rect": {
+        "x": 1200,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 6,
+      "name": "Borda reforçada",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_06.png",
+      "row": 1,
+      "column": 0,
+      "sprite_rect": {
+        "x": 0,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 7,
+      "name": "Canhões laterais",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_07.png",
+      "row": 1,
+      "column": 1,
+      "sprite_rect": {
+        "x": 300,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 8,
+      "name": "Artilharia ampliada",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_08.png",
+      "row": 1,
+      "column": 2,
+      "sprite_rect": {
+        "x": 600,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 9,
+      "name": "Velas de guerra",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_09.png",
+      "row": 1,
+      "column": 3,
+      "sprite_rect": {
+        "x": 900,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 10,
+      "name": "Esporão ornamentado",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_10.png",
+      "row": 1,
+      "column": 4,
+      "sprite_rect": {
+        "x": 1200,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 11,
+      "name": "Escolta armada",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_11.png",
+      "row": 2,
+      "column": 0,
+      "sprite_rect": {
+        "x": 0,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 12,
+      "name": "Blindagem naval",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_12.png",
+      "row": 2,
+      "column": 1,
+      "sprite_rect": {
+        "x": 300,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 13,
+      "name": "Velame rubro",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_13.png",
+      "row": 2,
+      "column": 2,
+      "sprite_rect": {
+        "x": 600,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 14,
+      "name": "Selo ritual",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_14.png",
+      "row": 2,
+      "column": 3,
+      "sprite_rect": {
+        "x": 900,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 15,
+      "name": "Fortaleza flutuante",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_15.png",
+      "row": 2,
+      "column": 4,
+      "sprite_rect": {
+        "x": 1200,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 16,
+      "name": "Capitânia carmesim",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_16.png",
+      "row": 3,
+      "column": 0,
+      "sprite_rect": {
+        "x": 0,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 17,
+      "name": "Nau da tempestade",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_17.png",
+      "row": 3,
+      "column": 1,
+      "sprite_rect": {
+        "x": 300,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 18,
+      "name": "Pacto tentacular",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_18.png",
+      "row": 3,
+      "column": 2,
+      "sprite_rect": {
+        "x": 600,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 19,
+      "name": "Encouraçado abissal",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_19.png",
+      "row": 3,
+      "column": 3,
+      "sprite_rect": {
+        "x": 900,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    },
+    {
+      "level": 20,
+      "name": "Soberana do Mar de Sangue",
+      "file": "mar_de_sangue_navio_proa_baixo_nivel_20.png",
+      "row": 3,
+      "column": 4,
+      "sprite_rect": {
+        "x": 1200,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "bow": "down",
+      "stern": "up",
+      "anchor": {
+        "x": 130,
+        "y": 346
+      }
+    }
+  ]
+}

@@ -160,6 +160,9 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
 .port-page__header p{margin:2px 0 4px;color:#b9c0bd;font:15px Georgia,serif}
 .port-page__balance{font-size:12px;letter-spacing:.12em;color:#d4b688;margin-top:13px}
 .port-page__balance strong{font:700 20px Georgia,serif;color:#ffe2a8}
+.port-ship-evolution{margin:12px auto 0;padding:8px 12px;max-width:580px;border-top:1px solid #907053;color:#efc98e;font:700 13px Georgia,serif;letter-spacing:.09em}
+.port-ship-evolution strong{font-size:19px;color:#ffe3a5}
+.port-page__header .port-ship-evolution p{font:13px Georgia,serif;letter-spacing:0;line-height:1.5;margin:4px 0 0;color:#c8c6b9}
 .port-tabs{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;padding:6px;
  background:#101721dd;border:1px solid #8f725b}
 .port-tabs button{flex:1 1 130px;background:#232931;color:#cfb89e;
