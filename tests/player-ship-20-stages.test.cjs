@@ -7,10 +7,10 @@ const menu=fs.readFileSync('SeaMenus.js','utf8');
 const port=fs.readFileSync('PortUI.js','utf8');
 const sw=fs.readFileSync('sw.js','utf8');
 const manifest=JSON.parse(fs.readFileSync('assets/player/mar_de_sangue_navio_proa_baixo_manifest.json','utf8'));
-const ids=Array.from(game.matchAll(/\\{ id: '([^']+)', icon:/g),x=>x[1]);
+const ids=Array.from(game.matchAll(/\{ id: '([^']+)', icon:/g),x=>x[1]);
 assert.equal(ids.length,15);
 const begin=game.indexOf('const SEA_PLAYER_SHIP = {');
-const end=game.indexOf('\\n};',begin);
+const end=game.indexOf('\n};',begin);
 assert(begin>=0 && end>begin);
 const context={};
 vm.runInNewContext('const SEA_UPGRADES='+JSON.stringify(ids.map(id=>({id})))+
@@ -41,12 +41,12 @@ const png=fs.readFileSync('assets/player/mar_de_sangue_navio_proa_baixo_20_evolu
 assert.equal(png.toString('hex',0,8),'89504e470d0a1a0a');
 assert.equal(png.readUInt32BE(16),1460);
 assert.equal(png.readUInt32BE(20),1560);
-assert.match(game,/this\\.load\\.spritesheet\\('player-ship-stages'/);
+assert.match(game,/this\.load\.spritesheet\('player-ship-stages'/);
 assert.match(game,/spacing: 40, endFrame: 19/);
-assert.match(game,/SEA_PLAYER_SHIP\\.stage\\(this\\.profile\\.levels\\) - 1/);
-assert.match(game,/setRotation\\(Math\\.PI\\)/);
+assert.match(game,/SEA_PLAYER_SHIP\.stage\(this\.profile\.levels\) - 1/);
+assert.match(game,/setRotation\(Math\.PI\)/);
 assert.match(menu,/player-ship-stages/);
-assert.match(port,/SEA_PLAYER_SHIP\\.progress\\(p\\.levels\\)/);
+assert.match(port,/SEA_PLAYER_SHIP\.progress\(p\.levels\)/);
 for(const src of [game,sw]){
   assert(!src.includes('assets/sprites/player_ship.png'));
   assert(!src.includes('assets/upgrades/upgrade_'));
