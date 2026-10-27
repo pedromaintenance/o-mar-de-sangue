@@ -39,7 +39,7 @@ const SEA_UI = {
         }
         const stamp=scene.add.image(x,top+62,'player-ship-stages',
             SEA_PLAYER_SHIP.stage(scene.profile?.levels || SeaProfile.load().levels)-1)
-            .setRotation(Math.PI).setAlpha(.095);
+            .setAlpha(.095);
         stamp.setScale(125/SEA_PLAYER_SHIP.frameHeight);add(stamp);
         const label=(yy,value,size=16,color='#d7ccba',bold=false,wrap=w-65)=>{
             return add(scene.add.text(x,yy,value,{
