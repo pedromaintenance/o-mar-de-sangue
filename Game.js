@@ -91,6 +91,10 @@ const SEA_MISSION_TITLES = [
     'As Esmeraldas Perdidas', 'O Horizonte dos Afogados', 'A Frota das Lanternas',
     'O Trono Naval da Noite'
 ];
+// O Kraken ocupa a 2ª posição do ciclo de chefes a cada 20 missões.
+function seaKrakenEncounterNumber(stage) {
+    return stage >= 10 && (stage - 10) % 20 === 0 ? 1 + (stage - 10) / 20 : 0;
+}
 const SEA_FOES = {
     patrulha: { name: 'Patrulha da Corte', tint: 0xa47d8d, hp: 60, speed: 100, atk: 10, reward: 22, radius: 58, mass: 1, range: 430, cooldown: 1900, pattern: 'broadside' },
     corsario: { name: 'Corsário de Sangue', tint: 0xcc746b, hp: 68, speed: 150, atk: 11, reward: 29, radius: 54, mass: .95, range: 330, cooldown: 1150, pattern: 'chase' },
@@ -107,6 +111,7 @@ const SEA_FOES = {
     coral: { name: 'Horror de Coral', hp: 143, speed: 64, atk: 22, reward: 62, radius: 76, mass: 1.65, range: 480, cooldown: 2250, pattern: 'sniper' },
     caranguejo: { name: 'Guardião Caranguejo', hp: 196, speed: 92, atk: 22, reward: 75, radius: 84, mass: 2.8, range: 145, cooldown: 5000, pattern: 'ram' },
     tartaruga: { name: 'Templo-Tartaruga', hp: 268, speed: 58, atk: 28, reward: 109, radius: 102, mass: 3.6, range: 445, cooldown: 2400, pattern: 'broadside' },
+    tentaculo: { name: 'Tentáculo Errante', hp: 145, speed: 95, atk: 20, reward: 64, radius: 73, mass: 2.2, range: 185, cooldown: 3250, pattern: 'tentacle' },
     kraken: { name: 'KRAKEN — O Abismo Desperta', hp: 690, speed: 61, atk: 53, reward: 380, radius: 166, mass: 7.5, range: 380, cooldown: 2750, pattern: 'tentacle' },
     dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 176, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
 };
@@ -250,7 +255,10 @@ class SeaBoot extends Phaser.Scene {
             frameWidth:512, frameHeight:682, endFrame:3
         });
         // O novo Dagon usa exclusivamente a textura dagon-animated.
-        this.load.image('v15-tentacle', 'assets/v15/beast_tentacle.png');
+        // Tentáculo: folha RGBA original de quatro quadros horizontais (512 × 682).
+        this.load.spritesheet('tentacle-animated', 'assets/v15/beast_tentacle.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         // Cortejo dos Afogados: original RGBA, quatro quadros horizontais de 512 x 682.
         this.load.spritesheet('drowned-animated', 'assets/v15/beast_drowned.png', {
             frameWidth:512, frameHeight:682, endFrame:3
@@ -399,6 +407,8 @@ class Game extends Phaser.Scene {
         this.playerVelocity = { x: 0, y: 0 }; this.hullRadius = 68;
         this.gold = 0; this.kills = 0; this.bossKills = 0; this.rammingSinks = 0; this.impactCount = 0; this.rockHits = 0;
         this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
+        this.sandboxKrakenTriggered = false;
+        this.nextTentacleSpawnAt = 0;
         this.elapsed = 0; this.waveElapsed = 0; this.ended = false; this.pausedByCaptain = false;
         this.gracePeriod = 3.0; // tempo para orientar o navio antes do primeiro ataque
         this.resultsBanked = false; this.speed = 0; this.lastImpact = -1000;
@@ -453,10 +463,20 @@ class Game extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, .095, .095);
         const startingFoes = this.mode === 'mission' ? (this.objective === 'boss' ? 5 : 7) : 6;
         for (let i = 0; i < startingFoes; i++) this.spawnEnemy(this.chooseFoe(i), 430 + i * 95);
+        // Só existe um tentáculo errante no mar aberto; ele guarda o encontro com o Kraken.
+        if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('tentaculo', 1000);
         if (this.objective === 'boss') {
             const bossTypes = ['almirante','kraken','dagon','nauabissal'];
             this.missionBoss = bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
             this.spawnEnemy(this.missionBoss, this.missionBoss === 'kraken' ? 560 : 600);
+            // Missão 10: primeiro Kraken sem reforços; missão 30: 4 tentáculos;
+            // em confrontos posteriores, até 7 tentáculos independentes.
+            const krakenEncounter = seaKrakenEncounterNumber(this.stage);
+            if (this.missionBoss === 'kraken' && krakenEncounter >= 2) {
+                const reinforcements = Math.min(7, krakenEncounter * 2);
+                for (let i=0;i<reinforcements;i++)
+                    this.spawnEnemy('tentaculo', 470 + i * 75);
+            }
             this.bossAlert = `ALERTA · ${SEA_FOES[this.missionBoss].name}`;
         }
         if (this.objective === 'hunt') for(let j = 0; j < Math.min(3,this.huntTarget); j++) this.spawnEnemy('fragata', 570 + j * 90);
@@ -684,9 +704,15 @@ class Game extends Phaser.Scene {
         if (rank >= 10) pool.push('tartaruga');
         return pool[(Math.floor(Math.random() * pool.length) + (seed % 2)) % pool.length];
     }
-    spawnEnemy(type = 'patrulha', spacing = 450) {
+    spawnEnemy(type = 'patrulha', spacing = 450, options = {}) {
         const f = SEA_FOES[type]; if (!f) return null;
-        if (this.enemies.filter(e => !e.dead).length >= 29) return null;
+        // Nenhum evento, onda ou contrato invoca o Kraken no sandbox diretamente.
+        if (this.mode === 'sandbox' && type === 'kraken' && !options.fromTentacle) return null;
+        if (this.mode === 'sandbox' && type === 'tentaculo' &&
+            (this.contractId || this.sandboxKrakenTriggered ||
+            this.enemies.some(e => !e.dead && e.sandboxSentinel))) return null;
+        // Prioridade ao chefe invocado; evita perder o gatilho com a fila cheia.
+        if (this.enemies.filter(e => !e.dead).length >= 29 && !options.fromTentacle) return null;
         const px = this.player?.x ?? this.W / 2, py = this.player?.y ?? this.H / 2;
         let pos = null;
         for (let tries = 0; tries < 34; tries++) {
@@ -707,25 +733,26 @@ class Game extends Phaser.Scene {
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
             enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated',
-            caranguejo:'foe-shell', tartaruga:'foe-turtle', kraken:'kraken-animated', dagon:'dagon-animated' })[type] || 'foe-sloop';
+            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
         const v15Visuals = { patrulha:'v15-sloop', corsario:'v15-blood', ariete:'v15-ram',
             fragata:'v15-royal', bombardeiro:'v15-chapel', espectral:'v15-spectral',
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
-            nauabissal:'v15-merchant', kraken:'kraken-animated', dagon:'dagon-animated',
+            nauabissal:'v15-merchant', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated',
             afogados:'drowned-animated', coral:'coral-animated' };
         if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='dagon' && tex==='dagon-animated') ||
             (type==='coral' && tex==='coral-animated') ||
             (type==='afogados' && tex==='drowned-animated') ||
-            (type==='kraken' && tex==='kraken-animated');
+            (type==='kraken' && tex==='kraken-animated') ||
+            (type==='tentaculo' && tex==='tentacle-animated');
         const sourceH = animated682 ? 682 :
             (this.textures.get(tex).getSourceImage().height || 160);
-        const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'].includes(type);
+        const supernatural = ['enguia','afogados','coral','caranguejo','tartaruga','tentaculo','kraken','dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='afogados'||type==='kraken')?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='afogados'||type==='kraken'||type==='tentaculo')?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -737,6 +764,7 @@ class Game extends Phaser.Scene {
             vx: 0, vy: 0, radius: f.radius, mass: f.mass,
             lastRockContact: -1000, lastRamming: -1000, specialPhase: 0, dead: false,
             maxRange: f.range, cooldownBase: f.cooldown, pattern: f.pattern, elite, boss: elite, bar: null };
+        enemy.sandboxSentinel = this.mode==='sandbox' && type==='tentaculo';
         enemy.spriteScale = ship.scaleX;
         enemy.visualPhase = id * 1.39;
         enemy.isMonster = supernatural;
@@ -1121,6 +1149,10 @@ class Game extends Phaser.Scene {
                     e.dagonFrame=frame;
                 }
             }
+            if(e.type==='tentaculo' && e.ship.texture.key==='tentacle-animated'){
+                const frame=Math.floor((t*4+e.visualPhase)%4);
+                if(e.tentacleFrame!==frame){e.ship.setFrame(frame);e.tentacleFrame=frame;}
+            }
             if(e.type==='kraken' && e.ship.texture.key==='kraken-animated'){
                 // Apenas animação visual de 4 fps; o Kraken mantém a própria
                 // orientação, comportamento, tentáculos e colisões.
@@ -1332,6 +1364,8 @@ class Game extends Phaser.Scene {
             const playerHit = this.damageShip(pd, hitX, hitY, 'ram');
             const enemy = a.isPlayer ? b : a;
             enemy.hp = Math.max(0, enemy.hp - Math.round(ed * this.shipStats.ramDamage));
+            // Abalroar o tentáculo é atacá-lo; sofrer seu impacto é ser atingido.
+            if (enemy.sandboxSentinel) this.summonSandboxKraken(enemy);
             this.impactFX(hitX, hitY, closingSpeed,
                 `ABALROAMENTO -${playerHit ? Math.round(pd * (1 - this.shipStats.ramProtection)) : 0} / -${Math.round(ed * this.shipStats.ramDamage)}`);
             if (enemy.hp <= 0) this.sinkEnemy(enemy, true);
@@ -1349,6 +1383,8 @@ class Game extends Phaser.Scene {
     sinkEnemy(enemy, ramming = false) {
         if (enemy.dead) return;
         enemy.dead = true;
+        if (enemy.sandboxSentinel && !this.sandboxKrakenTriggered)
+            this.nextTentacleSpawnAt = this.elapsed + 12;
         SEA_WEATHER.onSink(this, enemy, ramming);
         if(enemy.wake) enemy.wake.destroy();
         this.burst(enemy.x,enemy.y,enemy.boss?'blast':'smoke',enemy.boss?2.4:1.4);
@@ -1525,6 +1561,7 @@ class Game extends Phaser.Scene {
             const aim = Math.atan2(this.player.x - e.x, -(this.player.y - e.y));
             const sideAngle = Phaser.Math.Angle.Wrap(aim - e.heading);
             const aggressive = e.isMonster || ['ram','chase','tentacle'].includes(e.pattern);
+            const tentacleRoaming = e.sandboxSentinel && distance > 410;
             const kiting = !e.isMonster && e.pattern === 'sniper' && distance < e.maxRange * .52;
             let desired;
             if (aggressive) desired = aim;
@@ -1535,10 +1572,11 @@ class Game extends Phaser.Scene {
                 if (e.pattern === 'boss' || e.pattern === 'abyss') desired += .14;
             }
             if (kiting) desired = aim + Math.PI;
+            if (tentacleRoaming) desired = e.heading + Math.sin(this.elapsed*.65+e.visualPhase)*.035;
             if (distance < (e.isMonster?1400:850)) {
                 const diff = Phaser.Math.Angle.Wrap(desired - e.heading);
                 e.heading += SEA_MATH.clamp(diff, -1.75 * dt, 1.75 * dt);
-                const throttle = aggressive ? 1 : distance > e.maxRange * .75 ? .8 : distance < 135 ? .38 : .57;
+                const throttle = tentacleRoaming ? .55 : aggressive ? 1 : distance > e.maxRange * .75 ? .8 : distance < 135 ? .38 : .57;
                 const thrust=e.isMonster?260:180;
                 e.vx += Math.sin(e.heading) * thrust * throttle * dt;
                 e.vy -= Math.cos(e.heading) * thrust * throttle * dt;
@@ -1549,6 +1587,7 @@ class Game extends Phaser.Scene {
                     e.chargeMs=0;
                     if(distance<e.radius+this.hullRadius+105&&e.cooldown<=0){
                         if(e.type==='kraken')this.tentacleAttack(e);
+                        else if(e.type==='tentaculo')this.tentacleStrike(e);
                         else this.monsterLunge(e,distance);
                         e.cooldown=e.cooldownBase*(.85+Math.random()*.35);
                     }
@@ -1614,6 +1653,39 @@ class Game extends Phaser.Scene {
         e.vx-=fireDX*impulse;e.vy-=fireDY*impulse;
         this.splash(e.x + fireDX * 29, e.y + fireDY * 29, e.boss ? 0xffac83 : 0xc8a8bd, 7);
         if (distance < 840) SEA_AUDIO.play('enemy', e.boss ? .8 : .46, distance);
+    }
+    summonSandboxKraken(tentacle) {
+        if (this.mode !== 'sandbox' || this.contractId || !tentacle?.sandboxSentinel ||
+            this.sandboxKrakenTriggered || this.ended) return null;
+        const boss = this.spawnEnemy('kraken', 640, {fromTentacle:true});
+        if (!boss) return null;
+        this.sandboxKrakenTriggered = true;
+        this.announce('O TENTÁCULO DESPERTOU O KRAKEN!');
+        this.burst(tentacle.x,tentacle.y,'violet',2.2);
+        return boss;
+    }
+    tentacleStrike(e) {
+        if (e.dead || this.ended) return;
+        const cx=this.player.x+this.playerVelocity.x*.25;
+        const cy=this.player.y+this.playerVelocity.y*.25;
+        const radius=66;
+        const warning=this.add.circle(cx,cy,radius,0x922838,.16)
+            .setStrokeStyle(3,0xf3a29b,.9).setDepth(36);
+        this.tweens.add({targets:warning,alpha:.58,scale:1.08,duration:370,
+            onComplete:()=>warning.destroy()});
+        this.time.delayedCall(450,()=>{
+            if(this.ended || e.dead || !e.ship?.active) return;
+            // Reutiliza o mesmo sprite real do inimigo na investida emergindo.
+            const fx=this.add.image(cx,cy,'tentacle-animated',Math.floor(this.elapsed*4)%4)
+                .setDepth(36).setScale(.24).setAlpha(.90);
+            this.tweens.add({targets:fx,alpha:0,scale:.33,duration:500,
+                onComplete:()=>fx.destroy()});
+            this.splash(cx,cy,0xf2bcc1,11);
+            if(Math.hypot(this.player.x-cx,this.player.y-cy)<radius+this.hullRadius) {
+                const hurt=this.damageShip(e.atk,cx,cy,'ram');
+                if(hurt) this.summonSandboxKraken(e);
+            }
+        });
     }
     tentacleAttack(e) {
         if (e.dead || this.ended) return;
@@ -1700,6 +1772,7 @@ class Game extends Phaser.Scene {
                     if (e.dead) continue;
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; e.hp = Math.max(0, e.hp - p.damage);
+                        if(e.sandboxSentinel) this.summonSandboxKraken(e);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
                         SEA_COMBAT.hitEnemy(this, e, p.x, p.y, p.damage);
                         this.splash(p.x, p.y, 0xffdfb4, 9);
@@ -1746,12 +1819,18 @@ class Game extends Phaser.Scene {
                 this.nextSpawnTime=this.elapsed+7;
             }
         } else if (this.mode === 'sandbox') {
+            // Mantém um único tentáculo errante até a convocação do Kraken.
+            if (!this.sandboxKrakenTriggered && this.elapsed >= this.nextTentacleSpawnAt &&
+                !this.enemies.some(e => e.sandboxSentinel && !e.dead)) {
+                this.spawnEnemy('tentaculo', 980);
+                this.nextTentacleSpawnAt = this.elapsed + 14;
+            }
             if (this.waveClock > 52) {
                 this.waveClock -= 52; this.wave++; this.currentDifficulty = this.wave;
                 this.shipHP = Math.min(this.maxShipHP, this.shipHP + Math.max(8, this.maxShipHP * .10));
                 this.announce(`ONDA ${this.wave} · AS SOMBRAS SE FORTALECEM`);
                 if (this.wave % 5 === 0) {
-                    const bosses=['almirante','kraken','dagon','nauabissal'];
+                    const bosses=['almirante','dagon','nauabissal'];
                     const selected=bosses[(this.wave / 5 - 1) % bosses.length];
                     this.spawnEnemy(selected, 530);
                     this.announce(`ONDA ${this.wave} · ${SEA_FOES[selected].name}`);
