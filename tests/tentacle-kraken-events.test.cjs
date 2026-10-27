@@ -36,7 +36,7 @@ for(const [stage,expected] of [[5,0],[10,1],[15,0],[20,0],[25,0],[30,2],[35,0],[
 assert(game.includes("if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('tentaculo', 1000)"));
 assert(game.includes("this.mode === 'sandbox' && type === 'kraken' && !options.fromTentacle"),
  'Kraken cannot spawn automatically in sandbox');
-assert(game.includes("const bosses=['almirante','dagon','nauabissal'];"),'no Kraken wave spawn');
+assert(game.includes("const bosses=['almirante','nauabissal'];"),'neither Kraken nor Dagon appears automatically in sandbox waves');
 assert(game.includes("enemy.sandboxSentinel = this.mode==='sandbox' && type==='tentaculo'"));
 assert(game.includes("if(e.sandboxSentinel) this.summonSandboxKraken(e)"),
  'player cannon hit must summon Kraken');
