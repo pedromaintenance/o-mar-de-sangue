@@ -1243,7 +1243,7 @@ class Game extends Phaser.Scene {
             if(e.isMonster) {
                 const dx=(e.type==='enguia'? .045: .012)*pulse;
                 e.ship.setScale(e.spriteScale*(1+dx),e.spriteScale*(1-dx*.48));
-                e.ship.setAlpha(e.type==='olho_dagon' && e.eyeHidden ? (e.eyeFrame===0?.32:.78) : e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1);
+                e.ship.setAlpha(e.type==='olho_dagon' && e.eyeHidden ? (e.eyeFrame===0?0:.78) : e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1);
             } else {
                 e.ship.setScale(e.spriteScale);
                 e.ship.setAlpha(1);
