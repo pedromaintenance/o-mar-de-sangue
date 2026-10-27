@@ -19,7 +19,7 @@ new vm.Script(game,{filename:'Game.js'});
 assert(game.includes("this.load.spritesheet('treasure-chest', 'assets/items/treasure_chest.png'"),'Phaser spritesheet loader');
 assert(/frameWidth:512,\s*frameHeight:682,\s*endFrame:3/.test(game));
 assert(!game.includes("this.load.image('treasure-chest'"),'no static texture preload');
-assert(game.includes("this.add.image(0,0,kind,kind==='treasure-chest'?0:undefined)"),
+assert(game.includes("this.add.image(0,0,kind,(kind==='treasure-chest'||kind==='treasure-coin')?0:undefined)"),
  'loot spritesheet must start at frame 0');
 assert(game.includes("this.add.image(x, y, kind, kind==='treasure-chest'?0:undefined)"),
  'scenery spritesheet must start at frame 0');
@@ -37,8 +37,9 @@ assert(game.includes("this.gold = SEA_MATH.safe(this.gold + t.value)"),
 assert(game.includes("t.coin.destroy(); this.burst("),'collected chest is removed');
 assert(game.includes("const kind=fromEnemy?'treasure-chest'"),
  'enemies must still drop chests');
-assert(game.includes("this.load.image('treasure-crate'") && game.includes("this.load.image('treasure-coin'"),
- 'other loot remains static');
+assert(game.includes("this.load.image('treasure-crate'") &&
+       game.includes("this.load.spritesheet('treasure-coin'"),
+ 'crate stays static while coin is now a separate spritesheet');
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/items/treasure_chest.png"'),'PWA precache path');
 assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=77,'new PWA cache version');

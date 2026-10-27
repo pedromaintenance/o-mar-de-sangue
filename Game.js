@@ -324,7 +324,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('island-daegon', 'assets/islands/island_daegon.png');
         this.load.image('island-demeter', 'assets/islands/island_demeter.png');
         this.load.image('island-wreck', 'assets/islands/island_wreck.png');
-        this.load.image('treasure-coin', 'assets/items/treasure_coin.png');
+        // Oito quadros da moeda pirata, normalizados em células RGBA 272x272.
+        this.load.spritesheet('treasure-coin', 'assets/items/treasure_coin.png', {
+            frameWidth:272, frameHeight:272, endFrame:7
+        });
         this.load.image('treasure-crate', 'assets/items/treasure_crate.png');
         // Baú amaldiçoado flutuante: quatro quadros RGBA horizontais de 512 x 682.
         this.load.spritesheet('treasure-chest', 'assets/items/treasure_chest.png', {
@@ -809,14 +812,15 @@ class Game extends Phaser.Scene {
         const coin=this.add.container(x,y).setDepth(8);
         const kind=fromEnemy?'treasure-chest':((Math.floor(x+y+value)%3===0)?'treasure-crate':'treasure-coin');
         // O baú mantém proporções no jogo apesar do novo quadro-fonte de 512x682.
-        const scaleMap={'treasure-coin':.68,'treasure-crate':.84,'treasure-chest':.22};
-        const sprite=this.add.image(0,0,kind,kind==='treasure-chest'?0:undefined)
+        const scaleMap={'treasure-coin':.16,'treasure-crate':.84,'treasure-chest':.22};
+        const sprite=this.add.image(0,0,kind,(kind==='treasure-chest'||kind==='treasure-coin')?0:undefined)
             .setScale(scaleMap[kind]||.38).setAngle(((x+y)%18)-9);
         coin.add(sprite);
         const sparkle=this.add.image(0,-22,'fx-gold-0').setScale(fromEnemy?1.02:.72).setAlpha(.72);
         coin.add(sparkle);
         this.treasures.push({x,y,coin,value:Math.round(value),taken:false,phase:(x+y)*.021,
-            sparkle,chestSprite:kind==='treasure-chest'?sprite:null,chestFrame:0});
+            sparkle,chestSprite:kind==='treasure-chest'?sprite:null,chestFrame:0,
+            coinSprite:kind==='treasure-coin'?sprite:null,coinFrame:0});
     }
     updateImpulse(dt,pad) {
         const held=!!this.keys?.R?.isDown;
@@ -1245,6 +1249,11 @@ class Game extends Phaser.Scene {
                 if(loot.chestSprite?.active){
                     const frame=Math.floor((t*4+loot.phase)%4);
                     if(loot.chestFrame!==frame){loot.chestSprite.setFrame(frame);loot.chestFrame=frame;}
+                }
+                if(loot.coinSprite?.active){
+                    // Oito posições de rotação em 10 FPS, sem mudar coleta ou colisões.
+                    const frame=Math.floor((t*10+loot.phase)%8);
+                    if(loot.coinFrame!==frame){loot.coinSprite.setFrame(frame);loot.coinFrame=frame;}
                 }
                 if(loot.sparkle)loot.sparkle.setTexture(SEA_VISUALS.cyclic('gold',t+loot.phase)).setAlpha(.55+.3*Math.sin(t*3+loot.phase)**2);
             }
