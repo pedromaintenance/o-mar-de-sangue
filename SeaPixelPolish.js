@@ -90,7 +90,7 @@ const SEA_PIXEL = {
     const storm=scene.seaEvent==='storm';
     const fog=scene.seaEvent==='fog';
     const cursed=scene.curse>=65;
-    const count=SEA_DESKTOP?190:110;
+    const count=scene.seaV3Active?(SEA_DESKTOP?64:36):(SEA_DESKTOP?190:110);
     // Pixel locations are deterministic for a given viewport; recomputing
     // their hashes every paint cannot move the sea. Keep the cache local to
     // the Phaser scene and invalidate it on viewport/count changes.
@@ -123,7 +123,8 @@ const SEA_PIXEL = {
       const color=storm?0x8b9ba4:
             cursed?(i%4===0?0xb54d55:0x61283b):
             i%5===0?0xbd7770:i%3===0?0x9e8d7d:0x3b7879;
-      const alpha=(fog?.24:.20)+(flicker>.90?.17:0);
+      const alpha=scene.seaV3Active?((fog?.11:.08)+(flicker>.90?.04:0)):
+          ((fog?.24:.20)+(flicker>.90?.17:0));
       g.fillStyle(color,alpha);
       g.fillRect(px,py,3+(i%3)*3,i%6===0?3:2);
       if(i%11===0){

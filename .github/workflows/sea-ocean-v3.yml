@@ -1,0 +1,38 @@
+name: Sea Ocean V3
+on:
+  pull_request:
+    paths:
+      - 'SeaOceanV3.js'
+      - 'Game.js'
+      - 'SeaPixelPolish.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'assets/tiles/sea-v3/**'
+      - 'tests/sea-ocean-v3.test.cjs'
+      - '.github/workflows/sea-ocean-v3.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'SeaOceanV3.js'
+      - 'Game.js'
+      - 'SeaPixelPolish.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'assets/tiles/sea-v3/**'
+      - 'tests/sea-ocean-v3.test.cjs'
+      - '.github/workflows/sea-ocean-v3.yml'
+permissions:
+  contents: read
+jobs:
+  sea-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check SeaOceanV3.js
+      - run: node --check Game.js
+      - run: node tests/sea-ocean-v3.test.cjs
+      - run: node tests/pwa-cache-contract.test.cjs
+      - run: node tests/procedural-sea-cache-3-6k.test.cjs
