@@ -89,7 +89,7 @@ const SEA_MISSION_TITLES = [
     'Os Dentes de Daegon', 'O Resgate das Redes', 'Tempestade na Boca do Abismo',
     'A Guarda do Mar Vermelho', 'A Fortaleza Abissal', 'Sinos sob as Ondas',
     'As Esmeraldas Perdidas', 'O Horizonte dos Afogados', 'A Frota das Lanternas',
-    'O Trono Naval da Noite'
+    'A Devoradora de Juramentos'
 ];
 // O Kraken ocupa a 2ª posição do ciclo de chefes a cada 20 missões.
 function seaKrakenEncounterNumber(stage) {
@@ -104,7 +104,7 @@ const SEA_FOES = {
     espectral: { name: 'Nau Espectral', tint: 0x7fd0c2, hp: 115, speed: 133, atk: 20, reward: 62, radius: 62, mass: 1.05, range: 490, cooldown: 1400, pattern: 'flank' },
     galeao: { name: 'Galeão Uln-Shayr', tint: 0xefb9b8, hp: 205, speed: 89, atk: 27, reward: 95, radius: 86, mass: 2.5, range: 550, cooldown: 1700, pattern: 'broadside' },
     almirante: { name: 'Almirante das Sombras', tint: 0xffc970, hp: 390, speed: 117, atk: 36, reward: 170, radius: 102, mass: 3.4, range: 670, cooldown: 1150, pattern: 'boss' },
-    cultista: { name: 'Nau do Culto de Daegon', hp: 170, speed: 107, atk: 23, reward: 84, radius: 76, mass: 2.2, range: 530, cooldown: 1750, pattern: 'broadside' },
+    cultista: { name: 'A Devoradora de Juramentos', hp: 720, speed: 90, atk: 40, reward: 440, radius: 120, mass: 5.6, range: 630, cooldown: 1450, pattern: 'boss' },
     nauabissal: { name: 'Fortaleza Abissal', hp: 470, speed: 74, atk: 43, reward: 210, radius: 118, mass: 4.2, range: 590, cooldown: 1280, pattern: 'boss' },
     enguia: { name: 'Enguia das Profundezas', hp: 77, speed: 183, atk: 16, reward: 39, radius: 52, mass: .78, range: 168, cooldown: 2500, pattern: 'chase' },
     afogados: { name: 'Cortejo dos Afogados', hp: 100, speed: 125, atk: 18, reward: 53, radius: 60, mass: .91, range: 335, cooldown: 1900, pattern: 'flank' },
@@ -252,6 +252,9 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-bombard', 'assets/sprites/enemy_bombard.png');
         this.load.image('foe-spectral', 'assets/sprites/enemy_spectral.png');
         this.load.image('foe-admiral', 'assets/sprites/enemy_admiral.png');
+        // O arquivo contém quatro quadros lado a lado (512 × 646 cada).
+        // É carregado como imagem; criamos o spritesheet após o preload,
+        // mantendo compatibilidade com saves/instalações que ainda tenham a imagem antiga.
         this.load.image('foe-cult', 'assets/abyss/cult_barge.png');
         this.load.image('foe-dreadnought', 'assets/abyss/dreadnought.png');
         this.load.image('foe-drowned', 'assets/abyss/drowned_choir.png');
@@ -439,6 +442,16 @@ class Game extends Phaser.Scene {
         seaCenterCanvas(this.game);
         this.W = 4400; this.H = 3400;
         this.profile = SeaProfile.load(); this.shipStats = SeaProfile.stats(this.profile);
+        // Normaliza o atlas do chefe em runtime. A arte original tem 4 quadros
+        // horizontais sem espaçamento, proa para baixo. Não afeta outros navios.
+        if (!this.textures.exists('cult-barge-animated') && this.textures.exists('foe-cult')) {
+            const source = this.textures.get('foe-cult').getSourceImage();
+            if (source && source.width % 4 === 0 && source.width / source.height >= 2.5) {
+                this.textures.addSpriteSheet('cult-barge-animated', source, {
+                    frameWidth: source.width / 4, frameHeight: source.height, endFrame: 3
+                });
+            }
+        }
         this.maxShipHP = this.shipStats.maxHP;
         this.shipHP = this.maxShipHP;
         this.playerVelocity = { x: 0, y: 0 }; this.hullRadius = 68;
@@ -512,7 +525,10 @@ class Game extends Phaser.Scene {
         if (this.mode === 'sandbox' && !this.contractId) this.spawnEnemy('olho_dagon', 1250);
         if (this.objective === 'boss') {
             const bossTypes = ['almirante','kraken','dagon','nauabissal'];
-            this.missionBoss = bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
+            // A missão 25 (e depois 75, 125...) apresenta a arquinau cultista;
+            // os encontros com Kraken nas missões 10, 30, 50... não mudam.
+            this.missionBoss = this.stage % 50 === 25 ? 'cultista' :
+                bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
             this.spawnEnemy(this.missionBoss, this.missionBoss === 'kraken' ? 560 : 600);
             // Missão 10: primeiro Kraken sem reforços; missão 30: 4 tentáculos;
             // em confrontos posteriores, até 7 tentáculos independentes.
@@ -714,7 +730,7 @@ class Game extends Phaser.Scene {
         if (rank >= 2) pool.push('fragata');
         if (rank >= 3) pool.push('bombardeiro','enguia');
         if (rank >= 4) pool.push('espectral','afogados');
-        if (rank >= 5) pool.push('cultista');
+        // A arquinau do culto não entra no sorteio comum: é um chefe único.
         if (rank >= 6) pool.push('galeao','coral');
         if (rank >= 7) pool.push('recife');
         if (rank >= 8) pool.push('caranguejo');
@@ -765,7 +781,7 @@ class Game extends Phaser.Scene {
         if (!pos && rebirth) return null; // Nova tentativa segura na próxima atualização.
         if (!pos) pos = this.findWaterSpot(this.W / 2, this.H / 2, f.radius + 40);
         const scaleDifficulty = 1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .24 : .12);
-        const elite = ['almirante','nauabissal','kraken','dagon'].includes(type);
+        const elite = ['almirante','nauabissal','kraken','dagon','cultista'].includes(type);
         const maxhp = Math.round(f.hp * scaleDifficulty), id = ++this.foeSerial;
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
@@ -779,7 +795,10 @@ class Game extends Phaser.Scene {
             galeao:'v15-flagship', almirante:'v15-admiral', cultista:'v15-blood',
             nauabissal:'v15-merchant', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated',
             afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated' };
-        if (v15Visuals[type] && this.textures.exists(v15Visuals[type])) tex = v15Visuals[type];
+        if (type === 'cultista' && this.textures.exists('cult-barge-animated'))
+            tex = 'cult-barge-animated';
+        else if (type !== 'cultista' && v15Visuals[type] && this.textures.exists(v15Visuals[type]))
+            tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
             (type==='dagon' && tex==='dagon-animated') ||
@@ -792,7 +811,7 @@ class Game extends Phaser.Scene {
             (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon')?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon'||(type==='cultista'&&tex==='cult-barge-animated'))?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -804,6 +823,11 @@ class Game extends Phaser.Scene {
             vx: 0, vy: 0, radius: f.radius, mass: f.mass,
             lastRockContact: -1000, lastRamming: -1000, specialPhase: 0, dead: false,
             maxRange: f.range, cooldownBase: f.cooldown, pattern: f.pattern, elite, boss: elite, bar: null };
+        if (type === 'cultista') {
+            enemy.ritualReadyAt = this.elapsed + 7;
+            enemy.cultReinforced = false;
+            enemy.cultFrame = 0;
+        }
         enemy.sandboxSentinel = this.mode==='sandbox' && type==='tentaculo';
         enemy.sandboxDagonEye = this.mode==='sandbox' && type==='olho_dagon' && !options.fromDagon;
         if(type==='olho_dagon') {enemy.eyeBornAt=this.elapsed;enemy.eyeHidden=true;enemy.eyeFrame=0;}
@@ -1208,6 +1232,11 @@ class Game extends Phaser.Scene {
             if(e.type==='tentaculo' && e.ship.texture.key==='tentacle-animated'){
                 const frame=Math.floor((t*4+e.visualPhase)%4);
                 if(e.tentacleFrame!==frame){e.ship.setFrame(frame);e.tentacleFrame=frame;}
+            }
+            if(e.type==='cultista' && e.ship.texture.key==='cult-barge-animated'){
+                // Vela e tentáculos oscilam em quatro quadros; não mudam a física.
+                const frame=Math.floor((t*3+e.visualPhase)%4);
+                if(e.cultFrame!==frame){e.ship.setFrame(frame);e.cultFrame=frame;}
             }
             if(e.type==='kraken' && e.ship.texture.key==='kraken-animated'){
                 // Apenas animação visual de 4 fps; o Kraken mantém a própria
@@ -1686,6 +1715,19 @@ class Game extends Phaser.Scene {
                 e.vx += Math.sin(e.heading) * thrust * throttle * dt;
                 e.vy -= Math.cos(e.heading) * thrust * throttle * dt;
                 e.cooldown -= dt * 1000;
+                if (e.type === 'cultista') {
+                    if (!e.cultReinforced && e.hp / e.maxhp < .48) {
+                        e.cultReinforced = true;
+                        e.cooldownBase = Math.max(850, e.cooldownBase * .82);
+                        this.announce('DAEGON · A ARQUINAU CONVOCA SEUS DEVOTOS!');
+                        this.spawnEnemy('corsario', 570);
+                        this.spawnEnemy('afogados', 650);
+                    }
+                    if (distance < 590 && this.elapsed >= e.ritualReadyAt) {
+                        e.ritualReadyAt = this.elapsed + 13;
+                        this.cultBargeRitual(e);
+                    }
+                }
                 if(e.isMonster){
                     // Criaturas investem e chocam-se contra o casco; nenhuma
                     // arma de projéteis pode ser emitida por este ramo.
@@ -1742,6 +1784,29 @@ class Game extends Phaser.Scene {
             }
         }
     }
+    cultBargeRitual(e) {
+        // A nau cultista marca um ponto fixo no mar. O jogador tem quase
+        // um segundo para escapar; a explosão não persegue o barco.
+        if (e.dead || this.ended || this.sinking) return;
+        const x = this.player.x, y = this.player.y, radius = 145;
+        const sigil = this.add.circle(x, y, radius, 0x811326, .17)
+            .setStrokeStyle(4, 0xff445d, .93).setDepth(18);
+        this.tweens.add({ targets: sigil, scale: 1.12, alpha: .44, duration: 890 });
+        this.announce('DAEGON · SIGILO DE SANGUE! SAIA DO CÍRCULO!');
+        this.time.delayedCall(950, () => {
+            if (sigil.active) sigil.destroy();
+            if (e.dead || this.ended || this.sinking) return;
+            this.burst(x, y, 'violet', 1.8);
+            this.splash(x, y, 0xee3756, 13);
+            if (Math.hypot(this.player.x - x, this.player.y - y) <= radius + this.hullRadius * .35) {
+                const hurt = this.damageShip(Math.round(e.atk * .68), x, y, 'cannon');
+                if (hurt) {
+                    this.curse = Math.min(100, (this.curse || 0) + 12);
+                    this.announce('MALDIÇÃO DE DAEGON · +12%');
+                }
+            }
+        });
+    }
     enemyFire(e, distance) {
         // Monstros nunca passam pelo emissor de projéteis.
         if(e.isMonster)return;
@@ -1751,9 +1816,9 @@ class Game extends Phaser.Scene {
         const sideVX = rx * sign, sideVY = ry * sign;
         const fireDX = (e.pattern === 'chase' || e.pattern === 'sniper') ? dx : sideVX;
         const fireDY = (e.pattern === 'chase' || e.pattern === 'sniper') ? dy : sideVY;
-        const bullets = e.boss ? 3 : e.pattern === 'broadside' && (e.type === 'galeao' || e.type === 'tartaruga') ? 2 : 1;
+        const bullets = e.type === 'cultista' ? 5 : e.boss ? 3 : e.pattern === 'broadside' && (e.type === 'galeao' || e.type === 'tartaruga') ? 2 : 1;
         for (let j = 0; j < bullets; j++) {
-            const offset = (j - (bullets - 1) / 2) * 15;
+            const offset = (j - (bullets - 1) / 2) * (e.type === 'cultista' ? 22 : 15);
             this.makeShot(e.x + fireDX * 31 + Math.sin(e.heading) * offset,
                 e.y + fireDY * 31 - Math.cos(e.heading) * offset,
                 fireDX * (e.pattern === 'sniper' ? 370 : 265), fireDY * (e.pattern === 'sniper' ? 370 : 265),
@@ -1871,7 +1936,7 @@ class Game extends Phaser.Scene {
             // Enguia, Horror de Coral, Recife Devorador e aríete V15 têm PROA na parte inferior
             // da arte. Somente o sprite recebe +PI; física, rumo, colisões,
             // esteira e ataques continuam sem alterações.
-            const artFacesDown=e.type==='enguia'||e.type==='coral'||e.type==='recife'||
+            const artFacesDown=e.type==='enguia'||e.type==='coral'||e.type==='recife'||e.type==='cultista'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
             e.ship.setPosition(e.x,e.y).setRotation(e.type==='dagon'?0:e.type==='olho_dagon'?0:
                 e.heading+(artFacesDown?Math.PI:0));
@@ -1988,7 +2053,10 @@ class Game extends Phaser.Scene {
                 if (this.wave === 3) this.spawnEnemy('recife', 610);
                 if (this.wave % 5 === 0) {
                     const bosses=['almirante','nauabissal'];
-                    const selected=bosses[(this.wave / 5 - 1) % bosses.length];
+                    // Cultista é o chefe das ondas 15, 45, 75...;
+                    // não substitui o ciclo de invocação do Kraken ou Dagon.
+                    const selected=this.wave % 30 === 15 ? 'cultista' :
+                        bosses[(this.wave / 5 - 1) % bosses.length];
                     this.spawnEnemy(selected, 530);
                     this.announce(`ONDA ${this.wave} · ${SEA_FOES[selected].name}`);
                 }

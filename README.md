@@ -13,3 +13,12 @@ continua acessível com `?theme=classic`.
 
 Notas de versões anteriores: `docs/RELEASE-V151.md`.
 
+
+## Chefe naval — A Devoradora de Juramentos
+A arquinau cultista de Daegon usa exclusivamente `assets/abyss/cult_barge.png`.
+Spritesheet 2048×646, quatro quadros horizontais de 512×646, proa para baixo.
+Ela estreia como chefe da missão 25 (a cada 50 missões), e no sandbox como
+chefe da onda 15 (a cada 30 ondas). Tem cinco projéteis por salva, um
+círculo ritual de sangue telegrafado e convoca dois reforços quando a
+integridade cai abaixo de 48%. Não entra no sorteio dos inimigos comuns.
+Os encontros existentes com Kraken/Dagon não são alterados.
