@@ -6,6 +6,7 @@ on:
       - sw.js
       - assets/v15/beast_tentacle.png
       - tests/tentacle-kraken-events.test.cjs
+      - tests/kraken-rebirth-cycle.test.cjs
       - .github/workflows/tentacle-kraken-events.yml
   push:
     branches: [main]
@@ -14,6 +15,7 @@ on:
       - sw.js
       - assets/v15/beast_tentacle.png
       - tests/tentacle-kraken-events.test.cjs
+      - tests/kraken-rebirth-cycle.test.cjs
 permissions:
   contents: read
 jobs:
@@ -27,6 +29,7 @@ jobs:
       - run: |
           node --check Game.js
           node tests/tentacle-kraken-events.test.cjs
+          node tests/kraken-rebirth-cycle.test.cjs
           node tests/kraken-four-frame.test.cjs
           node tests/drowned-four-frame.test.cjs
           node tests/coral-asset-3-8a4.test.cjs
