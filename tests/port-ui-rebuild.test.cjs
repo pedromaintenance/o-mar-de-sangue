@@ -70,7 +70,7 @@ const SeaProfile={
   },
   reset:()=>{p.gold=55;p.levels.casco=0;}
 };
-const SEA_MATH={nice:v=>String(Math.floor(v||0))};
+const SEA_MATH={nice:v=>String(Math.floor(v||0)),clamp:(v,a,b)=>Math.max(a,Math.min(b,v))};
 const SEA_MUSIC={volume:.25,load:async()=>true,status:()=> 'FLAC',
  setVolume(v){this.volume=Math.max(0,Math.min(.6,v))},
  importFiles:async()=>2};
@@ -84,6 +84,11 @@ const SEA_GAMEPAD={poll:()=>({connected:false})};
 const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
  SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_PERFORMANCE,SEA_UPGRADES:upgrades,localStorage};
 vm.createContext(context);
+// Load the production evolution rule into this isolated PortUI test harness.
+const shipStart=game.indexOf('const SEA_PLAYER_SHIP = {');
+const shipEnd=game.indexOf('\n};',shipStart);
+assert(shipStart>=0 && shipEnd>shipStart);
+vm.runInContext(game.slice(shipStart,shipEnd+3),context);
 vm.runInContext(script+'\nthis.ui=SEA_PORT_UI;',context);
 const ui=context.ui;
 assert(ui.mount(scene));
