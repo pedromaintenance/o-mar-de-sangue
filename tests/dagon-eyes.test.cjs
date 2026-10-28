@@ -21,7 +21,7 @@ assert(game.includes("this.summonSandboxDagon(e)"));
 assert(game.includes("this.spawnEnemy('dagon',640,{fromEye:true})"));
 assert(game.includes("this.mode === 'sandbox' && type === 'dagon' && !options.fromEye"));
 assert(game.includes("this.spawnEnemy('olho_dagon', 1250)"));
-assert(game.includes("e.type==='dagon'?0:e.type==='olho_dagon'?0:"));
+assert(game.includes("e.type==='dagon'?0:e.type==='dagon_senhor'?0:e.type==='olho_dagon'?0:"));
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/abyss/dagon_eye.png"'));
 assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=82);

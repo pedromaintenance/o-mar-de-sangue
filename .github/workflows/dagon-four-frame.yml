@@ -5,9 +5,11 @@ on:
       - Game.js
       - sw.js
       - assets/abyss/dagon.png
+      - assets/v15/dagon_emerging.png
       - assets/v15/beast_dagon.png
       - assets/v15/dagon_emerging.webp
       - tests/dagon-four-frame.test.cjs
+      - tests/dagon-lord-encounter.test.cjs
       - tests/dagon-eyes.test.cjs
       - assets/abyss/dagon_eye.png
       - .github/workflows/dagon-four-frame.yml
@@ -35,3 +37,5 @@ jobs:
           node --check Game.js
           node tests/dagon-four-frame.test.cjs
           node tests/dagon-eyes.test.cjs
+          node tests/dagon-lord-encounter.test.cjs
+          node tests/tentacle-kraken-events.test.cjs
