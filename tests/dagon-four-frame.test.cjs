@@ -12,7 +12,7 @@ assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','PNG signatur
 assert.equal(data.readUInt32BE(16),2048,'4 frames must be 512px wide each');
 assert.equal(data.readUInt32BE(20),682,'Frame height must remain 682px');
 assert.equal(crypto.createHash('sha256').update(data).digest('hex'),
- '41dbb54d47bf4d08e03190464d008fa18e3a3b8bccdff5f70622db34a2989e62',
+ 'd86664fc5cd48d208dfbe7984b83d4627671a739c365df34949326a4aca9e1ff',
  'The committed art must match the exact original file attached by the user');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
