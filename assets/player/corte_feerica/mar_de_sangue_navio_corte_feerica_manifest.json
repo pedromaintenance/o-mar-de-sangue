@@ -1,0 +1,493 @@
+{
+  "name": "Mar de Sangue — Corte Feérica — 20 evoluções do navio",
+  "faction": "Corte Feérica / Shadow Fey",
+  "orientation": {
+    "bow": "down",
+    "stern": "up",
+    "perspective": "top-down; same direction all 20 levels"
+  },
+  "atlas": "mar_de_sangue_navio_corte_feerica_20_evolucoes.png",
+  "dimensions": {
+    "width": 1460,
+    "height": 1560
+  },
+  "grid": {
+    "rows": 4,
+    "columns": 5,
+    "cell_width": 260,
+    "cell_height": 360,
+    "gap_horizontal": 40,
+    "gap_vertical": 40,
+    "gap_rgba": [
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "progression": "1 to 20, left to right and top to bottom",
+  "level_20_note": "Uses the exactly approved original user reference, geometrically scaled into a sprite cell.",
+  "original_final_reference": "Navio_Feerico_Sombrio_da_Colheita_final_original.png",
+  "sprites": [
+    {
+      "level": 1,
+      "file": "navio_corte_feerica_nivel_01.png",
+      "row": 1,
+      "column": 1,
+      "atlas_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 65,
+        "y": 72,
+        "width": 129,
+        "height": 280
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 2,
+      "file": "navio_corte_feerica_nivel_02.png",
+      "row": 1,
+      "column": 2,
+      "atlas_rect": {
+        "x": 300,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 64,
+        "y": 69,
+        "width": 132,
+        "height": 283
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 3,
+      "file": "navio_corte_feerica_nivel_03.png",
+      "row": 1,
+      "column": 3,
+      "atlas_rect": {
+        "x": 600,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 55,
+        "y": 65,
+        "width": 150,
+        "height": 287
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 4,
+      "file": "navio_corte_feerica_nivel_04.png",
+      "row": 1,
+      "column": 4,
+      "atlas_rect": {
+        "x": 900,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 53,
+        "y": 62,
+        "width": 154,
+        "height": 290
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 5,
+      "file": "navio_corte_feerica_nivel_05.png",
+      "row": 1,
+      "column": 5,
+      "atlas_rect": {
+        "x": 1200,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 49,
+        "y": 58,
+        "width": 161,
+        "height": 294
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 6,
+      "file": "navio_corte_feerica_nivel_06.png",
+      "row": 2,
+      "column": 1,
+      "atlas_rect": {
+        "x": 0,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 54,
+        "y": 55,
+        "width": 152,
+        "height": 297
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 7,
+      "file": "navio_corte_feerica_nivel_07.png",
+      "row": 2,
+      "column": 2,
+      "atlas_rect": {
+        "x": 300,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 46,
+        "y": 52,
+        "width": 167,
+        "height": 300
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 8,
+      "file": "navio_corte_feerica_nivel_08.png",
+      "row": 2,
+      "column": 3,
+      "atlas_rect": {
+        "x": 600,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 38,
+        "y": 48,
+        "width": 184,
+        "height": 304
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 9,
+      "file": "navio_corte_feerica_nivel_09.png",
+      "row": 2,
+      "column": 4,
+      "atlas_rect": {
+        "x": 900,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 35,
+        "y": 45,
+        "width": 189,
+        "height": 307
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 10,
+      "file": "navio_corte_feerica_nivel_10.png",
+      "row": 2,
+      "column": 5,
+      "atlas_rect": {
+        "x": 1200,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 33,
+        "y": 42,
+        "width": 194,
+        "height": 310
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 11,
+      "file": "navio_corte_feerica_nivel_11.png",
+      "row": 3,
+      "column": 1,
+      "atlas_rect": {
+        "x": 0,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 33,
+        "y": 38,
+        "width": 193,
+        "height": 314
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 12,
+      "file": "navio_corte_feerica_nivel_12.png",
+      "row": 3,
+      "column": 2,
+      "atlas_rect": {
+        "x": 300,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 32,
+        "y": 35,
+        "width": 196,
+        "height": 317
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 13,
+      "file": "navio_corte_feerica_nivel_13.png",
+      "row": 3,
+      "column": 3,
+      "atlas_rect": {
+        "x": 600,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 29,
+        "y": 31,
+        "width": 202,
+        "height": 321
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 14,
+      "file": "navio_corte_feerica_nivel_14.png",
+      "row": 3,
+      "column": 4,
+      "atlas_rect": {
+        "x": 900,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 28,
+        "y": 28,
+        "width": 203,
+        "height": 324
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 15,
+      "file": "navio_corte_feerica_nivel_15.png",
+      "row": 3,
+      "column": 5,
+      "atlas_rect": {
+        "x": 1200,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 27,
+        "y": 25,
+        "width": 206,
+        "height": 327
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 16,
+      "file": "navio_corte_feerica_nivel_16.png",
+      "row": 4,
+      "column": 1,
+      "atlas_rect": {
+        "x": 0,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 31,
+        "y": 21,
+        "width": 197,
+        "height": 331
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 17,
+      "file": "navio_corte_feerica_nivel_17.png",
+      "row": 4,
+      "column": 2,
+      "atlas_rect": {
+        "x": 300,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 32,
+        "y": 18,
+        "width": 196,
+        "height": 334
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 18,
+      "file": "navio_corte_feerica_nivel_18.png",
+      "row": 4,
+      "column": 3,
+      "atlas_rect": {
+        "x": 600,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 30,
+        "y": 14,
+        "width": 199,
+        "height": 338
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 19,
+      "file": "navio_corte_feerica_nivel_19.png",
+      "row": 4,
+      "column": 4,
+      "atlas_rect": {
+        "x": 900,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 32,
+        "y": 11,
+        "width": 196,
+        "height": 341
+      },
+      "is_approved_final": false
+    },
+    {
+      "level": 20,
+      "file": "navio_corte_feerica_nivel_20.png",
+      "row": 4,
+      "column": 5,
+      "atlas_rect": {
+        "x": 1200,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "content_rect": {
+        "x": 47,
+        "y": 4,
+        "width": 165,
+        "height": 348
+      },
+      "is_approved_final": true
+    }
+  ]
+}
