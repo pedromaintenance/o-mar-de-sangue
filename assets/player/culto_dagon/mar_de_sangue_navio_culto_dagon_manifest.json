@@ -1,0 +1,615 @@
+{
+  "name": "O Mar de Sangue — Culto de Dagon — Evolução Eldritch (20 navios)",
+  "faction": "culto",
+  "status": "staged_art_only",
+  "source_file": "Evolucao_de_Navios_Eldritch_Culto_de_Dagon_original.png",
+  "source_size": {
+    "width": 1213,
+    "height": 1296
+  },
+  "source_sha256": "59d50d3ef2371af640b6a4f98ba60cd1b91b090daebc3f3ff31345ea65c98008",
+  "atlas_file": "mar_de_sangue_navio_culto_dagon_20_evolucoes.png",
+  "atlas_size": {
+    "width": 1460,
+    "height": 1560
+  },
+  "atlas_sha256": "07b5591fd7f4aa23666c376a099addae6a3c69531066ad1c41e065b44df40b3c",
+  "grid": {
+    "columns": 5,
+    "rows": 4,
+    "frame_width": 260,
+    "frame_height": 360,
+    "horizontal_gap": 40,
+    "vertical_gap": 40
+  },
+  "order": "row-major left-to-right top-to-bottom",
+  "orientation": {
+    "bow": "down",
+    "stern": "up",
+    "view": "top-down"
+  },
+  "processing": "Pixel-exact crops + transparent padding; no resizing or recoloring",
+  "faction_note": "Appearance unlocks after explicit persistent Cult allegiance; political choices do not grant allegiance.",
+  "sprites": [
+    {
+      "level": 1,
+      "file": "navio_culto_dagon_nivel_01.png",
+      "row": 0,
+      "column": 0,
+      "source_rect": {
+        "x": 22,
+        "y": 17,
+        "width": 162,
+        "height": 272
+      },
+      "atlas_rect": {
+        "x": 0,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 49,
+        "y": 80,
+        "width": 162,
+        "height": 272
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "e2988ecc9de9248efc1a18eb77b07bef8a573a1337792aaea8bf0f4064021847"
+    },
+    {
+      "level": 2,
+      "file": "navio_culto_dagon_nivel_02.png",
+      "row": 0,
+      "column": 1,
+      "source_rect": {
+        "x": 266,
+        "y": 17,
+        "width": 171,
+        "height": 272
+      },
+      "atlas_rect": {
+        "x": 300,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 44,
+        "y": 80,
+        "width": 171,
+        "height": 272
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "8b46b0e55738d53fe3cb3a79cd7d0bb6fd02ce509c58f9f20893c326c8cec9fe"
+    },
+    {
+      "level": 3,
+      "file": "navio_culto_dagon_nivel_03.png",
+      "row": 0,
+      "column": 2,
+      "source_rect": {
+        "x": 513,
+        "y": 17,
+        "width": 181,
+        "height": 272
+      },
+      "atlas_rect": {
+        "x": 600,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 39,
+        "y": 80,
+        "width": 181,
+        "height": 272
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "ee9830de0bb05010e4866b7ad726d0d1b985ba8251c780d1296aea16044216f9"
+    },
+    {
+      "level": 4,
+      "file": "navio_culto_dagon_nivel_04.png",
+      "row": 0,
+      "column": 3,
+      "source_rect": {
+        "x": 761,
+        "y": 17,
+        "width": 188,
+        "height": 272
+      },
+      "atlas_rect": {
+        "x": 900,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 36,
+        "y": 80,
+        "width": 188,
+        "height": 272
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "2cafe22e399b81e863a21db66290797e36bc18f1aadb0582fab2ccd6a0c699bf"
+    },
+    {
+      "level": 5,
+      "file": "navio_culto_dagon_nivel_05.png",
+      "row": 0,
+      "column": 4,
+      "source_rect": {
+        "x": 1002,
+        "y": 17,
+        "width": 183,
+        "height": 272
+      },
+      "atlas_rect": {
+        "x": 1200,
+        "y": 0,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 38,
+        "y": 80,
+        "width": 183,
+        "height": 272
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "08ce750a0c79713a1e1cbee3906e90e986faf47feae554d73fc5de380be23169"
+    },
+    {
+      "level": 6,
+      "file": "navio_culto_dagon_nivel_06.png",
+      "row": 1,
+      "column": 0,
+      "source_rect": {
+        "x": 23,
+        "y": 334,
+        "width": 162,
+        "height": 273
+      },
+      "atlas_rect": {
+        "x": 0,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 49,
+        "y": 79,
+        "width": 162,
+        "height": 273
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "53616f1f5f41c7d229e74685f3867ee8e029b2deb80616f6c608b1057e6e8d87"
+    },
+    {
+      "level": 7,
+      "file": "navio_culto_dagon_nivel_07.png",
+      "row": 1,
+      "column": 1,
+      "source_rect": {
+        "x": 266,
+        "y": 334,
+        "width": 172,
+        "height": 273
+      },
+      "atlas_rect": {
+        "x": 300,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 44,
+        "y": 79,
+        "width": 172,
+        "height": 273
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "08c4e72420f406f62e7a91c74dfcbc2ea5495dd845ff3bd6ca72db0eb88e3ecf"
+    },
+    {
+      "level": 8,
+      "file": "navio_culto_dagon_nivel_08.png",
+      "row": 1,
+      "column": 2,
+      "source_rect": {
+        "x": 513,
+        "y": 334,
+        "width": 181,
+        "height": 273
+      },
+      "atlas_rect": {
+        "x": 600,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 39,
+        "y": 79,
+        "width": 181,
+        "height": 273
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "6d962d3c5f28a5bfcafdfda15ed76f6ff0217c0942829646f4053f7a7663d325"
+    },
+    {
+      "level": 9,
+      "file": "navio_culto_dagon_nivel_09.png",
+      "row": 1,
+      "column": 3,
+      "source_rect": {
+        "x": 761,
+        "y": 334,
+        "width": 187,
+        "height": 273
+      },
+      "atlas_rect": {
+        "x": 900,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 36,
+        "y": 79,
+        "width": 187,
+        "height": 273
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "79b7d3f32ca3b88f26b54364e3f533d79db2e0525cb4d8daec1aa77dae2143fa"
+    },
+    {
+      "level": 10,
+      "file": "navio_culto_dagon_nivel_10.png",
+      "row": 1,
+      "column": 4,
+      "source_rect": {
+        "x": 1002,
+        "y": 334,
+        "width": 197,
+        "height": 273
+      },
+      "atlas_rect": {
+        "x": 1200,
+        "y": 400,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 31,
+        "y": 79,
+        "width": 197,
+        "height": 273
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "9f0ce2db2c4544d92d28af668539eff4c1c9df0db4f1ca7b44df63bbdd7b55c4"
+    },
+    {
+      "level": 11,
+      "file": "navio_culto_dagon_nivel_11.png",
+      "row": 2,
+      "column": 0,
+      "source_rect": {
+        "x": 22,
+        "y": 635,
+        "width": 163,
+        "height": 284
+      },
+      "atlas_rect": {
+        "x": 0,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 48,
+        "y": 68,
+        "width": 163,
+        "height": 284
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "5297c1a6863ddb5a1148d12bffdd3c59e7aa35e93d9b86e51912504c4cd57e81"
+    },
+    {
+      "level": 12,
+      "file": "navio_culto_dagon_nivel_12.png",
+      "row": 2,
+      "column": 1,
+      "source_rect": {
+        "x": 266,
+        "y": 635,
+        "width": 172,
+        "height": 284
+      },
+      "atlas_rect": {
+        "x": 300,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 44,
+        "y": 68,
+        "width": 172,
+        "height": 284
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "9c8c9164c3ba7f25972cbef73421fa92012dc897870f733605ca37f2c28795fd"
+    },
+    {
+      "level": 13,
+      "file": "navio_culto_dagon_nivel_13.png",
+      "row": 2,
+      "column": 2,
+      "source_rect": {
+        "x": 513,
+        "y": 635,
+        "width": 181,
+        "height": 284
+      },
+      "atlas_rect": {
+        "x": 600,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 39,
+        "y": 68,
+        "width": 181,
+        "height": 284
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "6c2ac4d1886429e6f5354449bfc2247e279e3306fd62805313e6e2e913365fb3"
+    },
+    {
+      "level": 14,
+      "file": "navio_culto_dagon_nivel_14.png",
+      "row": 2,
+      "column": 3,
+      "source_rect": {
+        "x": 761,
+        "y": 635,
+        "width": 188,
+        "height": 284
+      },
+      "atlas_rect": {
+        "x": 900,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 36,
+        "y": 68,
+        "width": 188,
+        "height": 284
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "a9457194a609a6d3bdc3b67bc377bf654fca7423bbe7294053318f016d31ffaf"
+    },
+    {
+      "level": 15,
+      "file": "navio_culto_dagon_nivel_15.png",
+      "row": 2,
+      "column": 4,
+      "source_rect": {
+        "x": 1002,
+        "y": 635,
+        "width": 199,
+        "height": 284
+      },
+      "atlas_rect": {
+        "x": 1200,
+        "y": 800,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 30,
+        "y": 68,
+        "width": 199,
+        "height": 284
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "f069ef16aabe46d9d840091751b8f1d289dc1252f34a7dbc4e0895d727bfa6dc"
+    },
+    {
+      "level": 16,
+      "file": "navio_culto_dagon_nivel_16.png",
+      "row": 3,
+      "column": 0,
+      "source_rect": {
+        "x": 22,
+        "y": 935,
+        "width": 163,
+        "height": 343
+      },
+      "atlas_rect": {
+        "x": 0,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 48,
+        "y": 9,
+        "width": 163,
+        "height": 343
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "1d3574ad46357e3842310ea70fc52414d819d9ba67ba20f3202a54879f9312b6"
+    },
+    {
+      "level": 17,
+      "file": "navio_culto_dagon_nivel_17.png",
+      "row": 3,
+      "column": 1,
+      "source_rect": {
+        "x": 265,
+        "y": 935,
+        "width": 173,
+        "height": 343
+      },
+      "atlas_rect": {
+        "x": 300,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 43,
+        "y": 9,
+        "width": 173,
+        "height": 343
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "8ba1fd17eec2e20f7695dd4dd42de98e1acce5be75121310d0880fdf39c8e423"
+    },
+    {
+      "level": 18,
+      "file": "navio_culto_dagon_nivel_18.png",
+      "row": 3,
+      "column": 2,
+      "source_rect": {
+        "x": 513,
+        "y": 935,
+        "width": 181,
+        "height": 344
+      },
+      "atlas_rect": {
+        "x": 600,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 39,
+        "y": 8,
+        "width": 181,
+        "height": 344
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "64d2a5b97cbcb3936c48114bdc4f92765bcea33480ace717dc7f5417ed1673d9"
+    },
+    {
+      "level": 19,
+      "file": "navio_culto_dagon_nivel_19.png",
+      "row": 3,
+      "column": 3,
+      "source_rect": {
+        "x": 761,
+        "y": 935,
+        "width": 188,
+        "height": 341
+      },
+      "atlas_rect": {
+        "x": 900,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 36,
+        "y": 11,
+        "width": 188,
+        "height": 341
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "188b6d65f60f30e5f4b008586fb260daa0ec030ba692420a1a90ee553e40af6b"
+    },
+    {
+      "level": 20,
+      "file": "navio_culto_dagon_nivel_20.png",
+      "row": 3,
+      "column": 4,
+      "source_rect": {
+        "x": 1002,
+        "y": 935,
+        "width": 199,
+        "height": 344
+      },
+      "atlas_rect": {
+        "x": 1200,
+        "y": 1200,
+        "width": 260,
+        "height": 360
+      },
+      "content_rect": {
+        "x": 30,
+        "y": 8,
+        "width": 199,
+        "height": 344
+      },
+      "anchor": {
+        "x": 130,
+        "y": 352
+      },
+      "sha256": "0ecf66188bf714e6620185241b646a4b9569f67320cb521441be24410dcc5ac5"
+    }
+  ]
+}
