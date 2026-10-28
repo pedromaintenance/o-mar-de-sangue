@@ -52,7 +52,20 @@ assert.equal(ship.cannonCharge.starboard,0);
 const monsterTypes=['enguia','afogados','coral','caranguejo','tartaruga','kraken','dagon'];
 const definitions=src.slice(src.indexOf('const SEA_FOES ='),src.indexOf('const SeaProfile ='));
 vm.runInContext(definitions+';this.foes=SEA_FOES;',c);
-vm.runInContext('this.ai={'+method('updateEnemies','enemyFire')+'};',c);
+// Extract only the method body, not helpers inserted between updateEnemies and enemyFire.
+function isolatedMethod(name){
+ const start=src.indexOf('    '+name+'(');
+ assert(start>=0,'missing method '+name);
+ const begin=src.indexOf('{',start);
+ let depth=0,end=-1;
+ for(let i=begin;i<src.length;i++){
+  if(src[i]==='{')depth++;
+  else if(src[i]==='}'&&--depth===0){end=i;break;}
+ }
+ assert(end>=0,'unbalanced method '+name);
+ return src.slice(start,end+1);
+}
+vm.runInContext('this.ai={'+isolatedMethod('updateEnemies')+'};',c);
 c.Phaser={Math:{Distance:{Between:(x1,y1,x2,y2)=>Math.hypot(x1-x2,y1-y2)},
  Angle:{Wrap:v=>Math.atan2(Math.sin(v),Math.cos(v))}}};
 c.SEA_MATH={clamp:(v,a,b)=>Math.max(a,Math.min(b,v))};
