@@ -1,43 +1,39 @@
-// Regression contracts for the updated Dagon King four-frame art.
-// Run after uploading the user's unchanged 2048x682 RGBA image.
+/* Dagon and his herald are distinct RGBA four-frame sprites. */
+'use strict';
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const vm=require('node:vm');
 const crypto=require('node:crypto');
-const file='assets/abyss/dagon.png';
-assert(fs.existsSync(file),
-  'Missing canonical dagon.png (new four-frame RGBA sprite).');
-const data=fs.readFileSync(file);
-assert.equal(data.subarray(0,8).toString('hex'),'89504e470d0a1a0a','PNG signature');
-assert.equal(data.readUInt32BE(16),2048,'4 frames must be 512px wide each');
-assert.equal(data.readUInt32BE(20),682,'Frame height must remain 682px');
-assert.equal(crypto.createHash('sha256').update(data).digest('hex'),
- 'd86664fc5cd48d208dfbe7984b83d4627671a739c365df34949326a4aca9e1ff',
- 'The committed art must match the exact original file attached by the user');
+function art(path,sha){
+  assert(fs.existsSync(path), 'Missing '+path);
+  const png=fs.readFileSync(path);
+  assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+  assert.equal(png.readUInt32BE(16),2048,'four equal 512px frames');
+  assert.equal(png.readUInt32BE(20),682,'682px frame height');
+  assert.deepEqual([...png.subarray(24,29)],[8,6,0,0,0],'RGBA8 transparent sprite');
+  assert.equal(crypto.createHash('sha256').update(png).digest('hex'),sha,'original image bytes');
+}
+art('assets/v15/dagon_emerging.png','63b7c963d4e5c571ce6df3f48b91a3b7f7baa559925a66843a974346fd016995');
+art('assets/abyss/dagon.png','d86664fc5cd48d208dfbe7984b83d4627671a739c365df34949326a4aca9e1ff');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
-assert(game.includes("this.load.spritesheet('dagon-animated', 'assets/abyss/dagon.png'"),
-  'Dagon must load sprite sheet');
-assert(/frameWidth:512,\s*frameHeight:682,\s*endFrame:3/.test(game),
-  'Load four equal frames');
-assert(game.includes("dagon:'dagon-animated'"),'Spawn must select four-frame art');
-assert(game.includes("type==='dagon' && e.ship.texture.key==='dagon-animated'"),
-  'Visual update must cycle Dagon frames');
-assert(game.includes("e.ship.setFrame(frame)"),'Frame progression required');
-assert(game.includes("e.type==='dagon'?0:e.type==='olho_dagon'?0:"),'Never rotate Dagon or its eyes with heading');
-assert(game.includes("if(e.type==='dagon'){")&&game.includes("this.spawnEnemy('afogados'"),
-  'Existing Dagon summons must remain active');
-assert(game.includes("this.spawnEnemy('coral'"),'Second summon phase must remain');
-assert(game.includes('monsterLunge(e,distance)'),'Existing boss lunge unaffected');
+assert(game.includes("this.load.spritesheet('dagon-animated', 'assets/v15/dagon_emerging.png'"));
+assert(game.includes("this.load.spritesheet('dagon-lord-animated', 'assets/abyss/dagon.png'"));
+assert(game.includes("dagon: { name: 'Arauto de Dagon'"));
+assert(game.includes("dagon_senhor: { name: 'Dagon · Senhor das Profundezas'"));
+assert(game.includes("dagon:'dagon-animated'"));
+assert(game.includes("dagon_senhor:'dagon-lord-animated'"));
+assert(game.includes("type==='dagon_senhor' && tex==='dagon-lord-animated'"));
+assert(game.includes("e.type==='dagon_senhor' && e.ship.texture.key==='dagon-lord-animated'"));
+assert(game.includes("e.type==='dagon'?0:e.type==='dagon_senhor'?0:e.type==='olho_dagon'?0:"),
+ 'Both Dagon entities and eyes must remain at zero art rotation');
+assert(game.includes("e.ship.setFrame(frame)"));
+assert(game.includes("if(type==='dagon') this.spawnDagonEyes(3)"),'herald retains its eye summons');
+assert(game.includes("if(e.type==='dagon'){"),'herald keeps abyss lunge phases');
+assert(game.includes("this.spawnEnemy('afogados',380)"));
+assert(game.includes("this.spawnEnemy('coral',390)"));
 const sw=fs.readFileSync('sw.js','utf8');
-assert(sw.includes('"./assets/abyss/dagon.png"'),
-  'Offline cache must include sprite sheet');
-assert(!fs.existsSync('assets/v15/beast_dagon.png'), 'Remove old duplicate PNG');
-assert(!fs.existsSync('assets/v15/dagon_emerging.webp'), 'Remove obsolete WebP');
-assert(!game.includes('beast_dagon.png') && !game.includes('dagon_emerging.webp'),
-  'Runtime must use only the canonical Dagon sprite');
-assert(!sw.includes('beast_dagon.png') && !sw.includes('dagon_emerging.webp'),
-  'Offline cache must not retain obsolete boss assets');
-const cacheVersion=Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1]);
-assert(cacheVersion>=72, 'Cache must refresh after Dagon asset consolidation');
-console.log('PASS updated Dagon King 2048x682 sheet, four-frame animation, fixed facing and unchanged summons');
+assert(sw.includes('"./assets/v15/dagon_emerging.png"'));
+assert(sw.includes('"./assets/abyss/dagon.png"'));
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=95);
+console.log('PASS distinct Herald and Lord PNG hashes, RGBA, animation, zero rotation, unchanged Herald combat');
