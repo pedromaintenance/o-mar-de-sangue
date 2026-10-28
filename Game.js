@@ -115,7 +115,8 @@ const SEA_FOES = {
     tentaculo: { name: 'Tentáculo Errante', hp: 145, speed: 95, atk: 20, reward: 64, radius: 73, mass: 2.2, range: 185, cooldown: 3250, pattern: 'tentacle' },
     kraken: { name: 'KRAKEN — O Abismo Desperta', hp: 690, speed: 61, atk: 53, reward: 380, radius: 166, mass: 7.5, range: 380, cooldown: 2750, pattern: 'tentacle' },
     olho_dagon: { name: 'Olho de Dagon', hp: 138, speed: 83, atk: 18, reward: 75, radius: 74, mass: 1.8, range: 590, cooldown: 2300, pattern: 'eye' },
-    dagon: { name: 'DAGON · Arauto de Daegon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 176, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' }
+    dagon: { name: 'Arauto de Dagon', hp: 860, speed: 78, atk: 56, reward: 510, radius: 176, mass: 8.7, range: 590, cooldown: 2150, pattern: 'abyss' },
+    dagon_senhor: { name: 'Dagon · Senhor das Profundezas', hp: 1800, speed: 48, atk: 82, reward: 1200, radius: 245, mass: 14, range: 660, cooldown: 2450, pattern: 'abyss' }
 };
 
 /** Quinze melhorias independentes; aparência limitada a 20 estágios.
@@ -269,7 +270,11 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('boss-kraken', 'assets/abyss/kraken.png');
         // Arauto de Dagon: spritesheet fornecida pelo criador (4 x 512×682).
         // Carregada uma vez; ele não altera a orientação visual ao navegar.
-        this.load.spritesheet('dagon-animated', 'assets/abyss/dagon.png', {
+        this.load.spritesheet('dagon-animated', 'assets/v15/dagon_emerging.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
+        // Dagon, Senhor das Profundezas, usa asset e identidade separados do Arauto.
+        this.load.spritesheet('dagon-lord-animated', 'assets/abyss/dagon.png', {
             frameWidth:512, frameHeight:682, endFrame:3
         });
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
@@ -803,7 +808,7 @@ class Game extends Phaser.Scene {
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
             enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated',
-            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated', olho_dagon:'dagon-eye-animated', olho_dagon:'dagon-eye-animated' })[type] || 'foe-sloop';
+            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated', dagon_senhor:'dagon-lord-animated', dagon_senhor:'dagon-lord-animated', olho_dagon:'dagon-eye-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
         const v15Visuals = { patrulha:'v15-sloop', corsario:'v15-blood', ariete:'v15-ram',
@@ -817,6 +822,7 @@ class Game extends Phaser.Scene {
             tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='dagon' && tex==='dagon-animated') ||
+            (type==='dagon_senhor' && tex==='dagon-lord-animated') ||
             (type==='kraken' && tex==='kraken-animated');
         const sourceH = type==='olho_dagon' && tex==='dagon-eye-animated' ? 559 :
             type==='afogados' && tex==='drowned-animated' ? 646 :
@@ -824,9 +830,9 @@ class Game extends Phaser.Scene {
             type==='recife' && tex==='reef-devourer-animated' ? 724 :
             type==='tentaculo' && tex==='tentacle-animated' ? 724 :
             animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
-        const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
+        const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','dagon_senhor','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon'||(type==='cultista'&&tex==='cult-barge-animated'))?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='dagon_senhor'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon'||(type==='cultista'&&tex==='cult-barge-animated'))?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -1227,7 +1233,8 @@ class Game extends Phaser.Scene {
             if(!near) {e.ship.setVisible(false);e.wake?.setVisible(false);if(e.bar)e.bar.setVisible(false);if(e.label)e.label.setVisible(false);continue;}
             e.ship.setVisible(true);e.wake?.setVisible(true);if(e.bar)e.bar.setVisible(true);if(e.label)e.label.setVisible(true);
             const pulse=Math.sin(t*(e.boss?2.35:3.4)+e.visualPhase);
-            if(e.type==='dagon' && e.ship.texture.key==='dagon-animated'){
+            if((e.type==='dagon' && e.ship.texture.key==='dagon-animated') ||
+               (e.type==='dagon_senhor' && e.ship.texture.key==='dagon-lord-animated')){
                 // Quatro quadros em sequência, sem aplicar heading à imagem.
                 // Apenas a textura muda; IA, redemoinhos e conjurações continuam intactos.
                 const frame=Math.floor((t*4+e.visualPhase)%4);
@@ -1959,7 +1966,7 @@ class Game extends Phaser.Scene {
             const artFacesDown=e.type==='enguia'||e.type==='recife'||e.type==='cultista'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
             e.ship.setPosition(e.x,e.y).setRotation(
-                e.type==='coral'?0:e.type==='dagon'?0:e.type==='olho_dagon'?0:
+                e.type==='coral'?0:e.type==='dagon'?0:e.type==='dagon_senhor'?0:e.type==='olho_dagon'?0:
                 e.heading+(artFacesDown?Math.PI:0));
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
