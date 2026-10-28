@@ -19,7 +19,7 @@ assert(game.includes("this.load.spritesheet('drowned-animated', 'assets/v15/beas
 assert(/frameWidth:512,\s*frameHeight:646,\s*endFrame:3/.test(game));
 assert(game.includes("afogados:'drowned-animated'"));
 assert(game.includes("const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :"), 'Use one frame height for scaling');
-const frameZero=game.match(/const initialMonsterFrame=\(([^)]*)\)\?0:undefined;/)?.[1]||'';
+const frameZero=game.split('const initialMonsterFrame=(')[1]?.split(')?0:undefined;')[0]||'';
 for(const type of ['dagon','coral','recife','afogados'])
  assert(frameZero.includes("type==='"+type+"'"), 'Spawn '+type+' at frame zero');
 assert(game.includes("if(e.type==='afogados' && e.ship.texture.key==='drowned-animated')"));
