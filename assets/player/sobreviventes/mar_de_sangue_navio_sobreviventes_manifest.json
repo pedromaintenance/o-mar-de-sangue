@@ -1,0 +1,472 @@
+{
+  "id": "mar_de_sangue_ship_sobreviventes",
+  "faction": "Sobreviventes",
+  "theme": "Deméter / vida, colheita, proteção e sobrevivência",
+  "atlas_file": "mar_de_sangue_navio_sobreviventes_20_evolucoes.png",
+  "atlas_size": {
+    "width": 1460,
+    "height": 1560
+  },
+  "layout": {
+    "rows": 4,
+    "columns": 5,
+    "reading_order": "left_to_right_top_to_bottom"
+  },
+  "frame_size": {
+    "width": 260,
+    "height": 360
+  },
+  "gutter_px": {
+    "horizontal": 40,
+    "vertical": 40
+  },
+  "orientation": {
+    "bow": "down",
+    "stern": "up",
+    "view": "top-down"
+  },
+  "level_20_reference": "a_highly_detailed_fantasy_pixel_art_isometric_sty.png",
+  "water_rule": "Somente o nível 20 possui água azul; níveis 1–19 sem água.",
+  "frames": [
+    {
+      "level": 1,
+      "file": "navio_sobreviventes_nivel_01.png",
+      "row": 0,
+      "col": 0,
+      "x": 0,
+      "y": 0,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 76,
+        "y": 58,
+        "width": 108,
+        "height": 244
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 2,
+      "file": "navio_sobreviventes_nivel_02.png",
+      "row": 0,
+      "col": 1,
+      "x": 300,
+      "y": 0,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 71,
+        "y": 56,
+        "width": 118,
+        "height": 248
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 3,
+      "file": "navio_sobreviventes_nivel_03.png",
+      "row": 0,
+      "col": 2,
+      "x": 600,
+      "y": 0,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 68,
+        "y": 53,
+        "width": 123,
+        "height": 253
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 4,
+      "file": "navio_sobreviventes_nivel_04.png",
+      "row": 0,
+      "col": 3,
+      "x": 900,
+      "y": 0,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 67,
+        "y": 51,
+        "width": 125,
+        "height": 257
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 5,
+      "file": "navio_sobreviventes_nivel_05.png",
+      "row": 0,
+      "col": 4,
+      "x": 1200,
+      "y": 0,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 65,
+        "y": 49,
+        "width": 130,
+        "height": 261
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 6,
+      "file": "navio_sobreviventes_nivel_06.png",
+      "row": 1,
+      "col": 0,
+      "x": 0,
+      "y": 400,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 60,
+        "y": 47,
+        "width": 139,
+        "height": 266
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 7,
+      "file": "navio_sobreviventes_nivel_07.png",
+      "row": 1,
+      "col": 1,
+      "x": 300,
+      "y": 400,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 61,
+        "y": 45,
+        "width": 138,
+        "height": 270
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 8,
+      "file": "navio_sobreviventes_nivel_08.png",
+      "row": 1,
+      "col": 2,
+      "x": 600,
+      "y": 400,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 57,
+        "y": 43,
+        "width": 145,
+        "height": 274
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 9,
+      "file": "navio_sobreviventes_nivel_09.png",
+      "row": 1,
+      "col": 3,
+      "x": 900,
+      "y": 400,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 54,
+        "y": 41,
+        "width": 152,
+        "height": 278
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 10,
+      "file": "navio_sobreviventes_nivel_10.png",
+      "row": 1,
+      "col": 4,
+      "x": 1200,
+      "y": 400,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 51,
+        "y": 38,
+        "width": 157,
+        "height": 283
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 11,
+      "file": "navio_sobreviventes_nivel_11.png",
+      "row": 2,
+      "col": 0,
+      "x": 0,
+      "y": 800,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 42,
+        "y": 36,
+        "width": 176,
+        "height": 287
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 12,
+      "file": "navio_sobreviventes_nivel_12.png",
+      "row": 2,
+      "col": 1,
+      "x": 300,
+      "y": 800,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 41,
+        "y": 34,
+        "width": 177,
+        "height": 291
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 13,
+      "file": "navio_sobreviventes_nivel_13.png",
+      "row": 2,
+      "col": 2,
+      "x": 600,
+      "y": 800,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 40,
+        "y": 32,
+        "width": 180,
+        "height": 296
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 14,
+      "file": "navio_sobreviventes_nivel_14.png",
+      "row": 2,
+      "col": 3,
+      "x": 900,
+      "y": 800,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 38,
+        "y": 30,
+        "width": 184,
+        "height": 300
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 15,
+      "file": "navio_sobreviventes_nivel_15.png",
+      "row": 2,
+      "col": 4,
+      "x": 1200,
+      "y": 800,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 36,
+        "y": 28,
+        "width": 188,
+        "height": 304
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 16,
+      "file": "navio_sobreviventes_nivel_16.png",
+      "row": 3,
+      "col": 0,
+      "x": 0,
+      "y": 1200,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 39,
+        "y": 26,
+        "width": 182,
+        "height": 308
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 17,
+      "file": "navio_sobreviventes_nivel_17.png",
+      "row": 3,
+      "col": 1,
+      "x": 300,
+      "y": 1200,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 41,
+        "y": 23,
+        "width": 178,
+        "height": 313
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 18,
+      "file": "navio_sobreviventes_nivel_18.png",
+      "row": 3,
+      "col": 2,
+      "x": 600,
+      "y": 1200,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 35,
+        "y": 21,
+        "width": 189,
+        "height": 317
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 19,
+      "file": "navio_sobreviventes_nivel_19.png",
+      "row": 3,
+      "col": 3,
+      "x": 900,
+      "y": 1200,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 36,
+        "y": 19,
+        "width": 187,
+        "height": 321
+      },
+      "blue_water": false,
+      "approved_reference_exact": false
+    },
+    {
+      "level": 20,
+      "file": "navio_sobreviventes_nivel_20.png",
+      "row": 3,
+      "col": 4,
+      "x": 1200,
+      "y": 1200,
+      "width": 260,
+      "height": 360,
+      "anchor": {
+        "x": 130,
+        "y": 180
+      },
+      "body_bounds": {
+        "x": 22,
+        "y": 8,
+        "width": 215,
+        "height": 344
+      },
+      "blue_water": true,
+      "approved_reference_exact": true
+    }
+  ]
+}
