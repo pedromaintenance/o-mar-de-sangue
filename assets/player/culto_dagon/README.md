@@ -1,19 +1,30 @@
-# Culto de Dagon — pacote de 20 evoluções de navio
+# Culto de Dagon — 20 evoluções da nau eldritch
 
-**Estado: arte preparada, aguardando a importação do PNG original e o futuro sistema de alianças.**
+**Estado:** pacote gráfico integrado ao GitHub e validado. **Não habilitado no gameplay** até existir aliança explícita e persistente com o Culto.
 
-Este pacote obedece ao mesmo contrato gráfico das evoluções da Corte Feérica e dos Sobreviventes: cinco colunas, quatro linhas, atlas RGBA 1460 × 1560, 20 quadros 260 × 360 px, separação transparente de 40 px, proa para baixo.
+## Arquivos publicados
 
-## Importação
+- `Evolucao_de_Navios_Eldritch_Culto_de_Dagon_original.png` — PNG original do criador (1213 × 1296, RGBA); SHA-256 `59d50d3ef2371af640b6a4f98ba60cd1b91b090daebc3f3ff31345ea65c98008`.
+- `mar_de_sangue_navio_culto_dagon_20_evolucoes.png` — atlas normalizado (1460 × 1560, RGBA); SHA-256 `07b5591fd7f4aa23666c376a099addae6a3c69531066ad1c41e065b44df40b3c`.
+- `mar_de_sangue_navio_culto_dagon_manifest.json` — 20 quadros com origem, destino, alinhamento e hashes individuais.
+- `evolucoes/navio_culto_dagon_nivel_01.png` até `nivel_20.png` — sprites RGBA individuais 260 × 360.
 
-O arquivo fonte fornecido pelo criador se chama `Evolucao_de_Navios_Eldritch_Culto_de_Dagon_original.png` e tem 1213 × 1296 px. Ao adicioná-lo **nesta pasta**, o workflow `dagon-ships.yml` executa `tools/preparar_evolucao_culto_dagon.py`, extrai os 20 sprites sem redimensionamento, gera o atlas e um manifesto com hashes e envia os produtos ao repositório.
+**Formato:** 5 colunas × 4 linhas, espaçamento transparente de 40 px, leitura esquerda → direita e cima → baixo. Proa apontada para baixo. Os quadros reproduzem os pixels originais, sem girar, redimensionar nem repintar a imagem. O atlas padronizado respeita o mesmo contrato visual da Corte Feérica e dos Sobreviventes.
 
-Também é possível rodar `python tools/preparar_evolucao_culto_dagon.py` localmente (requer Pillow).
+## Geração e validação
 
-A imagem original permanece intacta. As 20 embarcações são lidas da esquerda para a direita, de cima para baixo. O quadro 20 apresenta a nau corrompida por Dagon, com anatomia tentacular evidente.
+A importação foi executada por `.github/workflows/dagon-ships.yml` após o PNG ser enviado ao repositório, com conclusão **success** em 28/10/2026.
 
-## Uso futuro
+- Gerador: `python tools/preparar_evolucao_culto_dagon.py`.
+- Teste de regressão: `node tests/culto-dagon-assets.test.cjs`.
+- Todos os 20 arquivos e o manifesto estão versionados.
+- O teste valida SHA-256, RGBA, geometria, posições e consistência de cada quadro.
+- O processo preserva o original para futuras regenerações.
 
-A arte **não deve ser vinculada automaticamente** a um evento político com `faction:'culto'`: essa marca identifica a consequência narrativa de uma decisão, não uma aliança persistente. Somente quando existir aliança explícita, o jogo deverá selecionar `player-ship-culto-dagon`. O nível visual continua sendo `SEA_PLAYER_SHIP.stage(profile.levels)-1` (mínimo das 15 melhorias). Manter a rotação local de π do sprite do jogador e o movimento, colisões e upgrades sem modificações.
+## Integração funcional futura
 
-Após importar o PNG e implementar as alianças, adicionar o atlas ao precache PWA e ao preview dos menus. Não ativar loaders que apontem para arquivos ausentes. Leia também `docs/faction-ship-art-status.md`.
+As três facções **Corte Feérica**, **Sobreviventes** e **Culto de Dagon** têm arte pronta, mas o jogador ainda utiliza `player-ship-stages` por padrão. As aparências especiais só devem entrar no gameplay após a implementação de uma **aliança canônica persistente**. O campo `faction:'culto'` de decisões em `SeaPoliticalEvents.js` não equivale a uma adesão permanente.
+
+Ao ativar no futuro, registrar `allegiance` no perfil com compatibilidade de saves; carregar o atlas como spritesheet 260×360 com `spacing:40`; usar `SEA_PLAYER_SHIP.stage(profile.levels)-1` para escolher o quadro; preservar orientação local `Math.PI`, colisões, 15 upgrades, câmera e controles; incluir atlas no PWA e nas prévias de menu.
+
+**Não adicionar a textura ao preload nem ao precache antes de ser efetivamente usada:** evita carregar 1,8 MB extras em cada sessão. Consulte `docs/faction-ship-art-status.md`.

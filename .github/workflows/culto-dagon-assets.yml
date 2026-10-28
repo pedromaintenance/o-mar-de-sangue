@@ -1,0 +1,25 @@
+name: Culto de Dagon — integridade dos 20 navios
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/player/culto_dagon/**'
+      - 'tests/culto-dagon-assets.test.cjs'
+      - '.github/workflows/culto-dagon-assets.yml'
+  pull_request:
+    paths:
+      - 'assets/player/culto_dagon/**'
+      - 'tests/culto-dagon-assets.test.cjs'
+      - '.github/workflows/culto-dagon-assets.yml'
+permissions:
+  contents: read
+jobs:
+  art-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check tests/culto-dagon-assets.test.cjs
+      - run: node tests/culto-dagon-assets.test.cjs
