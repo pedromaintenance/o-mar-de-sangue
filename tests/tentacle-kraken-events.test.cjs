@@ -5,19 +5,22 @@ const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
 const vm=require('node:vm');
 const path='assets/v15/beast_tentacle.png';
-assert(fs.existsSync(path),'Tentacle original RGBA sheet missing');
+assert(fs.existsSync(path),'Tentacle submerged RGBA sheet missing');
 const png=fs.readFileSync(path);
 assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
-assert.equal(png.readUInt32BE(16),2048,'four horizontal 512px frames');
-assert.equal(png.readUInt32BE(20),682,'original 682px height');
+assert.equal(png.readUInt32BE(16),2292,'four 543px frames separated by 40px');
+assert.equal(png.readUInt32BE(20),724,'submerged 724px frame height');
 assert.deepEqual([...png.subarray(24,29)],[8,6,0,0,0],'RGBA8 with transparency');
 assert.equal(crypto.createHash('sha256').update(png).digest('hex'),
- '41ebca4be24a532b058043983824b77a7c9a483857cbddfef5f8d98e202bf6ad',
+ '0cff52e97ae68d4f357c96eec9f5d2ae04da9b444a9aa282a1eea911f2f50bde',
  'the image must be byte-identical to the supplied original');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
 assert(game.includes("this.load.spritesheet('tentacle-animated', 'assets/v15/beast_tentacle.png'"));
-assert(/frameWidth:512,\s*frameHeight:682,\s*endFrame:3/.test(game));
+assert(/frameWidth:543,\s*frameHeight:724,\s*spacing:40,\s*endFrame:3/.test(game));
+assert(game.includes("type==='tentaculo' && tex==='tentacle-animated' ? 724"),'single-frame scale');
+assert(game.includes('const sequence=[0,1,2,3,2,1]'),'six-phase animation');
+assert(game.includes('t*1000/175+e.visualPhase'),'175ms animation interval');
 assert(game.includes("tentaculo:'tentacle-animated'"));
 assert(game.includes("type==='tentaculo' && tex==='tentacle-animated'"));
 assert(game.includes("if(e.type==='tentaculo' && e.ship.texture.key==='tentacle-animated')"));
@@ -91,4 +94,4 @@ assert.equal(called,1);
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/v15/beast_tentacle.png"'),'asset remains offline');
 assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=75,'offline revision v75');
-console.log('PASS exact 4-frame sprite, mission 10/30/50 and sandbox interaction triggers');
+console.log('PASS exact submerged 4-frame sprite, mission 10/30/50 and sandbox interaction triggers');
