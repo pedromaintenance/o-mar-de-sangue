@@ -18,7 +18,7 @@ new vm.Script(game,{filename:'Game.js'});
 assert(game.includes("this.load.spritesheet('drowned-animated', 'assets/v15/beast_drowned.png'"));
 assert(/frameWidth:512,\s*frameHeight:646,\s*endFrame:3/.test(game));
 assert(game.includes("afogados:'drowned-animated'"));
-assert(game.includes("const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :"), 'Use one frame height for scaling');
+assert(game.includes("type==='afogados' && tex==='drowned-animated' ? 646 :"), 'Use one frame height for scaling, regardless of preceding sprite types');
 const frameZero=game.split('const initialMonsterFrame=(')[1]?.split(')?0:undefined;')[0]||'';
 for(const type of ['dagon','coral','recife','afogados'])
  assert(frameZero.includes("type==='"+type+"'"), 'Spawn '+type+' at frame zero');
