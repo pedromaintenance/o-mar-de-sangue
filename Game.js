@@ -95,6 +95,11 @@ const SEA_MISSION_TITLES = [
 function seaKrakenEncounterNumber(stage) {
     return stage >= 10 && (stage - 10) % 20 === 0 ? 1 + (stage - 10) / 20 : 0;
 }
+// Dagon, Senhor das Profundezas, tem estreia própria. Não desloca os
+// encontros do Kraken (10/30/50...) nem da Devoradora (25/75...).
+function seaDagonLordEncounter(stage) {
+    return stage >= 40 && (stage - 40) % 100 === 0;
+}
 const SEA_FOES = {
     patrulha: { name: 'Patrulha da Corte', tint: 0xa47d8d, hp: 60, speed: 100, atk: 10, reward: 22, radius: 58, mass: 1, range: 430, cooldown: 1900, pattern: 'broadside' },
     corsario: { name: 'Corsário de Sangue', tint: 0xcc746b, hp: 68, speed: 150, atk: 11, reward: 29, radius: 54, mass: .95, range: 330, cooldown: 1150, pattern: 'chase' },
@@ -467,6 +472,8 @@ class Game extends Phaser.Scene {
         this.impactMessage = null; this.pauseElements = null; this.huntKills=0;
         this.sandboxKrakenTriggered = false; // Kraken atualmente desperto no sandbox.
         this.sandboxDagonTriggered = false;
+        this.pendingDagonLord = false;
+        this.missionBossDefeated = false;
         this.nextDagonEyeSpawnAt = 0;
         this.nextTentacleSpawnAt = 0;
         this.sandboxTentacleRebirthFrom = null; // Posição da última derrota do Kraken.
@@ -535,7 +542,8 @@ class Game extends Phaser.Scene {
             const bossTypes = ['almirante','kraken','dagon','nauabissal'];
             // A missão 25 (e depois 75, 125...) apresenta a arquinau cultista;
             // os encontros com Kraken nas missões 10, 30, 50... não mudam.
-            this.missionBoss = this.stage % 50 === 25 ? 'cultista' :
+            this.missionBoss = seaDagonLordEncounter(this.stage) ? 'dagon_senhor' :
+                this.stage % 50 === 25 ? 'cultista' :
                 bossTypes[(Math.floor(this.stage / 5) - 1) % bossTypes.length];
             this.spawnEnemy(this.missionBoss, this.missionBoss === 'kraken' ? 560 : 600);
             // Missão 10: primeiro Kraken sem reforços; missão 30: 4 tentáculos;
@@ -777,6 +785,8 @@ class Game extends Phaser.Scene {
         // Nenhum evento, onda ou contrato invoca o Kraken no sandbox diretamente.
         if (this.mode === 'sandbox' && type === 'kraken' && !options.fromTentacle) return null;
         if (this.mode === 'sandbox' && type === 'dagon' && !options.fromEye) return null;
+        // O Senhor só aparece no seu encontro, jamais no sorteio de ondas.
+        if (this.mode === 'sandbox' && type === 'dagon_senhor' && !options.fromWaveBoss) return null;
         if (this.mode === 'sandbox' && type === 'olho_dagon' &&
             (!options.fromDagon && (this.contractId || this.sandboxDagonTriggered ||
             this.enemies.some(e => !e.dead && e.sandboxDagonEye)))) return null;
@@ -785,7 +795,8 @@ class Game extends Phaser.Scene {
             this.enemies.some(e => !e.dead && e.sandboxSentinel))) return null;
         // Prioridade ao chefe invocado; evita perder o gatilho com a fila cheia.
         if (this.enemies.filter(e => !e.dead).length >= 29 &&
-            !options.fromTentacle && !options.fromEye && !options.fromDagon) return null;
+            !options.fromTentacle && !options.fromEye && !options.fromDagon &&
+            !options.fromWaveBoss) return null;
         const px = this.player?.x ?? this.W / 2, py = this.player?.y ?? this.H / 2;
         const rebirth = this.mode==='sandbox' && type==='tentaculo' && options.rebirthFrom;
         let pos = rebirth ? this.findSandboxTentacleRebirthPosition(options.rebirthFrom,f.radius) : null;
@@ -802,13 +813,13 @@ class Game extends Phaser.Scene {
         if (!pos && rebirth) return null; // Nova tentativa segura na próxima atualização.
         if (!pos) pos = this.findWaterSpot(this.W / 2, this.H / 2, f.radius + 40);
         const scaleDifficulty = 1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .24 : .12);
-        const elite = ['almirante','nauabissal','kraken','dagon','cultista'].includes(type);
+        const elite = ['almirante','nauabissal','kraken','dagon','dagon_senhor','cultista'].includes(type);
         const maxhp = Math.round(f.hp * scaleDifficulty), id = ++this.foeSerial;
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
             enguia:'eel-swim', afogados:'drowned-animated', coral:'coral-animated', recife:'reef-devourer-animated',
-            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated', dagon_senhor:'dagon-lord-animated', dagon_senhor:'dagon-lord-animated', olho_dagon:'dagon-eye-animated' })[type] || 'foe-sloop';
+            caranguejo:'foe-shell', tartaruga:'foe-turtle', tentaculo:'tentacle-animated', kraken:'kraken-animated', dagon:'dagon-animated', dagon_senhor:'dagon-lord-animated', olho_dagon:'dagon-eye-animated' })[type] || 'foe-sloop';
         // v1.5.1 — physical and visual scales both doubled from v1.3.
         // Render height is tied to the encounter collision radius, independent of sprite source dimensions.
         const v15Visuals = { patrulha:'v15-sloop', corsario:'v15-blood', ariete:'v15-ram',
@@ -868,6 +879,7 @@ class Game extends Phaser.Scene {
         }).setOrigin(.5).setDepth(24);
         this.enemies.push(enemy);
         if(type==='dagon') this.spawnDagonEyes(3);
+        // O Senhor só invoca olhos ao perder integridade; diferente do Arauto.
         return enemy;
     }
     dropTreasure(x, y, fromEnemy = false, value = 14) {
@@ -911,7 +923,7 @@ class Game extends Phaser.Scene {
         this.damageFlash = this.add.rectangle(SEA_VIEW.width / 2, SEA_VIEW.height / 2,
             SEA_VIEW.width, SEA_VIEW.height, 0x99283a, 0).setScrollFactor(0).setDepth(82);
         this.statusBars=this.add.graphics().setScrollFactor(0).setDepth(101);
-        this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
+        this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${this.missionBoss==='dagon_senhor' ? 'Dagon, Senhor das Profundezas' : SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
             fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#ddc5a4'
         }).setScrollFactor(0).setDepth(100);
         this.hud = this.add.text(14, 37, '', { fontFamily: 'monospace', fontSize: '12px', color: '#e8d9c4' }).setScrollFactor(0).setDepth(100);
@@ -1237,7 +1249,7 @@ class Game extends Phaser.Scene {
                (e.type==='dagon_senhor' && e.ship.texture.key==='dagon-lord-animated')){
                 // Quatro quadros em sequência, sem aplicar heading à imagem.
                 // Apenas a textura muda; IA, redemoinhos e conjurações continuam intactos.
-                const frame=Math.floor((t*4+e.visualPhase)%4);
+                const frame=Math.floor((t*(e.type==='dagon_senhor'?2.5:4)+e.visualPhase)%4);
                 if(e.dagonFrame!==frame){
                     e.ship.setFrame(frame);
                     e.dagonFrame=frame;
@@ -1554,6 +1566,8 @@ class Game extends Phaser.Scene {
         if (this.objective === 'hunt' && enemy.type === 'fragata') this.huntKills = (this.huntKills || 0) + 1;
         this.totalKills = (this.totalKills || 0) + 1;
         if (enemy.boss) this.bossKills = (this.bossKills || 0) + 1;
+        if (this.mode==='mission' && this.objective==='boss' &&
+            enemy.type===this.missionBoss) this.missionBossDefeated = true;
         if (ramming) this.rammingSinks++;
         this.splash(enemy.x, enemy.y, 0xffc697, 16);
         SEA_CONTRACTS.onSink(this,enemy);
@@ -1741,6 +1755,20 @@ class Game extends Phaser.Scene {
                 e.vx += Math.sin(e.heading) * thrust * throttle * dt;
                 e.vy -= Math.cos(e.heading) * thrust * throttle * dt;
                 e.cooldown -= dt * 1000;
+                if (e.type === 'dagon_senhor') {
+                    // A manifestação se intensifica em duas fases; nunca invoca o Arauto.
+                    const life=e.hp/e.maxhp;
+                    if(life<=.70 && e.specialPhase===0){
+                        e.specialPhase=1;
+                        this.announce('DAGON · OS OLHOS DA FOSSA SE ABREM!');
+                        this.spawnDagonLordEyes(2);
+                    }else if(life<=.35 && e.specialPhase===1){
+                        e.specialPhase=2;
+                        e.cooldownBase*=.78;
+                        this.announce('DAGON · A FOSSA RECLAMA MAIS SANGUE!');
+                        this.spawnDagonLordEyes(2);
+                    }
+                }
                 if (e.type === 'cultista') {
                     if (!e.cultReinforced && e.hp / e.maxhp < .48) {
                         e.cultReinforced = true;
@@ -1758,7 +1786,12 @@ class Game extends Phaser.Scene {
                     // Criaturas investem e chocam-se contra o casco; nenhuma
                     // arma de projéteis pode ser emitida por este ramo.
                     e.chargeMs=0;
-                    if(e.type==='olho_dagon') {
+                    if(e.type==='dagon_senhor'){
+                        if(distance<e.maxRange && e.cooldown<=0){
+                            this.dagonLordRift(e);
+                            e.cooldown=e.cooldownBase*(.9+Math.random()*.3);
+                        }
+                    }else if(e.type==='olho_dagon') {
                         if(!e.eyeHidden && distance<e.maxRange && e.cooldown<=0){
                             this.dagonEyeFire(e,distance);
                             e.cooldown=e.cooldownBase*(.85+Math.random()*.3);
@@ -1868,6 +1901,34 @@ class Game extends Phaser.Scene {
         this.burst(eye.x,eye.y,'violet',2.3);
         return boss;
     }
+    // Garras do Senhor não repetem a investida do Arauto: abrem fendas
+    // telegrafadas sob a rota futura do navio. Os olhos são reforços, não gatilhos.
+    spawnDagonLordEyes(count=2) {
+        for(let i=0;i<count;i++) this.spawnEnemy('olho_dagon',510+i*130,{fromDagon:true});
+    }
+    dagonLordRift(e) {
+        if(e.dead||this.ended)return;
+        const r=140, lead=.45;
+        const cx=SEA_MATH.clamp(this.player.x+this.playerVelocity.x*lead,r,this.W-r);
+        const cy=SEA_MATH.clamp(this.player.y+this.playerVelocity.y*lead,r,this.H-r);
+        const warning=this.add.circle(cx,cy,r,0x6e142d,.18)
+            .setStrokeStyle(4,0xff93a7,.92).setDepth(36);
+        this.tweens.add({targets:warning,alpha:.70,scale:1.06,duration:920,
+            onComplete:()=>warning.destroy()});
+        this.announce('DAGON · FENDA DE SANGUE! AFASTE-SE!');
+        this.time.delayedCall(1050,()=>{
+            if(this.ended||e.dead||!e.ship?.active)return;
+            this.burst(cx,cy,'violet',2.1);
+            this.splash(cx,cy,0xff617b,19);
+            if(Math.hypot(this.player.x-cx,this.player.y-cy)<r+this.hullRadius){
+                const hurt=this.damageShip(Math.max(1,Math.round(e.atk*.72)),cx,cy,'ram');
+                if(hurt){
+                    this.curse=Math.min(100,(this.curse||0)+12);
+                    this.announce('DAGON · A FOSSA MARCOU SEU CASCO · MALDIÇÃO +12%');
+                }
+            }
+        });
+    }
     dagonEyeFire(e,distance) {
         if(e.dead||e.eyeHidden||this.ended)return;
         const dx=(this.player.x-e.x)/Math.max(1,distance);
@@ -1956,11 +2017,11 @@ class Game extends Phaser.Scene {
     paintEnemies() {
         for (const e of this.enemies) {
             if (e.dead) continue;
-            // O Dagon emerge da água: seu horizonte permanece horizontal.
+            // O Arauto e o Senhor emergem da água: horizonte sempre horizontal.
             // A direção de ataque e a física continuam usando e.heading.
             // Gameplay headings are measured from image-UP (0°).
             // A enguia, o Recife Devorador e o aríete V15 recebem +PI
-            // somente no sprite. Horror de Coral, Dagon e Olho de Dagon
+            // somente no sprite. Horror de Coral, Arauto, Senhor e Olho de Dagon
             // NÃO GIRAM: seus quadros mantêm sempre 0°, independentemente do heading.
             // Física, rumo, colisões, esteira e ataques permanecem intactos.
             const artFacesDown=e.type==='enguia'||e.type==='recife'||e.type==='cultista'||
@@ -2080,6 +2141,10 @@ class Game extends Phaser.Scene {
                 // A estreia no sandbox é garantida na onda 3, com encontros aleatórios depois.
                 if (this.wave === 3) this.spawnEnemy('recife', 610);
                 if (this.wave % 5 === 0) {
+                    // A cada 60 ondas, a 20ª reserva um encontro próprio do Senhor.
+                    // Se Kraken/Arauto estiverem ativos, o encontro aguarda.
+                    if(this.wave % 60 === 20) this.pendingDagonLord=true;
+                    else {
                     const bosses=['almirante','nauabissal'];
                     // Cultista é o chefe das ondas 15, 45, 75...;
                     // não substitui o ciclo de invocação do Kraken ou Dagon.
@@ -2087,9 +2152,18 @@ class Game extends Phaser.Scene {
                         bosses[(this.wave / 5 - 1) % bosses.length];
                     this.spawnEnemy(selected, 530);
                     this.announce(`ONDA ${this.wave} · ${SEA_FOES[selected].name}`);
+                    }
                 }
                 for (let j = 0; j < Math.min(9, 2 + Math.floor(this.wave / 2)); j++) this.spawnEnemy(this.chooseFoe(j), 490 + j * 50);
                 this.dropTreasure(this.player.x + 150, this.player.y + 150, false, 20 + this.wave * 17);
+            }
+            if(this.pendingDagonLord && !this.sandboxKrakenTriggered && !this.sandboxDagonTriggered &&
+                !this.enemies.some(e=>!e.dead && e.type==='dagon_senhor')){
+                const lord=this.spawnEnemy('dagon_senhor',860,{fromWaveBoss:true});
+                if(lord){
+                    this.pendingDagonLord=false;
+                    this.announce('A FOSSA SE ABRIU · DAGON, SENHOR DAS PROFUNDEZAS!');
+                }
             }
             const alive = this.enemies.reduce((n, e) => n + (!e.dead ? 1 : 0), 0);
             if (alive < Math.min(11, 4 + this.wave * .35) && this.elapsed > this.nextSpawnTime) {
@@ -2097,7 +2171,9 @@ class Game extends Phaser.Scene {
             }
         } else {
             // Missões escalam em dificuldade e alternam objetivos reais.
-            if (this.objective === 'boss' && (this.bossKills || 0) >= 1) return this.finish(true);
+            if (this.objective === 'boss' &&
+                (this.missionBoss==='dagon_senhor' ? this.missionBossDefeated : (this.bossKills || 0)>=1))
+                return this.finish(true);
             if (this.objective === 'kill' && this.kills >= this.targetKills) return this.finish(true);
             if (this.objective === 'hunt' && this.huntKills >= this.huntTarget) return this.finish(true);
             if (this.objective === 'cargo' && this.gold >= this.targetGold) return this.finish(true);
@@ -2115,7 +2191,7 @@ class Game extends Phaser.Scene {
     objectiveText() {
         if (this.contract)return SEA_CONTRACTS.status(this);
         if (this.mode === 'sandbox') return `ONDA ${this.wave} · +${Math.max(0, Math.ceil(52 - this.waveClock))}s até reforços`;
-        if (this.objective === 'boss') return `ENFRENTAR ${SEA_FOES[this.missionBoss]?.name || 'O CHEFE'} · ${this.bossKills || 0}/1`;
+        if (this.objective === 'boss') return `ENFRENTAR ${SEA_FOES[this.missionBoss]?.name || 'O CHEFE'} · ${this.missionBoss==='dagon_senhor' ? Number(!!this.missionBossDefeated) : (this.bossKills || 0)}/1`;
         if (this.objective === 'kill') return `CAÇA À CORTE · ${this.kills}/${this.targetKills} navios`;
         if (this.objective === 'hunt') return `ROMPER BLOQUEIO · FRAGATAS ${this.huntKills || 0}/${this.huntTarget}`;
         if (this.objective === 'cargo') return `RECUPERAR CARGA · ${SEA_MATH.nice(this.gold)}/${SEA_MATH.nice(this.targetGold)} ouro`;
