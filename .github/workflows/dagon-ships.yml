@@ -1,0 +1,32 @@
+name: Prepare Cult of Dagon player ships
+on:
+  push:
+    branches: [main]
+    paths:
+      - "assets/player/culto_dagon/Evolucao_de_Navios_Eldritch_Culto_de_Dagon_original.png"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install Pillow==11.3.0
+      - name: Generate exact sprites, normalized atlas and manifest
+        run: python tools/preparar_evolucao_culto_dagon.py
+      - name: Commit generated assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/player/culto_dagon/
+          if ! git diff --cached --quiet; then
+            git commit -m "assets: generate Dagon faction 20-stage sprite atlas"
+            git push
+          fi
