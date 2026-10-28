@@ -294,9 +294,10 @@ class SeaBoot extends Phaser.Scene {
             frameWidth:512, frameHeight:682, endFrame:3
         });
         // O novo Dagon usa exclusivamente a textura dagon-animated.
-        // Tentáculo: folha RGBA original de quatro quadros horizontais (512 × 682).
+        // Tentáculo submerso: 4 quadros RGBA (543 × 724), espaçados por 40 px.
+        // Transparência parcial da água preservada no PNG fornecido.
         this.load.spritesheet('tentacle-animated', 'assets/v15/beast_tentacle.png', {
-            frameWidth:512, frameHeight:682, endFrame:3
+            frameWidth:543, frameHeight:724, spacing:40, endFrame:3
         });
         // Cortejo dos Afogados submerso: RGBA original, quatro quadros 512 x 646.
         this.load.spritesheet('drowned-animated', 'assets/v15/beast_drowned.png', {
@@ -817,10 +818,10 @@ class Game extends Phaser.Scene {
         const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
             (type==='dagon' && tex==='dagon-animated') ||
             (type==='recife' && tex==='reef-devourer-animated') ||
-            (type==='kraken' && tex==='kraken-animated') ||
-            (type==='tentaculo' && tex==='tentacle-animated');
+            (type==='kraken' && tex==='kraken-animated');
         const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :
             type==='coral' && tex==='coral-animated' ? 644 :
+            type==='tentaculo' && tex==='tentacle-animated' ? 724 :
             animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
@@ -1243,7 +1244,10 @@ class Game extends Phaser.Scene {
                 if(e.eyeFrame!==frame){e.ship.setFrame(frame);e.eyeFrame=frame;}
             }
             if(e.type==='tentaculo' && e.ship.texture.key==='tentacle-animated'){
-                const frame=Math.floor((t*4+e.visualPhase)%4);
+                // Oscilação natural: 1-2-3-4-3-2 a cada 175 ms.
+                // Altera somente o quadro visual; física e ataques intactos.
+                const sequence=[0,1,2,3,2,1];
+                const frame=sequence[Math.floor((t*1000/175+e.visualPhase)%sequence.length)];
                 if(e.tentacleFrame!==frame){e.ship.setFrame(frame);e.tentacleFrame=frame;}
             }
             if(e.type==='cultista' && e.ship.texture.key==='cult-barge-animated'){
