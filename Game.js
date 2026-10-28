@@ -819,9 +819,9 @@ class Game extends Phaser.Scene {
             (type==='dagon' && tex==='dagon-animated') ||
             (type==='recife' && tex==='reef-devourer-animated') ||
             (type==='kraken' && tex==='kraken-animated');
-        const sourceH = type==='tentaculo' && tex==='tentacle-animated' ? 724 :
-            type==='afogados' && tex==='drowned-animated' ? 646 :
+        const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :
             type==='coral' && tex==='coral-animated' ? 644 :
+            type==='tentaculo' && tex==='tentacle-animated' ? 724 :
             animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
