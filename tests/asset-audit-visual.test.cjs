@@ -15,7 +15,7 @@ const {chromium}=require('playwright-core');
   await page.goto('http://127.0.0.1:8765/asset-audit.html');
   await page.waitForFunction(()=>document.querySelector('#source-status')?.textContent.includes('Inventário'),{timeout:20000});
   assert(await page.locator('.asset').count()>=40);
-  await page.locator('#search').fill('player_ship.png');
+  await page.locator('#search').fill('beast_drowned.png');
   assert.equal(await page.locator('.asset').count(),1);
   await page.locator('.asset .preview').click();
   assert(await page.locator('#detail').isVisible());
