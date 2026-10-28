@@ -43,10 +43,10 @@ assert(game.includes('const sequence=[0,1,2,3,2,1]'),'Reef animation should ping
 assert(game.includes('t*1000/175+e.visualPhase'),'Reef ping-pong interval should be 175ms');
 assert(game.includes("e.reefFrame!==frame")&&game.includes("e.ship.setFrame(frame)"),
  'Four-frame visual loop must actually progress');
-assert(game.includes("e.type==='enguia'||e.type==='recife'||"),
- 'Reef Devourer still rotates to heading; Coral remains fixed at zero');
-assert(game.includes("e.type==='coral'?0:"),
- 'New Horror de Coral uses fixed visual orientation');
+assert(game.includes("e.type==='enguia'||e.type==='cultista'||"),
+ 'Only eel and downward-facing ship sprites need the +PI correction');
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';"),
+ 'Reef Devourer and Horror de Coral both maintain 0° visual orientation');
 assert(game.includes("e.heading+(artFacesDown?Math.PI:0)"),
  'Rotation correction must never change physics heading');
 assert(game.includes("if (rank >= 7) pool.push('recife')"),

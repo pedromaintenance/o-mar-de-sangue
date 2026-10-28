@@ -26,8 +26,8 @@ for(const type of ['dagon','coral','recife','afogados','kraken'])
 assert(game.includes("if(e.type==='kraken' && e.ship.texture.key==='kraken-animated')"), 'animate in visual loop');
 assert(game.includes('e.krakenFrame!==frame')&&game.includes('e.ship.setFrame(frame)'), 'cycle frames only as needed');
 assert(!game.includes("this.load.image('v15-kraken'"), 'remove former static texture');
-assert(game.includes("e.type==='dagon'?0:")&&game.includes("e.heading+(artFacesDown?Math.PI:0)"),
- 'preserve orientation logic');
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';")&&game.includes("e.heading+(artFacesDown?Math.PI:0)"),
+ 'Non-eel monsters fixed; eel and ships still rotate');
 assert(game.includes("kraken: { name: 'KRAKEN")&&game.includes("this.tentacleAttack(e)"),
  'retain Kraken stats and tentacle attack');
 assert(game.includes("this.spawnEnemy('enguia',340+i*80)"), 'retain boss phase and eel summons');

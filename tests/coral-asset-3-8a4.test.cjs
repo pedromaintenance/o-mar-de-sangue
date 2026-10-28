@@ -28,12 +28,12 @@ assert(game.includes("type==='coral' && e.ship.texture.key==='coral-animated'"),
  'Advance frames in the visual render loop');
 assert(game.includes("e.coralFrame!==frame")&&game.includes("e.ship.setFrame(frame)"),
  'Frame caching and actual frame changes required');
-assert(game.includes("e.type==='enguia'||e.type==='recife'||"),
- 'Other downward-facing monsters retain their own visual +PI correction');
+assert(game.includes("e.type==='enguia'||e.type==='cultista'||"),
+ 'Downward-facing eel and barge retain the +PI correction');
 assert(!game.includes("e.type==='enguia'||e.type==='coral'||"),
  'Coral must not receive the previous heading-driven correction');
-assert(game.includes("e.type==='coral'?0:"),
- 'Coral must have fixed visual rotation 0°, independent of heading');
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';"),
+ 'Coral and all non-eel monsters must have fixed visual rotation 0°');
 assert(game.includes("e.heading+(artFacesDown?Math.PI:0)"),
  'Heading remains available for other sprites and physics');
 assert(game.includes("e.type==='dagon'?0:"),'Dagon fixed orientation remains untouched');
@@ -48,7 +48,7 @@ const end=game.indexOf('\n    }',start);
 assert(start>=0&&end>start,'paintEnemies should exist');
 const Painter=new Function('return class Painter {'+game.slice(start,end+6)+'}')();
 function mockEnemy(type,heading){
-  return {type,heading,dead:false,x:150,y:175,radius:76,hp:143,maxhp:143,boss:false,
+  return {type,heading,isMonster:true,dead:false,x:150,y:175,radius:76,hp:143,maxhp:143,boss:false,
     ship:{rotation:undefined,setPosition(x,y){this.x=x;this.y=y;return this;},
       setRotation(r){this.rotation=r;return this;},
       texture:{key:type==='coral'?'coral-animated':'reef-devourer-animated'}},
@@ -61,7 +61,7 @@ for(const heading of [0,Math.PI/3,-Math.PI/2,Math.PI,Math.PI*1.75]){
   coral.heading=reef.heading=heading;
   painter.paintEnemies();
   assert.equal(coral.ship.rotation,0,'Coral sprite must never rotate regardless of heading');
-  assert(Math.abs(reef.ship.rotation-(heading+Math.PI))<1e-9,
-    'Reef Devourer still faces navigation direction');
+  assert.equal(reef.ship.rotation,0,
+    'Reef Devourer must keep its sprite fixed regardless of navigation direction');
 }
 console.log('PASS Coral submerso (2048x644 RGBA), animation, rotation locked, PWA');

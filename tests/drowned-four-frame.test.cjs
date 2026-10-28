@@ -25,8 +25,8 @@ for(const type of ['dagon','coral','recife','afogados'])
 assert(game.includes("if(e.type==='afogados' && e.ship.texture.key==='drowned-animated')"));
 assert(game.includes('e.drownedFrame!==frame')&&game.includes('e.ship.setFrame(frame)'));
 assert(!game.includes("this.load.image('v15-drowned'"),'No static loader for four-frame sheet');
-assert(game.includes("e.type==='dagon'?0:")&&game.includes("e.heading+(artFacesDown?Math.PI:0)"),
-  'Existing monster orientation preserved');
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';")&&game.includes("e.heading+(artFacesDown?Math.PI:0)"),
+  'Drowned and other non-eel monsters have fixed sprite orientation');
 assert(game.includes("e.type==='afogados' ? .79+.18*(.5+.5*pulse) : 1"),
   'Existing transparency pulse preserved');
 assert(game.includes("afogados: { name: 'Cortejo dos Afogados'"), 'Enemy stats intact');

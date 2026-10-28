@@ -2018,18 +2018,16 @@ class Game extends Phaser.Scene {
     paintEnemies() {
         for (const e of this.enemies) {
             if (e.dead) continue;
-            // O Arauto e o Senhor emergem da água: horizonte sempre horizontal.
-            // A direção de ataque e a física continuam usando e.heading.
-            // Gameplay headings are measured from image-UP (0°).
-            // A enguia, o Recife Devorador e o aríete V15 recebem +PI
-            // somente no sprite. Horror de Coral, Arauto, Senhor e Olho de Dagon
-            // NÃO GIRAM: seus quadros mantêm sempre 0°, independentemente do heading.
-            // Física, rumo, colisões, esteira e ataques permanecem intactos.
-            const artFacesDown=e.type==='enguia'||e.type==='recife'||e.type==='cultista'||
+            // Apenas navios e a enguia giram conforme o rumo; todos os demais
+            // monstros mantêm o sprite vertical (0°), inclusive os animados.
+            // A enguia, a barca cultista e o aríete V15 têm a arte voltada
+            // para baixo e recebem +PI somente na apresentação.
+            // e.heading continua controlando IA, movimento, ataques e esteiras.
+            const artFacesDown=e.type==='enguia'||e.type==='cultista'||
                 (e.type==='ariete'&&e.ship.texture.key==='v15-ram');
+            const fixedMonsterArt=e.isMonster && e.type!=='enguia';
             e.ship.setPosition(e.x,e.y).setRotation(
-                e.type==='coral'?0:e.type==='dagon'?0:e.type==='dagon_senhor'?0:e.type==='olho_dagon'?0:
-                e.heading+(artFacesDown?Math.PI:0));
+                fixedMonsterArt ? 0 : e.heading+(artFacesDown?Math.PI:0));
             if (e.label) e.label.setPosition(e.x, e.y - e.radius - 54);
             const width=e.boss?112:58;
             e.bar.clear(); e.bar.fillStyle(0x160f1c, .84).fillRect(e.x - width/2-1, e.y - e.radius - 32, width+2, 8);

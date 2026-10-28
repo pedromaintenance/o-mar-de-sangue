@@ -25,7 +25,7 @@ assert(game.includes("dagon:'dagon-animated'"));
 assert(game.includes("dagon_senhor:'dagon-lord-animated'"));
 assert(game.includes("type==='dagon_senhor' && tex==='dagon-lord-animated'"));
 assert(game.includes("e.type==='dagon_senhor' && e.ship.texture.key==='dagon-lord-animated'"));
-assert(game.includes("e.type==='dagon'?0:e.type==='dagon_senhor'?0:e.type==='olho_dagon'?0:"),
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';"),
  'Both Dagon entities and eyes must remain at zero art rotation');
 assert(game.includes("e.ship.setFrame(frame)"));
 assert(game.includes("if(type==='dagon') this.spawnDagonEyes(3)"),'herald retains its eye summons');

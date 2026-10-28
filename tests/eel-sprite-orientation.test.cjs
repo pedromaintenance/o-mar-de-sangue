@@ -22,7 +22,7 @@ assert(game.includes("e.ship.setFrame(frame)"),'swim loop must actually update P
 assert(game.includes("e.eelFrame!==frame"),'avoid redundant frame changes on every tick');
 assert(game.includes("e.type==='ariete'&&e.ship.texture.key==='v15-ram'"));
 assert(game.includes("e.heading+(artFacesDown?Math.PI:0)"));
-assert(game.includes("e.type==='dagon'?0:"),'Dagon must remain vertically oriented');
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';"),'All monsters except the eel keep fixed visual orientation');
 assert(game.includes("Math.sin(e.heading) * thrust")&&game.includes("Math.cos(e.heading) * thrust"),
  'Movement and physics still derive only from heading');
 assert(sw.includes('"./assets/v15/beast_eel_swim.webp"'));
