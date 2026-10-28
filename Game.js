@@ -298,9 +298,9 @@ class SeaBoot extends Phaser.Scene {
         this.load.spritesheet('tentacle-animated', 'assets/v15/beast_tentacle.png', {
             frameWidth:512, frameHeight:682, endFrame:3
         });
-        // Cortejo dos Afogados: original RGBA, quatro quadros horizontais de 512 x 682.
+        // Cortejo dos Afogados submerso: RGBA original, quatro quadros 512 x 646.
         this.load.spritesheet('drowned-animated', 'assets/v15/beast_drowned.png', {
-            frameWidth:512, frameHeight:682, endFrame:3
+            frameWidth:512, frameHeight:646, endFrame:3
         });
         // Original-resolution transparent serpent sheet: 4 frames, 512 × 565 px each.
         // Its head is at the BOTTOM: paintEnemies offsets its artwork by 180 degrees.
@@ -817,10 +817,10 @@ class Game extends Phaser.Scene {
         const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
             (type==='dagon' && tex==='dagon-animated') ||
             (type==='recife' && tex==='reef-devourer-animated') ||
-            (type==='afogados' && tex==='drowned-animated') ||
             (type==='kraken' && tex==='kraken-animated') ||
             (type==='tentaculo' && tex==='tentacle-animated');
-        const sourceH = type==='coral' && tex==='coral-animated' ? 644 :
+        const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :
+            type==='coral' && tex==='coral-animated' ? 644 :
             animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;

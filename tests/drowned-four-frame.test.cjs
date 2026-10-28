@@ -1,4 +1,4 @@
-/* Cortejo dos Afogados: exact original four-frame RGBA, 26 Oct 2026. */
+/* Cortejo dos Afogados: original submerso four-frame RGBA, 27 Oct 2026. */
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
 const crypto=require('node:crypto');
@@ -8,17 +8,17 @@ assert(fs.existsSync(asset),'Original drowned spritesheet missing');
 const png=fs.readFileSync(asset);
 assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a','PNG signature');
 assert.equal(png.readUInt32BE(16),2048,'four 512-pixel frames');
-assert.equal(png.readUInt32BE(20),682,'frame height');
+assert.equal(png.readUInt32BE(20),646,'submerged frame height');
 assert.deepEqual([...png.subarray(24,29)],[8,6,0,0,0],'RGBA8 with transparency');
 assert.equal(crypto.createHash('sha256').update(png).digest('hex'),
-  '1c4f59aeed5167219ffcd2635bfeba71f9db8bedc29772eebe03bf9edf6f7db7',
+  '76567f55cc60baae73c1ac76447cbab75ab69cf03763e839ad6bf101acb6cf0b',
   'Committed bytes must match original artwork exactly');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
 assert(game.includes("this.load.spritesheet('drowned-animated', 'assets/v15/beast_drowned.png'"));
-assert(/frameWidth:512,\s*frameHeight:682,\s*endFrame:3/.test(game));
+assert(/frameWidth:512,\s*frameHeight:646,\s*endFrame:3/.test(game));
 assert(game.includes("afogados:'drowned-animated'"));
-assert(game.includes("type==='afogados' && tex==='drowned-animated'"), 'Use one frame height for scaling');
+assert(game.includes("const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :"), 'Use one frame height for scaling');
 const frameZero=game.match(/const initialMonsterFrame=\(([^)]*)\)\?0:undefined;/)?.[1]||'';
 for(const type of ['dagon','coral','recife','afogados'])
  assert(frameZero.includes("type==='"+type+"'"), 'Spawn '+type+' at frame zero');
@@ -34,4 +34,4 @@ assert(game.includes("this.spawnEnemy('afogados',380)"), 'Dagon summons intact')
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/v15/beast_drowned.png"'));
 assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=73);
-console.log('PASS Drowned original RGBA sprite, four frames, visual only, PWA');
+console.log('PASS Drowned original submerged RGBA sprite 2048x646, four frames, visual only, PWA');
