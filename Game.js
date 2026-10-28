@@ -273,7 +273,7 @@ class SeaBoot extends Phaser.Scene {
             frameWidth:512, frameHeight:682, endFrame:3
         });
         this.load.image('fx-tentacle', 'assets/abyss/kraken_tentacle.png');
-        this.load.spritesheet('dagon-eye-animated', 'assets/abyss/dagon_eye.png', {frameWidth:512,frameHeight:682,endFrame:3});
+        this.load.spritesheet('dagon-eye-animated', 'assets/abyss/dagon_eye.png', {frameWidth:512,frameHeight:559,endFrame:3});
         this.load.spritesheet('fx-cannon-charge', 'assets/fx/cannon_charge_sparks.png', {frameWidth:96,frameHeight:96,endFrame:4});
         this.load.image('fx-splash-0', 'assets/fx/splash_0.png');
         this.load.image('fx-splash-1', 'assets/fx/splash_1.png');
@@ -816,10 +816,10 @@ class Game extends Phaser.Scene {
         else if (type !== 'cultista' && v15Visuals[type] && this.textures.exists(v15Visuals[type]))
             tex = v15Visuals[type];
         // Spritesheet source height is ONE frame; four frames are side by side.
-        const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
-            (type==='dagon' && tex==='dagon-animated') ||
+        const animated682 = (type==='dagon' && tex==='dagon-animated') ||
             (type==='kraken' && tex==='kraken-animated');
-        const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :
+        const sourceH = type==='olho_dagon' && tex==='dagon-eye-animated' ? 559 :
+            type==='afogados' && tex==='drowned-animated' ? 646 :
             type==='coral' && tex==='coral-animated' ? 644 :
             type==='recife' && tex==='reef-devourer-animated' ? 724 :
             type==='tentaculo' && tex==='tentacle-animated' ? 724 :
