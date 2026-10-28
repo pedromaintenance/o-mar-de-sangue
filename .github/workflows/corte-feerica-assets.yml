@@ -1,0 +1,24 @@
+name: Corte Feérica — integrity of 20 player ship evolution sprites
+on:
+  push:
+    paths:
+      - 'assets/player/corte_feerica/**'
+      - 'tests/corte-feerica-assets.test.cjs'
+      - '.github/workflows/corte-feerica-assets.yml'
+  pull_request:
+    paths:
+      - 'assets/player/corte_feerica/**'
+      - 'tests/corte-feerica-assets.test.cjs'
+      - '.github/workflows/corte-feerica-assets.yml'
+permissions:
+  contents: read
+jobs:
+  art-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check tests/corte-feerica-assets.test.cjs
+      - run: node tests/corte-feerica-assets.test.cjs
