@@ -259,9 +259,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('foe-cult', 'assets/abyss/cult_barge.png');
         this.load.image('foe-dreadnought', 'assets/abyss/dreadnought.png');
         this.load.image('foe-drowned', 'assets/abyss/drowned_choir.png');
-        // Recife Devorador: novo monstro, independente do Horror de Coral V15.
+        // Recife Devorador: arte submersa original em quatro quadros RGBA 543×724,
+        // com espaçamento transparente de 40 px entre quadros. Independente do Horror de Coral V15.
         this.load.spritesheet('reef-devourer-animated', 'assets/abyss/coral_horror.png', {
-            frameWidth:512, frameHeight:682, endFrame:3
+            frameWidth:543, frameHeight:724, spacing:40, endFrame:3
         });
         this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
         this.load.image('foe-turtle', 'assets/abyss/temple_turtle.png');
@@ -817,10 +818,10 @@ class Game extends Phaser.Scene {
         // Spritesheet source height is ONE frame; four frames are side by side.
         const animated682 = (type==='olho_dagon' && tex==='dagon-eye-animated') ||
             (type==='dagon' && tex==='dagon-animated') ||
-            (type==='recife' && tex==='reef-devourer-animated') ||
             (type==='kraken' && tex==='kraken-animated');
         const sourceH = type==='afogados' && tex==='drowned-animated' ? 646 :
             type==='coral' && tex==='coral-animated' ? 644 :
+            type==='recife' && tex==='reef-devourer-animated' ? 724 :
             type==='tentaculo' && tex==='tentacle-animated' ? 724 :
             animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','olho_dagon'].includes(type);
@@ -1267,8 +1268,9 @@ class Game extends Phaser.Scene {
                 if(e.drownedFrame!==frame){e.ship.setFrame(frame);e.drownedFrame=frame;}
             }
             if(e.type==='recife' && e.ship.texture.key==='reef-devourer-animated'){
-                // Boca, tentáculos e bolhas da criatura independente, sem afetar a física.
-                const frame=Math.floor((t*4+e.visualPhase)%4);
+                // Animação original 1-2-3-4-3-2; apenas apresentação, sem alterar física.
+                const sequence=[0,1,2,3,2,1];
+                const frame=sequence[Math.floor((t*1000/175+e.visualPhase)%sequence.length)];
                 if(e.reefFrame!==frame){e.ship.setFrame(frame);e.reefFrame=frame;}
             }
             if(e.type==='coral' && e.ship.texture.key==='coral-animated'){
