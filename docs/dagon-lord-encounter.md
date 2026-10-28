@@ -24,3 +24,6 @@ Vida 1.800, ataque 82, raio de colisão 245, deslocamento 48, intervalo básico 
 
 ## Segurança e regressão
 Nenhuma estrutura do save foi modificada. Recarregamento PWA versionado; assets originais não são convertidos nem reamostrados. Validar `node --check Game.js`, `node tests/dagon-lord-encounter.test.cjs`, `node tests/dagon-four-frame.test.cjs` e demais testes das sentinelas. Verificação física de controles e balanço em navegador ainda necessária.
+
+## Isolamento do encontro
+Enquanto o Senhor está vivo no sandbox, novas sentinelas (Olhos vagantes e tentáculos do Kraken) deixam de surgir, e as sentinelas preexistentes não podem despertar simultaneamente o Arauto ou o Kraken. Quando o Senhor é derrotado, os ciclos normais voltam a funcionar.

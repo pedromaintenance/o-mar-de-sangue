@@ -497,3 +497,8 @@ A página padrão usa **A Maré Negra**. Para comparação, a aparência antiga 
 **Executar Sprint 01 — Ecos da Maré Sangrenta**, priorizando narrativa política e diversidade de encontros, sem interromper a validação do HUD paisagem de 26/10. Sprint 02 (captura e especializações temporárias) e Sprint 03 (reputação persistente e possíveis mudanças do save) dependem de avaliação separada. A migração v4→v5 não é pré-requisito em pré-alfa.
 
 O roadmap não é uma promessa de datas; a ordem pode mudar conforme testes, bugs e feedback dos jogadores.
+
+
+### Marco de combate — Dagon, Senhor das Profundezas (2026-10-28)
+
+Implementação isolada em `Game.js`: chefe independente do Arauto, com aparição exclusiva na missão 40 (recorrência +100) e no sandbox na onda 20 (+60); fendas sinalizadas e reforços escalonados. Testes de contrato e spritesheets em `tests/dagon-lord-encounter.test.cjs` e `tests/dagon-four-frame.test.cjs`. Cache PWA v95. **Pendência de QA:** validação visual e ajuste de balanço em desktop e celular; não altera save v4 nem ciclos do Kraken/Arauto.

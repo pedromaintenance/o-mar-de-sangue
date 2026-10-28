@@ -1893,6 +1893,7 @@ class Game extends Phaser.Scene {
     }
     summonSandboxDagon(eye) {
         if(this.mode!=='sandbox'||this.contractId||!eye?.sandboxDagonEye||
+            (this.enemies?.some(e=>!e.dead&&e.type==='dagon_senhor'))||
             this.sandboxDagonTriggered||this.ended)return null;
         const boss=this.spawnEnemy('dagon',640,{fromEye:true});
         if(!boss)return null;
@@ -1917,7 +1918,7 @@ class Game extends Phaser.Scene {
             onComplete:()=>warning.destroy()});
         this.announce('DAGON · FENDA DE SANGUE! AFASTE-SE!');
         this.time.delayedCall(1050,()=>{
-            if(this.ended||e.dead||!e.ship?.active)return;
+            if(this.ended||this.sinking||e.dead||!e.ship?.active)return;
             this.burst(cx,cy,'violet',2.1);
             this.splash(cx,cy,0xff617b,19);
             if(Math.hypot(this.player.x-cx,this.player.y-cy)<r+this.hullRadius){
@@ -1940,7 +1941,7 @@ class Game extends Phaser.Scene {
     }
     summonSandboxKraken(tentacle) {
         if (this.mode !== 'sandbox' || this.contractId || !tentacle?.sandboxSentinel ||
-            this.sandboxKrakenTriggered || this.ended) return null;
+            this.sandboxKrakenTriggered || this.enemies?.some(e=>!e.dead&&e.type==='dagon_senhor') || this.ended) return null;
         const boss = this.spawnEnemy('kraken', 640, {fromTentacle:true});
         if (!boss) return null;
         this.sandboxKrakenTriggered = true;
@@ -2116,13 +2117,15 @@ class Game extends Phaser.Scene {
             }
         } else if (this.mode === 'sandbox') {
             // Ciclos independentes: tentáculo/Kraken e olho/Dagon.
-            if(!this.sandboxDagonTriggered && this.elapsed>=this.nextDagonEyeSpawnAt &&
+            if(!this.sandboxDagonTriggered && !this.enemies.some(e=>!e.dead&&e.type==='dagon_senhor') &&
+                this.elapsed>=this.nextDagonEyeSpawnAt &&
                 !this.enemies.some(e=>e.sandboxDagonEye&&!e.dead)){
                 const eye=this.spawnEnemy('olho_dagon',1150);
                 this.nextDagonEyeSpawnAt=this.elapsed+(eye?15:3);
             }
             // Ciclo sandbox: tentáculo solitário -> Kraken -> novo tentáculo distante.
-            if (!this.sandboxKrakenTriggered && this.elapsed >= this.nextTentacleSpawnAt &&
+            if (!this.sandboxKrakenTriggered && !this.enemies.some(e=>!e.dead&&e.type==='dagon_senhor') &&
+                this.elapsed >= this.nextTentacleSpawnAt &&
                 !this.enemies.some(e => e.sandboxSentinel && !e.dead)) {
                 const origin = this.sandboxTentacleRebirthFrom;
                 const next = this.spawnEnemy('tentaculo', 980, origin ? {rebirthFrom:origin} : {});

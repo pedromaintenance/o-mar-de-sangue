@@ -22,3 +22,7 @@ chefe da onda 15 (a cada 30 ondas). Tem cinco projéteis por salva, um
 círculo ritual de sangue telegrafado e convoca dois reforços quando a
 integridade cai abaixo de 48%. Não entra no sorteio dos inimigos comuns.
 Os encontros existentes com Kraken/Dagon não são alterados.
+
+## Dagon, Senhor das Profundezas (encontro separado)
+O **Arauto de Dagon** mantém o identificador `dagon` e os quatro quadros de `assets/v15/dagon_emerging.png`; o **Senhor das Profundezas** usa `dagon_senhor` e `assets/abyss/dagon.png`.
+A batalha exclusiva estreia na missão 40 (depois 140, 240...) e nas ondas 20, 80, 140... do sandbox. O Senhor usa Fendas de Sangue telegrafadas e invoca Olhos em duas fases, sem substituir o ciclo do Arauto. Ver [guia do encontro](docs/dagon-lord-encounter.md).

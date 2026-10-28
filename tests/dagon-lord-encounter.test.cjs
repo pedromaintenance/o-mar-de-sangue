@@ -19,6 +19,8 @@ assert(game.includes("this.dagonLordRift(e)"));
 assert(game.includes("this.spawnDagonLordEyes(2)"));
 assert(game.includes("e.cooldownBase*=.78"));
 assert(game.includes("this.curse=Math.min(100,(this.curse||0)+12)"));
+assert(game.includes("this.enemies?.some(e=>!e.dead&&e.type==='dagon_senhor')"), 'no simultaneous eye/tentacle summons during the Lord encounter');
+assert(game.includes("!this.enemies.some(e=>!e.dead&&e.type==='dagon_senhor')"), 'roaming sentinels pause while Lord lives');
 function method(name,ctx={}){
   const at=game.indexOf('\n    '+name+'(');
   assert(at>=0,'method missing '+name);
