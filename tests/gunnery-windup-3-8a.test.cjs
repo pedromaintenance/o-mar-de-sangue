@@ -70,6 +70,9 @@ c.Phaser={Math:{Distance:{Between:(x1,y1,x2,y2)=>Math.hypot(x1-x2,y1-y2)},
  Angle:{Wrap:v=>Math.atan2(Math.sin(v),Math.cos(v))}}};
 c.SEA_MATH={clamp:(v,a,b)=>Math.max(a,Math.min(b,v))};
 c.SEA_WEATHER={enemyCurrent(){}};
+// V101 faction AI can mark a neutral Court patrol; isolated gunnery tests
+// need that harmless dependency stub even when no faction is selected.
+c.SEA_FACTION_POLITICS={neutralSail(){return false;}};
 function foe(type){
  const f=c.foes[type];return {type,id:10,x:150,y:0,vx:0,vy:0,heading:0,
  speed:f.speed,maxRange:f.range,radius:f.radius,cooldown:0,
