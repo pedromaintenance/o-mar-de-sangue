@@ -1,0 +1,32 @@
+name: Naval Counterbattery V102 — Gameplay
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SeaGunnery.js'
+      - 'Game.js'
+      - 'sw.js'
+      - 'tests/counterbattery-v102.test.cjs'
+      - '.github/workflows/counterbattery-v102.yml'
+  pull_request:
+    paths:
+      - 'SeaGunnery.js'
+      - 'Game.js'
+      - 'sw.js'
+      - 'tests/counterbattery-v102.test.cjs'
+      - '.github/workflows/counterbattery-v102.yml'
+permissions:
+  contents: read
+jobs:
+  counterbattery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and gameplay regressions
+        run: |
+          node --check Game.js
+          node --check SeaGunnery.js
+          node --test tests/counterbattery-v102.test.cjs tests/gunnery-windup-3-8a.test.cjs tests/gunnery-single-shot-3-8a1.test.cjs tests/braced-gunnery-3-8a2.test.cjs tests/dagon-lord-encounter.test.cjs tests/faction-politics-v101.test.cjs
