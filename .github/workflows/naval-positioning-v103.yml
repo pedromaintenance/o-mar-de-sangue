@@ -1,0 +1,39 @@
+name: Naval Positioning V103 — Gameplay
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SeaPositioning.js'
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/naval-positioning-v103.test.cjs'
+      - 'tests/counterbattery-v102.test.cjs'
+      - '.github/workflows/naval-positioning-v103.yml'
+  pull_request:
+    paths:
+      - 'SeaPositioning.js'
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/naval-positioning-v103.test.cjs'
+      - 'tests/counterbattery-v102.test.cjs'
+      - '.github/workflows/naval-positioning-v103.yml'
+permissions:
+  contents: read
+jobs:
+  naval-positioning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax, combat and political regressions
+        run: |
+          node --check Game.js
+          node --check SeaPositioning.js
+          node --check PortUI.js
+          node --test tests/naval-positioning-v103.test.cjs tests/counterbattery-v102.test.cjs tests/gunnery-windup-3-8a.test.cjs tests/gunnery-single-shot-3-8a1.test.cjs tests/braced-gunnery-3-8a2.test.cjs tests/dagon-lord-encounter.test.cjs tests/faction-politics-v101.test.cjs tests/pwa-cache-contract.test.cjs
