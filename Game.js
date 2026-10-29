@@ -284,8 +284,15 @@ class SeaBoot extends Phaser.Scene {
         this.load.spritesheet('reef-devourer-animated', 'assets/abyss/coral_horror.png', {
             frameWidth:543, frameHeight:724, spacing:40, endFrame:3
         });
-        this.load.image('foe-shell', 'assets/abyss/shell_guardian.png');
-        this.load.image('foe-turtle', 'assets/abyss/temple_turtle.png');
+        // Guardião Caranguejo: quatro quadros RGBA horizontais 512×646.
+        // Templo Tartaruga: quatro quadros RGBA horizontais 512×682.
+        // A água semitransparente e todos os pixels originais são preservados.
+        this.load.spritesheet('foe-shell', 'assets/abyss/shell_guardian.png', {
+            frameWidth:512, frameHeight:646, endFrame:3
+        });
+        this.load.spritesheet('foe-turtle', 'assets/abyss/temple_turtle.png', {
+            frameWidth:512, frameHeight:682, endFrame:3
+        });
         this.load.image('boss-kraken', 'assets/abyss/kraken.png');
         // Arauto de Dagon: spritesheet fornecida pelo criador (4 x 512×682).
         // Carregada uma vez; ele não altera a orientação visual ao navegar.
@@ -865,13 +872,15 @@ class Game extends Phaser.Scene {
             (type==='kraken' && tex==='kraken-animated');
         const sourceH = type==='olho_dagon' && tex==='dagon-eye-animated' ? 559 :
             type==='afogados' && tex==='drowned-animated' ? 646 :
+            type==='caranguejo' && tex==='foe-shell' ? 646 :
+            type==='tartaruga' && tex==='foe-turtle' ? 682 :
             type==='coral' && tex==='coral-animated' ? 644 :
             type==='recife' && tex==='reef-devourer-animated' ? 724 :
             type==='tentaculo' && tex==='tentacle-animated' ? 724 :
             animated682 ? 682 : (this.textures.get(tex).getSourceImage().height || 160);
         const supernatural = ['enguia','afogados','coral','recife','caranguejo','tartaruga','tentaculo','kraken','dagon','dagon_senhor','olho_dagon'].includes(type);
         const heightFactor = supernatural ? (elite ? 2.12 : 2.02) : ['foe-galleon','foe-admiral'].includes(tex) ? 2.35 : tex === 'foe-ram' ? 2.15 : 2.45;
-        const initialMonsterFrame=(type==='dagon'||type==='dagon_senhor'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon'||(type==='cultista'&&tex==='cult-barge-animated'))?0:undefined;
+        const initialMonsterFrame=(type==='dagon'||type==='dagon_senhor'||type==='coral'||type==='recife'||type==='afogados'||type==='kraken'||type==='tentaculo'||type==='olho_dagon'||type==='caranguejo'||type==='tartaruga'||(type==='cultista'&&tex==='cult-barge-animated'))?0:undefined;
         const ship = this.add.image(pos.x, pos.y, tex,
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
@@ -1311,6 +1320,19 @@ class Game extends Phaser.Scene {
                 // orientação, comportamento, tentáculos e colisões.
                 const frame=Math.floor((t*4+e.visualPhase)%4);
                 if(e.krakenFrame!==frame){e.ship.setFrame(frame);e.krakenFrame=frame;}
+            }
+            if(e.type==='caranguejo' && e.ship.texture.key==='foe-shell'){
+                // Água e pinças serpenteiam em 0-1-2-3-2-1; orientação fixa.
+                // Física, alcance, IA e colisões do Guardião ficam intactos.
+                const sequence=[0,1,2,3,2,1];
+                const frame=sequence[Math.floor((t*1000/190+e.visualPhase)%sequence.length)];
+                if(e.crabFrame!==frame){e.ship.setFrame(frame);e.crabFrame=frame;}
+            }
+            if(e.type==='tartaruga' && e.ship.texture.key==='foe-turtle'){
+                // O templo move-se com a água em 4 quadros, sem girar o casco.
+                const sequence=[0,1,2,3,2,1];
+                const frame=sequence[Math.floor((t*1000/230+e.visualPhase)%sequence.length)];
+                if(e.turtleFrame!==frame){e.ship.setFrame(frame);e.turtleFrame=frame;}
             }
             if(e.type==='afogados' && e.ship.texture.key==='drowned-animated'){
                 // Quatro quadros animados, sem mudar rotação, colisões, IA ou ataques.
