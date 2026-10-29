@@ -37,7 +37,8 @@ const SEA_UI = {
                 ornament.fillStyle(0x171317,1);ornament.fillCircle(cx,cy,1);
             }
         }
-        const stamp=scene.add.image(x,top+62,SEA_FACTIONS.texture(scene.profile||SeaProfile.load()),
+        const stamp=scene.add.image(x,top+62,typeof SEA_FACTIONS==='undefined' ? 'player-ship-stages' :
+            SEA_FACTIONS.texture(scene.profile||SeaProfile.load()),
             SEA_PLAYER_SHIP.stage(scene.profile?.levels || SeaProfile.load().levels)-1)
             .setAlpha(.095);
         stamp.setScale(125/SEA_PLAYER_SHIP.frameHeight);add(stamp);
