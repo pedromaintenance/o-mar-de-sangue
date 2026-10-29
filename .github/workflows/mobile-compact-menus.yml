@@ -28,7 +28,7 @@ jobs:
       - run: npm install --no-save --no-package-lock playwright-core@1.56.1
       - name: Source, theme and PWA regressions
         run: |
-          node --test tests/port-ui-rebuild.test.cjs tests/port-theme-abyss.test.cjs tests/pwa-cache-contract.test.cjs tests/port-controller-navigation.test.cjs
+          node --test tests/port-ui-rebuild.test.cjs tests/pwa-cache-contract.test.cjs tests/port-controller-navigation.test.cjs
       - name: Exercise real Porto on mobile portrait/landscape and desktop
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/mobile-compact.log 2>&1 &
@@ -36,6 +36,7 @@ jobs:
           trap 'kill $SERVER_PID' EXIT
           sleep 2
           node tests/mobile-compact-menus.test.cjs
+          node tests/port-theme-abyss.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
