@@ -110,6 +110,7 @@ const SEA_ISLANDS = {
         // Three independent affinities persist when the expedition is settled.
         // Numeric alignment does not automatically sign a faction alliance.
         s.alignment={...{sobreviventes:0,corte:0,culto:0},...(s.profile?.alignment||{})};
+        s.faction=typeof SEA_FACTIONS==='undefined'?null:SEA_FACTIONS.normalize(s.profile?.faction);
         s.islandDocked = false;
         s.islandCandidate = null;
         s.islandOptions = [];
@@ -304,6 +305,7 @@ const SEA_ISLANDS = {
             changes.push('+'+choice.cannon+' dano dos canhões');
         }
         }
+        if(typeof SEA_FACTIONS!=='undefined')SEA_FACTIONS.recordChoice(s,choice);
         s.islandVisits.add(s.islandSelected.id);
         if(choice.destroysIsland===true){
             s.islandSelected.destroyed=true;

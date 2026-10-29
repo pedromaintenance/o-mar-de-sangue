@@ -24,6 +24,13 @@ const t=ctx.transfer,save=t.saveKey,rollback=t.rollbackKey;
 const wrap=(profile=imported)=>JSON.stringify({format:'mar-de-sangue-captain-backup',
  schema:4,exportedAt:'2026-10-16T18:44:18.000Z',profile});
 const parsed=t.parse(wrap());
+const withFaction={...imported,
+  alignment:{sobreviventes:55,corte:30,culto:5},
+  faction:{allegiance:'sobreviventes',proofs:{sobreviventes:true,corte:false,culto:false},
+    lockUntil:0,history:[{action:'join',faction:'sobreviventes',sortie:12}]}};
+assert.deepEqual(JSON.parse(JSON.stringify(t.parse(wrap(withFaction)).profile)),withFaction,
+  'Faction pact and proof history survive export and import');
+
 const aligned={...imported,alignment:{sobreviventes:21,corte:0,culto:63}};
 assert.deepEqual(JSON.parse(JSON.stringify(t.parse(wrap(aligned)).profile)),aligned,
  'newer v4 saves must preserve all three alignments');
@@ -48,6 +55,11 @@ bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,gold:1.5}}),/Valo
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,mission:0}}),/Valor inválido/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,levels:{...imported.levels,casco:1000000}}}),/Nível inválido/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,evil:'code'}}),/campos exatos/);
+bad(wrap({...withFaction,faction:{...withFaction.faction,allegiance:'unknown'}}),/Juramento de facção inválido/);
+bad(wrap({...withFaction,faction:{...withFaction.faction,
+ proofs:{sobreviventes:'yes',corte:false,culto:false}}}),/Prova de facção inválida/);
+bad(wrap({...withFaction,faction:{...withFaction.faction,
+ history:[{action:'destruct',faction:'corte',sortie:3}]}}),/Histórico de facção inválido/);
 bad(wrap({...aligned,alignment:{sobreviventes:20,corte:4,culto:200}}),/Alinhamento fora do limite/);
 bad(wrap({...aligned,alignment:{sobreviventes:20,corte:4,evil:1}}),/Alinhamentos de facção inválidos/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,levels:{...imported.levels,evil:1}}}),/lista de melhorias/);

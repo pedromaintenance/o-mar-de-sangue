@@ -1,0 +1,49 @@
+name: Faction Council V100 — oaths and ships
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SeaFactions.js'
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'SeaIslands.js'
+      - 'SeaMenus.js'
+      - 'SeaSaveTransfer.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/faction-council-v100.test.cjs'
+      - '.github/workflows/faction-council-v100.yml'
+  pull_request:
+    paths:
+      - 'SeaFactions.js'
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'PortUI.css'
+      - 'SeaIslands.js'
+      - 'SeaMenus.js'
+      - 'SeaSaveTransfer.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/faction-council-v100.test.cjs'
+      - '.github/workflows/faction-council-v100.yml'
+permissions:
+  contents: read
+jobs:
+  faction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate scripts
+        run: |
+          node --check SeaFactions.js
+          node --check PortUI.js
+          node --check Game.js
+          node --check SeaIslands.js
+      - name: Verify faction rules, regressions, save and atlas
+        run: |
+          node --test tests/faction-council-v100.test.cjs
+          node --test tests/player-ship-20-stages.test.cjs tests/pwa-cache-contract.test.cjs tests/save-restore-3-6c.test.cjs tests/island-gameplay-v99.test.cjs

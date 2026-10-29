@@ -20,8 +20,10 @@ const SEA_SAVE_TRANSFER = {
     // Accept canonical pre-alignment backups and newer v4 files with the
     // optional three-field alignment object. Never accept arbitrary extras.
     const withAlignment=[...this.profileFields,'alignment'];
+    const withFaction=[...withAlignment,'faction'];
     if(!this.sameKeys(value,this.profileFields)&&
-       !this.sameKeys(value,withAlignment))
+       !this.sameKeys(value,withAlignment)&&
+       !this.sameKeys(value,withFaction))
       throw Error('O arquivo não tem os campos exatos do save v4.');
     if(value.version!==4)throw Error('Apenas saves v4 são aceitos nesta versão.');
     if(!['mission','sandbox'].includes(value.mode))
@@ -57,12 +59,30 @@ const SEA_SAVE_TRANSFER = {
           throw Error('Alinhamento fora do limite: '+key);
       }
     }
+    if(Object.hasOwn(value,'faction')){
+      const f=value.faction;
+      if(!this.sameKeys(f,['allegiance','proofs','lockUntil','history'])||
+         !this.sameKeys(f.proofs,['sobreviventes','corte','culto'])||
+         ![null,'sobreviventes','corte','culto'].includes(f.allegiance)||
+         !Number.isSafeInteger(f.lockUntil)||f.lockUntil<0||
+         !Array.isArray(f.history)||f.history.length>24)
+        throw Error('Juramento de facção inválido.');
+      for(const id of ['sobreviventes','corte','culto'])if(typeof f.proofs[id]!=='boolean')
+        throw Error('Prova de facção inválida: '+id);
+      for(const entry of f.history)if(!this.sameKeys(entry,['action','faction','sortie'])||
+          !['join','leave'].includes(entry.action)||
+          !['sobreviventes','corte','culto'].includes(entry.faction)||
+          !Number.isSafeInteger(entry.sortie)||entry.sortie<0)
+        throw Error('Histórico de facção inválido.');
+    }
     const cleaned={version:4};
     for(const f of this.profileFields){
       if(f==='version')continue;
       cleaned[f]=f==='levels'?levels:value[f];
     }
     if(value.alignment)cleaned.alignment={...value.alignment};
+    if(value.faction)cleaned.faction={...value.faction,proofs:{...value.faction.proofs},
+      history:value.faction.history.map(e=>({...e}))};
     return cleaned;
   },
   parse(text) {
@@ -105,7 +125,8 @@ const SEA_SAVE_TRANSFER = {
     // The game may read older saves with extra legacy metadata. Keep only
     // canonical v4 fields in the rollback, while retaining exact raw v4 bytes.
     const previousFields=[...this.profileFields,
-      ...(current.alignment?['alignment']:[])];
+      ...(current.alignment?['alignment']:[]),
+      ...(current.faction?['faction']:[])];
     const previousProfile=this.profile(Object.fromEntries(
       previousFields.map(field=>[field,current[field]])));
     const snapshot=JSON.stringify({

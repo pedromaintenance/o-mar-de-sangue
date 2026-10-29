@@ -400,3 +400,29 @@ font-weight:400;line-height:1.45;overscroll-behavior:contain;touch-action:pan-y;
 .port-chronicle li span{font:12px/1.45 monospace;color:#b8c0b9}
 @media(max-width:700px){.port-chronicle{padding:14px;margin:13px 0 17px}
  .port-chronicle ol{grid-template-columns:1fr}.port-chronicle h2{font-size:19px}}
+
+/* Council of the Three Banners — each faction uses its actual 20-frame PNGs. */
+.port-council{max-width:1180px;margin:0 auto;width:100%}
+.port-council__current{color:#d6b892;font-size:13px;letter-spacing:.035em}
+.port-council__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.port-faction-card{min-width:0;position:relative;padding:21px 17px 17px;background:linear-gradient(170deg,rgba(33,31,42,.98),rgba(14,21,28,.98));border:1px solid var(--faction-color);box-shadow:0 15px 30px #06080c66;display:flex;flex-direction:column;gap:9px}
+.port-faction-card__icon{color:var(--faction-color);font-size:32px;line-height:1}
+.port-faction-card h2{font:700 clamp(17px,2vw,24px) Georgia,serif;color:#ebd8bd;margin:0}
+.port-faction-card p{font-size:13px;line-height:1.5;margin:0;color:#c4b9b0}
+.port-faction-card__ship{height:190px;display:flex;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#4d303a77,transparent 72%);overflow:hidden}
+.port-faction-card__atlas{height:180px;width:130px;flex:none;background-size:730px 780px;background-repeat:no-repeat;image-rendering:pixelated}
+.port-faction-card__trial{min-height:54px}
+.port-faction-card__trial strong{display:block;color:var(--faction-color);font-size:11px;letter-spacing:.09em}
+.port-faction-card__meter{height:8px;border:1px solid #715b52;background:#0c1016}
+.port-faction-card__meter span{display:block;height:100%;background:var(--faction-color)}
+.port-faction-card__tasks{font-size:12px;color:#c5beb3;min-height:73px}
+.port-faction-card__tasks>div{padding:3px 0}
+.port-faction-card__tasks span{color:var(--faction-color)}
+.port-faction-card__join{width:100%;min-height:49px;padding:9px;color:#171013;font-weight:800;background:var(--faction-color);border:1px solid #efddc4}
+.port-faction-card__join:disabled{color:#d1b8ae;background:#31272f;border-color:#78616a}
+.port-faction-card__reason{font-size:11px!important;min-height:36px}
+.port-faction-card__active{text-align:center;padding:13px 7px;background:#283528;border:1px solid #7eb18e;color:#d0ebd0;font-weight:700;font-size:12px}
+.port-council__footer{margin:18px 0;padding:15px;border-top:1px solid #7d5c55;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.port-council__footer p{flex-basis:100%;color:#c0afa4;line-height:1.55}
+.port-council__footer .port-choice{flex:1 1 300px}
+@media(max-width:860px){.port-council__grid{grid-template-columns:1fr}.port-faction-card{gap:10px}.port-faction-card__ship{height:170px}.port-faction-card__atlas{transform:scale(.9)}.port-faction-card__trial,.port-faction-card__tasks{min-height:0}}

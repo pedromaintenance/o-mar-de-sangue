@@ -240,6 +240,19 @@ const SEA_PORT_UI = {
     const [name,id]=value.split(':');
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='contracts'){this.goto('contracts');return;}
+    if(name==='council'){this.goto('council');return;}
+    if(name==='faction'&&id){
+      const result=SeaProfile.joinFaction(id);
+      this.render('faction:'+id);
+      this.notify(result.ok?'O juramento foi aceito. A nau mudou de bandeira.':result.reason);
+      return;
+    }
+    if(name==='desert'){
+      const result=SeaProfile.leaveFaction();
+      this.render('council');
+      this.notify(result.ok?'A bandeira foi retirada. Uma expedição independente será exigida.':result.reason);
+      return;
+    }
     if(name==='contract'&&['rescue','smuggle','hunt'].includes(id)){
       if(scene.page!=='contracts')return;
       this.start('sandbox',id);return;
@@ -569,7 +582,9 @@ const SEA_PORT_UI = {
             '<h1 id="port-title">O MAR<br><em>DE SANGUE</em></h1>'+
             '<p>O ouro compra aço.<br>O oceano cobra cada erro.</p>'+
           '</div>'+
-          '<img class="port-hero__ship" src="'+this.img('ship_flagship')+'" alt="Navio de guerra navegando pelas águas malditas">'+
+          '<img class="port-hero__ship" src="'+
+            (p.faction?.allegiance?('./'+SEA_FACTIONS.preview(p.faction.allegiance,SEA_PLAYER_SHIP.stage(p.levels))):this.img('ship_flagship'))+
+            '" alt="Navio do capitão navegando pelas águas malditas">'+
           '<span class="port-hero__seal" aria-hidden="true">✦</span>'+
         '</section>'+
         '<div class="port-section-label"><span>ESCOLHA O TEU DESTINO</span><span>✣</span></div>'+
@@ -579,6 +594,9 @@ const SEA_PORT_UI = {
           this.button('yard:armas','ESTALEIRO','Reforce seu navio e sua tripulação','⚒','')+
           this.button('help','DIÁRIO DE BORDO','Comandos, regras e navegação','☷','')+
           this.button('contracts','CONTRATOS DA COSTA SUL','Resgate e contrabando · duas expedições','⚓','port-choice--contract')+
+          this.button('council','CONSELHO DAS TRÊS BANDEIRAS',
+            p.faction?.allegiance?'Bandeira atual: '+SEA_FACTIONS.definitions[p.faction.allegiance].label:
+            'Faça alianças e transforme a sua embarcação','⚑','')+
         '</div>'+
         '<div class="port-statbar" aria-label="Estado da embarcação">'+
           '<div><span>CASCO</span><strong>'+this.num(stats.maxHP)+'</strong></div>'+
@@ -606,6 +624,53 @@ const SEA_PORT_UI = {
           '</div>'+
           '<p>O ouro está seguro no cofre. A próxima viagem não tem essa garantia.</p>'+
         '</div></aside></div>';
+  },
+  council(p) {
+    const f=SEA_FACTIONS.normalize(p.faction);
+    const level=SEA_PLAYER_SHIP.stage(p.levels);
+    const active=f.allegiance?SEA_FACTIONS.definitions[f.allegiance].label:'NAVEGAÇÃO INDEPENDENTE';
+    const cards=SEA_FACTIONS.ids.map(id=>{
+      const def=SEA_FACTIONS.definitions[id],score=p.alignment[id]||0,
+        eligible=SEA_FACTIONS.status(p,id),joined=f.allegiance===id;
+      const col=(level-1)%5,row=Math.floor((level-1)/5);
+      const tasks=[
+        ['RECONHECIMENTO',score>=20],
+        ['CONFIANÇA · '+score+'/40',score>=40],
+        ['PROVA DE LEALDADE',f.proofs[id]===true]
+      ];
+      return '<article class="port-faction-card" style="--faction-color:'+def.color+'">'+
+        '<div class="port-faction-card__icon">'+def.sigil+'</div>'+
+        '<h2>'+this.text(def.name)+'</h2>'+
+        '<p>'+this.text(def.subtitle)+'</p>'+
+        '<div class="port-faction-card__ship"><div class="port-faction-card__atlas" role="img" '+
+        'aria-label="Navio da facção '+this.text(def.label)+' no estágio '+level+'" '+
+        'style="background-image:url(./'+def.atlas+');background-position:-'+
+          (col*150)+'px -'+(row*200)+'px"></div></div>'+
+        '<p class="port-faction-card__trial"><strong>PROVA</strong> '+this.text(def.trial)+'</p>'+
+        '<div class="port-faction-card__meter"><span style="width:'+Math.min(100,score)+'%"></span></div>'+
+        '<div class="port-faction-card__tasks">'+tasks.map(([label,done])=>
+          '<div><span aria-hidden="true">'+(done?'◆':'◇')+'</span> '+this.text(label)+'</div>').join('')+'</div>'+
+        (joined?'<div class="port-faction-card__active">✦ SUA BANDEIRA ATUAL</div>':
+          '<button class="port-faction-card__join" type="button" data-action="faction:'+id+
+          '" '+(!eligible.ok?'disabled ':'')+'>'+
+          (eligible.ok?'PRESTAR JURAMENTO':'JURAMENTO INDISPONÍVEL')+'</button>')+
+        (!joined&&!eligible.ok?'<p class="port-faction-card__reason">'+
+          this.text(eligible.reason)+'</p>':'')+
+        '</article>';
+    }).join('');
+    return '<main class="port-page port-council" id="port-main">'+
+      '<section class="port-page__header"><span class="port-eyebrow">PORTOMONTE · PODERES DA COSTA</span>'+
+      '<h1>O CONSELHO DAS TRÊS BANDEIRAS</h1>'+
+      '<p>A reputação abre portas. Uma prova demonstra seu compromisso. Só um juramento transforma sua nau.</p>'+
+      '<p class="port-council__current">BANDEIRA: <strong>'+this.text(active)+'</strong>'+
+        ' · EVOLUÇÃO VISUAL <strong>'+level+'/20</strong></p></section>'+
+      '<section class="port-council__grid">'+cards+'</section>'+
+      '<section class="port-council__footer"><p>Um único juramento de cada vez. Os estágios e as melhorias permanecem. '+
+      'Renunciar custa 20 pontos de confiança da facção abandonada e exige uma expedição sem bandeira.</p>'+
+      (f.allegiance?this.button('desert','RENUNCIAR AO JURAMENTO',
+        'Perder 20 pontos de reputação · uma viagem independente','⚑',''):'')+
+      this.button('menu','VOLTAR AO PORTO','','←','port-choice--return')+
+      '</section></main>';
   },
   contracts(){
     const rescue=SEA_CONTRACTS.offers.rescue,smuggle=SEA_CONTRACTS.offers.smuggle,
@@ -826,6 +891,7 @@ const SEA_PORT_UI = {
     const body=page==='yard'?this.yard(p):page==='help'?this.help():
       page==='reset'?this.reset():page==='restore'?this.restore():
       page==='fps-compare'?this.fpsCompare():page==='contracts'?this.contracts():
+      page==='council'?this.council(p):
        page==='result'?this.result(this.scene.report):this.home(p);
     ui.innerHTML='<div class="port-background" aria-hidden="true">'+
       '<span class="port-background__moon"></span><span class="port-background__sea"></span>'+

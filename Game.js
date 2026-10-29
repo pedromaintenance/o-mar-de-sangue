@@ -151,7 +151,7 @@ const SeaProfile = {
     defaults() { const levels = {}; for (const x of SEA_UPGRADES) levels[x.id] = 0;
         return { version: 4, gold: 55, levels, sorties: 0, wins: 0, losses: 0, kills: 0, rammings: 0, earned: 0, best: 0,
             mission: 1, bestMission: 0, bestWave: 0, mode: 'mission',
-            alignment:{sobreviventes:0,corte:0,culto:0} }; },
+            alignment:{sobreviventes:0,corte:0,culto:0}, faction:SEA_FACTIONS.initial() }; },
     load() {
         let raw = SEA_SESSION;
         try { raw = JSON.parse(localStorage.getItem(SEA_SAVE_V4)) || JSON.parse(localStorage.getItem(SEA_SAVE_V3)) || raw; } catch (e) {
@@ -166,6 +166,7 @@ const SeaProfile = {
         // Additive migration for existing v4 saves: no change to levels or bank.
         p.alignment=Object.fromEntries(['sobreviventes','corte','culto'].map(k=>
             [k,SEA_MATH.clamp(Number(raw.alignment?.[k])||0,0,100)]));
+        p.faction=SEA_FACTIONS.normalize(raw.faction);
         if (!['mission', 'sandbox'].includes(p.mode)) p.mode = 'mission';
         return p;
     },
@@ -199,6 +200,8 @@ const SeaProfile = {
             stage, evolved: stage > previousStage };
     },
     selectMode(mode) { const p = this.load(); p.mode = mode; this.store(p); },
+    joinFaction(id) { const p=this.load(),out=SEA_FACTIONS.join(p,id); if(out.ok)this.store(p); return out; },
+    leaveFaction() { const p=this.load(),out=SEA_FACTIONS.leave(p); if(out.ok)this.store(p); return out; },
     settle(opts) {
         const p = this.load(); const won = !!opts.won, withdrawn = !!opts.withdrawn;
         const retention = won ? 1 : withdrawn ? .75 : .4;
@@ -208,6 +211,7 @@ const SeaProfile = {
         p.kills += opts.kills; p.rammings += opts.rammings;
         if(opts.alignment)for(const k of ['sobreviventes','corte','culto'])
             p.alignment[k]=SEA_MATH.clamp(Number(opts.alignment[k])||0,0,100);
+        if(opts.faction)p.faction=SEA_FACTIONS.normalize(opts.faction);
         p.best = Math.max(p.best, opts.collected); p.bestWave = Math.max(p.bestWave, opts.wave || 0);
         if (opts.mode === 'mission' && won) {
             p.bestMission = Math.max(p.bestMission, opts.stage);
@@ -260,6 +264,8 @@ class SeaBoot extends Phaser.Scene {
         this.load.spritesheet('player-ship-stages',
             'assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png',
             { frameWidth: 260, frameHeight: 360, spacing: 40, endFrame: 19 });
+        for(const def of Object.values(SEA_FACTIONS.definitions))
+            this.load.spritesheet(def.ship,def.atlas,{frameWidth:260,frameHeight:360,spacing:40,endFrame:19});
         this.load.image('foe-sloop', 'assets/sprites/enemy_court_ship.png');
         this.load.image('foe-galleon', 'assets/sprites/enemy_galleon.png');
         this.load.image('foe-ram', 'assets/sprites/enemy_ram.png');
@@ -525,7 +531,7 @@ class Game extends Phaser.Scene {
         // A física usa 0 = norte, por isso a imagem recebe π localmente.
         this.player = this.add.container(start.x, start.y).setDepth(20).setRotation(Math.PI);
         const playerScale = (this.hullRadius * 2.25) / SEA_PLAYER_SHIP.frameHeight;
-        this.playerSprite = this.add.image(0, 0, 'player-ship-stages',
+        this.playerSprite = this.add.image(0, 0, SEA_FACTIONS.texture(this.profile),
             SEA_PLAYER_SHIP.stage(this.profile.levels) - 1)
             .setScale(playerScale).setRotation(Math.PI);
         this.playerVisual = this.add.container(0, 0);
@@ -2376,10 +2382,11 @@ class Game extends Phaser.Scene {
         let commission = 0;
         if (won && this.mode === 'mission') commission = Math.round(42 * Math.pow(1.25, Math.min(this.stage, 90)));
         const contractBounty=won&&this.contract?.completed ? this.contract.bounty : 0;
+        SEA_FACTIONS.recordContract(this,this.contract);
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
             collected: SEA_MATH.safe(this.gold + commission + contractBounty), kills: this.kills,
             rammings: this.rammingSinks, islands: this.islandVisits?.size || 0,
-            alignment:this.alignment });
+            alignment:this.alignment,faction:this.faction });
         // The after-action chronicle is passed to Port in memory, not the save.
         report.politicalChronicle=(this.politicalEvents||[]).slice(0,8).map(entry=>({
             text:String(entry.text||''),terms:String(entry.terms||'')
