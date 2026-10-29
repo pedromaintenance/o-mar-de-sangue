@@ -17,6 +17,6 @@ const SEA_POSITIONING=Object.freeze({
       zone==='bow'?(elite?.95:.90):1;
     const base=Number.isFinite(raw)?Math.max(0,raw):0;
     // Só a direção modifica o dano: broadside mantém o valor original.
-    return {zone,multiplier,damage:Math.max(1,Math.round(base*multiplier))};
+    return {zone,multiplier,damage:zone==='broadside'?base:Math.max(1,Math.round(base*multiplier))};
   }
 });
