@@ -2119,7 +2119,12 @@ class Game extends Phaser.Scene {
                     if (e.dead || (e.type==='olho_dagon' && e.eyeHidden)) continue;
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; SEA_FACTION_POLITICS.provoke(e);
-                        e.hp = Math.max(0, e.hp - p.damage);
+                        // Alcançar a popa recompensa o flanqueamento; criaturas
+                        // continuam sem pontos fracos navais artificiais.
+                        const angleHit=e.isMonster?
+                            {damage:p.damage,zone:'broadside',multiplier:1}:
+                            SEA_POSITIONING.impact(p.damage,e.heading,p.vx,p.vy,!!e.boss);
+                        e.hp = Math.max(0, e.hp - angleHit.damage);
                         // Um impacto durante os ultimos 40% do preparo
                         // interrompe a proxima salva de um navio nao-chefe.
                         // A verificacao ocorre apos o dano: nao mostra aviso
@@ -2135,7 +2140,13 @@ class Game extends Phaser.Scene {
                         if(e.sandboxSentinel) this.summonSandboxKraken(e);
                         if(e.sandboxDagonEye) this.summonSandboxDagon(e);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
-                        SEA_COMBAT.hitEnemy(this, e, p.x, p.y, p.damage);
+                        SEA_COMBAT.hitEnemy(this, e, p.x, p.y, angleHit.damage);
+                        if(angleHit.zone==='stern' &&
+                           this.time.now-(this.lastSternHitNoticeAt??-Infinity)>=2500){
+                            this.lastSternHitNoticeAt=this.time.now;
+                            this.announce('TIRO DE POPA · +'+
+                                Math.round((angleHit.multiplier-1)*100)+'% DANO');
+                        }
                         this.splash(p.x, p.y, 0xffdfb4, 9);
                         if (e.hp <= 0) this.sinkEnemy(e);
                         break;
@@ -2143,7 +2154,18 @@ class Game extends Phaser.Scene {
                 }
             } else if (!hit && this.segmentNear(p.px, p.py, p.x, p.y, this.player.x, this.player.y, this.hullRadius)) {
                 hit = true;
-                const hurt=this.damageShip(p.damage,p.x,p.y,'cannon');
+                // Orbes do Olho de Dagon sao magia, nao balas de canhao:
+                // nao ganham vantagem posicional artificial.
+                const angleHit=p.dagonEyeCurse?
+                    {damage:p.damage,zone:'broadside',multiplier:1}:
+                    SEA_POSITIONING.impact(
+                        p.damage,this.player.rotation,p.vx,p.vy);
+                const hurt=this.damageShip(angleHit.damage,p.x,p.y,'cannon');
+                if(hurt && angleHit.zone==='stern' &&
+                   this.time.now-(this.lastSternWarningAt??-Infinity)>=2500){
+                    this.lastSternWarningAt=this.time.now;
+                    this.announce('POPA EXPOSTA · +20% DANO RECEBIDO');
+                }
                 if(hurt && p.dagonEyeCurse){
                     this.curse=Math.min(100,(this.curse||0)+p.dagonEyeCurse);
                     this.announce('OLHO DE DAGON · MALDIÇÃO +'+p.dagonEyeCurse+'%');

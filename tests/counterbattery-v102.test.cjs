@@ -3,8 +3,10 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const src=fs.readFileSync('Game.js','utf8');
 const gun=fs.readFileSync('SeaGunnery.js','utf8');
+const positioning=fs.readFileSync('SeaPositioning.js','utf8');
 const c={};vm.createContext(c);
 vm.runInContext(gun+';this.gunnery=SEA_GUNNERY;',c);
+vm.runInContext(positioning+';this.positioning=SEA_POSITIONING;',c);
 const g=c.gunnery;
 const enemy=(overrides={})=>({
  type:'patrulha',pattern:'broadside',isMonster:false,boss:false,
@@ -87,5 +89,6 @@ c.ai.updateEnemies.call(world,.05);
 assert.doesNotMatch(e.label.text,/SALVA INTERROMPIDA/,'notice automatically clears');
 assert.equal(e.counterbatteryNoticeUntil,0);
 
-assert(fs.readFileSync('sw.js','utf8').includes('v102-counterbattery'));
+assert(Number(fs.readFileSync('sw.js','utf8').match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=102,
+ 'counterbattery stays cached in future PWA revisions');
 console.log('PASS V102: bounded interruption, immunity, bosses, lethal hits, live shot collision and label expiry');
