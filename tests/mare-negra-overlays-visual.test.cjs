@@ -64,7 +64,7 @@ const {chromium}=require('playwright-core');
     SEA_ISLANDS.render(s);
     return {count:s.islandOptions.length,depth:s.islandOverlay.depth};
    });
-   assert.equal(island.count,4);
+   assert.equal(island.count,6,'five island choices plus return');
    const islandGuide=await page.evaluate(()=>{
      const scene=game.scene.getScene('Game');
      const guide=scene.islandOverlay.list.find(o=>o.type==='Text'&&o.text.includes('DIRECIONAL: ESCOLHER'));
@@ -73,7 +73,7 @@ const {chromium}=require('playwright-core');
    });
    assert(islandGuide.text.includes('ENTER / A: CONFIRMAR'));
    assert(islandGuide.text.includes('ESC / B: VOLTAR'));
-   assert.equal(islandGuide.options.length,4);
+   assert.equal(islandGuide.options.length,6);
    const lastIsland=islandGuide.options.at(-1);
    assert(islandGuide.bounds&&
       (islandGuide.bounds.y+islandGuide.bounds.height)<lastIsland.y-lastIsland.h/2,

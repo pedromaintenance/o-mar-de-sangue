@@ -1,23 +1,20 @@
-# Arquipélago dos Condenados — laboratório de gameplay
+# O Arquipélago dos Condenados — laboratório permanente de gameplay
 
-Esta é a **página permanente** para analisar e simular os encontros costeiros de *O Mar de Sangue*.
+**GitHub Pages:** https://pedromaintenance.github.io/o-mar-de-sangue/laboratorio-ilhas/
 
-**URL prevista no Pages:** `https://pedromaintenance.github.io/o-mar-de-sangue/laboratorio-ilhas/`
+A partir da V99, as cinco decisões de cada um dos 19 cenários (95 decisões) **estão em jogo**. O laboratório e o Phaser compartilham a única fonte de regras:
 
-## Fonte única e sincronização
+- `catalog.json`: 19 eventos, 95 escolhas e fórmulas porcentuais; o Phaser carrega via `SeaBoot.preload()`, na chave `mar-ilhas-v2`.
+- `../SeaIslandRules.js`: intérprete das fórmulas, preços, benefícios, custos e alinhamentos em tempo de execução.
+- `index.html`: simulador de balanceamento; não contém cópia dos dados de eventos.
+- `../SeaPoliticalEvents.js` e `../SeaIslands.js`: gerenciamento de encontros, ecos, navegação, contratações e efeitos.
 
-- `index.html`: apenas a interface e as operações de simulação. **Não contém a tabela de eventos embutida.**
-- `catalog.json`: proposta atual de balanceamento (19 cenários, 95 escolhas, cinco por evento). **Para mudar percentuais, títulos, textos e consequências, editar somente este arquivo.** O site carrega o JSON a cada visita, com URL anti-cache.
-- `../SeaIslands.js` e `../SeaPoliticalEvents.js`: fontes do **jogo de verdade**, lidas com cache-busting em cada acesso à aba "Jogo atual". Mudanças no gameplay são exibidas nessa aba após a publicação do Pages; não há duplicação manual dessa lista.
+**Para alterar uma decisão:** editar `catalog.json`, publicar na `main`, recarregar a mesma página e iniciar uma nova viagem no jogo. Não gerar HTML novo. As modificações feitas somente dentro da oficina do navegador **não** escrevem no GitHub nem no save. Exporte o JSON e publique a mudança desejada por commit.
 
-A publicação do Pages acompanha os commits em `main`. Em uma alteração no catálogo, atualizar `catalog.json` e recarregar a mesma URL. **Não gerar novo HTML.**
+O jogador vê apenas o preço (em moedas/casco), não os percentuais dos benefícios. Custos de ouro dependem do ouro a bordo e sacrifícios não podem afundar o navio dentro do modal.
 
-## Limites e segurança
+Alinhamento com Sobreviventes, Corte e Culto persiste no save após o fim da viagem, sem adesão automática. Backups antigos v4 continuam aceitos. Os três arcos políticos continuam com seus ecos; contratos especiais têm opções próprias para preservar o objetivo.
 
-1. A simulação é isolada e **não escreve em saves**, não gasta ouro real, não altera a versão publicada do jogo.
-2. Os cinco serviços são **propostas**; o jogo ainda usa as escolhas dos arquivos JavaScript de produção.
-3. Os medidores de alinhamento representam um *conceito* de progressão, não um sistema de reputação persistente existente.
-4. Os eventos de contrato continuam protegidos no gameplay até uma implementação explícita.
-5. O Pages é estático e público: não contém segredos, tokens ou qualquer mecanismo de escrita autenticada no GitHub. A edição do catálogo ocorre pelo repositório.
+**Destruição:** a arte com fumaça é ativada pelas escolhas `demeter_4`, `daegon_4` e `reef_4`; a marca de devastação persiste na viagem, não entre mapas regenerados.
 
-Se o usuário realmente precisar de uma URL Pages em **outro projeto/repositório**, é necessário criar e configurar um segundo repositório, além da rota permanente acima. Aqui a rota foi isolada do jogo sem modificar a home.
+**Regressão:** `tests/island-gameplay-v99.test.cjs` e `tests/save-restore-3-6c.test.cjs`. A versão do PWA é V99.

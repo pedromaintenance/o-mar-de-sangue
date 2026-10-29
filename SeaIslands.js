@@ -460,7 +460,7 @@ const SEA_ISLANDS = {
                 const quote=choice.formula&&typeof SEA_ISLAND_RULES!=='undefined'?
                     SEA_ISLAND_RULES.preview(s,choice):null;
                 const compact=actions.length>=4;
-                this.screenButton(s,root,x,top+(compact?335+i*49:385+i*72),
+                this.screenButton(s,root,x,top+(compact?327+i*49:385+i*72),
                     width-48,compact?45:63,choice.name,hint,i,
                     quote?!quote.ok:!!(
                         (choice.cost&&s.gold<choice.cost)||
