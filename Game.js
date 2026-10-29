@@ -705,7 +705,8 @@ class Game extends Phaser.Scene {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
                     .setScale(Math.max(.7,radius/46)).setTint(tint).setAlpha(.28).setDepth(1);
-                this.landmarkGlows.push({ glow, x, y, phase: i*.51, alpha: kind==='demeter'?.52:.30 });
+                this.landmarkGlows.push({ glow, x, y, kind, phase: i*.51,
+                    alpha: kind==='demeter'?.52:.30, nextSparkAt:1.2+(i%13)*.68 });
             }
             if (radius > 82 && i % 3 === 0) {
                 this.add.text(x, y + radius + 25, labels[i % labels.length], {
@@ -1327,7 +1328,15 @@ class Game extends Phaser.Scene {
             if(!o.glow.active)continue;
             const near=SEA_VISUALS.distance2(o.x,o.y,this.player.x,this.player.y)<780*780;
             o.glow.setVisible(near);
-            if(near)o.glow.setAlpha(o.alpha*(.55+.45*Math.sin(t*1.7+o.phase)**2));
+            if(near) {
+                o.glow.setAlpha(o.alpha*(.55+.45*Math.sin(t*1.7+o.phase)**2));
+                // Sparse temple auras. Staggered and limited by the global VFX budget.
+                if((o.kind==='demeter'||o.kind==='daegon') &&
+                   t>=o.nextSparkAt && this.effectsActive<this.effectsLimit-12){
+                    this.burst(o.x,o.y,o.kind==='demeter'?'gold':'violet',.32);
+                    o.nextSparkAt=t+5.7+(o.phase%2.8);
+                }
+            }
         }
         for(const f of this.flotsam){
             if(!f.sprite.active)continue;
@@ -1562,6 +1571,11 @@ class Game extends Phaser.Scene {
         SEA_WEATHER.onSink(this, enemy, ramming);
         if(enemy.wake) enemy.wake.destroy();
         this.burst(enemy.x,enemy.y,enemy.boss?'blast':'smoke',enemy.boss?2.4:1.4);
+        // Differentiate eldritch dissolution from the splintering of wooden hulls.
+        if(this.effectsActive<this.effectsLimit-10 &&
+           SEA_VISUALS.distance2(enemy.x,enemy.y,this.player.x,this.player.y)<980*980)
+            this.burst(enemy.x,enemy.y,enemy.isMonster?'violet':'splinters',
+                enemy.isMonster?(enemy.boss?1.6:.9):(enemy.boss?1.25:.82));
         SEA_COMBAT.sinkEnemy(this, enemy);
         enemy.bar.destroy();
         if (enemy.label) enemy.label.destroy();
@@ -2083,6 +2097,14 @@ class Game extends Phaser.Scene {
                 }
             }
             if (hit || p.ttl <= 0 || p.x < 0 || p.y < 0 || p.x > this.W || p.y > this.H) {
+                // Every third missed projectile raises distant foam, never collision debris.
+                if(!hit && p.ttl<=0 && p.x>=0 && p.x<=this.W &&
+                   p.y>=0 && p.y<=this.H &&
+                   SEA_VISUALS.distance2(p.x,p.y,this.player.x,this.player.y)<900*900 &&
+                   this.effectsActive<this.effectsLimit-12){
+                    this.missedWaterShots=(this.missedWaterShots||0)+1;
+                    if(this.missedWaterShots%3===0)this.burst(p.x,p.y,'foam',.42);
+                }
                 p.object.destroy(); this.shots.splice(i, 1);
             }
         }

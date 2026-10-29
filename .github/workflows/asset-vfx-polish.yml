@@ -1,0 +1,35 @@
+name: Asset FX polish — island ambience and combat
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Game.js'
+      - 'SeaEffects.js'
+      - 'SeaIslands.js'
+      - 'asset-audit.html'
+      - 'sw.js'
+      - 'tests/asset-vfx-polish.test.cjs'
+      - '.github/workflows/asset-vfx-polish.yml'
+  pull_request:
+    paths:
+      - 'Game.js'
+      - 'SeaEffects.js'
+      - 'SeaIslands.js'
+      - 'asset-audit.html'
+      - 'sw.js'
+      - 'tests/asset-vfx-polish.test.cjs'
+      - '.github/workflows/asset-vfx-polish.yml'
+permissions:
+  contents: read
+jobs:
+  fx-visual-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: FX syntax and behavior
+        run: node --test tests/asset-vfx-polish.test.cjs
+      - name: Existing regressions
+        run: node --test tests/island-destruction-smoke.test.cjs tests/monster-orientation.test.cjs tests/player-ship-20-stages.test.cjs tests/pwa-cache-contract.test.cjs tests/asset-audit-visual.test.cjs

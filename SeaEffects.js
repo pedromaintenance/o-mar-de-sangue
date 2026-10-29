@@ -201,7 +201,8 @@ const SEA_COMBAT = {
         if (s.time.now - e.lastHitVisualTime < 95) return;
         e.lastHitVisualTime = s.time.now;
         this.floating(s, x, y, amount);
-        s.burst(x, y, 'splinters', .6);
+        // Abyssal creatures release violet magic; wooden ships throw splinters.
+        s.burst(x, y, e.isMonster?'violet':'splinters', e.isMonster ? .72 : .6);
         SEA_AUDIO.play('hit', .82, Math.hypot(e.x-s.player.x, e.y-s.player.y));
     },
     damagePlayer(s, x, y, amount) {
@@ -230,9 +231,12 @@ const SEA_COMBAT = {
         }
         const dist = Math.hypot(e.x-s.player.x, e.y-s.player.y);
         if (dist < 1150) SEA_AUDIO.play('sink', e.boss ? 1.45 : .68, dist);
+        // Keep non-eel monsters upright during death, too.
+        const sinkRotation=e.isMonster && e.type!=='enguia' ? 0 :
+            e.ship.rotation+(e.id%2 ? .3 : -.3);
         s.tweens.add({targets:e.ship, y:e.y+e.radius*.4, alpha:0,
             scaleX:e.spriteScale*.70, scaleY:e.spriteScale*.51,
-            rotation:e.heading+(e.id%2 ? .3 : -.3),
+            rotation:sinkRotation,
             duration:e.boss ? 1450 : 850, ease:'Sine.easeIn',
             onComplete:()=>{if(e.ship.active)e.ship.destroy();}});
     },

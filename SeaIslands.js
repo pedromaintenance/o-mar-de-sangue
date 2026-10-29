@@ -201,8 +201,12 @@ const SEA_ISLANDS = {
     close(s) {
         if(!s.islandDocked)return;
         if(s.islandOverlay){s.islandOverlay.destroy(true);s.islandOverlay=null;}
+        const leaveFx=s.islandDepartureFx, leaveAt=s.islandSelected;
         s.islandDocked=false;s.islandSelected=null;s.islandOptions=[];s.islandOutcome='';
+        s.islandDepartureFx=null;
         s.touchReset();s.islandCandidate=null;
+        if(leaveFx && leaveAt && s.burst && s.effectsActive<s.effectsLimit-8)
+            s.burst(leaveAt.x,leaveAt.y,leaveFx,.72);
         // Return to Port only after the final sanctuary outcome has been read.
         if(s.contract?.completed&&!s.ended&&!s.sinking)s.finish(true);
     },
@@ -310,6 +314,11 @@ const SEA_ISLANDS = {
         if(s.drawHullScars)s.drawHullScars();
         if(typeof SEA_COMBAT!=='undefined'&&SEA_COMBAT.scars)SEA_COMBAT.scars(s);
         SEA_AUDIO.play('gold',.55);
+        // Play a quiet reward/ritual accent after the docking overlay closes.
+        s.islandDepartureFx=choice.destroysIsland===true ? null :
+            (choice.heal||choice.healPercent||choice.curse<0) ? 'gold' :
+            (choice.cannon||choice.hp<0||choice.curse>0) ? 'violet' :
+            choice.gold ? 'gold' : null;
         this.render(s);
         return true;
     },
