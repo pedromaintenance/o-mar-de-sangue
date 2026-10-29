@@ -42,6 +42,6 @@ jobs:
           node --check Game.js
           node --check PortUI.js
           node --test tests/faction-politics-v101.test.cjs
-      - name: Regression: contract and island foundations
+      - name: Regression — contract and island foundations
         run: |
           node --test tests/faction-council-v100.test.cjs tests/island-gameplay-v99.test.cjs tests/player-ship-20-stages.test.cjs tests/pwa-cache-contract.test.cjs
