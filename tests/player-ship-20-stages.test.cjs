@@ -45,8 +45,8 @@ assert.match(game,/this\.load\.spritesheet\('player-ship-stages'/);
 assert.match(game,/spacing: 40, endFrame: 19/);
 assert.match(game,/SEA_PLAYER_SHIP\.stage\(this\.profile\.levels\) - 1/);
 assert.match(game,/setRotation\(Math\.PI\)/);
-assert.match(menu,/SEA_FACTIONS\\.texture\\(scene\\.profile/);
-assert.match(game,/SEA_FACTIONS\\.texture\\(this\\.profile\\)/);
+assert(menu.includes('SEA_FACTIONS.texture(scene.profile'),'Faction aware pause ship');
+assert(game.includes('SEA_FACTIONS.texture(this.profile)'),'Faction aware player ship');
 assert.match(port,/SEA_PLAYER_SHIP\.progress\(p\.levels\)/);
 for(const src of [game,sw]){
   assert(!src.includes('assets/sprites/player_ship.png'));
