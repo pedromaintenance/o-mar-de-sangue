@@ -150,7 +150,8 @@ const SEA_PLAYER_SHIP = {
 const SeaProfile = {
     defaults() { const levels = {}; for (const x of SEA_UPGRADES) levels[x.id] = 0;
         return { version: 4, gold: 55, levels, sorties: 0, wins: 0, losses: 0, kills: 0, rammings: 0, earned: 0, best: 0,
-            mission: 1, bestMission: 0, bestWave: 0, mode: 'mission' }; },
+            mission: 1, bestMission: 0, bestWave: 0, mode: 'mission',
+            alignment:{sobreviventes:0,corte:0,culto:0} }; },
     load() {
         let raw = SEA_SESSION;
         try { raw = JSON.parse(localStorage.getItem(SEA_SAVE_V4)) || JSON.parse(localStorage.getItem(SEA_SAVE_V3)) || raw; } catch (e) {
@@ -162,6 +163,9 @@ const SeaProfile = {
         for (const u of SEA_UPGRADES) levels[u.id] = SEA_MATH.clamp(Math.floor(Number(raw.levels[u.id]) || 0), 0, 999999);
         const p = { ...def, ...raw, version: 4, levels, gold: SEA_MATH.safe(raw.gold), mission: Math.max(1, Math.floor(raw.mission || 1)),
             bestMission: Math.max(0, Math.floor(raw.bestMission || 0)), bestWave: Math.max(0, Math.floor(raw.bestWave || 0)) };
+        // Additive migration for existing v4 saves: no change to levels or bank.
+        p.alignment=Object.fromEntries(['sobreviventes','corte','culto'].map(k=>
+            [k,SEA_MATH.clamp(Number(raw.alignment?.[k])||0,0,100)]));
         if (!['mission', 'sandbox'].includes(p.mode)) p.mode = 'mission';
         return p;
     },
@@ -202,6 +206,8 @@ const SeaProfile = {
         p.gold = SEA_MATH.safe(p.gold + reward); p.earned = SEA_MATH.safe(p.earned + reward);
         p.sorties++; if (won) p.wins++; else if (!withdrawn) p.losses++;
         p.kills += opts.kills; p.rammings += opts.rammings;
+        if(opts.alignment)for(const k of ['sobreviventes','corte','culto'])
+            p.alignment[k]=SEA_MATH.clamp(Number(opts.alignment[k])||0,0,100);
         p.best = Math.max(p.best, opts.collected); p.bestWave = Math.max(p.bestWave, opts.wave || 0);
         if (opts.mode === 'mission' && won) {
             p.bestMission = Math.max(p.bestMission, opts.stage);
@@ -242,6 +248,8 @@ class SeaBoot extends Phaser.Scene {
     constructor() { super('SeaBoot'); }
     preload() {
         this.load.setPath('');
+        // Same catalog read by the permanent design laboratory.
+        this.load.json(SEA_ISLAND_RULES.cacheKey,'laboratorio-ilhas/catalog.json');
         this.load.image('menu-bg', 'assets/menu_bg.png');
         this.load.image('sea-base', 'assets/tiles/sea_base.png');
         this.load.image('sea-blood', 'assets/tiles/sea_blood.png');
@@ -701,11 +709,12 @@ class Game extends Phaser.Scene {
             this.islands.push({ id: i, x, y, radius, kind });
             const islandScaleMap = { reef: 1.0, ruin: 1.0, monastery: 1.08, daegon: 1.0, demeter: 1.08, wreck: 1.08 };
             const img = this.add.image(x, y, keyMap[kind] || 'island-reef').setDepth(0).setScale(((radius * 2.8) / 256) * (islandScaleMap[kind] || 1));
+            this.islands[this.islands.length-1].image=img;
             if (kind !== 'reef') {
                 const tint = kind === 'demeter' ? 0xb6e6b1 : kind === 'daegon' ? 0xcf7894 : 0x82bbb4;
                 const glow = this.add.image(x + radius*.12, y - radius*.16, 'fx-shrine-glow')
                     .setScale(Math.max(.7,radius/46)).setTint(tint).setAlpha(.28).setDepth(1);
-                this.landmarkGlows.push({ glow, x, y, kind, phase: i*.51,
+                this.landmarkGlows.push({ glow, x, y, kind, islandId:i, phase: i*.51,
                     alpha: kind==='demeter'?.52:.30, nextSparkAt:1.2+(i%13)*.68 });
             }
             if (radius > 82 && i % 3 === 0) {
@@ -1326,6 +1335,7 @@ class Game extends Phaser.Scene {
         }
         for(const o of this.landmarkGlows){
             if(!o.glow.active)continue;
+            if(o.destroyed){o.glow.setVisible(false);continue;}
             const near=SEA_VISUALS.distance2(o.x,o.y,this.player.x,this.player.y)<780*780;
             o.glow.setVisible(near);
             if(near) {
@@ -2368,7 +2378,8 @@ class Game extends Phaser.Scene {
         const contractBounty=won&&this.contract?.completed ? this.contract.bounty : 0;
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
             collected: SEA_MATH.safe(this.gold + commission + contractBounty), kills: this.kills,
-            rammings: this.rammingSinks, islands: this.islandVisits?.size || 0 });
+            rammings: this.rammingSinks, islands: this.islandVisits?.size || 0,
+            alignment:this.alignment });
         // The after-action chronicle is passed to Port in memory, not the save.
         report.politicalChronicle=(this.politicalEvents||[]).slice(0,8).map(entry=>({
             text:String(entry.text||''),terms:String(entry.terms||'')

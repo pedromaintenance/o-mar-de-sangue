@@ -23,7 +23,7 @@ main{max-width:1600px;margin:auto;padding:20px 24px 50px;display:grid;grid-templ
 </head>
 <body>
 <header><div><div class="kicker">O Mar de Sangue · protótipo de regras</div><h1>O Arquipélago <em>dos Condenados</em></h1><div class="subtitle">Estudo de balanceamento dos encontros costeiros · propostas proporcionais de progresso, facção e corrupção · nenhum save é alterado.</div></div><div class="header-controls"><button class="btn" id="resetAll">↺ Reiniciar simulação</button><button class="btn" id="fullTable">Catálogo integral</button><button class="btn" id="downloadRules">↓ Exportar JSON</button></div></header>
-<nav class="lab-switch" aria-label="Fonte das regras"><button class="btn active" id="showProposal">Proposta · laboratório</button><button class="btn" id="showCurrent">Jogo atual · leitura direta</button><button class="btn flat" id="reloadSources">↻ Atualizar fontes</button><a href="https://github.com/pedromaintenance/o-mar-de-sangue/tree/main/laboratorio-ilhas" target="_blank" rel="noopener">Editar catálogo no GitHub</a></nav><section class="panel game-source" id="gameSnapshot" hidden><div class="pad"><div class="section-label">Regras efetivamente publicadas no jogo</div><h2>O arquipélago hoje</h2><p class="subtitle" style="max-width:none">Esta aba carrega <code>SeaIslands.js</code> e <code>SeaPoliticalEvents.js</code> do mesmo Pages. É uma leitura do jogo publicado, não uma simulação de regras ainda não implementadas.</p><p class="pill" id="liveCounts">Consultando arquivos do jogo...</p><p class="smallnote" id="gameSourceError"></p><div id="gameSourceList"></div></div></section>
+<nav class="lab-switch" aria-label="Fonte das regras"><button class="btn active" id="showProposal">Proposta · laboratório</button><button class="btn" id="showCurrent">Jogo atual · leitura direta</button><button class="btn flat" id="reloadSources">↻ Atualizar fontes</button><a href="https://github.com/pedromaintenance/o-mar-de-sangue/tree/main/laboratorio-ilhas" target="_blank" rel="noopener">Editar catálogo no GitHub</a></nav><section class="panel game-source" id="gameSnapshot" hidden><div class="pad"><div class="section-label">Regras efetivamente publicadas no jogo</div><h2>O arquipélago hoje</h2><p class="subtitle" style="max-width:none">Esta aba consulta <code>SeaIslandRules.js</code>, <code>SeaIslands.js</code> e <code>SeaPoliticalEvents.js</code> do jogo e mostra o catálogo em uso. O mesmo <code>catalog.json</code> alimenta a simulação e as decisões reais no mar.</p><p class="pill" id="liveCounts">Consultando arquivos do jogo...</p><p class="smallnote" id="gameSourceError"></p><div id="gameSourceList"></div></div></section>
 <div class="banner"><span class="pill strong" id="catalogStamp">LENDO REGRAS DO REPOSITÓRIO…</span><span class="pill" id="totalEvents">19 CENÁRIOS</span><span class="pill">5 ESCOLHAS POR EVENTO</span><span class="pill">PORCENTAGENS SOMENTE NO BACKEND</span><span class="pill" id="actionsCount">0 DECISÕES SIMULADAS</span></div>
 <div id="labContent"><main>
 <aside class="panel sticky"><div class="pad"><div class="section-label">Carta de navegação</div><input class="search" id="search" placeholder="Buscar ilhas ou eventos" aria-label="Buscar eventos"><div class="tabs" id="tabs"></div><div class="event-list" id="eventList"></div><div class="tooltip" id="navCount"></div></div></aside>
@@ -93,9 +93,12 @@ function readProposed(){return fetch('./catalog.json?ts='+Date.now(),{cache:'no-
 function loadGameSource(path){return new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='../'+path+'?lab='+Date.now();script.onload=resolve;script.onerror=()=>reject(new Error('Falha ao carregar '+path));document.head.appendChild(script)})}
 function displayGameSource(){
  const groups=[];
- if(typeof SEA_ISLANDS!=='undefined')for(const [key,options] of Object.entries(SEA_ISLANDS.choices||{}))
+ if(typeof SEA_ISLAND_RULES!=='undefined' && EVENTS.length) {
+  for(const evt of EVENTS)groups.push({kind:'REGRA ATIVA',title:evt.title,
+    options:evt.options.map(o=>({name:o.title,hint:'Preço variável no jogo · '+o.formula.replace(/(?:G|H):-?\\d+(?:\\.\\d+)?/g,'custo proporcional')}))});
+ } else if(typeof SEA_ISLANDS!=='undefined')for(const [key,options] of Object.entries(SEA_ISLANDS.choices||{}))
   groups.push({kind:'ILHA',title:SEA_ISLANDS.titles?.[key]||key,options});
- if(typeof SEA_POLITICAL_EVENTS!=='undefined'){
+ if(typeof SEA_POLITICAL_EVENTS!=='undefined' && !(typeof SEA_ISLAND_RULES!=='undefined' && EVENTS.length)){
   for(const [key,evt] of Object.entries(SEA_POLITICAL_EVENTS.events||{}))
    groups.push({kind:'POLÍTICA',title:evt.title||key,options:evt.choices||[]});
   for(const [key,branches] of Object.entries(SEA_POLITICAL_EVENTS.echoes||{}))
@@ -104,7 +107,7 @@ function displayGameSource(){
  }
  $('liveCounts').textContent=groups.length+' cenários · '+groups.reduce((n,g)=>n+g.options.length,0)+' decisões na versão publicada do jogo';
  $('gameSourceList').innerHTML=groups.map(g=>`<article class="source-entry"><div class="source-title"><b>${escapeHTML(g.title)}</b><small>${escapeHTML(g.kind)} · ${g.options.length} escolhas</small></div><div class="source-actions">${g.options.map((o,i)=>`<div><strong>${i+1}. ${escapeHTML(o.name||o.title||o.id)}</strong><span>${escapeHTML(o.hint||'Sem preço especificado')}</span></div>`).join('')}</div></article>`).join('');
- $('gameSourceError').textContent=groups.length?'Leitura direta dos dois módulos JavaScript do jogo nesta visita.':'Nenhum encontro encontrado; confira os módulos do jogo.';
+ $('gameSourceError').textContent=groups.length?'O jogo e o laboratório utilizam o mesmo catalog.json; o módulo SeaIslandRules.js aplica os percentuais em tempo de execução.':'Nenhum encontro encontrado; confira os módulos do jogo.';
 }
 function activateView(view){const current=view==='current';$('labContent').hidden=current;$('gameSnapshot').hidden=!current;$('showCurrent').classList.toggle('active',current);$('showProposal').classList.toggle('active',!current)}
 $('showProposal').onclick=()=>activateView('proposal');
@@ -117,10 +120,10 @@ $('reloadSources').onclick=()=>location.reload();
   EVENTS.splice(0,EVENTS.length,...data.events);
   ORIGINAL.splice(0,ORIGINAL.length,...structuredClone(data.events));
   selectedEvent=EVENTS[0].id;
-  $('catalogStamp').textContent='PROPOSTA '+(data.version||'s/versão')+' · '+data.events.length+' cenários · regras sincronizadas';
+  $('catalogStamp').textContent='REGRAS EM JOGO '+(data.version||'s/versão')+' · '+data.events.length+' cenários · catálogo compartilhado';
   render();
  }catch(err){$('catalogStamp').textContent='FALHA NO CATÁLOGO: '+err.message;$('eventTitle').textContent='Não foi possível carregar a proposta';$('eventLore').textContent='Verifique laboratorio-ilhas/catalog.json no repositório.'}
- try{await loadGameSource('SeaIslands.js');await loadGameSource('SeaPoliticalEvents.js');displayGameSource()}
+ try{await loadGameSource('SeaIslandRules.js');await loadGameSource('SeaIslands.js');await loadGameSource('SeaPoliticalEvents.js');displayGameSource()}
  catch(err){$('gameSourceError').textContent='Erro ao consultar a versão atual: '+err.message;$('liveCounts').textContent='Jogo atual indisponível'}
 })();
 </script>

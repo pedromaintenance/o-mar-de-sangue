@@ -107,6 +107,9 @@ const SEA_ISLANDS = {
     },
     init(s) {
         s.islandVisits = new Set();
+        // Three independent affinities persist when the expedition is settled.
+        // Numeric alignment does not automatically sign a faction alliance.
+        s.alignment={...{sobreviventes:0,corte:0,culto:0},...(s.profile?.alignment||{})};
         s.islandDocked = false;
         s.islandCandidate = null;
         s.islandOptions = [];
@@ -222,7 +225,7 @@ const SEA_ISLANDS = {
         if((choice.politicalEvent||choice.politicalEcho) &&
             typeof SEA_POLITICAL_EVENTS==='undefined')return false;
         if(choice.politicalEvent && (s.islandSelected.politicalEventId!==choice.politicalEvent ||
-            !SEA_POLITICAL_EVENTS.events[choice.politicalEvent]?.choices.some(c=>
+            !SEA_POLITICAL_EVENTS.encounter(s,s.islandSelected)?.choices.some(c=>
                 c.id===choice.id)))return false;
         if(choice.politicalEcho){
             const echo=SEA_POLITICAL_EVENTS.echoEncounter(s,s.islandSelected);
@@ -230,23 +233,35 @@ const SEA_ISLANDS = {
                 s.islandSelected.politicalEcho?.source!==choice.politicalEcho||
                 !echo.choices.some(c=>c.id===choice.id))return false;
         }
-        if(choice.cost&&s.gold<choice.cost){
+        const ruleQuote=choice.formula&&typeof SEA_ISLAND_RULES!=='undefined'?
+            SEA_ISLAND_RULES.preview(s,choice):null;
+        if(ruleQuote && !ruleQuote.ok){
+            s.islandError=ruleQuote.error;
+            this.render(s);
+            return false;
+        }
+        if(!ruleQuote && choice.cost&&s.gold<choice.cost){
             s.islandError='OURO INSUFICIENTE PARA ESTA ESCOLHA';
             this.render(s);
             return false;
         }
-        if(choice.hp<0 && s.shipHP<=Math.abs(choice.hp)){
+        if(!ruleQuote && choice.hp<0 && s.shipHP<=Math.abs(choice.hp)){
             s.islandError='O CASCO NÃO SUPORTARIA ESSE SACRIFÍCIO';
             this.render(s);
             return false;
         }
-        if(choice.cost && (choice.heal||choice.healPercent) &&
+        if(!ruleQuote && choice.cost && (choice.heal||choice.healPercent) &&
             !choice.curse && s.shipHP>=s.maxShipHP){
             s.islandError='O CASCO JÁ ESTÁ TOTALMENTE REPARADO';
             this.render(s);
             return false;
         }
         const changes=[];
+        if(ruleQuote) {
+            const done=SEA_ISLAND_RULES.commit(s,choice);
+            if(!done.ok)return false;
+            changes.push(...done.changes);
+        } else {
         if(choice.cost) {
             s.gold-=choice.cost;changes.push('-'+choice.cost+' ouro');
         }
@@ -288,7 +303,14 @@ const SEA_ISLANDS = {
             s.shipStats.cannonDamage+=choice.cannon;
             changes.push('+'+choice.cannon+' dano dos canhões');
         }
+        }
         s.islandVisits.add(s.islandSelected.id);
+        if(choice.destroysIsland===true){
+            s.islandSelected.destroyed=true;
+            s.islandSelected.image?.setTint(0x504840)?.setAlpha(.72);
+            for(const glow of s.landmarkGlows||[])if(glow.islandId===s.islandSelected.id)
+                { glow.destroyed=true; glow.glow?.setVisible(false)?.setAlpha(0); }
+        }
         // Only an explicit destruction choice may activate the island smoke.
         // Existing island actions, contracts, navigation and collision stay intact.
         if(choice.destroysIsland===true)this.showDestructionSmoke(s,s.islandSelected);
@@ -307,7 +329,9 @@ const SEA_ISLANDS = {
             SEA_POLITICAL_EVENTS.record(s,choice,changes);
         if(choice.politicalEcho && typeof SEA_POLITICAL_EVENTS!=='undefined')
             SEA_POLITICAL_EVENTS.resolveEcho(s,choice,changes);
-        const result=changes.join('  ·  ')||'Os ventos mudaram.';
+        const result=choice.formula?
+            'O pacto foi firmado. O navio carrega as consequências.':
+            changes.join('  ·  ')||'Os ventos mudaram.';
         s.islandOutcome=choice.outcome?choice.outcome+'\n'+result:result;
         s.lastDamageTime=s.time.now;
         s.updateHUD();
@@ -315,7 +339,11 @@ const SEA_ISLANDS = {
         if(typeof SEA_COMBAT!=='undefined'&&SEA_COMBAT.scars)SEA_COMBAT.scars(s);
         SEA_AUDIO.play('gold',.55);
         // Play a quiet reward/ritual accent after the docking overlay closes.
-        s.islandDepartureFx=choice.destroysIsland===true ? null :
+        s.islandDepartureFx=choice.formula && choice.destroysIsland!==true ?
+            (/C:-|C:zero|H:\d+/.test(choice.formula)?'gold':
+                /D:|C:\d+|H:-/.test(choice.formula)?'violet':
+                /G:\d+/.test(choice.formula)?'gold':null) :
+            choice.destroysIsland===true ? null :
             (choice.heal||choice.healPercent||choice.curse<0) ? 'gold' :
             (choice.cannon||choice.hp<0||choice.curse>0) ? 'violet' :
             choice.gold ? 'gold' : null;
@@ -349,17 +377,17 @@ const SEA_ISLANDS = {
         const bg=disabled?0x131a1d:selected?0x392025:0x161e21;
         const edge=disabled?0x534844:selected?0xc3a078:0x655343;
         root.add(s.add.rectangle(x,y,w,h,bg,.97).setStrokeStyle(selected?3:2,edge,.95));
-        root.add(s.add.text(x,y-10,name,{
-            fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',fontStyle:'bold',
+        root.add(s.add.text(x,y-(h<=45?8:10),name,{
+            fontFamily:'Georgia',fontSize:h<=45?(SEA_DESKTOP?'15px':'13px'):(SEA_DESKTOP?'18px':'15px'),fontStyle:'bold',
             color:disabled?'#928c84':'#e5d3bc',align:'center',wordWrap:{width:w-25}
         }).setOrigin(.5));
-        if(detail)root.add(s.add.text(x,y+17,detail,{
-            fontFamily:'monospace',fontSize:'11px',color:disabled?'#87837e':'#b3b9af',
+        if(detail)root.add(s.add.text(x,y+(h<=45?11:17),detail,{
+            fontFamily:'monospace',fontSize:h<=45?'10px':'11px',color:disabled?'#87837e':'#b3b9af',
             align:'center',wordWrap:{width:w-28}
         }).setOrigin(.5));
         s.islandOptions.push({hit:{x,y,w,h},onTap:()=>{
             if(index===-1)this.close(s);
-            else this.apply(s,choice||this.choices[s.islandSelected.kind][index]);
+            else if(!disabled)this.apply(s,choice||this.choices[s.islandSelected.kind][index]);
         }});
     },
     render(s) {
@@ -394,16 +422,18 @@ const SEA_ISLANDS = {
         const asset=type==='reef'?'island-reef':type==='parley'?'island-wreck':'island-'+type;
         if(s.textures.exists(asset)){
             const sourceHeight=s.textures.get(asset).getSourceImage().height||256;
-            root.add(s.add.image(x,top+161,asset).setScale((SEA_DESKTOP?146:129)/sourceHeight));
+            root.add(s.add.image(x,top+149,asset).setScale((SEA_DESKTOP?112:101)/sourceHeight));
         }
-        root.add(s.add.text(x,top+262,event?.lore||this.lore[type],{
-            fontFamily:'Georgia',fontSize:SEA_DESKTOP?'18px':'15px',
-            color:'#d6c6b7',align:'center',lineSpacing:5,wordWrap:{width:width-52}
+        const labEvent=typeof SEA_ISLAND_RULES!=='undefined'?
+            SEA_ISLAND_RULES.event(s,type):null;
+        root.add(s.add.text(x,top+244,event?.lore||labEvent?.lore||this.lore[type],{
+            fontFamily:'Georgia',fontSize:SEA_DESKTOP?'15px':'13px',
+            color:'#d6c6b7',align:'center',lineSpacing:3,wordWrap:{width:width-52}
         }).setOrigin(.5));
         const visited=s.islandVisits.has(island.id);
         if(s.islandOutcome){
             if(type==='parley') root.add(s.add.text(
-                x,top+324,'ACORDO DESTA EXPEDIÇÃO · NÃO É REPUTAÇÃO PERMANENTE',{
+                x,top+324,'O ACORDO NÃO É UMA ALIANÇA DE FACÇÃO',{
                 fontFamily:'monospace',fontSize:SEA_DESKTOP?'11px':'10px',
                 color:'#be9d83',align:'center',wordWrap:{width:width-45}
             }).setOrigin(.5));
@@ -416,8 +446,10 @@ const SEA_ISLANDS = {
             }).setOrigin(.5));
         }else{
             const contractActions=typeof SEA_CONTRACTS!=='undefined'?SEA_CONTRACTS.options(s,island):null;
-            const actions=contractActions||event?.choices||this.choices[type];
-            root.add(s.add.text(x,top+328,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
+            const actions=contractActions||event?.choices||
+                (typeof SEA_ISLAND_RULES!=='undefined'?SEA_ISLAND_RULES.options(s,type):null)||
+                this.choices[type];
+            root.add(s.add.text(x,top+293,s.islandError||'QUAL SERÁ A SUA DECISÃO?',{
                 fontFamily:'monospace',fontSize:'12px',color:s.islandError?'#d68c86':'#aba99d'
             }).setOrigin(.5));
             for(let i=0;i<actions.length;i++){
@@ -425,8 +457,12 @@ const SEA_ISLANDS = {
                 const hint=(type==='parley'||event)&&choice.faction
                     ? '['+this.factionLabels[choice.faction]+'] '+choice.hint
                     : choice.hint;
-                this.screenButton(s,root,x,top+385+i*72,width-48,63,
-                    choice.name,hint,i,!!(
+                const quote=choice.formula&&typeof SEA_ISLAND_RULES!=='undefined'?
+                    SEA_ISLAND_RULES.preview(s,choice):null;
+                const compact=actions.length>=4;
+                this.screenButton(s,root,x,top+(compact?335+i*49:385+i*72),
+                    width-48,compact?45:63,choice.name,hint,i,
+                    quote?!quote.ok:!!(
                         (choice.cost&&s.gold<choice.cost)||
                         (choice.hp<0&&s.shipHP<=Math.abs(choice.hp))),choice);
             }

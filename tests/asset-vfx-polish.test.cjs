@@ -19,7 +19,7 @@ assert(game.includes("if(this.missedWaterShots%3===0)this.burst(p.x,p.y,'foam',.
 assert(game.includes('this.effectsActive<this.effectsLimit-12'),'FX budget must protect dense fights');
 assert(effects.includes("e.isMonster?'violet':'splinters'"));
 assert(effects.includes("e.isMonster && e.type!=='enguia' ? 0"),'non-eel monsters must never rotate during death');
-assert(islands.includes('s.islandDepartureFx=choice.destroysIsland===true ? null'));
+assert(islands.includes('s.islandDepartureFx=choice.formula && choice.destroysIsland!==true ?'));
 assert(islands.includes("s.burst(leaveAt.x,leaveAt.y,leaveFx,.72)"));
 assert(islands.includes('if(choice.destroysIsland===true)this.showDestructionSmoke'),'destruction hook preserved');
 assert(gallery.includes('Curadoria de efeitos em gameplay'));

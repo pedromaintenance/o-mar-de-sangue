@@ -171,7 +171,10 @@ const SEA_POLITICAL_EVENTS = {
         const group=this.echoes[data.source];
         const echo=group?.[data.originalChoice];
         if(!echo||island.kind!==group.kind)return null;
-        return {...echo,label:'ECO DA ESCOLHA',choices:echo.choices.map(choice=>({
+        const catalogId=typeof SEA_ISLAND_RULES!=='undefined'?
+            SEA_ISLAND_RULES.echoIds[data.source+':'+data.originalChoice]:null;
+        const expanded=catalogId&&SEA_ISLAND_RULES.options(s,catalogId,{politicalEcho:data.source});
+        return {...echo,label:'ECO DA ESCOLHA',choices:expanded||echo.choices.map(choice=>({
             ...choice,politicalEcho:data.source
         }))};
     },
@@ -261,7 +264,12 @@ const SEA_POLITICAL_EVENTS = {
         // A contract action must never be replaced by a political encounter.
         if(s.contract && ['pickupId','shelterId','destinationId','clueId']
             .some(key=>s.contract[key]===island.id))return null;
-        return this.events[island.politicalEventId]||null;
+        const event=this.events[island.politicalEventId];
+        if(!event)return null;
+        const expanded=typeof SEA_ISLAND_RULES!=='undefined'?
+            SEA_ISLAND_RULES.options(s,island.politicalEventId,
+                {politicalEvent:island.politicalEventId}):null;
+        return expanded?{...event,choices:expanded}:event;
     },
     record(s,choice,changes) {
         const event=this.encounter(s,s.islandSelected);
@@ -274,7 +282,7 @@ const SEA_POLITICAL_EVENTS = {
             terms:changes.join(' · ')||'Sem custo imediato'
         });
         if(choice.pursuit)this.pursue(s,choice.pursuit);
-        this.scheduleEcho(s,choice.politicalEvent,choice.id);
+        this.scheduleEcho(s,choice.politicalEvent,choice.storyChoice||choice.id);
         return true;
     },
     update(s) {

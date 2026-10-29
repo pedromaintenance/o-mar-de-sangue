@@ -1,0 +1,46 @@
+name: Island gameplay v99 — shared laboratory rules
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SeaIslandRules.js'
+      - 'SeaIslands.js'
+      - 'SeaPoliticalEvents.js'
+      - 'Game.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'laboratorio-ilhas/**'
+      - 'tests/island-gameplay-v99.test.cjs'
+      - 'tests/asset-vfx-polish.test.cjs'
+      - '.github/workflows/island-gameplay-v99.yml'
+  pull_request:
+    paths:
+      - 'SeaIslandRules.js'
+      - 'SeaIslands.js'
+      - 'SeaPoliticalEvents.js'
+      - 'Game.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'laboratorio-ilhas/**'
+      - 'tests/island-gameplay-v99.test.cjs'
+      - '.github/workflows/island-gameplay-v99.yml'
+permissions:
+  contents: read
+jobs:
+  gameplay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compile scripts and new rules
+        run: |
+          node --check SeaIslandRules.js
+          node --check SeaIslands.js
+          node --check SeaPoliticalEvents.js
+          node --check Game.js
+      - name: Catalog math, political narrative, smoke and save regression
+        run: |
+          node --test tests/island-gameplay-v99.test.cjs
+          node --test tests/political-events-sprint01.test.cjs tests/political-echoes-sprint01b.test.cjs tests/island-destruction-smoke.test.cjs tests/pwa-cache-contract.test.cjs tests/laboratorio-ilhas-pages.test.cjs

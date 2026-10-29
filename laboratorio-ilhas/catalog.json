@@ -1,6 +1,6 @@
 {
-  "version": "2.0-conceito",
-  "source": "GitHub SeaIslands.js / SeaPoliticalEvents.js em 2026-10-28 + propostas novas",
+  "version": "2.1-live",
+  "source": "Fonte única das regras porcentuais: laboratório e jogo Phaser (SEA_ISLAND_RULES)",
   "events": [
     {
       "id": "demeter",
