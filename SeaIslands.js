@@ -285,6 +285,9 @@ const SEA_ISLANDS = {
             changes.push('+'+choice.cannon+' dano dos canhões');
         }
         s.islandVisits.add(s.islandSelected.id);
+        // Only an explicit destruction choice may activate the island smoke.
+        // Existing island actions, contracts, navigation and collision stay intact.
+        if(choice.destroysIsland===true)this.showDestructionSmoke(s,s.islandSelected);
         s.islandError='';
         s.islandChoiceIndex=0;
         if(s.islandSelected.kind==='parley' && choice.faction){
@@ -309,6 +312,25 @@ const SEA_ISLANDS = {
         SEA_AUDIO.play('gold',.55);
         this.render(s);
         return true;
+    },
+    showDestructionSmoke(s,island) {
+        if(!island || !s?.textures?.exists('island-destruction-smoke'))return null;
+        if(island.destructionSmoke?.active)return island.destructionSmoke;
+        // The bitmap is 512×682 PER FRAME; island art is visually radius×2.8 tall.
+        // Only the presentation changes: island coordinates and hitboxes do not.
+        const sprite=s.add.sprite(island.x,island.y,'island-destruction-smoke',0)
+            .setScale((island.radius*2.8)/682).setDepth(3);
+        const key='island-destruction-smoke-loop';
+        if(!s.anims.exists(key)){
+            s.anims.create({
+                key,
+                frames:s.anims.generateFrameNumbers('island-destruction-smoke',{start:0,end:3}),
+                frameRate:3,repeat:-1,yoyo:true
+            });
+        }
+        sprite.play(key);
+        island.destructionSmoke=sprite;
+        return sprite;
     },
     screenButton(s,root,x,y,w,h,name,detail,index,disabled=false,choice=null) {
         // Return is dynamically after 2 or 3 decisions, never hard-coded slot 3.

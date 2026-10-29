@@ -375,6 +375,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.image('island-daegon', 'assets/islands/island_daegon.png');
         this.load.image('island-demeter', 'assets/islands/island_demeter.png');
         this.load.image('island-wreck', 'assets/islands/island_wreck.png');
+        // Destruction VFX: 4 original RGBA frames (512×682) with transparent 80px gutters.
+        this.load.spritesheet('island-destruction-smoke', 'assets/islands/island_destruction_smoke.png', {
+            frameWidth:512, frameHeight:682, spacing:80, endFrame:3
+        });
         // Oito quadros da moeda pirata, normalizados em células RGBA 272x272.
         this.load.spritesheet('treasure-coin', 'assets/items/treasure_coin.png', {
             frameWidth:272, frameHeight:272, endFrame:7

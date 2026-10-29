@@ -1,0 +1,54 @@
+{
+  "name": "O Mar de Sangue — fumaça sobre ilha destruída",
+  "textureKey": "island-destruction-smoke",
+  "path": "assets/islands/island_destruction_smoke.png",
+  "sha256": "4312c1099d88def9bc6a9ff765de17df9de7bf2f8b9fe7014472cf477cda8fbe",
+  "width": 2288,
+  "height": 682,
+  "format": "PNG RGBA 8-bit",
+  "columns": 4,
+  "rows": 1,
+  "frameWidth": 512,
+  "frameHeight": 682,
+  "spacing": 80,
+  "margin": 0,
+  "frameCount": 4,
+  "frames": [
+    {
+      "index": 0,
+      "x": 0,
+      "y": 0,
+      "width": 512,
+      "height": 682
+    },
+    {
+      "index": 1,
+      "x": 592,
+      "y": 0,
+      "width": 512,
+      "height": 682
+    },
+    {
+      "index": 2,
+      "x": 1184,
+      "y": 0,
+      "width": 512,
+      "height": 682
+    },
+    {
+      "index": 3,
+      "x": 1776,
+      "y": 0,
+      "width": 512,
+      "height": 682
+    }
+  ],
+  "frameSequence": "0 → 1 → 2 → 3 → 2 → 1 (loop)",
+  "frameRate": 3,
+  "displayHeight": "island.radius * 2.8",
+  "depth": 3,
+  "orientation": "fixed sprite, 0 degrees",
+  "condition": "choice.destroysIsland === true",
+  "scope": "visual hook only; existing choices unchanged",
+  "verification": "Every frame is pixel-identical to the user-supplied original 2048×682 sprite; 80px gaps alpha=0."
+}

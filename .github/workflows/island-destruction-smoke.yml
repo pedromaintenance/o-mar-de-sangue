@@ -1,0 +1,38 @@
+name: Island destruction smoke — sprite atlas and runtime contract
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Game.js'
+      - 'SeaIslands.js'
+      - 'sw.js'
+      - 'assets/islands/island_destruction_smoke*'
+      - 'tests/island-destruction-smoke.test.cjs'
+      - '.github/workflows/island-destruction-smoke.yml'
+  pull_request:
+    paths:
+      - 'Game.js'
+      - 'SeaIslands.js'
+      - 'sw.js'
+      - 'assets/islands/island_destruction_smoke*'
+      - 'tests/island-destruction-smoke.test.cjs'
+      - '.github/workflows/island-destruction-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  smoke-integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and atlas integrity
+        run: |
+          node --check Game.js
+          node --check SeaIslands.js
+          node --check sw.js
+          node --test tests/island-destruction-smoke.test.cjs
+      - name: Existing island and PWA regression
+        run: |
+          node --test tests/political-events-sprint01.test.cjs tests/political-echoes-sprint01b.test.cjs tests/pwa-cache-contract.test.cjs
