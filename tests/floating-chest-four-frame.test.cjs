@@ -32,8 +32,8 @@ assert(game.includes('loot.chestSprite.setFrame(frame)') && game.includes('f.spr
 assert(game.includes("Math.floor((t*4+loot.phase)%4)")&&game.includes("Math.floor((t*4+f.phase)%4)"),
  'animated at 4 FPS');
 assert(game.includes("'treasure-chest':.22"),'normalize new 512px sprite proportions');
-assert(game.includes("this.gold = SEA_MATH.safe(this.gold + t.value)"),
- 'collection and reward must remain unchanged');
+assert(/this\.gold = SEA_MATH\.safe\(this\.gold \+\s*SEA_FACTION_POLITICS\.treasure\(this,t\.value\)\)/.test(game),
+ 'collection retains the established V101 political treasure modifier');
 assert(game.includes("t.coin.destroy(); this.burst("),'collected chest is removed');
 assert(game.includes("const kind=fromEnemy?'treasure-chest'"),
  'enemies must still drop chests');
