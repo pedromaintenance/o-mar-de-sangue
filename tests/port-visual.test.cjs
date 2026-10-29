@@ -149,6 +149,19 @@ const {chromium}=require('playwright-core');
       assert.equal(await page.evaluate(()=>SeaProfile.load().gold),
         stateBeforeBackup.profile.gold,'Rollback must recover previous profile');
       assert.deepEqual(await page.evaluate(()=>SeaProfile.load()),stateBeforeBackup.profile);
+      // Isolate keyboard navigation from progression prices: fund a temporary QA
+      // wallet only after the save/restore equality assertions above.
+      const goldBeforeFocusQA=await page.evaluate(()=>{
+        const p=SeaProfile.load();
+        const affordable=['canhoes','alcance'].map(id=>{
+          const u=SEA_UPGRADES.find(x=>x.id===id);
+          return SeaProfile.price(u,p.levels[id]||0);
+        });
+        const previous=p.gold;
+        p.gold=Math.max(previous,...affordable);
+        SeaProfile.store(p);
+        return previous;
+      });
       await page.locator('[data-action="yard:armas"]').click();
       await page.locator('.port-upgrades').waitFor({timeout:10000});
       await page.screenshot({path:path.join('port-artifacts',label+'-yard.png'),fullPage:true});
@@ -184,6 +197,12 @@ const {chromium}=require('playwright-core');
         finally{SEA_GAMEPAD.poll=original;}
       });
       await page.locator('.port-hero').waitFor({timeout:10000});
+      await page.evaluate(previous=>{
+        const p=SeaProfile.load();
+        p.gold=previous;
+        SeaProfile.store(p);
+        SEA_PORT_UI.render();
+      },goldBeforeFocusQA);
       // 3.5b — exercise both footer mixers with real mouse/touch hitboxes.
       const audioBefore=await page.evaluate(()=>({
         music:SEA_MUSIC.volume,fx:SEA_AUDIO.effectsVolume,

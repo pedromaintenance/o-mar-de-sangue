@@ -590,8 +590,8 @@ const SEA_PORT_UI = {
         '</section>'+
         '<div class="port-section-label"><span>ESCOLHA O TEU DESTINO</span><span>✣</span></div>'+
         '<div class="port-actions">'+
-          this.button('mission','MISSÕES','Continue na etapa '+this.num(p.mission),'⚔','port-choice--primary')+
-          this.button('sandbox','MAR SEM FIM','Recorde: onda '+this.num(p.bestWave),'∞','')+
+          this.button('mission','MISSÕES','Etapa '+this.num(p.mission)+' · 25% do saque ao cofre','⚔','port-choice--primary')+
+          this.button('sandbox','MAR SEM FIM','Saque integral · onda '+this.num(p.bestWave),'∞','')+
           this.button('yard:armas','ESTALEIRO','Reforce seu navio e sua tripulação','⚒','')+
           this.button('help','DIÁRIO DE BORDO','Comandos, regras e navegação','☷','')+
           this.button('contracts','CONTRATOS DA COSTA SUL','Resgate e contrabando · duas expedições','⚓','port-choice--contract')+
@@ -754,10 +754,10 @@ const SEA_PORT_UI = {
       ['IMPULSO NAVAL','R no teclado, X no Xbox, ou botão IMPULSO na tela. Arrancada curta para atacar/fugir; recarga começa em 10s e aproxima-se de 2s com Mestres da Arrancada. Cancela o preparo dos canhões; não concede invulnerabilidade.'],
       ['DIÁRIOS E ENCONTROS','Em pausa, ilhas e Carta: setas / direcional para escolher, Enter / A para confirmar, ESC / B para voltar. Pausa: ESC / P / Menu. Carta: M / View. Atracação: F / A / toque.'],
       ['ABALROAMENTO','Velocidade e ângulo da proa determinam o impacto. Rochas danificam o casco.'],
-      ['MISSÕES','Escolta, caçada, sobrevivência e chefes. A campanha avança após vitórias.'],
-      ['SANDBOX','Ondas sucessivas, frota hostil crescente e recompensas acumuladas.'],
+      ['MISSÕES','Escolta, caçada, sobrevivência e chefes. Avançam a campanha, mas 75% do ouro recuperável financia a guerra; 25% chega ao cofre.'],
+      ['SANDBOX','Mar Sem Fim: ondas sucessivas, inimigos mais fortes e saque integral ao retornar vitorioso. Retirada conserva 75%; derrota, 40%.'],
       ['ATRACAÇÃO','Aproxime-se devagar e afaste inimigos. F, botão A ou toque para atracar.'],
-      ['ESTALEIRO','Quinze melhorias sem limite artificial; cada nível aumenta o preço. LB/RB ou Q/E trocam as abas.'],
+      ['ESTALEIRO','Quinze melhorias sem limite artificial; custos triplicados e crescimento por nível mantido. LB/RB ou Q/E trocam as abas.'],
       ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.'],
       ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
        ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
@@ -884,7 +884,9 @@ const SEA_PORT_UI = {
         r.contractEscaped?'FUGIU':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
         ['PRÊMIO DO CONTRATO',r.contractBounty||0],
         ...(r.contractRoute?[[ 'FORMA DA ENTREGA',r.contractRoute==='hidden'?'CLANDESTINA':'SUBORNO À CORTE' ]]:[])]:[]),
-      ['OURO ENCONTRADO',r.collected],['OURO RECUPERADO',r.reward],
+      ['OURO ENCONTRADO',r.collected],
+      ...(r.mode==='mission'?[['CUSTO DA CAMPANHA',r.campaignCost??0]]:[]),
+      ['OURO RECUPERADO',r.reward],
       ['INIMIGOS AFUNDADOS',r.kills],['ABALROAMENTOS',r.rammings],
       ['COFRE DO CAPITÃO',r.bank],
       [r.mode==='mission'?'ETAPA':'ONDA',r.mode==='mission'?r.stage:r.wave],

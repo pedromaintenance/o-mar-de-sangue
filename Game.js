@@ -63,6 +63,19 @@ const SEA_MATH = {
     nice(n) { n = Math.max(0, n || 0); return n >= 1e12 ? (n / 1e12).toFixed(2) + 'T' : n >= 1e9 ? (n / 1e9).toFixed(2) + 'B' : n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e4 ? (n / 1e3).toFixed(1) + 'k' : String(Math.floor(n)); },
     clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 };
+// Missões avançam a campanha; o mar aberto financia as melhorias.
+const SEA_ECONOMY = Object.freeze({
+    missionPayoutMultiplier: .25,
+    upgradePriceMultiplier: 3,
+    upgradePrice(base, factor, level) {
+        return SEA_MATH.safe(Math.ceil(SEA_MATH.cost(base, factor, level) * this.upgradePriceMultiplier));
+    },
+    missionCommission(stage) {
+        // Prêmio limitado, em vez de crescimento exponencial por missão.
+        const rank = SEA_MATH.clamp(Math.floor(Number(stage) || 1), 1, 100);
+        return SEA_MATH.safe(Math.round(24 + 4.5 * rank + 6 * Math.sqrt(rank)));
+    }
+});
 const SEA_UPGRADES = [
     { id: 'casco', icon: '▣', name: 'Casco de Ironwood', desc: '+35 integridade máxima', base: 35, factor: 1.47, group: 'casco' },
     { id: 'blindagem', icon: '◈', name: 'Placas de Golzdov', desc: 'Reduz dano de projéteis e rochas', base: 85, factor: 1.52, group: 'casco' },
@@ -171,7 +184,7 @@ const SeaProfile = {
         return p;
     },
     store(p) { SEA_SESSION = JSON.parse(JSON.stringify(p)); try { localStorage.setItem(SEA_SAVE_V4, JSON.stringify(p)); } catch (_) { /* keep RAM copy */ } },
-    price(u, level) { return SEA_MATH.cost(u.base, u.factor, level); },
+    price(u, level) { return SEA_ECONOMY.upgradePrice(u.base, u.factor, level); },
     stats(p) {
         const u = p.levels;
         return {
@@ -205,7 +218,11 @@ const SeaProfile = {
     settle(opts) {
         const p = this.load(); const won = !!opts.won, withdrawn = !!opts.withdrawn;
         const retention = won ? 1 : withdrawn ? .75 : .4;
-        const reward = SEA_MATH.safe(Math.floor(opts.collected * retention * (1 + p.levels.cofre * .15)));
+        const grossReward = SEA_MATH.safe(Math.floor(opts.collected * retention * (1 + p.levels.cofre * .15)));
+        // A campanha consome provisões; só a transferência ao banco muda.
+        // Saque coletado para objetivos de missão e loot no mar aberto permanecem intactos.
+        const payoutFactor = opts.mode === 'mission' ? SEA_ECONOMY.missionPayoutMultiplier : 1;
+        const reward = SEA_MATH.safe(Math.floor(grossReward * payoutFactor));
         p.gold = SEA_MATH.safe(p.gold + reward); p.earned = SEA_MATH.safe(p.earned + reward);
         p.sorties++; if (won) p.wins++; else if (!withdrawn) p.losses++;
         p.kills += opts.kills; p.rammings += opts.rammings;
@@ -218,7 +235,8 @@ const SeaProfile = {
             p.mission = Math.max(p.mission, opts.stage + 1);
         }
         this.store(p);
-        return { ...opts, reward, retention, bank: p.gold, mission: p.mission };
+        return { ...opts, reward, grossReward, campaignCost: grossReward - reward,
+            payoutFactor, retention, bank: p.gold, mission: p.mission };
     },
     reset() { this.store(this.defaults()); }
 };
@@ -2444,7 +2462,7 @@ class Game extends Phaser.Scene {
         if (this.pauseElements) { this.pauseElements.destroy(true); this.pauseElements = null; }
         if (this.atlasOpen) SEA_ATLAS.close(this);
         let commission = 0;
-        if (won && this.mode === 'mission') commission = Math.round(42 * Math.pow(1.25, Math.min(this.stage, 90)));
+        if (won && this.mode === 'mission') commission = SEA_ECONOMY.missionCommission(this.stage);
         const contractBounty=won&&this.contract?.completed ? this.contract.bounty : 0;
         if(won)SEA_FACTION_POLITICS.bonusAtSettlement(this);
         SEA_FACTIONS.recordContract(this,this.contract);
