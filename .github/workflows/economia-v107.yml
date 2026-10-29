@@ -1,0 +1,28 @@
+name: Economy V107 — Mission vs Open Sea
+on:
+  push:
+    branches: [main]
+    paths: [Game.js, PortUI.js, sw.js, tests/economia-v107.test.cjs, .github/workflows/economia-v107.yml]
+  pull_request:
+    paths: [Game.js, PortUI.js, sw.js, tests/economia-v107.test.cjs, .github/workflows/economia-v107.yml]
+permissions:
+  contents: read
+jobs:
+  economic-balance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate economic rules
+        run: |
+          node --check Game.js
+          node --check PortUI.js
+          node tests/economia-v107.test.cjs
+      - name: Validate previous gameplay
+        run: |
+          node tests/player-ship-20-stages.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+          node tests/faction-politics-v101.test.cjs
+          node tests/port-ui-rebuild.test.cjs
