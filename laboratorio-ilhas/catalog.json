@@ -1,0 +1,1089 @@
+{
+  "version": "2.0-conceito",
+  "source": "GitHub SeaIslands.js / SeaPoliticalEvents.js em 2026-10-28 + propostas novas",
+  "events": [
+    {
+      "id": "demeter",
+      "title": "Santuário de Deméter",
+      "group": "ilhas",
+      "place": "Templo de Deméter",
+      "lore": "Ramos verdes crescem entre pedras banhadas pelo mar de sangue. Os sacerdotes não vendem cura: exigem que o capitão escolha o que está disposto a entregar.",
+      "source": "usuário",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "demeter_1",
+          "title": "Milagre",
+          "text": "Uma grande oferenda convoca a renovação de seu casco.",
+          "formula": "G:-50,H:50",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "demeter_2",
+          "title": "Bênção",
+          "text": "Um pequeno tributo fortalece as tábuas e as costuras do navio.",
+          "formula": "G:-5,H:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "demeter_3",
+          "title": "Purificação",
+          "text": "O templo desfaz toda a corrupção que acompanha a embarcação.",
+          "formula": "G:-10,C:zero",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "demeter_4",
+          "title": "Destruir o templo",
+          "text": "Queime o santuário e absorva sua força vital. A profanação chama o mar profundo.",
+          "formula": "H:20,C:40,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": "Profanação irreversível deste santuário"
+        },
+        {
+          "id": "demeter_5",
+          "title": "Saquear o templo",
+          "text": "Tome os tesouros dos fiéis e venda os símbolos sagrados à aristocracia feérica.",
+          "formula": "G:20,C:30,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": "A Corte aceita o saque; os devotos não esquecem"
+        }
+      ]
+    },
+    {
+      "id": "daegon",
+      "title": "Altar de Dagon",
+      "group": "ilhas",
+      "place": "Templo de Dagon (Daegon nos arquivos)",
+      "lore": "Sob cordames úmidos e ossos de peixes, os sacerdotes prometem poder aos navios que aceitem alimentar o abismo.",
+      "source": "usuário",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "daegon_1",
+          "title": "Maldição",
+          "text": "O ídolo bebe parte do casco para alimentar os canhões.",
+          "formula": "H:-10,D:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "daegon_2",
+          "title": "Oferenda",
+          "text": "O altar aceita ouro em troca de pólvora encantada.",
+          "formula": "G:-5,D:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "daegon_3",
+          "title": "Sacrifício",
+          "text": "Metade de sua estrutura é entregue ao mar: o poder cresce e a corrupção o acompanha.",
+          "formula": "H:-50,D:20,C:40",
+          "kind": "serviço",
+          "faction": "culto",
+          "alert": "Risco extremo: dano do casco pode impedir a viagem"
+        },
+        {
+          "id": "daegon_4",
+          "title": "Atacar o templo",
+          "text": "Rompa o altar, enfrente seus defensores e rejeite a maldição.",
+          "formula": "H:-20,C:zero,FS:10",
+          "kind": "violência",
+          "faction": "sobreviventes",
+          "alert": "Confronto aberto contra o Culto"
+        },
+        {
+          "id": "daegon_5",
+          "title": "Assaltar o templo",
+          "text": "Roube os tributos rituais e venda-os aos agentes feéricos.",
+          "formula": "G:50,C:50,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": "Recompensa proporcional ao ouro atual"
+        }
+      ]
+    },
+    {
+      "id": "reef",
+      "title": "Recifes Tabaxi",
+      "group": "ilhas",
+      "place": "Recifes de passagem",
+      "lore": "Navegadores tabaxi conhecem os corais como quem lê uma língua viva. Os caminhos têm custo — ou podem ser tomados pela força.",
+      "source": "proposta",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "reef_1",
+          "title": "Contratar pilotos",
+          "text": "Os guias revelam enseadas, correntes e ameaças próximas.",
+          "formula": "G:-5,R:18",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "reef_2",
+          "title": "Comprar uma rota veloz",
+          "text": "Marque caminhos menos turbulentos no seu livro de bordo.",
+          "formula": "G:-10,S:12",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "reef_3",
+          "title": "Mergulhar por pérolas",
+          "text": "Arrisque o casco nas pedras para recuperar uma carga de joias.",
+          "formula": "H:-8,G:20",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "reef_4",
+          "title": "Dinamitar os corais",
+          "text": "Destrua o ecossistema para extrair os depósitos de pérolas.",
+          "formula": "G:30,H:-12,C:20,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": "A agressão pode atrair os guardiões do recife"
+        },
+        {
+          "id": "reef_5",
+          "title": "Envenenar os poços",
+          "text": "Entregue o recife aos cultistas e adquira munição contaminada.",
+          "formula": "D:12,C:30,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": "O recife deixa de oferecer abrigo"
+        }
+      ]
+    },
+    {
+      "id": "ruin",
+      "title": "Ruínas da Costa Sul",
+      "group": "ilhas",
+      "place": "Entreposto afogado",
+      "lore": "Paredes desabadas revelam a história de uma costa saqueada. Cada objeto recuperado contém um vestígio de quem viveu aqui.",
+      "source": "proposta",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "ruin_1",
+          "title": "Escavação controlada",
+          "text": "Trabalhe nos escombros para recuperar mercadorias antigas.",
+          "formula": "H:-8,G:20",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "ruin_2",
+          "title": "Decifrar os mapas",
+          "text": "Pague escribas para restaurar rotas e pontos de referência.",
+          "formula": "G:-7,R:25",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "ruin_3",
+          "title": "Reaproveitar a muralha",
+          "text": "Adquira pedras e madeira tratada para reforçar o casco.",
+          "formula": "G:-15,H:28",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "ruin_4",
+          "title": "Pilhar o memorial",
+          "text": "Venda relíquias funerárias aos colecionadores da Corte.",
+          "formula": "G:35,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "ruin_5",
+          "title": "Despertar o selo enterrado",
+          "text": "Rompa uma inscrição e aceite o poder que escapou das pedras.",
+          "formula": "D:14,C:35,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "monastery",
+      "title": "Mosteiro Tortle",
+      "group": "ilhas",
+      "place": "Mosteiro das Ilhas",
+      "lore": "Monges tartaruga ensinam que manobra não é só virar o leme. Também sabem o preço que a guerra cobra da mente e das águas.",
+      "source": "proposta",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "monastery_1",
+          "title": "Treinar com os monges",
+          "text": "A tripulação melhora sua habilidade para mudar de rumo.",
+          "formula": "G:-10,T:12",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "monastery_2",
+          "title": "Meditação guiada",
+          "text": "Recolha a mente e deixe a água consumir parte do peso do abismo.",
+          "formula": "G:-5,C:-25",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "monastery_3",
+          "title": "Estudar cartografia",
+          "text": "Copie as cartas das ilhas e reconheça correntes longínquas.",
+          "formula": "G:-10,R:25",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "monastery_4",
+          "title": "Violentar o claustro",
+          "text": "Tome doações e metais sagrados dos monges.",
+          "formula": "G:25,C:22,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "monastery_5",
+          "title": "Profanar o sino",
+          "text": "Transforme o som ritual em impulso para seus canhões.",
+          "formula": "D:10,C:30,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "wreck",
+      "title": "Cemitério de Naus",
+      "group": "ilhas",
+      "place": "Naufrágios e destroços",
+      "lore": "O ferro range sob o peso das águas rubras. Marinheiros mortos não podem cobrar dívidas, mas seus sobreviventes ainda podem.",
+      "source": "proposta",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "wreck_1",
+          "title": "Resgate submerso",
+          "text": "Arrisque sua integridade para recolher cofres ainda lacrados.",
+          "formula": "H:-5,G:18",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "wreck_2",
+          "title": "Comprar madeiras",
+          "text": "Troque parte do tesouro por reparos e cordame salgado.",
+          "formula": "G:-12,H:25",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "wreck_3",
+          "title": "Honrar os afogados",
+          "text": "Pague um último rito para aliviar a corrupção do mar.",
+          "formula": "G:-5,C:-25",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "wreck_4",
+          "title": "Saquear os mortos",
+          "text": "Recupere todos os bens dos naufragados e venda seus nomes.",
+          "formula": "G:40,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "wreck_5",
+          "title": "Consagrar os cascos ao abismo",
+          "text": "Use o cemitério como arma contra os vivos.",
+          "formula": "D:15,C:35,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "parley",
+      "title": "Três Bandeiras na Maré",
+      "group": "ilhas",
+      "place": "Encontro político excepcional",
+      "lore": "Um barco de refugiados, um emissário da Corte Feérica e devotos de Dagon reivindicam sua bandeira. Nenhum lado está disposto a oferecer amizade gratuita.",
+      "source": "adaptação",
+      "trigger": "",
+      "note": "Encontro extraordinário: preserva a lógica política, mas suas cinco escolhas são propostas de redesenho.",
+      "options": [
+        {
+          "id": "parley_1",
+          "title": "Abrigar os sobreviventes",
+          "text": "Entregue abrigo, recolha testemunhos e receba auxílio de reparo.",
+          "formula": "H:15,C:-10,FS:10",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": ""
+        },
+        {
+          "id": "parley_2",
+          "title": "Vender os nomes à Corte",
+          "text": "Entregue os náufragos aos cobradores feéricos e receba ouro.",
+          "formula": "G:25,C:20,FC:10",
+          "kind": "acordo",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "parley_3",
+          "title": "Aceitar pólvora ritual",
+          "text": "Troque parte do casco por poder vindo das águas profundas.",
+          "formula": "H:-10,D:10,C:18,FD:10",
+          "kind": "acordo",
+          "faction": "culto",
+          "alert": ""
+        },
+        {
+          "id": "parley_4",
+          "title": "Romper o bloqueio",
+          "text": "Liberte os cativos enfrentando as duas forças que os disputam.",
+          "formula": "H:-20,C:-20,FS:15",
+          "kind": "violência",
+          "faction": "sobreviventes",
+          "alert": "Perseguição após a decisão"
+        },
+        {
+          "id": "parley_5",
+          "title": "Trair as três bandeiras",
+          "text": "Roube simultaneamente os emissários e deixe testemunhas para trás.",
+          "formula": "G:40,C:35,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": "Perseguição de múltiplas forças"
+        }
+      ]
+    },
+    {
+      "id": "refugees",
+      "title": "Refugiados sob as Velas",
+      "group": "política",
+      "place": "Cemitério de Naus",
+      "lore": "Famílias da Costa Sul escondem-se no porão enquanto uma patrulha feérica procura seus nomes.",
+      "source": "político adaptado",
+      "trigger": "",
+      "note": "Originalmente 3 escolhas; duas alternativas hostis propostas. Abre eco conforme a opção escolhida.",
+      "options": [
+        {
+          "id": "refugees_1",
+          "title": "Abrigar os refugiados",
+          "text": "Repare o casco com auxílio dos resgatados e torne-se alvo da Corte.",
+          "formula": "H:18,C:-8,FS:10",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": "Patrulha após deixar a ilha"
+        },
+        {
+          "id": "refugees_2",
+          "title": "Entregar os nomes",
+          "text": "Receba ouro pela delação dos passageiros.",
+          "formula": "G:25,C:15,FC:10",
+          "kind": "acordo",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "refugees_3",
+          "title": "Pedir um guia",
+          "text": "A navegadora revela rotas perdidas, mas cobra silêncio.",
+          "formula": "R:22,C:5,FS:5",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": ""
+        },
+        {
+          "id": "refugees_4",
+          "title": "Expulsar os fiscais",
+          "text": "Enfrente a patrulha e liberte as famílias sob sua vigilância.",
+          "formula": "H:-12,C:-15,FS:12",
+          "kind": "violência",
+          "faction": "sobreviventes",
+          "alert": "Patrulha hostil"
+        },
+        {
+          "id": "refugees_5",
+          "title": "Assaltar o barco dos refugiados",
+          "text": "Tome as posses das famílias e venda sua localização.",
+          "formula": "G:35,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "convoy",
+      "title": "Carga sem Bandeira",
+      "group": "política",
+      "place": "Ruínas da Costa Sul",
+      "lore": "Mercadores repartem pólvora clandestina. Um fiscal feérico aproxima-se pelo canal.",
+      "source": "político adaptado",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "convoy_1",
+          "title": "Esconder a carga",
+          "text": "Participe do contrabando e aceite o risco de uma perseguição.",
+          "formula": "G:22,C:12,FS:5",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": "Patrulha após partir"
+        },
+        {
+          "id": "convoy_2",
+          "title": "Denunciar o comboio",
+          "text": "Venda informações à Corte em troca de ouro.",
+          "formula": "G:18,C:8,FC:10",
+          "kind": "acordo",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "convoy_3",
+          "title": "Comprar cartas clandestinas",
+          "text": "Adquira rotas proibidas e pontos de passagem.",
+          "formula": "G:-10,R:27",
+          "kind": "acordo",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "convoy_4",
+          "title": "Interceptar o fiscal",
+          "text": "Ataque a embarcação da fiscalização e entregue a carga aos rebeldes.",
+          "formula": "H:-15,G:20,FS:10",
+          "kind": "violência",
+          "faction": "sobreviventes",
+          "alert": "Perseguição feérica"
+        },
+        {
+          "id": "convoy_5",
+          "title": "Tomar a pólvora à força",
+          "text": "Roube comerciantes e fiscais enquanto destrói seus registros.",
+          "formula": "G:36,C:30,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "ritual",
+      "title": "A Liturgia Interrompida",
+      "group": "política",
+      "place": "Altar de Dagon",
+      "lore": "Cultistas kuo-toa disputam prisioneiros amarrados aos mastros. Um sacerdote exige sangue; os cativos pedem ajuda.",
+      "source": "político adaptado",
+      "trigger": "",
+      "note": "",
+      "options": [
+        {
+          "id": "ritual_1",
+          "title": "Libertar os prisioneiros",
+          "text": "Resgate os cativos e obtenha auxílio para reparar a nau.",
+          "formula": "H:15,C:-18,FS:10",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": "Cultistas perseguem o jogador"
+        },
+        {
+          "id": "ritual_2",
+          "title": "Roubar a pólvora ritual",
+          "text": "Tome a substância ritual sem romper o santuário.",
+          "formula": "D:8,C:18,FD:8",
+          "kind": "acordo",
+          "faction": "culto",
+          "alert": ""
+        },
+        {
+          "id": "ritual_3",
+          "title": "Aceitar o pacto das marés",
+          "text": "Os sacerdotes abrem uma corrente rápida à sua tripulação.",
+          "formula": "S:14,C:22,FD:10",
+          "kind": "acordo",
+          "faction": "culto",
+          "alert": ""
+        },
+        {
+          "id": "ritual_4",
+          "title": "Quebrar a liturgia",
+          "text": "Enfrente os devotos e purifique os que escaparam.",
+          "formula": "H:-20,C:zero,FS:12",
+          "kind": "violência",
+          "faction": "sobreviventes",
+          "alert": "Perseguição de cultistas"
+        },
+        {
+          "id": "ritual_5",
+          "title": "Vender os cativos à Corte",
+          "text": "Aceite uma proposta de compra dos prisioneiros.",
+          "formula": "G:45,C:40,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_ref_shelter",
+      "title": "As Testemunhas de Deméter",
+      "group": "ecos",
+      "place": "Santuário de Deméter",
+      "lore": "Os refugiados chegaram ao santuário. Um escriba deseja seu testemunho para Portomonte.",
+      "source": "eco adaptado",
+      "trigger": "Refugiados → Abrigar",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_ref_shelter_1",
+          "title": "Garantir asilo",
+          "text": "Custear acolhida permanente e receber reparos dos fiéis.",
+          "formula": "G:-5,H:20,C:-8,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_shelter_2",
+          "title": "Recolher testemunho",
+          "text": "Ouça os relatos e construa novas cartas de viagem.",
+          "formula": "R:28,C:5,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_shelter_3",
+          "title": "Escoltar os refugiados",
+          "text": "Proteja a travessia de uma última patrulha.",
+          "formula": "H:-10,C:-15,FS:10",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": "Patrulha hostil"
+        },
+        {
+          "id": "echo_ref_shelter_4",
+          "title": "Confiscar os suprimentos",
+          "text": "Tome os víveres destinados às famílias.",
+          "formula": "G:25,C:20,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_shelter_5",
+          "title": "Queimar os registros",
+          "text": "Destrua as evidências de que os refugiados existem.",
+          "formula": "G:15,C:25,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_ref_inform",
+      "title": "Nomes à Porta do Santuário",
+      "group": "ecos",
+      "place": "Santuário de Deméter",
+      "lore": "A lista que você vendeu está pendurada na entrada do templo. O sacerdote reconhece sua escrita.",
+      "source": "eco adaptado",
+      "trigger": "Refugiados → Entregar nomes",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_ref_inform_1",
+          "title": "Queimar a lista",
+          "text": "Compre o silêncio do mensageiro e elimine as cópias.",
+          "formula": "G:-10,C:-20,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_inform_2",
+          "title": "Cobrar pela segunda lista",
+          "text": "Vender novamente os nomes restantes.",
+          "formula": "G:22,C:15,FC:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_inform_3",
+          "title": "Financiar fugas",
+          "text": "Transforme parte da recompensa em passagens clandestinas.",
+          "formula": "G:-18,C:-35,FS:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_inform_4",
+          "title": "Prender o sacerdote",
+          "text": "Entregue o último defensor da lista aos inquisidores.",
+          "formula": "G:20,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_inform_5",
+          "title": "Profanar o cadastro",
+          "text": "Consagre os nomes ao ídolo submerso.",
+          "formula": "D:8,C:30,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_ref_pilot",
+      "title": "O Recado da Navegadora",
+      "group": "ecos",
+      "place": "Santuário de Deméter",
+      "lore": "Duas cartas foram deixadas na capela: uma rota rápida e a estrada até a família da navegadora.",
+      "source": "eco adaptado",
+      "trigger": "Refugiados → Pedir guia",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_ref_pilot_1",
+          "title": "Seguir a passagem secreta",
+          "text": "Atravessar correntes ocultas usando o mapa.",
+          "formula": "S:12,C:8",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_pilot_2",
+          "title": "Devolver a carta",
+          "text": "Entregar aos familiares o último vestígio do destino dela.",
+          "formula": "H:18,C:-10,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_pilot_3",
+          "title": "Compartilhar as cartas",
+          "text": "Repassar as rotas seguras aos refugiados.",
+          "formula": "G:-5,R:18,FS:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_pilot_4",
+          "title": "Vender a navegação à Corte",
+          "text": "Entregar todas as passagens secretas aos fiscais.",
+          "formula": "G:28,C:22,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_ref_pilot_5",
+          "title": "Apagar os faróis",
+          "text": "Deixar as rotas à mercê dos cultistas.",
+          "formula": "D:8,C:25,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_convoy_hide",
+      "title": "O Preço da Carga Escondida",
+      "group": "ecos",
+      "place": "Cemitério de Naus",
+      "lore": "O naufrágio guarda a segunda metade da carga que você ajudou a ocultar. Fiscalização se aproxima.",
+      "source": "eco adaptado",
+      "trigger": "Carga → Esconder carga",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_convoy_hide_1",
+          "title": "Entregar o restante",
+          "text": "Conclua o negócio sob risco de perseguição.",
+          "formula": "G:20,C:10,FS:5",
+          "kind": "acordo",
+          "faction": "sobreviventes",
+          "alert": "Perseguição feérica"
+        },
+        {
+          "id": "echo_convoy_hide_2",
+          "title": "Destruir as provas",
+          "text": "Queime os barris e aproveite madeira limpa.",
+          "formula": "H:15,C:-15,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_hide_3",
+          "title": "Oferecer a carga aos rebeldes",
+          "text": "Financie portos de refúgio com a carga restante.",
+          "formula": "G:-10,C:-10,FS:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_hide_4",
+          "title": "Abater a patrulha",
+          "text": "Tome o carregamento e destrua os navios fiscais.",
+          "formula": "H:-15,G:28,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": "Confronto direto"
+        },
+        {
+          "id": "echo_convoy_hide_5",
+          "title": "Afundar os contrabandistas",
+          "text": "Venda os destroços e desapareça com a mercadoria.",
+          "formula": "G:36,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_convoy_report",
+      "title": "Os Restos da Fiscalização",
+      "group": "ecos",
+      "place": "Cemitério de Naus",
+      "lore": "Após a denúncia, há mortos entre inocentes. Os registros de fiscalização estão no fundo do mar.",
+      "source": "eco adaptado",
+      "trigger": "Carga → Denunciar comboio",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_convoy_report_1",
+          "title": "Resgatar as provas",
+          "text": "Revele rotas utilizadas por uma fiscalização criminosa.",
+          "formula": "R:22,C:-8,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_report_2",
+          "title": "Apagar as marcas da Corte",
+          "text": "Retire os cofres e esconda as ordens oficiais.",
+          "formula": "G:22,C:18,FC:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_report_3",
+          "title": "Reparar os barcos civis",
+          "text": "Invista em recuperar o casco dos sobreviventes.",
+          "formula": "G:-10,H:15,FS:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_report_4",
+          "title": "Saquear os restos",
+          "text": "Retire dos mortos o que puder carregar.",
+          "formula": "G:34,C:22,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_report_5",
+          "title": "Contaminar os restos",
+          "text": "Alimente uma maré de espectros para fortalecer os canhões.",
+          "formula": "D:12,C:32,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_convoy_charts",
+      "title": "As Cartas dos Afogados",
+      "group": "ecos",
+      "place": "Cemitério de Naus",
+      "lore": "As rotas clandestinas conduzem a uma nau perdida e a portos apagados da memória.",
+      "source": "eco adaptado",
+      "trigger": "Carga → Comprar cartas",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_convoy_charts_1",
+          "title": "Decifrar a passagem",
+          "text": "Descubra uma corrente navegável em mar aberto.",
+          "formula": "S:10,C:8",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_charts_2",
+          "title": "Revender as cartas",
+          "text": "Venda o conhecimento ao maior comprador.",
+          "formula": "G:24,FC:5",
+          "kind": "acordo",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_charts_3",
+          "title": "Divulgar as rotas",
+          "text": "Compartilhe os caminhos com os portos livres.",
+          "formula": "G:-5,R:18,FS:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_charts_4",
+          "title": "Roubar a nau cartográfica",
+          "text": "Tome os mapas de uma comunidade de navegadores.",
+          "formula": "G:32,C:22,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_convoy_charts_5",
+          "title": "Rasgar a geografia",
+          "text": "Queime os mapas para abrir passagem ao abismo.",
+          "formula": "D:8,C:25,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_ritual_free",
+      "title": "A Vigília dos Cativos",
+      "group": "ecos",
+      "place": "Mosteiro Tortle",
+      "lore": "Os libertos chegaram ao mosteiro. Os monges pedem que sejam protegidos da resposta do Culto.",
+      "source": "eco adaptado",
+      "trigger": "Liturgia → Libertar prisioneiros",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_ritual_free_1",
+          "title": "Proteger os cativos",
+          "text": "Aceite os votos dos monges e ajude a organizar a defesa.",
+          "formula": "H:20,C:-15,FS:8",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_free_2",
+          "title": "Ouvir os sonhos",
+          "text": "Use os relatos dos cativos para localizar canais antigos.",
+          "formula": "R:20,C:10,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_free_3",
+          "title": "Treinar os libertos",
+          "text": "Partilhe técnicas de defesa e aprenda as manobras deles.",
+          "formula": "G:-8,T:10,FS:10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_free_4",
+          "title": "Entregar os fugitivos",
+          "text": "Venda a localização do mosteiro à Corte.",
+          "formula": "G:30,C:24,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_free_5",
+          "title": "Devolver os cativos ao ídolo",
+          "text": "Troque a liberdade dos prisioneiros por poder.",
+          "formula": "D:12,C:35,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_ritual_powder",
+      "title": "A Fumaça Tem Voz",
+      "group": "ecos",
+      "place": "Mosteiro Tortle",
+      "lore": "A pólvora roubada sussurra nos porões. Os monges podem silenciá-la ou permitir que ela ensine outra salva.",
+      "source": "eco adaptado",
+      "trigger": "Liturgia → Roubar pólvora",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_ritual_powder_1",
+          "title": "Apaziguar a pólvora",
+          "text": "Pague um rito para reduzir a corrupção das chamas.",
+          "formula": "G:-10,C:-20,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_powder_2",
+          "title": "Escutar a pólvora",
+          "text": "Deixe que as vozes aprimorem o poder de fogo.",
+          "formula": "D:7,C:20,FD:5",
+          "kind": "acordo",
+          "faction": "culto",
+          "alert": "Cultistas reconhecem sua marca"
+        },
+        {
+          "id": "echo_ritual_powder_3",
+          "title": "Isolar o barril",
+          "text": "Invista em blindagem ritual para manter a pólvora contida.",
+          "formula": "G:-10,H:15,C:-10",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_powder_4",
+          "title": "Roubar o acervo do mosteiro",
+          "text": "Tome os manuscritos e cobre pelo silêncio dos monges.",
+          "formula": "G:25,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_powder_5",
+          "title": "Acender o círculo de sal",
+          "text": "Realize um segundo ritual com os barris profanados.",
+          "formula": "D:15,C:35,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    },
+    {
+      "id": "echo_ritual_pact",
+      "title": "A Âncora do Pacto",
+      "group": "ecos",
+      "place": "Mosteiro Tortle",
+      "lore": "O sino do mosteiro soa sem vento. Os monges sabem como aliviar o vínculo, mas o mar oferece atalhos.",
+      "source": "eco adaptado",
+      "trigger": "Liturgia → Pacto das marés",
+      "note": "Evento de segunda etapa: só surge em uma rota onde a escolha anterior correspondente aconteceu.",
+      "options": [
+        {
+          "id": "echo_ritual_pact_1",
+          "title": "Aliviar o vínculo",
+          "text": "Pague pelos cânticos que reduzem o peso ritual.",
+          "formula": "G:-10,C:-25,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_pact_2",
+          "title": "Aprofundar o pacto",
+          "text": "As velas respiram contra o vento da costa.",
+          "formula": "S:12,C:20,FD:10",
+          "kind": "acordo",
+          "faction": "culto",
+          "alert": "Devotos perseguem o novo sinal"
+        },
+        {
+          "id": "echo_ritual_pact_3",
+          "title": "Romper a corrente",
+          "text": "Quebre parte do vínculo à força e ganhe novo controle do leme.",
+          "formula": "H:-10,T:10,C:-20,FS:5",
+          "kind": "serviço",
+          "faction": "",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_pact_4",
+          "title": "Subjugar os monges",
+          "text": "Tome o claustro e negocie as cartas com a Corte.",
+          "formula": "G:30,C:25,FC:10",
+          "kind": "violência",
+          "faction": "corte",
+          "alert": ""
+        },
+        {
+          "id": "echo_ritual_pact_5",
+          "title": "Enraizar o ídolo",
+          "text": "Abra um nicho para Dagon na fundação do templo.",
+          "formula": "D:15,C:35,FD:10",
+          "kind": "violência",
+          "faction": "culto",
+          "alert": ""
+        }
+      ]
+    }
+  ]
+}
