@@ -1,0 +1,284 @@
+/* O MAR DE SANGUE — Porto compact mobile (29 Oct 2026).
+ * Loaded AFTER the canonical Porto + Maré Negra styles: mobile overrides must
+ * win the cascade. Gameplay canvas, Phaser HUD and desktop remain untouched.
+ * Covers phones in portrait AND landscape (coarse pointer up to 1024px).
+ */
+@media (max-width:780px), (hover:none) and (pointer:coarse) and (max-width:1024px) {
+  .port-ui {
+    font-size:12px;
+    line-height:1.34;
+    -webkit-text-size-adjust:100%;
+    text-size-adjust:100%;
+  }
+  .port-ui .port-container {
+    padding:8px 10px max(10px,env(safe-area-inset-bottom));
+    gap:8px;
+  }
+  .port-ui .port-layout {gap:9px}
+  .port-ui .port-layout--home {grid-template-columns:minmax(0,1fr)}
+  .port-ui .port-aside {display:none}
+  .port-ui .port-center {gap:8px}
+  .port-ui .port-top {
+    padding:2px 0 7px;
+    gap:7px;
+    min-height:42px;
+  }
+  .port-ui .port-top__brand {gap:7px;min-width:0}
+  .port-ui .port-top__brand>div {min-width:0}
+  .port-ui .port-top__sigil {width:30px;height:30px;flex:none;font-size:18px}
+  .port-ui .port-top__title {
+    display:block;
+    font-size:clamp(12px,2.45vw,16px);
+    line-height:1.15;
+    letter-spacing:.055em;
+    overflow-wrap:anywhere;
+  }
+  .port-ui .port-eyebrow {font-size:8px;letter-spacing:.09em;line-height:1.25}
+  .port-ui .port-top__right {gap:5px;flex-shrink:0}
+  .port-ui .port-top__coins {font-size:10px;letter-spacing:0}
+  .port-ui .port-top__coins span {font-size:12px}
+  .port-ui .port-mini {
+    min-height:44px;
+    font-size:10px!important;
+    padding:5px 8px;
+    letter-spacing:0;
+    white-space:normal;
+    max-width:115px;
+    line-height:1.15;
+  }
+  /* Hero is a banner, not half a phone screen. */
+  .port-ui .port-hero,
+  .theme-mare-negra .port-hero {
+    height:clamp(112px,18vh,154px);
+    min-height:112px;
+  }
+  .port-ui .port-hero__copy,
+  .theme-mare-negra .port-hero__copy {margin-left:15px;width:65%}
+  .port-ui .port-hero h1,
+  .theme-mare-negra .port-hero h1 {
+    font-size:clamp(25px,5.2vw,39px);
+    line-height:.95;
+    letter-spacing:.035em;
+    margin:3px 0 5px;
+  }
+  .port-ui .port-hero p,
+  .theme-mare-negra .port-hero p {font-size:11px;line-height:1.3}
+  .port-ui .port-hero__ship,
+  .theme-mare-negra .port-hero__ship {
+    width:40%;
+    height:96%;
+    top:2%;
+    right:-4%;
+  }
+  .port-ui .port-section-label {font-size:9px;padding:2px 4px;gap:8px}
+  .port-ui .port-section-label span:last-child {font-size:12px}
+  .port-ui .port-actions {gap:6px;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .port-ui .port-choice,
+  .theme-mare-negra .port-choice {
+    min-height:48px;
+    padding:6px 20px 6px 8px;
+    gap:7px;
+  }
+  .port-ui .port-choice::before,
+  .theme-mare-negra .port-choice::before {inset:3px}
+  .port-ui .port-choice__icon {
+    flex:0 0 25px;
+    width:25px;
+    height:28px;
+    font-size:15px;
+  }
+  .port-ui .port-choice__copy {gap:2px}
+  .port-ui .port-choice__copy strong,
+  .theme-mare-negra .port-choice__copy strong {
+    font-size:11px;
+    line-height:1.2;
+    letter-spacing:.03em;
+    overflow-wrap:anywhere;
+  }
+  .port-ui .port-choice__copy small,
+  .theme-mare-negra .port-choice__copy small {font-size:9px;line-height:1.2}
+  .port-ui .port-choice__arrow,
+  .theme-mare-negra .port-choice__arrow {font-size:13px;right:6px}
+  .port-ui .port-actions .port-choice--contract {min-height:48px}
+  .port-ui .port-statbar>div {padding:5px 2px;gap:0}
+  .port-ui .port-statbar span {font-size:8px;letter-spacing:.045em}
+  .port-ui .port-statbar strong {font-size:16px;line-height:1.1}
+  .port-ui .port-bottom {font-size:9px;gap:5px;letter-spacing:.025em}
+  .port-ui .port-bottom__actions {gap:3px 6px}
+  .port-ui .port-bottom__actions .port-text-button {
+    min-height:40px;
+    padding:7px 6px;
+  }
+  .port-ui .port-text-button {font-size:10px!important;letter-spacing:0}
+  .port-ui .port-footer {gap:6px;padding:6px 0 0;font-size:9px}
+  .port-ui .port-sound {gap:4px}
+  .port-ui .port-sound__group {min-height:36px;padding:2px 3px;gap:3px;flex:1 1 142px}
+  .port-ui .port-sound__label,
+  .port-ui .port-sound__group .port-sound__label {font-size:9px;letter-spacing:0;min-width:0}
+  .port-ui .port-sound__volume {font-size:10px;min-width:25px}
+  .port-ui .port-sound button {
+    min-height:40px;
+    min-width:40px;
+    font-size:10px;
+    padding:5px 7px;
+    letter-spacing:0;
+  }
+  .port-ui .port-sound small {font-size:9px;max-width:none}
+  .port-ui .port-pad-hint,.port-ui .port-tabs__hint {font-size:9px;letter-spacing:.025em}
+  /* Shared subpages — Estaleiro, Diário, Contratos, Conselho, saves and results. */
+  .port-ui .port-page {gap:9px;padding-bottom:8px}
+  .port-ui .port-page__header {padding:10px 13px}
+  .port-ui .port-page__header::before,
+  .port-ui .port-page__header::after {top:5px;font-size:13px}
+  .port-ui .port-page h1,
+  .theme-mare-negra .port-page h1 {
+    font-size:clamp(19px,3.9vw,27px);
+    line-height:1.15;
+    letter-spacing:.035em;
+    overflow-wrap:anywhere;
+    margin:3px 0;
+  }
+  .port-ui .port-page__header p {font-size:11px;line-height:1.35}
+  .port-ui .port-page__balance {font-size:10px;margin-top:6px;letter-spacing:.05em}
+  .port-ui .port-page__balance strong {font-size:15px}
+  .port-ui .port-ship-evolution {padding:5px 7px;margin:6px auto 0;font-size:10px}
+  .port-ui .port-ship-evolution strong {font-size:14px}
+  .port-ui .port-page__header .port-ship-evolution p {font-size:10px;line-height:1.3}
+  .port-ui .port-tabs {gap:4px;padding:4px}
+  .port-ui .port-tabs button {
+    flex:1 1 90px;
+    min-height:44px;
+    padding:7px 5px;
+    font-size:10px;
+    letter-spacing:.02em;
+  }
+  .port-ui .port-upgrades {gap:8px;grid-template-columns:1fr}
+  .port-ui .port-upgrade {
+    grid-template-columns:38px minmax(0,1fr);
+    gap:5px 8px;
+    min-height:0;
+    padding:9px;
+  }
+  .port-ui .port-upgrade__symbol {width:36px;height:36px;font-size:20px}
+  .port-ui .port-upgrade__head span {font-size:9px;letter-spacing:.045em}
+  .port-ui .port-upgrade h2 {font-size:15px;line-height:1.2;margin:1px 0 2px}
+  .port-ui .port-upgrade p {font-size:11px;line-height:1.3;margin:0 0 4px}
+  .port-ui .port-upgrade__foot {gap:5px;padding-top:6px}
+  .port-ui .port-upgrade__foot>span {font-size:9px;letter-spacing:0}
+  .port-ui .port-upgrade__foot strong {font-size:14px}
+  .port-ui .port-upgrade__foot button {min-height:44px;padding:6px 11px;font-size:10px}
+  .port-ui .port-help-grid {grid-template-columns:1fr;gap:6px}
+  .port-ui .port-help {min-height:0;padding:8px 10px;gap:9px}
+  .port-ui .port-help__number {width:30px;height:33px;font-size:15px}
+  .port-ui .port-help h2 {font-size:13px;line-height:1.2;margin:0 0 3px}
+  .port-ui .port-help p {font-size:11px;line-height:1.35}
+  .port-ui .port-warning {padding:14px 12px;gap:8px}
+  .port-ui .port-warning__sigil {font-size:34px}
+  .port-ui .port-warning p {font-size:12px;line-height:1.4;margin:3px 0}
+  .port-ui .port-warning>strong {font-size:10px;letter-spacing:.06em}
+  .port-ui .port-warning__actions {gap:6px}
+  .port-ui .port-contracts h2 {font-size:15px;padding-top:8px;margin:3px 0 0}
+  .port-ui .port-restore__grid {padding:5px}
+  .port-ui .port-restore__row {font-size:10px;gap:3px;padding:5px 3px}
+  .port-ui .port-restore__row--head {font-size:9px}
+  .port-ui .port-restore__notice {font-size:11px!important}
+  .port-ui .port-restore__actions {gap:6px}
+  .port-ui .port-result-grid {gap:5px}
+  .port-ui .port-result-grid>div {padding:9px 5px;gap:3px}
+  .port-ui .port-result-grid span {font-size:9px;letter-spacing:.03em}
+  .port-ui .port-result-grid strong {font-size:18px}
+  .port-ui .port-result-actions {gap:6px}
+  .port-ui .port-chronicle {margin:6px 0 8px;padding:9px}
+  .port-ui .port-chronicle h2 {font-size:15px;margin-bottom:4px}
+  .port-ui .port-chronicle>p {font-size:11px;line-height:1.35;margin-bottom:6px}
+  .port-ui .port-chronicle ol {gap:4px}
+  .port-ui .port-chronicle li {padding:6px 8px;gap:3px}
+  .port-ui .port-chronicle li strong {font-size:11px}
+  .port-ui .port-chronicle li span {font-size:10px}
+  /* Faction council used to devote 170–190px PER image on mobile. */
+  .port-ui .port-council__grid {grid-template-columns:1fr;gap:9px}
+  .port-ui .port-council__current {font-size:10px}
+  .port-ui .port-faction-card {padding:11px;gap:5px}
+  .port-ui .port-faction-card__icon {font-size:22px}
+  .port-ui .port-faction-card h2 {font-size:16px;line-height:1.2}
+  .port-ui .port-faction-card p {font-size:11px;line-height:1.35}
+  .port-ui .port-faction-card__ship {height:104px}
+  .port-ui .port-faction-card__atlas {transform:scale(.58)}
+  .port-ui .port-faction-card__trial {min-height:0}
+  .port-ui .port-faction-card__trial strong {font-size:9px}
+  .port-ui .port-faction-card__meter {height:6px}
+  .port-ui .port-faction-card__tasks {font-size:10px;min-height:0}
+  .port-ui .port-faction-card__tasks>div {padding:2px 0}
+  .port-ui .port-faction-card__join {
+    min-height:44px;
+    font-size:11px;
+    padding:7px;
+  }
+  .port-ui .port-faction-card__reason {font-size:10px!important;min-height:0}
+  .port-ui .port-faction-card__active {font-size:11px;padding:8px 5px}
+  .port-ui .port-council__footer {margin:8px 0;padding:8px;gap:8px}
+  .port-ui .port-council__footer p {font-size:11px;line-height:1.35}
+  .port-ui .port-council__footer .port-choice {flex-basis:180px}
+  .port-ui .port-compare {gap:7px}
+  .port-ui .port-compare__row {font-size:10px;min-width:350px;gap:4px}
+  .port-ui .port-compare__warnings {font-size:11px;padding:8px}
+  .port-ui .port-compare>p {font-size:11px}
+  .port-ui .port-toast {font-size:11px;padding:8px 11px}
+  /* Keep accessibility's expanded-reading option but prevent 19–24px
+   * typography from defeating the phone layout again. */
+  .port-ui.port-ui--readable .port-choice__copy strong {font-size:13px;line-height:1.35}
+  .port-ui.port-ui--readable .port-choice__copy small {font-size:11px;line-height:1.35}
+  .port-ui.port-ui--readable .port-help p,
+  .port-ui.port-ui--readable .port-upgrade p {font-size:13px;line-height:1.4}
+  .port-ui.port-ui--readable .port-help h2 {font-size:15px}
+  .port-ui.port-ui--readable .port-upgrade__head span,
+  .port-ui.port-ui--readable .port-upgrade__foot>span {font-size:10px}
+  .port-ui.port-ui--readable .port-upgrade h2 {font-size:17px}
+  .port-ui.port-ui--readable .port-restore__row {font-size:11px;line-height:1.4}
+  .port-ui.port-ui--readable .port-restore__row--head {font-size:10px}
+  .port-ui.port-ui--readable .port-restore .port-warning p {font-size:13px;line-height:1.45}
+  .port-ui.port-ui--readable .port-restore__notice {font-size:12px!important}
+  .port-ui.port-ui--readable .port-statbar span,
+  .port-ui.port-ui--readable .port-result-grid span {font-size:10px}
+  .port-ui.port-ui--readable .port-section-label,
+  .port-ui.port-ui--readable .port-eyebrow {font-size:10px}
+  .port-ui.port-ui--readable .port-sound__label,
+  .port-ui.port-ui--readable .port-sound__group .port-sound__label,
+  .port-ui.port-ui--readable .port-sound button,
+  .port-ui.port-ui--readable .port-pad-hint {font-size:11px}
+  .port-ui.port-ui--readable .port-sound small,
+  .port-ui.port-ui--readable .port-bottom {font-size:10px}
+  .port-ui.port-ui--readable .port-page__header p {font-size:13px;line-height:1.4}
+  .port-ui.port-ui--readable .port-text-button {font-size:11px!important}
+  .port-ui.port-ui--readable .port-compare__row {font-size:12px;min-width:380px}
+  .port-ui.port-ui--readable .port-choice {min-height:50px}
+}
+/* Portrait phones: one column of SHORT actions, not one tall card per menu. */
+@media (max-width:420px) {
+  .port-ui .port-actions {grid-template-columns:1fr}
+  .port-ui .port-choice,
+  .theme-mare-negra .port-choice {min-height:46px}
+  .port-ui .port-top__sigil {display:none}
+  .port-ui .port-top__coins {display:none}
+  .port-ui .port-warning__actions,
+  .port-ui .port-restore__actions {grid-template-columns:1fr}
+  .port-ui .port-restore__row {font-size:10px}
+  .port-ui .port-hero,
+  .theme-mare-negra .port-hero {height:120px;min-height:120px}
+  .port-ui .port-hero h1,
+  .theme-mare-negra .port-hero h1 {font-size:30px}
+  .port-ui .port-result-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .port-ui .port-sound__group {flex:1 1 142px}
+}
+/* Phone landscape: retain two quick-action columns and limit the banner. */
+@media (hover:none) and (pointer:coarse) and (orientation:landscape) and (max-width:1024px) {
+  .port-ui .port-container {padding:6px 12px max(8px,env(safe-area-inset-bottom))}
+  .port-ui .port-hero,
+  .theme-mare-negra .port-hero {height:100px;min-height:100px}
+  .port-ui .port-actions {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .port-ui .port-upgrades,
+  .port-ui .port-help-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .port-ui .port-council__grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .port-ui .port-hero h1,
+  .theme-mare-negra .port-hero h1 {font-size:29px}
+}
