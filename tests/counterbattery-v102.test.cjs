@@ -89,5 +89,6 @@ c.ai.updateEnemies.call(world,.05);
 assert.doesNotMatch(e.label.text,/SALVA INTERROMPIDA/,'notice automatically clears');
 assert.equal(e.counterbatteryNoticeUntil,0);
 
-assert(fs.readFileSync('sw.js','utf8').includes('v102-counterbattery'));
+assert(Number(fs.readFileSync('sw.js','utf8').match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=102,
+ 'counterbattery stays cached in future PWA revisions');
 console.log('PASS V102: bounded interruption, immunity, bosses, lethal hits, live shot collision and label expiry');
