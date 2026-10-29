@@ -31,7 +31,8 @@ const {chromium}=require('playwright-core');
      if(!origin)throw Error('Original encounter absent: '+source);
      s.touchReset();s.islandDocked=true;s.islandSelected=origin;
      s.islandChoiceIndex=choiceIndex;s.islandOutcome='';s.islandError='';
-     const choice=SEA_POLITICAL_EVENTS.events[source].choices[choiceIndex];
+     s.gold=200; // deterministic voyage funds for percentage-based offerings
+     const choice=SEA_POLITICAL_EVENTS.encounter(s,origin).choices[choiceIndex];
      const accepted=SEA_ISLANDS.apply(s,choice);
      if(!accepted)throw Error('Original decision blocked: '+source);
      const site=s.islands.find(x=>x.politicalEcho?.source===source);
@@ -49,7 +50,7 @@ const {chromium}=require('playwright-core');
     },{source,choiceIndex});
     assert(result.visible,'the clue must be revealed to the player');
     assert.notEqual(result.siteId,result.originId);
-    assert.equal(result.options,3,source+': 2 decisions + return');
+    assert.equal(result.options,6,source+': five decisions + return');
     assert(result.labels.includes(result.title));
     assert(result.labels.some(s=>s.includes('QUAL SERÁ A SUA DECISÃO?')));
     await page.screenshot({path:path.join('port-artifacts',

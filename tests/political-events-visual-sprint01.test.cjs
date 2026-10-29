@@ -45,7 +45,7 @@ const {chromium}=require('playwright-core');
        return {options:s.islandOptions.length,
          labels:s.islandOverlay.list.filter(x=>x.type==='Text').map(x=>x.text)};
      },eventId);
-     assert.equal(before.options,4,label+' '+eventId+': 3 options and safe return');
+     assert.equal(before.options,6,label+' '+eventId+': five lab options and safe return');
      assert(before.labels.some(x=>x.includes('QUAL SERÁ A SUA DECISÃO?')));
      assert(before.labels.some(x=>x.startsWith('[')),
        label+' '+eventId+': disclose political beneficiary');

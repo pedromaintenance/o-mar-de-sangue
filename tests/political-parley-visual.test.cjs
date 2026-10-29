@@ -41,7 +41,7 @@ const {chromium}=require('playwright-core');
     const candidates=s.islands.filter(i=>i.kind==='parley');
     if(candidates.length!==1)throw Error('Expected exactly one parley island');
     const spot=candidates[0];
-    s.touchReset();s.islandDocked=true;
+    s.touchReset();s.gold=120;s.islandDocked=true;
     s.islandSelected=spot;s.islandChoiceIndex=0;s.islandOutcome='';s.islandError='';
     SEA_ISLANDS.render(s);
     const text=s.islandOverlay.list.filter(v=>v.type==='Text').map(v=>v.text);
@@ -49,12 +49,12 @@ const {chromium}=require('playwright-core');
       factions:s.politicalLedger,
       originalSave:localStorage.getItem('carcaca.mar-de-sangue.v4')};
    });
-   assert.equal(before.options,4,'3 faction choices + return');
+   assert.equal(before.options,6,'five political choices + return');
    assert(before.text.some(s=>s.includes('TRÊS BANDEIRAS')));
-   assert(before.text.some(s=>s.includes('Portomonte')));
+   assert(before.text.some(s=>s.includes('Corte Feérica')));
    assert(before.text.some(s=>s.includes('VENDER OS NOMES')));
    assert(before.text.some(s=>s.includes('ABRIGAR OS SOBREVIVENTES')));
-   assert(before.text.some(s=>s.includes('PÓLVORA DE DAEGON')));
+   assert(before.text.some(s=>s.includes('PÓLVORA RITUAL')));
    assert(before.text.some(s=>s.includes('[SOBREVIVENTES]')),
      'Political choice must disclose beneficiary before it is selected');
    assert(before.text.some(s=>s.includes('[CORTE FEÉRICA]')));
@@ -74,12 +74,12 @@ const {chromium}=require('playwright-core');
       visited:s.islandVisits.has(s.islandSelected.id),
       save:localStorage.getItem('carcaca.mar-de-sangue.v4')};
    });
-   assert.equal(after.deltaGold,60);
-   assert(after.deltaCurse>=0&&after.deltaCurse<=15);
+   assert.equal(after.deltaGold,30,'25% of the 120 on-board gold');
+   assert.equal(after.deltaCurse,20);
    assert.equal(after.ledger.corte,1);
    assert.equal(after.ledger.culto,0);assert.equal(after.ledger.sobreviventes,0);
    assert.equal(after.options,1);
-   assert(after.outcome.includes('agente feérico'));
+   assert(after.outcome.includes('consequências'));
    assert(after.visited);
    assert.equal(after.save,before.originalSave,'Voyage decision must not mutate persistent saves');
    await page.screenshot({path:path.join('port-artifacts',
@@ -95,7 +95,7 @@ const {chromium}=require('playwright-core');
       visited:s.islandVisits.size,choice:s.politicalChoice};
    });
    assert(result.closed&&result.overlayCleared&&result.goldSame);
-   assert.equal(result.choice,'tribute');
+   assert.equal(result.choice,'parley_2');
    const journal=await page.evaluate(()=>{
      const sc=game.scene.getScene('Game');
      const saved=localStorage.getItem('carcaca.mar-de-sangue.v4');
@@ -109,8 +109,8 @@ const {chromium}=require('playwright-core');
      'Captain journal must keep three original actions');
    assert(journal.labels.some(t=>t.includes('CRÔNICA POLÍTICA · 1 DECISÃO')));
    assert(journal.labels.some(t=>t.includes('TRÊS BANDEIRAS: VENDER OS NOMES')));
-   assert(journal.labels.some(t=>t.includes('+60 ouro · +15 maldição')));
-   assert.equal(journal.choice,'tribute','Diary cannot erase the political decision');
+   assert(journal.labels.some(t=>t.includes('+30 ouro · +20 maldição')));
+   assert.equal(journal.choice,'parley_2','Diary cannot erase the political decision');
    assert.equal(journal.save,before.originalSave,'Diary must not alter save');
    await page.screenshot({path:path.join('port-artifacts',
       'mare-negra-3-3b0-'+label+'-political-journal.png'),fullPage:true});
