@@ -7,6 +7,8 @@ on:
       - 'Game.js'
       - 'sw.js'
       - 'tests/counterbattery-v102.test.cjs'
+      - 'tests/faction-politics-v101.test.cjs'
+      - 'tests/gunnery-windup-3-8a.test.cjs'
       - '.github/workflows/counterbattery-v102.yml'
   pull_request:
     paths:
@@ -14,6 +16,8 @@ on:
       - 'Game.js'
       - 'sw.js'
       - 'tests/counterbattery-v102.test.cjs'
+      - 'tests/faction-politics-v101.test.cjs'
+      - 'tests/gunnery-windup-3-8a.test.cjs'
       - '.github/workflows/counterbattery-v102.yml'
 permissions:
   contents: read
