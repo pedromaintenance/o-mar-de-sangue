@@ -2154,8 +2154,12 @@ class Game extends Phaser.Scene {
                 }
             } else if (!hit && this.segmentNear(p.px, p.py, p.x, p.y, this.player.x, this.player.y, this.hullRadius)) {
                 hit = true;
-                const angleHit=SEA_POSITIONING.impact(
-                    p.damage,this.player.rotation,p.vx,p.vy);
+                // Orbes do Olho de Dagon sao magia, nao balas de canhao:
+                // nao ganham vantagem posicional artificial.
+                const angleHit=p.dagonEyeCurse?
+                    {damage:p.damage,zone:'broadside',multiplier:1}:
+                    SEA_POSITIONING.impact(
+                        p.damage,this.player.rotation,p.vx,p.vy);
                 const hurt=this.damageShip(angleHit.damage,p.x,p.y,'cannon');
                 if(hurt && angleHit.zone==='stern' &&
                    this.time.now-(this.lastSternWarningAt??-Infinity)>=2500){
