@@ -750,6 +750,7 @@ const SEA_PORT_UI = {
       ['NAVEGAÇÃO','W / ↑ acelerar · S / ↓ frear / ré · A/D ou ←/→ virar · Durante a preparação, a velocidade cai (mais com ambos os bordos). Escoras amortecem o recuo.'],
       ['CANHÕES','SEGURE Q/E ou ESPAÇO até a salva sair (2 s no início). Soltar antes CANCELA. Segurar após o tiro não recarrega: solte e pressione novamente.'],
       ['CONTRABATERIA','Acerte os navios comuns nos 40% finais de sua preparação para interromper a salva. Cada alvo só pode ser interrompido uma vez a cada 5 s. Chefes e monstros são imunes.'],
+      ['ÂNGULO DE IMPACTO','Projéteis na popa causam +20% de dano; acertar a proa causa 10% a menos. Vale para o seu navio também. Navios-chefes têm bônus reduzidos (+10% / −5%). Monstros não possuem zonas de casco.'],
       ['CONTROLE XBOX','Analógico esquerdo · LT/LB ou RT/RB seguram os canhões · X dá IMPULSO · A confirma · B retorna'],
       ['IMPULSO NAVAL','R no teclado, X no Xbox, ou botão IMPULSO na tela. Arrancada curta para atacar/fugir; recarga começa em 10s e aproxima-se de 2s com Mestres da Arrancada. Cancela o preparo dos canhões; não concede invulnerabilidade.'],
       ['DIÁRIOS E ENCONTROS','Em pausa, ilhas e Carta: setas / direcional para escolher, Enter / A para confirmar, ESC / B para voltar. Pausa: ESC / P / Menu. Carta: M / View. Atracação: F / A / toque.'],
