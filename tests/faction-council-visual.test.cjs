@@ -35,7 +35,7 @@ const {chromium}=require('playwright-core');
    assert.equal(joined.allegiance,'culto');
    assert.equal(joined.levels,baseline,'joining must preserve upgrade levels');
    await page.screenshot({path:path.join('port-artifacts','factions-'+label+'-dagon.png')});
-   await page.locator('[data-action="menu"]').click();
+   await page.locator('.port-council__footer [data-action="menu"]').click();
    await page.locator('[data-action="mission"]').click();
    await page.waitForFunction(()=>game.scene.isActive('Game')&&!!game.scene.getScene('Game').player,
       {timeout:25000});
