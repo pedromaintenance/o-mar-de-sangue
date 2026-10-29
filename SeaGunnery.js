@@ -27,6 +27,20 @@ const SEA_GUNNERY = Object.freeze({
     return power*Math.exp(-Math.max(0,Number(braces)||0)/11)/
       Math.sqrt(Math.max(.7,Number(mass)||1));
   },
+  // Contrabateria: tiros certeiros desorganizam a salva de navios comuns.
+  // A janela comeca em 60% da preparacao e cada casco so pode sofrer
+  // uma interrupcao a cada cinco segundos, sem bloqueio permanente.
+  // Chefes, monstros e arietes conservam suas regras proprias.
+  counterbatteryReady(enemy, now, requiredMs) {
+    if(!enemy || enemy.dead || enemy.isMonster || enemy.boss ||
+       enemy.pattern==='ram' || !(enemy.hp>0) || !Number.isFinite(now) ||
+       !Number.isFinite(requiredMs) || requiredMs<=0)return false;
+    const held=Number(enemy.chargeMs);
+    if(!Number.isFinite(held) || held<requiredMs*.60)return false;
+    const last=Number.isFinite(enemy.lastCounterbatteryAt)
+      ? enemy.lastCounterbatteryAt : -Infinity;
+    return now-last>=5000;
+  },
   ready(heldMs,requiredMs,now,lastShot,reload) {
     return heldMs>=requiredMs &&
       Number.isFinite(now) && now-lastShot>=reload;

@@ -29,7 +29,8 @@ assert(game.includes("Math.floor((t*10+loot.phase)%8)"),'coin rotates at 10 FPS 
 assert(game.includes("loot.coinSprite.setFrame(frame)"),'update coin frame');
 assert(game.includes("loot.coinFrame!==frame"),'avoid redundant frame changes');
 assert(game.includes("const kind=fromEnemy?'treasure-chest'"),'enemies still drop chests');
-assert(game.includes("this.gold = SEA_MATH.safe(this.gold + t.value)"),'gold unchanged');
+assert(/this\.gold = SEA_MATH\.safe\(this\.gold \+\s*SEA_FACTION_POLITICS\.treasure\(this,t\.value\)\)/.test(game),
+ 'pickup keeps its value and applies the established Court faction bonus');
 assert(game.includes("t.coin.destroy(); this.burst("),'collection destroys coin');
 assert(game.includes("this.load.image('treasure-crate'"),'crate still static');
 assert(game.includes("this.load.spritesheet('treasure-chest'"),'floating chest still animated');

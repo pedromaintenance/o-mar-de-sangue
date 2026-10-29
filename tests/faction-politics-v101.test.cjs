@@ -115,5 +115,6 @@ assert(source.port.includes("data-action=\"faction:"));
 assert(source.port.includes("this.button('contract:'+assignment[0]"));
 assert(source.html.includes('<script src="SeaFactionPolitics.js"></script>'));
 assert(source.sw.includes('"./SeaFactionPolitics.js"'));
-assert(source.sw.includes('v101-faction-political-consequences'));
+assert(Number(source.sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=101,
+  'V101 political rules persist in all newer offline cache generations');
 console.log('PASS V101: three bounded perks, allied patrol, provocation, deserter pursuer, faction commissions, contract exclusivity, PWA');
