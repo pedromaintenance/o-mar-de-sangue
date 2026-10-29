@@ -3,8 +3,10 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const src=fs.readFileSync('Game.js','utf8');
 const gun=fs.readFileSync('SeaGunnery.js','utf8');
+const positioning=fs.readFileSync('SeaPositioning.js','utf8');
 const c={};vm.createContext(c);
 vm.runInContext(gun+';this.gunnery=SEA_GUNNERY;',c);
+vm.runInContext(positioning+';this.positioning=SEA_POSITIONING;',c);
 const g=c.gunnery;
 const enemy=(overrides={})=>({
  type:'patrulha',pattern:'broadside',isMonster:false,boss:false,
