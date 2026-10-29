@@ -284,6 +284,11 @@ class SeaBoot extends Phaser.Scene {
             { frameWidth: 260, frameHeight: 360, spacing: 40, endFrame: 19 });
         for(const def of Object.values(SEA_FACTIONS.definitions))
             this.load.spritesheet(def.ship,def.atlas,{frameWidth:260,frameHeight:360,spacing:40,endFrame:19});
+        // Navio de nível 20 dos Sobreviventes: quatro quadros originais RGBA.
+        // O atlas de 20 evoluções continua intacto para os níveis 1–19.
+        this.load.spritesheet(SEA_FACTIONS.final20.texture,SEA_FACTIONS.final20.image,{
+            frameWidth:512,frameHeight:682,endFrame:3
+        });
         this.load.image('foe-sloop', 'assets/sprites/enemy_court_ship.png');
         this.load.image('foe-galleon', 'assets/sprites/enemy_galleon.png');
         this.load.image('foe-ram', 'assets/sprites/enemy_ram.png');
@@ -559,9 +564,17 @@ class Game extends Phaser.Scene {
         // Começa navegando rumo ao sul: a proa aparece para BAIXO na tela.
         // A física usa 0 = norte, por isso a imagem recebe π localmente.
         this.player = this.add.container(start.x, start.y).setDepth(20).setRotation(Math.PI);
-        const playerScale = (this.hullRadius * 2.25) / SEA_PLAYER_SHIP.frameHeight;
-        this.playerSprite = this.add.image(0, 0, SEA_FACTIONS.texture(this.profile),
-            SEA_PLAYER_SHIP.stage(this.profile.levels) - 1)
+        const playerStage=SEA_PLAYER_SHIP.stage(this.profile.levels);
+        const finalSurvivorTexture=SEA_FACTIONS.level20Texture(this.profile,playerStage);
+        this.playerShipAnimated=!!finalSurvivorTexture;
+        this.playerShipFrame=0;
+        // A escala usa a altura de UM quadro: colisão e raio permanecem iguais.
+        const playerFrameHeight=this.playerShipAnimated?SEA_FACTIONS.final20.frameHeight:
+            SEA_PLAYER_SHIP.frameHeight;
+        const playerScale=(this.hullRadius*2.25)/playerFrameHeight;
+        this.playerSprite = this.add.image(0, 0,
+            finalSurvivorTexture||SEA_FACTIONS.texture(this.profile),
+            this.playerShipAnimated?0:playerStage-1)
             .setScale(playerScale).setRotation(Math.PI);
         this.playerVisual = this.add.container(0, 0);
         this.playerVisual.add(this.playerSprite);
@@ -1284,6 +1297,13 @@ class Game extends Phaser.Scene {
         SEA_COMBAT.animate(this);
         // Throttled visual update. Physics uses unmodified player/enemy positions.
         const t=this.elapsed;
+        if(this.playerShipAnimated && this.playerSprite?.active){
+            const frame=Math.floor(t*SEA_FACTIONS.final20.fps)%SEA_FACTIONS.final20.frameCount;
+            if(frame!==this.playerShipFrame){
+                this.playerSprite.setFrame(frame);
+                this.playerShipFrame=frame;
+            }
+        }
         if(this.playerVisual) {
             this.recoilVisual=(this.recoilVisual||0)*Math.exp(-8*Math.max(0,Math.min(dt,.05)));
             this.playerVisual.x=this.recoilVisual;

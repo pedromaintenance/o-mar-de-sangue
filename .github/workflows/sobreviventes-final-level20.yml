@@ -1,0 +1,48 @@
+name: Survivor Golden Harvest — level 20 animation
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - SeaFactions.js
+      - SeaMenus.js
+      - PortUI.js
+      - sw.js
+      - assets/player/sobreviventes/navio_sobreviventes_nivel_20_animado.png
+      - assets/player/sobreviventes/navio_sobreviventes_nivel_20_preview.png
+      - tests/sobreviventes-final-level20.test.cjs
+      - .github/workflows/sobreviventes-final-level20.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - SeaFactions.js
+      - SeaMenus.js
+      - PortUI.js
+      - sw.js
+      - assets/player/sobreviventes/navio_sobreviventes_nivel_20_animado.png
+      - assets/player/sobreviventes/navio_sobreviventes_nivel_20_preview.png
+      - tests/sobreviventes-final-level20.test.cjs
+permissions:
+  contents: read
+jobs:
+  survivors-final:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source and art
+        run: |
+          node --check Game.js
+          node --check SeaFactions.js
+          node --check SeaMenus.js
+          node --check PortUI.js
+          node tests/sobreviventes-final-level20.test.cjs
+          node tests/sobreviventes-assets.test.cjs
+      - name: Progression, faction and cache regression
+        run: |
+          node tests/faction-council-v100.test.cjs
+          node tests/player-ship-20-stages.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+          node tests/port-ui-rebuild.test.cjs

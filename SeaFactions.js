@@ -4,6 +4,14 @@
  */
 const SEA_FACTIONS = {
   threshold:40,
+  // A colheita dourada só aparece com TODOS os quinze aprimoramentos
+  // no estágio visual 20 e com a bandeira dos Sobreviventes.
+  final20:Object.freeze({
+    texture:'player-ship-survivors-final',
+    image:'assets/player/sobreviventes/navio_sobreviventes_nivel_20_animado.png',
+    preview:'assets/player/sobreviventes/navio_sobreviventes_nivel_20_preview.png',
+    frameWidth:512,frameHeight:682,frameCount:4,fps:4
+  }),
   ids:['sobreviventes','corte','culto'],
   definitions:{
     sobreviventes:{
@@ -55,6 +63,14 @@ const SEA_FACTIONS = {
   },
   faction(s){return this.ids.includes(s?.faction?.allegiance)?s.faction.allegiance:null;},
   texture(profile){return this.definitions[this.faction(profile)]?.ship||'player-ship-stages';},
+  level20Texture(profile,stage){
+    return this.faction(profile)==='sobreviventes' && stage===20 ?
+      this.final20.texture : null;
+  },
+  visualPreview(faction,stage){
+    return faction==='sobreviventes' && stage===20 ?
+      this.final20.preview : this.preview(faction,stage);
+  },
   preview(faction,stage){
     const def=this.definitions[faction];if(!def)return '';
     const n=Math.max(1,Math.min(20,Math.floor(stage||1)));
