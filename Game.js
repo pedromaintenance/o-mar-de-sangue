@@ -895,6 +895,8 @@ class Game extends Phaser.Scene {
         enemy.visualPhase = id * 1.39;
         enemy.isMonster = supernatural;
         enemy.chargeMs=0;enemy.chargeStage=0;
+        enemy.lastCounterbatteryAt=-Infinity;
+        enemy.counterbatteryNoticeUntil=0;
         enemy.wake = this.add.image(pos.x,pos.y,supernatural ? 'fx-violet-0' : 'fx-foam-0')
             .setDepth(13).setAlpha(0).setScale(supernatural ? 2.2 : 1.35);
         enemy.flashUntil = 0;
@@ -1856,8 +1858,12 @@ class Game extends Phaser.Scene {
                     const stage=Math.floor(e.chargeMs/duration*4);
                     if(stage!==e.chargeStage){
                         e.chargeStage=stage;
-                        e.label?.setText(SEA_FOES[e.type].name+
-                            (stage>0?' · '+Math.min(100,stage*25)+'%':''));
+                        // A mensagem de contrabateria permanece legivel
+                        // mesmo se a proxima preparacao ja tiver comecado.
+                        if(!e.counterbatteryNoticeUntil ||
+                           (this.time?.now??0)>=e.counterbatteryNoticeUntil)
+                            e.label?.setText(SEA_FOES[e.type].name+
+                                (stage>0?' · '+Math.min(100,stage*25)+'%':''));
                     }
                     if(e.chargeMs>=duration&&e.cooldown<=0){
                         this.enemyFire(e,distance);
@@ -1875,6 +1881,15 @@ class Game extends Phaser.Scene {
                 e.heading += Math.sin(this.elapsed + e.id) * dt * .2;
                 e.vx += Math.sin(e.heading) * 95 * dt;
                 e.vy -= Math.cos(e.heading) * 95 * dt;
+            }
+            // Restaura a etiqueta normal sem deixar avisos presos
+            // quando o alvo sai do alcance ou interrompe seu ataque.
+            if(e.counterbatteryNoticeUntil &&
+               (this.time?.now??0)>=e.counterbatteryNoticeUntil){
+                e.counterbatteryNoticeUntil=0;
+                const stage=e.chargeStage||0;
+                e.label?.setText(SEA_FOES[e.type].name+
+                    (stage>0?' · '+Math.min(100,stage*25)+'%':''));
             }
             SEA_WEATHER.enemyCurrent(this, e, dt);
             const drag = Math.exp(-1.25 * dt);
@@ -2105,6 +2120,18 @@ class Game extends Phaser.Scene {
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; SEA_FACTION_POLITICS.provoke(e);
                         e.hp = Math.max(0, e.hp - p.damage);
+                        // Um impacto durante os ultimos 40% do preparo
+                        // interrompe a proxima salva de um navio nao-chefe.
+                        // A verificacao ocorre apos o dano: nao mostra aviso
+                        // se o tiro ja afundou a embarcacao.
+                        const gunWindup=SEA_GUNNERY.chargeMs(Math.max(0,
+                            (this.currentDifficulty-1)*.5));
+                        if(SEA_GUNNERY.counterbatteryReady(e,this.time.now,gunWindup)){
+                            e.chargeMs=0;e.chargeStage=0;
+                            e.lastCounterbatteryAt=this.time.now;
+                            e.counterbatteryNoticeUntil=this.time.now+650;
+                            e.label?.setText(SEA_FOES[e.type].name+' · SALVA INTERROMPIDA');
+                        }
                         if(e.sandboxSentinel) this.summonSandboxKraken(e);
                         if(e.sandboxDagonEye) this.summonSandboxDagon(e);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
