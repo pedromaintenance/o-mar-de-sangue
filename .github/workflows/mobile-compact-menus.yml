@@ -1,0 +1,44 @@
+name: Compact Mobile Porto — responsive menu QA
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'PortMobileCompact.css'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/mobile-compact-menus.test.cjs'
+      - '.github/workflows/mobile-compact-menus.yml'
+  pull_request:
+    paths:
+      - 'PortMobileCompact.css'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/mobile-compact-menus.test.cjs'
+      - '.github/workflows/mobile-compact-menus.yml'
+permissions:
+  contents: read
+jobs:
+  mobile-menu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source, theme and PWA regressions
+        run: |
+          node --test tests/port-ui-rebuild.test.cjs tests/port-theme-abyss.test.cjs tests/pwa-cache-contract.test.cjs tests/port-controller-navigation.test.cjs
+      - run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Exercise real Porto on mobile portrait/landscape and desktop
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/mobile-compact.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/mobile-compact-menus.test.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-compact-menu-screenshots
+          path: port-artifacts/mobile-compact-*.png
+          if-no-files-found: ignore
