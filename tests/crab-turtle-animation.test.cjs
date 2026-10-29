@@ -35,8 +35,9 @@ for(const item of cases){
  assert(preload.test(game),'Phaser must load 4 distinct original frames for '+item.type);
  assert(game.includes(item.type+":'"+item.key+"'"),'enemy spawns with correct animated texture');
  assert(game.includes("type==='"+item.type+"'"),'monster type referenced in Game.js');
- assert(game.includes(item.type+"'&& tex==='"+item.key+"' ? "+item.height),
-  'render size must use ONE frame height');
+ const sourceHPattern=new RegExp("type==='"+
+  item.type+"'\\s*&&\\s*tex==='"+item.key+"'\\s*\\?\\s*"+item.height);
+ assert(sourceHPattern.test(game),'render size must use ONE frame height');
  const start=visualMethod.indexOf("            if(e.type==='"+item.type+"'");
  const finish=visualMethod.indexOf("\n            if(",start+14);
  assert(start>=0&&finish>start,'live animation block missing for '+item.type);
@@ -45,14 +46,14 @@ for(const item of cases){
  const history=[];
  const e={type:item.type,visualPhase:0,
   ship:{texture:{key:item.key},setFrame(n){history.push(n);this.frame=n;}}};
- for(const time of [0,item.interval/1000,2*item.interval/1000,3*item.interval/1000,
-   4*item.interval/1000,5*item.interval/1000,6*item.interval/1000]){
+ for(const step of [0,1,2,3,4,5,6]){
+  const time=(step+.01)*item.interval/1000;
   animation(e,time);
  }
  assert.deepEqual(history,[0,1,2,3,2,1,0],
   item.type+': frames must animate 0-1-2-3-2-1 without changing AI');
  const oldCount=history.length;
- animation(e,6*item.interval/1000);
+ animation(e,(6+.01)*item.interval/1000);
  assert.equal(history.length,oldCount,'same frame must not be sent to GPU twice');
  assert.equal(e[item.field],0,'animation state stored per enemy');
 }
