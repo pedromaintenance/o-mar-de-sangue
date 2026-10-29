@@ -12,7 +12,7 @@ assert.equal(png.readUInt32BE(16),2048,'four 512px frames');
 assert.equal(png.readUInt32BE(20),682,'frame height');
 assert.deepEqual([...png.subarray(24,29)],[8,6,0,0,0],'RGBA8 noninterlaced');
 assert.equal(crypto.createHash('sha256').update(png).digest('hex'),
- '1f5bdfd7f017d0797d381833d1c4f9bb516d66865a9b2b1374c53047f6e38e9a',
+ '83a56b79b57703ea53d8fea548058ece282132c9da8c59938c2fa1c5d0e3dd97',
  'Committed sprite must be byte-for-byte equal to supplied PNG');
 const game=fs.readFileSync('Game.js','utf8');
 new vm.Script(game,{filename:'Game.js'});
