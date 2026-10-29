@@ -24,6 +24,9 @@ const t=ctx.transfer,save=t.saveKey,rollback=t.rollbackKey;
 const wrap=(profile=imported)=>JSON.stringify({format:'mar-de-sangue-captain-backup',
  schema:4,exportedAt:'2026-10-16T18:44:18.000Z',profile});
 const parsed=t.parse(wrap());
+const aligned={...imported,alignment:{sobreviventes:21,corte:0,culto:63}};
+assert.deepEqual(JSON.parse(JSON.stringify(t.parse(wrap(aligned)).profile)),aligned,
+ 'newer v4 saves must preserve all three alignments');
 assert.deepEqual(JSON.parse(JSON.stringify(parsed.profile)),imported);
 const oldV4={...imported,levels:Object.fromEntries(Object.entries(imported.levels).filter(([k])=>k!=='impulso'))};
 const migrated=t.parse(wrap(oldV4)).profile;
@@ -45,6 +48,8 @@ bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,gold:1.5}}),/Valo
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,mission:0}}),/Valor inválido/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,levels:{...imported.levels,casco:1000000}}}),/Nível inválido/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,evil:'code'}}),/campos exatos/);
+bad(wrap({...aligned,alignment:{sobreviventes:20,corte:4,culto:200}}),/Alinhamento fora do limite/);
+bad(wrap({...aligned,alignment:{sobreviventes:20,corte:4,evil:1}}),/Alinhamentos de facção inválidos/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,levels:{...imported.levels,evil:1}}}),/lista de melhorias/);
 bad(JSON.stringify({...JSON.parse(wrap()),profile:{...imported,mode:'evil'}}),/Modo/);
 bad(JSON.stringify({...JSON.parse(wrap()),nasty:true}),/Formato de backup/);

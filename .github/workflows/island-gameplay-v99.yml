@@ -8,6 +8,8 @@ on:
       - 'SeaPoliticalEvents.js'
       - 'Game.js'
       - 'index.html'
+      - 'SeaSaveTransfer.js'
+      - 'tests/save-restore-3-6c.test.cjs'
       - 'sw.js'
       - 'laboratorio-ilhas/**'
       - 'tests/island-gameplay-v99.test.cjs'
@@ -40,7 +42,8 @@ jobs:
           node --check SeaIslands.js
           node --check SeaPoliticalEvents.js
           node --check Game.js
+          node --check SeaSaveTransfer.js
       - name: Catalog math, political narrative, smoke and save regression
         run: |
-          node --test tests/island-gameplay-v99.test.cjs
+          node --test tests/island-gameplay-v99.test.cjs tests/save-restore-3-6c.test.cjs
           node --test tests/political-events-sprint01.test.cjs tests/political-echoes-sprint01b.test.cjs tests/island-destruction-smoke.test.cjs tests/pwa-cache-contract.test.cjs tests/laboratorio-ilhas-pages.test.cjs

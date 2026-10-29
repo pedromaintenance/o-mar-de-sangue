@@ -17,7 +17,11 @@ const SEA_SAVE_TRANSFER = {
       && Object.keys(value).every(key=>fields.includes(key));
   },
   profile(value) {
-    if(!this.sameKeys(value,this.profileFields))
+    // Accept canonical pre-alignment backups and newer v4 files with the
+    // optional three-field alignment object. Never accept arbitrary extras.
+    const withAlignment=[...this.profileFields,'alignment'];
+    if(!this.sameKeys(value,this.profileFields)&&
+       !this.sameKeys(value,withAlignment))
       throw Error('O arquivo não tem os campos exatos do save v4.');
     if(value.version!==4)throw Error('Apenas saves v4 são aceitos nesta versão.');
     if(!['mission','sandbox'].includes(value.mode))
@@ -44,11 +48,21 @@ const SEA_SAVE_TRANSFER = {
         throw Error('Nível inválido: '+id);
       levels[id]=level;
     }
+    if(Object.hasOwn(value,'alignment')){
+      if(!this.sameKeys(value.alignment,['sobreviventes','corte','culto']))
+        throw Error('Alinhamentos de facção inválidos.');
+      for(const key of ['sobreviventes','corte','culto']){
+        const n=value.alignment[key];
+        if(typeof n!=='number'||!Number.isSafeInteger(n)||n<0||n>100)
+          throw Error('Alinhamento fora do limite: '+key);
+      }
+    }
     const cleaned={version:4};
     for(const f of this.profileFields){
       if(f==='version')continue;
       cleaned[f]=f==='levels'?levels:value[f];
     }
+    if(value.alignment)cleaned.alignment={...value.alignment};
     return cleaned;
   },
   parse(text) {
@@ -90,8 +104,10 @@ const SEA_SAVE_TRANSFER = {
     const current=SeaProfile.load();
     // The game may read older saves with extra legacy metadata. Keep only
     // canonical v4 fields in the rollback, while retaining exact raw v4 bytes.
+    const previousFields=[...this.profileFields,
+      ...(current.alignment?['alignment']:[])];
     const previousProfile=this.profile(Object.fromEntries(
-      this.profileFields.map(field=>[field,current[field]])));
+      previousFields.map(field=>[field,current[field]])));
     const snapshot=JSON.stringify({
       format:'mar-de-sangue-pre-restore',schema:1,
       createdAt:new Date().toISOString(),previousProfile,previousRawV4:previous
