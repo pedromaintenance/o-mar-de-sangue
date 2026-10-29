@@ -81,8 +81,10 @@ const SEA_SAVE_TRANSFER={lastRollback:()=>null,clearRollback:()=>{},maxSize:2621
 const SEA_PERFORMANCE={enabled:false,mockReport:null,
   report(){return this.mockReport;},toggle(){this.enabled=!this.enabled;return this.enabled;}};
 const SEA_GAMEPAD={poll:()=>({connected:false})};
+// V101 political commissions are optional and absent in this old port smoke harness.
+const SEA_FACTION_POLITICS={commissions:{},allegiance(){return null;}};
 const context={document:doc,window:win,Phaser,Blob:BlobStub,URL:URLStub,setTimeout:fn=>fn(),
- SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_PERFORMANCE,SEA_UPGRADES:upgrades,localStorage};
+ SeaProfile,SEA_MATH,SEA_MUSIC,SEA_AUDIO,SEA_GAMEPAD,SEA_SAVE_TRANSFER,SEA_PERFORMANCE,SEA_UPGRADES:upgrades,SEA_FACTION_POLITICS,localStorage};
 vm.createContext(context);
 // Load the production evolution rule into this isolated PortUI test harness.
 const shipStart=game.indexOf('const SEA_PLAYER_SHIP = {');
