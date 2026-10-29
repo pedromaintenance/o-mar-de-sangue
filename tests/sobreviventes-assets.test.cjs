@@ -1,4 +1,4 @@
-/* Sobreviventes — assets only; 20 faction evolutions, no runtime modification. */
+/* Sobreviventes — preserve original 20-stage atlas and add separate animated final. */
 'use strict';
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
@@ -59,6 +59,5 @@ assert(!fs.existsSync(base+'referencia_final/'+m.level_20_reference));
 const game=fs.readFileSync('Game.js','utf8');
 assert(game.includes("assets/player/mar_de_sangue_navio_proa_baixo_20_evolucoes.png"),
  'Existing player ship remains the active default');
-assert(!game.includes("this.load.spritesheet('survivors-player'"),
- 'Faction ship integration is reserved for later gameplay work');
-console.log('PASS Sobreviventes: original atlas, original manifest, 20 lossless frame exports; no active ship change');
+assert(game.includes('SEA_FACTIONS.final20.texture'),'Level 20 animated texture is loaded independently');
+console.log('PASS Sobreviventes: original 20-stage atlas preserved; animated level 20 separate');

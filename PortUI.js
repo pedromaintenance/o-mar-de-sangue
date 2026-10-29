@@ -584,7 +584,7 @@ const SEA_PORT_UI = {
             '<p>O ouro compra aço.<br>O oceano cobra cada erro.</p>'+
           '</div>'+
           '<img class="port-hero__ship" src="'+
-            (p.faction?.allegiance?('./'+SEA_FACTIONS.preview(p.faction.allegiance,SEA_PLAYER_SHIP.stage(p.levels))):this.img('ship_flagship'))+
+            (p.faction?.allegiance?('./'+SEA_FACTIONS.visualPreview(p.faction.allegiance,SEA_PLAYER_SHIP.stage(p.levels))):this.img('ship_flagship'))+
             '" alt="Navio do capitão navegando pelas águas malditas">'+
           '<span class="port-hero__seal" aria-hidden="true">✦</span>'+
         '</section>'+
@@ -649,8 +649,11 @@ const SEA_PORT_UI = {
           '+7% de dano dos canhões · rituais geram 10% mais maldição')+'</p>'+
         '<div class="port-faction-card__ship"><div class="port-faction-card__atlas" role="img" '+
         'aria-label="Navio da facção '+this.text(def.label)+' no estágio '+level+'" '+
-        'style="background-image:url(./'+def.atlas+');background-position:-'+
-          (col*150)+'px -'+(row*200)+'px"></div></div>'+
+        (id==='sobreviventes'&&level===20 ?
+          'style="background-image:url(./'+SEA_FACTIONS.visualPreview(id,level)+
+          ');background-position:center;background-size:contain"' :
+          'style="background-image:url(./'+def.atlas+');background-position:-'+
+            (col*150)+'px -'+(row*200)+'px"')+'></div></div>'+
         '<p class="port-faction-card__trial"><strong>PROVA</strong> '+this.text(def.trial)+'</p>'+
         '<div class="port-faction-card__meter"><span style="width:'+Math.min(100,score)+'%"></span></div>'+
         '<div class="port-faction-card__tasks">'+tasks.map(([label,done])=>
