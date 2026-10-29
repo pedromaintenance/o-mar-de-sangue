@@ -13,7 +13,12 @@ const SEA_CONTRACTS = {
   }),
   init(s,id) {
     s.contract=null;
-    if(id==='hunt'){
+    const authorized=typeof SEA_FACTION_POLITICS!=='undefined'?
+      SEA_FACTION_POLITICS.commission(id,s.profile):null;
+    if(typeof SEA_FACTION_POLITICS!=='undefined'&&
+       Object.hasOwn(SEA_FACTION_POLITICS.commissions,id)&&!authorized)return false;
+    const base=authorized?.base||id;
+    if(base==='hunt'){
       const wrecks=s.islands.filter(i=>i.kind==='wreck');
       if(!wrecks.length)return false;
       const center={x:s.W/2,y:s.H/2};
@@ -22,10 +27,11 @@ const SEA_CONTRACTS = {
       s.contract={id:'hunt',clueId:clue.id,phase:'clue',completed:false,
         escaped:false,targetEnemyId:null,escapeAt:0,exitX:null,exitY:null,
         bounty:this.offers.hunt.bounty};
+      this.decorate(s,id,authorized);
       this.mark(s);
       return true;
     }
-    if(id==='smuggle'){
+    if(base==='smuggle'){
       const center={x:s.W/2,y:s.H/2};
       // Reuse known physical ruins, never generate a new unreachable site.
       const distance=i=>Math.hypot(i.x-center.x,i.y-center.y);
@@ -35,10 +41,11 @@ const SEA_CONTRACTS = {
       s.contract={id:'smuggle',destinationId:ruins[0].id,phase:'deliver',
         completed:false,intercepted:false,inspectorSpawned:false,
         suspicion:0,route:null,bounty:this.offers.smuggle.bounty};
+      this.decorate(s,id,authorized);
       this.mark(s);
       return true;
     }
-    if(id!=='rescue')return false;
+    if(base!=='rescue')return false;
     const center={x:s.W/2,y:s.H/2};
     const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
     const wrecks=s.islands.filter(i=>i.kind==='wreck');
@@ -49,8 +56,16 @@ const SEA_CONTRACTS = {
     const shelter=[...shelters].sort((a,b)=>dist(a,pickup)-dist(b,pickup)||a.id-b.id)[0];
     s.contract={id:'rescue',pickupId:pickup.id,shelterId:shelter.id,
       phase:'pickup',completed:false,bounty:this.offers.rescue.bounty};
+    this.decorate(s,id,authorized);
     this.mark(s);
     return true;
+  },
+  decorate(s,id,commission){
+    if(!commission||!s.contract)return;
+    s.contract.commission=commission.faction;
+    s.contract.commissionTitle=commission.title;
+    s.contract.bounty=SEA_FACTION_POLITICS.bounty(s.profile,id);
+    s.contract.commissionBounty=s.contract.bounty;
   },
   target(s) {
     const c=s.contract;
@@ -108,7 +123,7 @@ const SEA_CONTRACTS = {
       [{id:'rescue-pickup',contractAction:'pickup',name:'RECOLHER OS NÁUFRAGOS',
         hint:'Embarcar sobreviventes · depois buscar o santuário'}]:
       [{id:'rescue-deliver',contractAction:'deliver',name:'DESEMBARCAR SOBREVIVENTES',
-        hint:'Concluir o resgate · contrato de 125 ouro'}];
+        hint:'Concluir o resgate · '+c.bounty+' ouro'}];
   },
   update(s,dt) {
     const c=s.contract;
@@ -129,9 +144,11 @@ const SEA_CONTRACTS = {
     if(s.elapsed<6||!s.player||!delta)return;
     if(!c.inspectorSpawned){
       c.inspectorSpawned=true;
-      const inspector=s.spawnEnemy?.('patrulha',330)||
+      const inspector=s.spawnEnemy?.('patrulha',330,{forcedHostile:true})||
         s.enemies?.find(e=>!e.dead&&e.type==='patrulha');
       if(inspector){
+        if(typeof SEA_FACTION_POLITICS!=='undefined')
+          SEA_FACTION_POLITICS.provoke(inspector);
         inspector.smugglingInspector=true;
         s.announce?.('FISCAL DA CORTE NA MARÉ · EVITE A INSPEÇÃO');
       }
@@ -242,7 +259,10 @@ const SEA_CONTRACTS = {
         return false;
       }
       c.route=hidden?'hidden':'bribe';
-      c.bounty=hidden?190:115;
+      // The clandestine delivery is worth more than a Court bribe.
+      c.bounty=c.commission?
+        (hidden?c.commissionBounty:Math.round(c.commissionBounty*.61)):
+        (hidden?190:115);
       if(hidden){
         s.curse=Math.min(100,Math.max(0,(s.curse||0)+12));
         if(typeof SEA_WEATHER!=='undefined')SEA_WEATHER.announceTier(s);
@@ -250,9 +270,9 @@ const SEA_CONTRACTS = {
       c.completed=true;c.phase='complete';
       s.islandOutcome=hidden?
         'A pólvora desaparece pelas passagens da ruína.\n'+
-          'Entrega clandestina concluída · 190 ouro · +12 maldição.':
+          'Entrega clandestina concluída · prêmio conforme o contrato · +12 maldição.':
         'Os fiscais recebem sua parte e apagam o registro.\n'+
-          'A Corte tolera o tráfico por hoje · 115 ouro.';
+          'A Corte tolera o tráfico por hoje · prêmio reduzido.';
       s.chartWaypointId=null;
       s.islandVisits.add(target.id);s.islandChoiceIndex=0;s.islandError='';
       s.updateHUD?.();
@@ -270,7 +290,7 @@ const SEA_CONTRACTS = {
       c.completed=true;
       c.phase='complete';
       s.islandOutcome='Os náufragos desembarcam sob a proteção do santuário.\n'+
-        'Contrato cumprido: 125 ouro será pago ao retornar ao Porto.';
+        'Contrato cumprido: '+c.bounty+' ouro será pago ao retornar ao Porto.';
       s.chartWaypointId=null;
     }
     s.islandVisits.add(target.id);

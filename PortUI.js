@@ -175,7 +175,7 @@ const SEA_PORT_UI = {
     const profile=SeaProfile.load();
     scene.scene.start('Game',mode==='mission'?
       {mode:'mission',stage:profile.mission}:
-      {mode:'sandbox',...(['rescue','smuggle','hunt'].includes(contract)?{contract}:{})});
+      {mode:'sandbox',...((['rescue','smuggle','hunt'].includes(contract)||Object.hasOwn(SEA_FACTION_POLITICS.commissions,contract||''))?{contract}:{})});
   },
   notify(message) {
     if(!this.root)return;
@@ -253,7 +253,8 @@ const SEA_PORT_UI = {
       this.notify(result.ok?'A bandeira foi retirada. Uma expedição independente será exigida.':result.reason);
       return;
     }
-    if(name==='contract'&&['rescue','smuggle','hunt'].includes(id)){
+    if(name==='contract'&&(['rescue','smuggle','hunt'].includes(id)||
+        Object.hasOwn(SEA_FACTION_POLITICS.commissions,id))){
       if(scene.page!=='contracts')return;
       this.start('sandbox',id);return;
     }
@@ -642,6 +643,10 @@ const SEA_PORT_UI = {
         '<div class="port-faction-card__icon">'+def.sigil+'</div>'+
         '<h2>'+this.text(def.name)+'</h2>'+
         '<p>'+this.text(def.subtitle)+'</p>'+
+        '<p class="port-faction-card__perk">'+this.text(
+          id==='sobreviventes'?'+10% de cura nos templos · caçado pela Corte':
+          id==='corte'?'10% mais ouro recolhido · patrulhas comuns aliadas':
+          '+7% de dano dos canhões · rituais geram 10% mais maldição')+'</p>'+
         '<div class="port-faction-card__ship"><div class="port-faction-card__atlas" role="img" '+
         'aria-label="Navio da facção '+this.text(def.label)+' no estágio '+level+'" '+
         'style="background-image:url(./'+def.atlas+');background-position:-'+
@@ -674,12 +679,18 @@ const SEA_PORT_UI = {
   },
   contracts(){
     const rescue=SEA_CONTRACTS.offers.rescue,smuggle=SEA_CONTRACTS.offers.smuggle,
-      hunt=SEA_CONTRACTS.offers.hunt;
+      hunt=SEA_CONTRACTS.offers.hunt,profile=SeaProfile.load();
+    const politics=typeof SEA_FACTION_POLITICS!=='undefined'?SEA_FACTION_POLITICS:null;
+    const factionId=politics?.allegiance(profile);
+    const assignment=politics?Object.entries(politics.commissions)
+      .find(([id])=>politics.commission(id,profile)):null;
+    const commission=assignment?assignment[1]:null;
+    const commissionBounty=assignment?politics.bounty(profile,assignment[0]):0;
     return '<main class="port-page port-page--narrow port-contracts" id="port-main">'+
       '<section class="port-warning" role="region" aria-labelledby="port-contract-title">'+
       '<span class="port-eyebrow">PACTOS, FISCALIZAÇÃO E SOBREVIVÊNCIA</span>'+
       '<h1 id="port-contract-title">CONTRATOS DA COSTA SUL</h1>'+
-      '<p>Expedições independentes: não avançam missões ou reputação e preservam o save v4.</p>'+
+      '<p>Expedições independentes não avançam a campanha. Comissões de bandeira aumentam a confiança apenas quando concluídas.</p>'+
       '<h2>'+this.text(rescue.title)+'</h2><p>'+this.text(rescue.description)+'</p>'+
       '<p>PRÊMIO: <strong>'+this.num(rescue.bounty)+' OURO</strong> · após entrega em Deméter.</p>'+
       this.button('contract:rescue','ACEITAR RESGATE','Recolher e entregar sobreviventes','⚓','port-choice--primary')+
@@ -691,6 +702,14 @@ const SEA_PORT_UI = {
       '<h2>'+this.text(hunt.title)+'</h2><p>'+this.text(hunt.description)+'</p>'+
       '<p>PRÊMIO: <strong>'+this.num(hunt.bounty)+' OURO</strong> · somente se a presa for abatida antes da fuga.</p>'+
       this.button('contract:hunt','ACEITAR CAÇADA','Investigar uma pista e interceptar uma fragata fugitiva','⚔','')+
+      (commission?
+        '<h2>⚑ '+this.text(commission.title)+'</h2><p>'+
+          this.text(commission.desc)+'</p><p>COMISSÃO EXCLUSIVA · '+
+          '<strong>'+this.num(commissionBounty)+' OURO</strong> · +8 de confiança se concluída</p>'+
+          this.button('contract:'+assignment[0],'ACEITAR COMISSÃO DA BANDEIRA',
+            'Missão exclusiva para '+SEA_FACTIONS.definitions[factionId].label,
+            '⚑','port-choice--primary') :
+        '<h2>COMISSÕES DAS BANDEIRAS</h2><p>Preste juramento no Conselho para receber ordens próprias.</p>')+
       this.button('menu','VOLTAR AO PORTO','','←','')+
       '</section></main>';
   },

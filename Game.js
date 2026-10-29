@@ -467,12 +467,16 @@ class Game extends Phaser.Scene {
         this.mode = data?.mode || p.mode || 'mission';
         this.stage = data?.stage || p.mission || 1;
         this.wave = 1;
-        this.contractId = this.mode==='sandbox' && ['rescue','smuggle','hunt'].includes(data?.contract) ? data.contract : null;
+        this.contractId = this.mode==='sandbox' &&
+            (['rescue','smuggle','hunt'].includes(data?.contract) ||
+            Object.hasOwn(SEA_FACTION_POLITICS.commissions,data?.contract||'')) ?
+            data.contract : null;
     }
     create() {
         seaCenterCanvas(this.game);
         this.W = 4400; this.H = 3400;
         this.profile = SeaProfile.load(); this.shipStats = SeaProfile.stats(this.profile);
+        SEA_FACTION_POLITICS.shipStats(this);
         // Normaliza o atlas do chefe em runtime. A arte original tem 4 quadros
         // horizontais sem espaçamento, proa para baixo. Não afeta outros navios.
         if (!this.textures.exists('cult-barge-animated') && this.textures.exists('foe-cult')) {
@@ -775,7 +779,11 @@ class Game extends Phaser.Scene {
     }
     chooseFoe(seed = 0) {
         const rank = this.currentDifficulty;
-        const pool = ['patrulha', 'corsario', 'ariete'];
+        // Sworn survivors draw the Court's attention; Court captains still
+        // encounter independent pirates and can provoke friendly patrols.
+        const pool = SEA_FACTION_POLITICS.allegiance(this)==='sobreviventes' ?
+            ['patrulha','patrulha','corsario','ariete'] :
+            ['patrulha','corsario','ariete'];
         if (rank >= 2) pool.push('fragata');
         if (rank >= 3) pool.push('bombardeiro','enguia');
         if (rank >= 4) pool.push('espectral','afogados');
@@ -898,6 +906,7 @@ class Game extends Phaser.Scene {
             backgroundColor: '#131720bd', padding: { x: 2, y: 2 }
         }).setOrigin(.5).setDepth(24);
         this.enemies.push(enemy);
+        SEA_FACTION_POLITICS.markEnemy(this,enemy,options);
         if(type==='dagon') this.spawnDagonEyes(3);
         // O Senhor só invoca olhos ao perder integridade; diferente do Arauto.
         return enemy;
@@ -1535,6 +1544,7 @@ class Game extends Phaser.Scene {
             const ed = a.isPlayer ? db : da;
             const playerHit = this.damageShip(pd, hitX, hitY, 'ram');
             const enemy = a.isPlayer ? b : a;
+            SEA_FACTION_POLITICS.provoke(enemy);
             enemy.hp = Math.max(0, enemy.hp - Math.round(ed * this.shipStats.ramDamage));
             // Abalroar o tentáculo é atacá-lo; sofrer seu impacto é ser atingido.
             if (enemy.sandboxSentinel) this.summonSandboxKraken(enemy);
@@ -1751,6 +1761,7 @@ class Game extends Phaser.Scene {
         SEA_CONTRACTS.update(this,dt);
         if (this.ended) return;
         SEA_POLITICAL_EVENTS.update(this);
+        SEA_FACTION_POLITICS.desertion(this);
         if (this.ended) return;
         this.collectTreasures(dt);
         this.progressBattle(dt);
@@ -1764,6 +1775,8 @@ class Game extends Phaser.Scene {
         for (const e of this.enemies) {
             if (e.dead) continue;
             if(e.huntTarget&&SEA_CONTRACTS.evade(this,e,dt))continue;
+            // An allied Court patrol wanders peacefully unless provoked.
+            if(SEA_FACTION_POLITICS.neutralSail(this,e,dt))continue;
             const distance = Math.max(.01, Phaser.Math.Distance.Between(e.x, e.y, this.player.x, this.player.y));
             const aim = Math.atan2(this.player.x - e.x, -(this.player.y - e.y));
             const sideAngle = Phaser.Math.Angle.Wrap(aim - e.heading);
@@ -2090,7 +2103,8 @@ class Game extends Phaser.Scene {
                 for (const e of this.enemies) {
                     if (e.dead || (e.type==='olho_dagon' && e.eyeHidden)) continue;
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
-                        hit = true; e.hp = Math.max(0, e.hp - p.damage);
+                        hit = true; SEA_FACTION_POLITICS.provoke(e);
+                        e.hp = Math.max(0, e.hp - p.damage);
                         if(e.sandboxSentinel) this.summonSandboxKraken(e);
                         if(e.sandboxDagonEye) this.summonSandboxDagon(e);
                         if(e.ship?.active){e.ship.setTintFill(0xffe3b9);e.flashUntil=this.time.now+120;}
@@ -2138,7 +2152,8 @@ class Game extends Phaser.Scene {
                 t.coin.setPosition(t.x, t.y - 5);
             }
             if (Math.hypot(this.player.x - t.x, this.player.y - t.y) < Math.max(96, range + 16)) {
-                t.taken = true; this.gold = SEA_MATH.safe(this.gold + t.value);
+                t.taken = true; this.gold = SEA_MATH.safe(this.gold +
+                    SEA_FACTION_POLITICS.treasure(this,t.value));
                 t.coin.destroy(); this.burst(t.x,t.y,'gold',.75); this.splash(t.x,t.y,0xf9d77b,8);
                 SEA_AUDIO.play('gold', .65);
             }
@@ -2382,6 +2397,7 @@ class Game extends Phaser.Scene {
         let commission = 0;
         if (won && this.mode === 'mission') commission = Math.round(42 * Math.pow(1.25, Math.min(this.stage, 90)));
         const contractBounty=won&&this.contract?.completed ? this.contract.bounty : 0;
+        if(won)SEA_FACTION_POLITICS.bonusAtSettlement(this);
         SEA_FACTIONS.recordContract(this,this.contract);
         const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
             collected: SEA_MATH.safe(this.gold + commission + contractBounty), kills: this.kills,
@@ -2392,7 +2408,9 @@ class Game extends Phaser.Scene {
             text:String(entry.text||''),terms:String(entry.terms||'')
         }));
         if(this.contract){
-            report.contractTitle=SEA_CONTRACTS.offers[this.contract.id].title;
+            report.contractTitle=this.contract.commission ?
+                this.contract.commissionTitle :
+                SEA_CONTRACTS.offers[this.contract.id].title;
             report.contractBounty=contractBounty;
             report.contractCompleted=!!this.contract.completed;
             report.contractSeized=!!this.contract.intercepted;

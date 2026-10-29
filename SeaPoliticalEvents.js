@@ -291,7 +291,7 @@ const SEA_POLITICAL_EVENTS = {
         const remaining=[];
         for(const threat of s.politicalThreats){
             if((s.elapsed||0)<threat.dueAt){remaining.push(threat);continue;}
-            const hostile=s.spawnEnemy?.(threat.type,540);
+            const hostile=s.spawnEnemy?.(threat.type,540,{forcedHostile:true});
             if(hostile){
                 s.announce?.(threat.type==='cultista'?
                     'O CULTO EXIGE REPARAÇÃO · NAVIO DEVOTO À VISTA':

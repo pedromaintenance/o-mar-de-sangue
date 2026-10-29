@@ -1,0 +1,47 @@
+name: Faction Politics V101 — contracts and patrols
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'SeaFactionPolitics.js'
+      - 'SeaContracts.js'
+      - 'SeaIslandRules.js'
+      - 'SeaPoliticalEvents.js'
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/faction-politics-v101.test.cjs'
+      - '.github/workflows/faction-politics-v101.yml'
+  pull_request:
+    paths:
+      - 'SeaFactionPolitics.js'
+      - 'SeaContracts.js'
+      - 'SeaIslandRules.js'
+      - 'SeaPoliticalEvents.js'
+      - 'Game.js'
+      - 'PortUI.js'
+      - 'index.html'
+      - 'sw.js'
+      - 'tests/faction-politics-v101.test.cjs'
+      - '.github/workflows/faction-politics-v101.yml'
+permissions:
+  contents: read
+jobs:
+  politics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate sources and faction mechanics
+        run: |
+          node --check SeaFactionPolitics.js
+          node --check SeaContracts.js
+          node --check Game.js
+          node --check PortUI.js
+          node --test tests/faction-politics-v101.test.cjs
+      - name: Regression: contract and island foundations
+        run: |
+          node --test tests/faction-council-v100.test.cjs tests/island-gameplay-v99.test.cjs tests/player-ship-20-stages.test.cjs tests/pwa-cache-contract.test.cjs

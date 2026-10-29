@@ -104,11 +104,16 @@ const SEA_ISLAND_RULES = {
             }else if(key==='H'){
                 const n=Math.max(1,Math.round(before.maxhp*Math.abs(value)/100));
                 if(value<0){next.hp-=n;changes.push('-'+n+' casco');}
-                else{const gained=Math.min(before.maxhp-next.hp,n);next.hp+=gained;
+                else{const improved=typeof SEA_FACTION_POLITICS!=='undefined'?
+                    Math.round(SEA_FACTION_POLITICS.healing(s,n)):n;
+                    const gained=Math.min(before.maxhp-next.hp,improved);next.hp+=gained;
                     changes.push('+'+Math.round(gained)+' casco');}
             }else if(key==='C'){
                 const previous=next.curse;
-                next.curse=value==='zero'?0:clamp(next.curse+value,0,100);
+                const points=value==='zero'?0:
+                    (value>0&&typeof SEA_FACTION_POLITICS!=='undefined' ?
+                    SEA_FACTION_POLITICS.curseAdded(s,value):value);
+                next.curse=value==='zero'?0:clamp(next.curse+points,0,100);
                 changes.push((next.curse-previous>=0?'+':'')+
                     Math.round(next.curse-previous)+' maldição');
             }else if(Object.hasOwn(this.statsKeys,key)){
