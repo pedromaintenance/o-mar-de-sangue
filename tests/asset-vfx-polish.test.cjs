@@ -25,7 +25,7 @@ assert(islands.includes('if(choice.destroysIsland===true)this.showDestructionSmo
 assert(gallery.includes('Curadoria de efeitos em gameplay'));
 assert(gallery.includes('data-vfx-search="island_destruction_smoke"'));
 assert(gallery.includes("button.dataset.vfxSearch"),'curated cards must navigate to actual asset');
-assert(sw.includes('v98-asset-vfx-polish-20261028'));
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=98,'PWA version must not regress below V98');
 
 // Execute the original effects methods with lightweight Phaser-free stubs.
 const context={localStorage:{getItem(){return null;}}};
