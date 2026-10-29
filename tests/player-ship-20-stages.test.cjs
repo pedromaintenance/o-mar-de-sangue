@@ -43,7 +43,10 @@ assert.equal(png.readUInt32BE(16),1460);
 assert.equal(png.readUInt32BE(20),1560);
 assert.match(game,/this\.load\.spritesheet\('player-ship-stages'/);
 assert.match(game,/spacing: 40, endFrame: 19/);
-assert.match(game,/SEA_PLAYER_SHIP\.stage\(this\.profile\.levels\) - 1/);
+assert(game.includes('const playerStage=SEA_PLAYER_SHIP.stage(this.profile.levels);'),
+  'Stage still follows the weakest of 15 upgrades');
+assert(game.includes('this.playerShipAnimated?0:playerStage-1'),
+  'Animated finale uses frame zero; other stages retain atlas index');
 assert.match(game,/setRotation\(Math\.PI\)/);
 assert(menu.includes('SEA_FACTIONS.texture(scene.profile'),'Faction aware pause ship');
 assert(game.includes('SEA_FACTIONS.texture(this.profile)'),'Faction aware player ship');
