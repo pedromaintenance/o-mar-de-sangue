@@ -16,6 +16,7 @@ const {chromium}=require('playwright-core');
    await page.goto('http://127.0.0.1:8765/',{waitUntil:'domcontentloaded'});
    await page.locator('#sea-port-ui [data-action="council"]').waitFor({timeout:40000});
    await page.locator('[data-action="council"]').click();
+   await page.locator('.port-faction-card').first().waitFor({timeout:20000});
    assert.equal(await page.locator('.port-faction-card').count(),3,'three factions available');
    assert.equal(await page.locator('.port-faction-card__atlas').count(),3,'all atlases previewed');
    assert.equal(await page.locator('[data-action^="faction:"]:not(:disabled)').count(),0,
