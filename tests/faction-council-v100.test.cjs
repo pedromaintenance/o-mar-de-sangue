@@ -72,5 +72,5 @@ for(const id of ids){
  assert(game.includes('this.load.spritesheet(def.ship,def.atlas'),id+' must be loaded in Phaser');
 }
 assert(sw.includes('./SeaFactions.js'));
-assert(sw.includes('v100-three-banners-factions'));
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=100,'PWA must not regress below faction Council V100');
 console.log('PASS factions: '+all.join(', ')+'; 20 frames each, proof/reputation/jurament/desertion, scene, menu and PWA');
