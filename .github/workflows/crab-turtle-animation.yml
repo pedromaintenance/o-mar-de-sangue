@@ -1,0 +1,39 @@
+name: Crab Guardian + Temple Turtle — original 4-frame sprites
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/abyss/shell_guardian.png'
+      - 'assets/abyss/temple_turtle.png'
+      - 'Game.js'
+      - 'sw.js'
+      - 'tests/crab-turtle-animation.test.cjs'
+      - '.github/workflows/crab-turtle-animation.yml'
+  pull_request:
+    paths:
+      - 'assets/abyss/shell_guardian.png'
+      - 'assets/abyss/temple_turtle.png'
+      - 'Game.js'
+      - 'sw.js'
+      - 'tests/crab-turtle-animation.test.cjs'
+      - '.github/workflows/crab-turtle-animation.yml'
+permissions:
+  contents: read
+jobs:
+  animations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and pixel-identity verification
+        run: |
+          node --check Game.js
+          node tests/crab-turtle-animation.test.cjs
+      - name: Mechanics and offline regressions
+        run: |
+          node tests/monster-orientation.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+          node tests/counterbattery-v102.test.cjs
+          node tests/gunnery-windup-3-8a.test.cjs
