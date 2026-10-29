@@ -36,7 +36,7 @@ assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';"),
  'Coral and all non-eel monsters must have fixed visual rotation 0°');
 assert(game.includes("e.heading+(artFacesDown?Math.PI:0)"),
  'Heading remains available for other sprites and physics');
-assert(game.includes("e.type==='dagon'?0:"),'Dagon fixed orientation remains untouched');
+assert(game.includes("const fixedMonsterArt=e.isMonster && e.type!=='enguia';"),'Dagon and all non-eel monsters retain fixed zero-degree visual orientation');
 assert(game.includes("coral: { name: 'Horror de Coral'"),'Enemy stats unchanged');
 const sw=fs.readFileSync('sw.js','utf8');
 assert(sw.includes('"./assets/v15/beast_coral.png"'),'Offline asset stays precached');
