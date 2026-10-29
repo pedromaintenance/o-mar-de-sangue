@@ -59,7 +59,7 @@ for(const item of cases){
 }
 const sw=fs.readFileSync('sw.js','utf8');
 for(const x of cases)assert(sw.includes('"./'+x.path+'"'),'PWA precache missing '+x.path);
-assert(/omar-mar-de-sangue-v105-/.test(sw),'PWA must refresh cached monster art');
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=105,'PWA must refresh cached monster art');
 assert(game.includes('fixedMonsterArt ? 0 : e.heading+'),
  'Crab and Turtle must remain visually fixed at 0 degrees');
 console.log('PASS 4-frame crab + turtle: uploaded SHA256, dimensions/alpha, live animation, orientation, scaling, PWA');
