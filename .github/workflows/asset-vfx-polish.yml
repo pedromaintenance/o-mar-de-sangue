@@ -32,4 +32,4 @@ jobs:
       - name: FX syntax and behavior
         run: node --test tests/asset-vfx-polish.test.cjs
       - name: Existing regressions
-        run: node --test tests/island-destruction-smoke.test.cjs tests/monster-orientation.test.cjs tests/player-ship-20-stages.test.cjs tests/pwa-cache-contract.test.cjs tests/asset-audit-visual.test.cjs
+        run: node --test tests/island-destruction-smoke.test.cjs tests/monster-orientation.test.cjs tests/player-ship-20-stages.test.cjs tests/pwa-cache-contract.test.cjs tests/asset-audit.test.cjs
