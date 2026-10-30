@@ -54,3 +54,4 @@ jobs:
           trap 'kill $SERVER_PID' EXIT
           sleep 2
           node tests/world-scale-v109-visual.test.cjs
+          node tests/port-visual.test.cjs
