@@ -37,5 +37,15 @@ for(const name of ['almirante','cultista','nauabissal','kraken','dagon','dagon_s
  assert.equal(hp*context.cfg.bossHP,hp*5);
 }
 assert(ocean.includes('SEA_VIEW.width / zoom')&&ocean.includes('SEA_VIEW.height / zoom'));
+const islandsCode=fs.readFileSync('SeaIslands.js','utf8');
+const neighbor={id:2,x:1300,y:1000,radius:60};
+const target={id:1,x:1000,y:1000,radius:60};
+const contractCtx={SEA_CONTRACTS:{target:()=>target}};
+vm.runInNewContext(islandsCode+';this.islands=SEA_ISLANDS;',contractCtx);
+const mockVoyage={player:{x:1163,y:1000},playerVelocity:{x:0,y:0},
+  hullRadius:68,islands:[neighbor,target],contract:{pickupId:1},
+  islandVisits:new Set(),enemies:[],ended:false,sinking:false};
+assert.equal(contractCtx.islands.nearest(mockVoyage).island.id,1,
+  'contract port must take priority over closer neighboring island');
 assert(sw.includes('omar-mar-de-sangue-v109-'));
 console.log('PASS V109: map +300% area, vision +20% each axis, boss HP +400%, camera UI, PWA');
