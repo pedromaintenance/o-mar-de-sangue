@@ -141,6 +141,10 @@ const SEA_ISLANDS = {
     nearest(s) {
         if (!s.player || s.ended || s.sinking) return null;
         let found=null;
+        // Num mapa maior, portos vizinhos não devem interceptar a atracação
+        // quando o capitão chegou ao destino exato de um contrato ativo.
+        const contractTargetId=typeof SEA_CONTRACTS!=='undefined'?
+            SEA_CONTRACTS.target(s)?.id:null;
         for(const island of s.islands){
             if(s.islandVisits.has(island.id) &&
                !(s.contract?.phase==='deliver'&&island.id===s.contract.shelterId)&&
@@ -149,7 +153,9 @@ const SEA_ISLANDS = {
             const d=Math.hypot(s.player.x-island.x,s.player.y-island.y);
             const gap=d-island.radius-s.hullRadius;
             if(gap<-10||gap>112)continue;
-            if(!found||gap<found.gap) found={island,gap};
+            if(!found||island.id===contractTargetId||
+               (found.island.id!==contractTargetId&&gap<found.gap))
+                found={island,gap};
         }
         if(!found)return null;
         const speed=Math.hypot(s.playerVelocity.x,s.playerVelocity.y);
