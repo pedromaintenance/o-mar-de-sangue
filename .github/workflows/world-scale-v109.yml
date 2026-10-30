@@ -4,6 +4,7 @@ on:
     paths:
       - Game.js
       - SeaOceanV3.js
+      - SeaIslands.js
       - sw.js
       - tests/world-scale-v109.test.cjs
       - tests/world-scale-v109-visual.test.cjs
@@ -13,6 +14,7 @@ on:
     paths:
       - Game.js
       - SeaOceanV3.js
+      - SeaIslands.js
       - sw.js
       - tests/world-scale-v109.test.cjs
       - tests/world-scale-v109-visual.test.cjs
