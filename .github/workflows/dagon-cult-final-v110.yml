@@ -9,6 +9,7 @@ on:
       - sw.js
       - assets/player/culto_dagon/**
       - tests/dagon-cult-final-v110.test.cjs
+      - tests/dagon-cult-final-v110-visual.test.cjs
       - tests/sobreviventes-final-level20.test.cjs
       - .github/workflows/dagon-cult-final-v110.yml
   push:
@@ -21,6 +22,7 @@ on:
       - sw.js
       - assets/player/culto_dagon/**
       - tests/dagon-cult-final-v110.test.cjs
+      - tests/dagon-cult-final-v110-visual.test.cjs
       - tests/sobreviventes-final-level20.test.cjs
 permissions:
   contents: read
@@ -46,3 +48,20 @@ jobs:
           node tests/player-ship-20-stages.test.cjs
           node tests/pwa-cache-contract.test.cjs
           node tests/port-ui-rebuild.test.cjs
+
+  cult-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Gameplay on desktop and mobile
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/dagon-v110.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/dagon-cult-final-v110-visual.test.cjs
