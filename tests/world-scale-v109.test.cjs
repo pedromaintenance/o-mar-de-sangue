@@ -47,5 +47,5 @@ const mockVoyage={player:{x:1163,y:1000},playerVelocity:{x:0,y:0},
   islandVisits:new Set(),enemies:[],ended:false,sinking:false};
 assert.equal(contractCtx.islands.nearest(mockVoyage).island.id,1,
   'contract port must take priority over closer neighboring island');
-assert(sw.includes('omar-mar-de-sangue-v109-'));
+assert(Number(sw.match(/omar-mar-de-sangue-v(\d+)-/)?.[1])>=109,'PWA must not regress below V109');
 console.log('PASS V109: map +300% area, vision +20% each axis, boss HP +400%, camera UI, PWA');

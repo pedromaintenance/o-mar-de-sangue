@@ -39,13 +39,14 @@ const SEA_UI = {
         }
         const pauseProfile=scene.profile||SeaProfile.load();
         const pauseStage=SEA_PLAYER_SHIP.stage(pauseProfile.levels);
-        const pauseFinal=typeof SEA_FACTIONS!=='undefined' ?
-            SEA_FACTIONS.level20Texture(pauseProfile,pauseStage):null;
+        const pauseConfig=typeof SEA_FACTIONS!=='undefined' ?
+            SEA_FACTIONS.level20Asset(pauseProfile,pauseStage):null;
+        const pauseFinal=pauseConfig?.texture||null;
         const stamp=scene.add.image(x,top+62,pauseFinal||
             (typeof SEA_FACTIONS==='undefined' ? 'player-ship-stages' :
               SEA_FACTIONS.texture(scene.profile||SeaProfile.load())),
             pauseFinal?0:pauseStage-1).setAlpha(.095);
-        stamp.setScale(125/(pauseFinal?SEA_FACTIONS.final20.frameHeight:
+        stamp.setScale(125/(pauseConfig?.frameHeight||
             SEA_PLAYER_SHIP.frameHeight));add(stamp);
         const label=(yy,value,size=16,color='#d7ccba',bold=false,wrap=w-65)=>{
             return add(scene.add.text(x,yy,value,{

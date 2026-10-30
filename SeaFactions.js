@@ -12,6 +12,14 @@ const SEA_FACTIONS = {
     preview:'assets/player/sobreviventes/navio_sobreviventes_nivel_20_preview.png',
     frameWidth:512,frameHeight:682,frameCount:4,fps:4
   }),
+  // V110: o mesmo tratamento de nível final para o Culto de Dagon.
+  // Arte original 2048×512, com derivado transparente para o oceano.
+  cultFinal20:Object.freeze({
+    texture:'player-ship-dagon-final',
+    image:'assets/player/culto_dagon/navio_culto_dagon_nivel_20_animado.png',
+    preview:'assets/player/culto_dagon/navio_culto_dagon_nivel_20_preview.png',
+    frameWidth:512,frameHeight:512,frameCount:4,fps:4
+  }),
   ids:['sobreviventes','corte','culto'],
   definitions:{
     sobreviventes:{
@@ -63,13 +71,19 @@ const SEA_FACTIONS = {
   },
   faction(s){return this.ids.includes(s?.faction?.allegiance)?s.faction.allegiance:null;},
   texture(profile){return this.definitions[this.faction(profile)]?.ship||'player-ship-stages';},
+  level20Asset(profile,stage){
+    if(stage!==20)return null;
+    const faction=this.faction(profile);
+    return faction==='sobreviventes'?this.final20:
+      faction==='culto'?this.cultFinal20:null;
+  },
   level20Texture(profile,stage){
-    return this.faction(profile)==='sobreviventes' && stage===20 ?
-      this.final20.texture : null;
+    return this.level20Asset(profile,stage)?.texture||null;
   },
   visualPreview(faction,stage){
-    return faction==='sobreviventes' && stage===20 ?
-      this.final20.preview : this.preview(faction,stage);
+    if(stage===20&&faction==='sobreviventes')return this.final20.preview;
+    if(stage===20&&faction==='culto')return this.cultFinal20.preview;
+    return this.preview(faction,stage);
   },
   preview(faction,stage){
     const def=this.definitions[faction];if(!def)return '';

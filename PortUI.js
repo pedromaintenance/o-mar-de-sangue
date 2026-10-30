@@ -649,7 +649,7 @@ const SEA_PORT_UI = {
           '+7% de dano dos canhões · rituais geram 10% mais maldição')+'</p>'+
         '<div class="port-faction-card__ship"><div class="port-faction-card__atlas" role="img" '+
         'aria-label="Navio da facção '+this.text(def.label)+' no estágio '+level+'" '+
-        (id==='sobreviventes'&&level===20 ?
+        ((id==='sobreviventes'||id==='culto')&&level===20 ?
           'style="background-image:url(./'+SEA_FACTIONS.visualPreview(id,level)+
           ');background-position:center;background-size:contain"' :
           'style="background-image:url(./'+def.atlas+');background-position:-'+
