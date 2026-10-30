@@ -1,0 +1,54 @@
+name: V109 - World scale, camera, boss HP
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - SeaOceanV3.js
+      - sw.js
+      - tests/world-scale-v109.test.cjs
+      - tests/world-scale-v109-visual.test.cjs
+      - .github/workflows/world-scale-v109.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - SeaOceanV3.js
+      - sw.js
+      - tests/world-scale-v109.test.cjs
+      - tests/world-scale-v109-visual.test.cjs
+permissions:
+  contents: read
+jobs:
+  world-scale-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static and gameplay contracts
+        run: |
+          node --check Game.js
+          node --check SeaOceanV3.js
+          node tests/world-scale-v109.test.cjs
+          node tests/dagon-lord-encounter.test.cjs
+          node tests/sea-ocean-v3.test.cjs
+          node tests/atlas-chart.test.cjs
+          node tests/player-ship-20-stages.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+  browser-vision:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Desktop and mobile camera and boss verification
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v109-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/world-scale-v109-visual.test.cjs
