@@ -1,0 +1,48 @@
+name: Culto de Dagon — navio final 4 quadros (V110)
+on:
+  pull_request:
+    paths:
+      - Game.js
+      - SeaFactions.js
+      - SeaMenus.js
+      - PortUI.js
+      - sw.js
+      - assets/player/culto_dagon/**
+      - tests/dagon-cult-final-v110.test.cjs
+      - tests/sobreviventes-final-level20.test.cjs
+      - .github/workflows/dagon-cult-final-v110.yml
+  push:
+    branches: [main]
+    paths:
+      - Game.js
+      - SeaFactions.js
+      - SeaMenus.js
+      - PortUI.js
+      - sw.js
+      - assets/player/culto_dagon/**
+      - tests/dagon-cult-final-v110.test.cjs
+      - tests/sobreviventes-final-level20.test.cjs
+permissions:
+  contents: read
+jobs:
+  cult-final:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and pixel integrity
+        run: |
+          node --check Game.js
+          node --check SeaFactions.js
+          node --check SeaMenus.js
+          node --check PortUI.js
+          node tests/dagon-cult-final-v110.test.cjs
+          node tests/sobreviventes-final-level20.test.cjs
+      - name: Faction and save regressions
+        run: |
+          node tests/faction-council-v100.test.cjs
+          node tests/player-ship-20-stages.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+          node tests/port-ui-rebuild.test.cjs
