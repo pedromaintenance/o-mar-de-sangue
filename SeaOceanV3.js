@@ -40,8 +40,10 @@ const SEA_OCEAN_V3 = {
         if (!this.available(scene)) return false;
         scene.seaV3Active = true;
         scene.seaV3Tiles = [];
-        const columns = Math.ceil(SEA_VIEW.width / this.tileSize) + 2;
-        const rows = Math.ceil(SEA_VIEW.height / this.tileSize) + 2;
+        // Considera a área extra vista sem desenhar todo o mapa.
+        const zoom = Math.max(.01, scene.cameras.main.zoom || 1);
+        const columns = Math.ceil((SEA_VIEW.width / zoom) / this.tileSize) + 2;
+        const rows = Math.ceil((SEA_VIEW.height / zoom) / this.tileSize) + 2;
         for (let y = 0; y < rows; y++) for (let x = 0; x < columns; x++) {
             const sprite = scene.add.image(0, 0, this.key(1), this.animated ? 0 : undefined)
                 .setOrigin(0, 0).setDepth(-110);

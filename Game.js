@@ -19,6 +19,33 @@ const SEA_TOUCH = typeof window !== 'undefined' && (
     /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') ||
     !!window.matchMedia?.('(pointer: coarse)').matches);
 const SEA_VIEW = { width: 1280, height: 720 };
+// V109: +300% área de mapa, +20% visão por eixo, +400% PV dos chefes.
+const SEA_WORLD_SCALE = Object.freeze({ linear: 2, vision: 1.2, bossHP: 5 });
+// Câmera secundária deixa HUD, diálogos e controles sem zoom.
+// A lista dinâmica inclui menus abertos durante a navegação.
+const SEA_CAMERA_LAYERS = {
+    attach(scene) {
+        const world = scene.cameras.main;
+        const hud = scene.cameras.add(0, 0, SEA_VIEW.width, SEA_VIEW.height,
+            false, 'sea-hud-fixed');
+        scene.seaHudCamera = hud;
+        const classified = new WeakSet();
+        const classify = () => {
+            for (const obj of scene.children.list) {
+                if (classified.has(obj)) continue;
+                if (obj.scrollFactorX === 0 && obj.scrollFactorY === 0)
+                    world.ignore(obj);
+                else hud.ignore(obj);
+                classified.add(obj);
+            }
+        };
+        classify();
+        scene.events.on(Phaser.Scenes.Events.PRE_RENDER, classify);
+        scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            scene.events.off(Phaser.Scenes.Events.PRE_RENDER, classify);
+        });
+    }
+};
 
 const SEA_GAMEPAD = {
     previous: [], lastId: null,
@@ -504,7 +531,9 @@ class Game extends Phaser.Scene {
     }
     create() {
         seaCenterCanvas(this.game);
-        this.W = 4400; this.H = 3400;
+        // Dobrar cada eixo quadruplica a área navegável.
+        this.W = 4400 * SEA_WORLD_SCALE.linear;
+        this.H = 3400 * SEA_WORLD_SCALE.linear;
         this.profile = SeaProfile.load(); this.shipStats = SeaProfile.stats(this.profile);
         SEA_FACTION_POLITICS.shipStats(this);
         // Normaliza o atlas do chefe em runtime. A arte original tem 4 quadros
@@ -556,7 +585,9 @@ class Game extends Phaser.Scene {
             this.survivalTime = 50 + this.stage * 3;
             this.huntTarget = 1 + Math.floor(this.stage / 9); this.huntKills = 0;
         } else { this.objective = 'endless'; }
-        this.cameras.main.setBackgroundColor('#2b1929'); this.cameras.main.setBounds(0, 0, this.W, this.H);
+        this.cameras.main.setBackgroundColor('#2b1929');
+        this.cameras.main.setBounds(0, 0, this.W, this.H);
+        this.cameras.main.setZoom(1 / SEA_WORLD_SCALE.vision);
         this.createSeaLayers();
         SEA_PIXEL.seaInit(this);
         this.buildWorld();
@@ -713,6 +744,7 @@ class Game extends Phaser.Scene {
                 backgroundColor: '#111e29eb', padding: { x: 12, y: 12 }
             }).setOrigin(.5, 0).setDepth(160).setScrollFactor(0);
         this.tweens.add({ targets: tip, alpha: 0, delay: 3700, duration: 950, onComplete: () => tip.destroy() });
+        SEA_CAMERA_LAYERS.attach(this);
         this.updateHUD();
     }
     createSeaLayers() {
@@ -734,13 +766,15 @@ class Game extends Phaser.Scene {
         const rng = new Phaser.Math.RandomDataGenerator(['carcaca-mar-sangue-pwa']);
         const spots = [];
         const kinds = ['reef', 'ruin', 'monastery', 'daegon', 'demeter', 'wreck'];
-        for (let row = 0; row < 5; row++) for (let col = 0; col < 7; col++) {
+        // Preserva densidade e espaçamento nos novos trechos do mapa.
+        for (let row = 0; row < 5 * SEA_WORLD_SCALE.linear; row++)
+            for (let col = 0; col < 7 * SEA_WORLD_SCALE.linear; col++) {
             const x = 295 + col * 628 + rng.between(-145, 145);
             const y = 285 + row * 670 + rng.between(-150, 150);
             if (Math.hypot(x - this.W / 2, y - this.H / 2) < 570) continue;
-            spots.push([x, y, rng.between(52, 108), kinds[(row * 7 + col) % kinds.length]]);
+            spots.push([x, y, rng.between(52, 108), kinds[(row * 7 * SEA_WORLD_SCALE.linear + col) % kinds.length]]);
         }
-        for (let i = 0; i < 35; i++) {
+        for (let i = 0; i < 35 * SEA_WORLD_SCALE.linear ** 2; i++) {
             const x = rng.between(150, this.W - 150), y = rng.between(150, this.H - 150), radius = rng.between(22, 52);
             if (Math.hypot(x - this.W / 2, y - this.H / 2) < 550) continue;
             if (spots.some(z => Math.hypot(z[0] - x, z[1] - y) < z[2] + radius + 90)) continue;
@@ -772,12 +806,12 @@ class Game extends Phaser.Scene {
                 }).setOrigin(.5).setDepth(4);
             }
         });
-        for (let i = 0; i < 52; i++) {
+        for (let i = 0; i < 52 * SEA_WORLD_SCALE.linear ** 2; i++) {
             const x = rng.between(130, this.W - 130), y = rng.between(130, this.H - 130);
             if (this.islands.some(isl => Math.hypot(isl.x - x, isl.y - y) < isl.radius + 55)) continue;
             this.dropTreasure(x, y, false, 10 + Math.floor(this.currentDifficulty * 1.1) + rng.between(0, 14));
         }
-        for (let i = 0; i < 16; i++) {
+        for (let i = 0; i < 16 * SEA_WORLD_SCALE.linear ** 2; i++) {
             const x = rng.between(120, this.W - 120), y = rng.between(120, this.H - 120);
             if (this.islands.some(isl => Math.hypot(isl.x - x, isl.y - y) < isl.radius + 60)) continue;
             const kind = i % 2 ? 'treasure-crate' : 'treasure-chest';
@@ -880,7 +914,9 @@ class Game extends Phaser.Scene {
         if (!pos) pos = this.findWaterSpot(this.W / 2, this.H / 2, f.radius + 40);
         const scaleDifficulty = 1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .24 : .12);
         const elite = ['almirante','nauabissal','kraken','dagon','dagon_senhor','cultista'].includes(type);
-        const maxhp = Math.round(f.hp * scaleDifficulty), id = ++this.foeSerial;
+        // +400% PV exclusivamente para os seis chefes da definição elite.
+        const maxhp = Math.round(f.hp * scaleDifficulty *
+            (elite ? SEA_WORLD_SCALE.bossHP : 1)), id = ++this.foeSerial;
         let tex = ({ ariete:'foe-ram', corsario:'foe-corsair', bombardeiro:'foe-bombard',
             espectral:'foe-spectral', fragata:'foe-galleon', galeao:'foe-galleon',
             almirante:'foe-admiral', cultista:'foe-cult', nauabissal:'foe-dreadnought',
