@@ -81,6 +81,7 @@ const {chromium}=require('playwright-core');
    }
    if(config.mobile){
     await page.evaluate(()=>{SEA_PORT_UI.scene.page='menu';SEA_PORT_UI.render()});
+    if(config.mobile)await page.locator('[data-action="tools-toggle"]').click();
     await page.locator('[data-action="readability"]').click();
     const readable=await page.locator('.port-choice__copy strong').first()
       .evaluate(x=>parseFloat(getComputedStyle(x).fontSize));
