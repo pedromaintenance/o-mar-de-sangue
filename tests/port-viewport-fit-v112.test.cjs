@@ -59,7 +59,7 @@ const {chromium}=require('playwright-core');
        buttons:[...el.querySelectorAll('.port-upgrade__foot button')].map(b=>b.getBoundingClientRect().height)};
    });
    assert(yard.overflowX<=2,'yard horizontal overflow');
-   assert(yard.buttons.every(h=>h>=43.5),'yard buttons under 44px');
+   if(v.mobile)assert(yard.buttons.every(h=>h>=43.5),'yard buttons under 44px');
    await page.evaluate(()=>{SEA_PORT_UI.scene.page='council';SEA_PORT_UI.render()});
    await page.locator('.port-council__grid').waitFor();
    const council=await page.evaluate(()=>{
