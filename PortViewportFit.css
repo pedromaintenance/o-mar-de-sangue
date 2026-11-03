@@ -122,7 +122,7 @@
  .port-ui .port-council__footer{padding:7px;margin:6px 0;gap:6px}
  .port-ui.port-ui--readable .port-choice{min-height:48px}
  .port-ui.port-ui--readable .port-actions .port-choice__copy strong{font-size:13px}
- .port-ui.port-ui--readable .port-actions .port-choice__copy small{font-size:10px}
+ .port-ui.port-ui--readable .port-actions .port-choice__copy small{font-size:12px}
 }
 @media (max-width:420px){
  .port-ui .port-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
