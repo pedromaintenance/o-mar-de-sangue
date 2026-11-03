@@ -12,7 +12,7 @@ const {chromium}=require('playwright-core');
    {name:'portrait-390',w:390,h:844,mobile:true,fit:true},
    {name:'portrait-360',w:360,h:740,mobile:true,fit:true},
    {name:'portrait-320',w:320,h:640,mobile:true,fit:true},
-   {name:'landscape-844',w:844,h:390,mobile:true,fit:false},
+   {name:'landscape-844',w:844,h:390,mobile:true,fit:true},
    {name:'desktop-1280',w:1280,h:720,mobile:false,fit:false}
   ]){
    const page=await browser.newPage({viewport:{width:v.w,height:v.h},isMobile:v.mobile,
