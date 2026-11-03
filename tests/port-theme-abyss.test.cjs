@@ -46,7 +46,9 @@ const {chromium}=require('playwright-core');
    const focused=()=>page.evaluate(()=>document.activeElement?.dataset?.action);
    assert.equal(await focused(),'mission');
    if(isMobile){
-    await page.keyboard.press('ArrowDown');assert.equal(await focused(),'sandbox');
+    // V112: a grade mobile agora tem duas colunas, tal como no desktop.
+    await page.keyboard.press('ArrowRight');assert.equal(await focused(),'sandbox');
+    await page.keyboard.press('ArrowDown');assert.equal(await focused(),'help');
    }else{
     await page.keyboard.press('ArrowRight');assert.equal(await focused(),'sandbox');
     await page.keyboard.press('ArrowDown');assert.equal(await focused(),'help');

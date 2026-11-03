@@ -1,0 +1,55 @@
+name: V112 - Menus dimensionados para viewport
+on:
+  pull_request:
+    paths:
+      - PortUI.js
+      - PortViewportFit.css
+      - index.html
+      - sw.js
+      - tests/port-viewport-fit-v112.test.cjs
+      - tests/mobile-compact-menus.test.cjs
+      - tests/port-visual.test.cjs
+      - .github/workflows/port-viewport-fit-v112.yml
+  push:
+    branches: [main]
+    paths:
+      - PortUI.js
+      - PortViewportFit.css
+      - index.html
+      - sw.js
+      - tests/port-viewport-fit-v112.test.cjs
+      - tests/mobile-compact-menus.test.cjs
+      - tests/port-visual.test.cjs
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Menu, cache and navigation contracts
+        run: |
+          node --check PortUI.js
+          node tests/port-ui-rebuild.test.cjs
+          node tests/port-controller-navigation.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+  mobile-layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser setup
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Viewport fit and accessible touch targets
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/port-v112-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/port-viewport-fit-v112.test.cjs
+          node tests/mobile-compact-menus.test.cjs

@@ -1,0 +1,157 @@
+/* V112 — Porto: densidade visual compatível com a área útil da janela.
+ * Esta folha é carregada DEPOIS de PortMobileCompact.css.
+ * Nunca modifica a câmera Phaser, o canvas, a física ou os controles de combate.
+ */
+.port-tools{display:contents}
+.port-tools__toggle{display:none}
+.port-tools__panel{display:contents}
+.port-tools__panel[hidden]{display:none!important}
+
+/* Desktop: leve redução da escala dos menus, sem zoom da página inteira. */
+@media (min-width:781px) and (pointer:fine){
+ .port-ui .port-container{padding-top:13px;gap:12px;padding-bottom:9px}
+ .port-ui .port-top{padding-bottom:12px}
+ .port-ui .port-layout{gap:15px}
+ .port-ui .port-center{gap:10px}
+ .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(210px,28vh,270px)}
+ .port-ui .port-hero h1,.theme-mare-negra .port-hero h1{font-size:clamp(39px,4.7vw,68px);margin:5px 0 9px}
+ .port-ui .port-actions{gap:8px}
+ .port-ui .port-actions .port-choice,.theme-mare-negra .port-actions .port-choice{min-height:68px;padding:9px 30px 9px 11px;gap:10px}
+ .port-ui .port-choice__icon{flex-basis:38px;height:38px;font-size:20px}
+ .port-ui .port-statbar>div{padding:8px 5px}
+ .port-ui .port-statbar strong{font-size:22px}
+ .port-ui .port-bottom__actions{gap:5px}
+ .port-ui .port-page{gap:13px;padding-bottom:10px}
+ .port-ui .port-page__header{padding:15px 20px}
+ .port-ui .port-page h1{font-size:clamp(28px,3vw,42px)}
+ .port-ui .port-upgrades{gap:11px}
+ .port-ui .port-upgrade{padding:14px;min-height:158px}
+ .port-ui .port-upgrade__symbol{width:50px;height:50px;font-size:26px}
+ .port-ui .port-upgrade h2{font-size:20px}
+ .port-ui .port-help-grid{gap:9px}
+ .port-ui .port-help{min-height:92px;padding:12px 15px}
+ .port-ui .port-warning{padding:clamp(22px,3vw,38px);gap:11px}
+ .port-ui .port-faction-card{padding:16px 13px;gap:7px}
+ .port-ui .port-faction-card__ship{height:162px}
+ .port-ui .port-faction-card__atlas{transform:scale(.88)}
+ .port-ui .port-chronicle{margin:10px 0;padding:14px}
+}
+
+/* Mobile: a tela inicial prioriza navegação, não informação secundária.
+ * Diário/Contratos/Conselho com conteúdo extenso continuam roláveis. */
+@media (max-width:780px), (hover:none) and (pointer:coarse) and (max-width:1024px){
+ .port-ui{overflow-y:auto;overscroll-behavior-y:contain}
+ .port-ui .port-container{width:100%;min-height:100dvh;padding:6px 8px max(6px,env(safe-area-inset-bottom));gap:5px}
+ .port-ui .port-top{min-height:36px;gap:5px;padding:0 0 4px}
+ .port-ui .port-top__title{font-size:clamp(11px,2.8vw,14px)}
+ .port-ui .port-top__brand{gap:6px}
+ .port-ui .port-top__sigil{width:25px;height:25px;font-size:15px}
+ .port-ui .port-mini{min-height:44px;padding:5px 6px;font-size:9px!important;max-width:110px}
+ .port-ui .port-layout,.port-ui .port-center{gap:5px}
+ .port-ui .port-layout--home{display:block}
+ .port-ui .port-center{width:100%}
+ .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(92px,14svh,121px);min-height:0}
+ .port-ui .port-hero__copy,.theme-mare-negra .port-hero__copy{margin-left:12px;width:67%}
+ .port-ui .port-hero h1,.theme-mare-negra .port-hero h1{font-size:clamp(24px,5.2vw,33px);line-height:.95;margin:2px 0 3px}
+ .port-ui .port-hero p,.theme-mare-negra .port-hero p{font-size:10px;line-height:1.15}
+ .port-ui .port-hero__ship,.theme-mare-negra .port-hero__ship{height:94%;width:38%;right:-3%;top:3%}
+ .port-ui .port-section-label{padding:0 3px;font-size:9px;line-height:1.2}
+ .port-ui .port-section-label span:last-child{font-size:11px}
+ .port-ui .port-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
+ .port-ui .port-actions .port-choice,.theme-mare-negra .port-actions .port-choice{min-height:48px;padding:5px 17px 5px 7px;gap:6px}
+ .port-ui .port-actions .port-choice--contract,.port-ui .port-actions [data-action="council"]{grid-column:1/-1;min-height:44px}
+ .port-ui .port-actions .port-choice__icon{width:23px;height:25px;flex-basis:23px;font-size:14px}
+ .port-ui .port-actions .port-choice__copy strong,.theme-mare-negra .port-actions .port-choice__copy strong{font-size:clamp(10px,2.45vw,12px);line-height:1.16;letter-spacing:.01em}
+ .port-ui .port-actions .port-choice__copy small,.theme-mare-negra .port-actions .port-choice__copy small{font-size:9px;line-height:1.1}
+ .port-ui .port-actions .port-choice:not(.port-choice--contract):not([data-action="council"]) .port-choice__copy small{display:none}
+ .port-ui .port-choice__arrow{font-size:12px;right:4px}
+ .port-ui .port-statbar>div{padding:4px 2px}
+ .port-ui .port-statbar strong{font-size:15px;line-height:1.08}
+ .port-ui .port-statbar span{font-size:8px;letter-spacing:0}
+ .port-ui .port-bottom{gap:3px}
+ .port-ui .port-bottom>span:first-child{display:none}
+ .port-ui .port-bottom__actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:4px}
+ .port-ui .port-bottom__actions .port-text-button{min-width:0;min-height:38px;padding:5px 4px;font-size:9px!important;line-height:1.12;white-space:normal}
+ .port-ui .port-footer{display:block;padding:5px 0 0;margin-top:auto;text-align:center}
+ .port-ui .port-footer>span:first-child,.port-ui .port-footer__version,.port-ui .port-pad-hint{display:none}
+ .port-ui .port-tools{display:block;width:100%}
+ .port-ui .port-tools__toggle{display:block;width:100%;min-height:44px;padding:7px 9px;border:1px solid #806249;background:#161c21;color:#cfb18b;font-size:10px;line-height:1.2;font-weight:700;letter-spacing:.06em}
+ .port-ui .port-tools__panel{display:block;padding-top:6px}
+ .port-ui .port-tools__panel[hidden]{display:none!important}
+ .port-ui .port-sound{gap:4px;padding-bottom:4px}
+ .port-ui .port-sound__group{flex:1 1 144px}
+ /* Densidade das telas secundárias sem eliminar conteúdo. */
+ .port-ui .port-page{gap:6px;padding-bottom:5px}
+ .port-ui .port-page__header{padding:8px 10px}
+ .port-ui .port-page h1,.theme-mare-negra .port-page h1{font-size:clamp(18px,4.7vw,24px);letter-spacing:.025em;line-height:1.12;margin:2px 0}
+ .port-ui .port-page__header p{font-size:10px;line-height:1.2}
+ .port-ui .port-page__balance{margin-top:4px}
+ .port-ui .port-ship-evolution{margin-top:4px;padding:3px 5px}
+ .port-ui .port-tabs{padding:2px;gap:3px}
+ .port-ui .port-tabs button{padding:5px 3px;min-height:44px;flex:1 1 72px;font-size:10px}
+ .port-ui .port-tabs__hint{padding-bottom:2px;font-size:8px}
+ .port-ui .port-upgrades{gap:5px}
+ .port-ui .port-upgrade{padding:7px;gap:3px 6px}
+ .port-ui .port-upgrade__symbol{width:32px;height:32px;font-size:18px}
+ .port-ui .port-upgrade h2{font-size:14px;margin:0}
+ .port-ui .port-upgrade p{font-size:10px;line-height:1.25;margin:0 0 3px}
+ .port-ui .port-upgrade__foot{padding-top:4px;gap:4px}
+ .port-ui .port-upgrade__foot button{min-height:44px;padding:5px 8px}
+ .port-ui .port-help-grid{gap:5px}
+ .port-ui .port-help{gap:7px;padding:6px 8px}
+ .port-ui .port-help__number{width:26px;height:29px;font-size:13px}
+ .port-ui .port-help h2{font-size:12px;margin-bottom:2px}
+ .port-ui .port-help p{font-size:10px;line-height:1.3}
+ .port-ui .port-warning{padding:10px;gap:7px}
+ .port-ui .port-warning__sigil{font-size:27px}
+ .port-ui .port-warning p{font-size:11px;line-height:1.3;margin:2px 0}
+ .port-ui .port-contracts h2{padding-top:5px;margin:2px 0 0;font-size:15px}
+ .port-ui .port-restore__row{padding:4px 3px}
+ .port-ui .port-result-grid{gap:4px}
+ .port-ui .port-result-grid>div{padding:6px 4px}
+ .port-ui .port-result-grid strong{font-size:17px}
+ .port-ui .port-result-actions{gap:5px}
+ .port-ui .port-chronicle{margin:5px 0;padding:7px}
+ .port-ui .port-chronicle li{padding:5px 7px}
+ .port-ui .port-council__grid{gap:6px}
+ .port-ui .port-faction-card{padding:8px;gap:4px}
+ .port-ui .port-faction-card__ship{height:92px}
+ .port-ui .port-faction-card__atlas{transform:scale(.5)}
+ .port-ui .port-faction-card__trial,.port-ui .port-faction-card__tasks{min-height:0}
+ .port-ui .port-faction-card__tasks>div{padding:1px 0}
+ .port-ui .port-council__footer{padding:7px;margin:6px 0;gap:6px}
+ .port-ui.port-ui--readable .port-choice{min-height:48px}
+ .port-ui.port-ui--readable .port-actions .port-choice__copy strong{font-size:13px}
+ .port-ui.port-ui--readable .port-actions .port-choice__copy small{font-size:12px}
+}
+@media (max-width:420px){
+ .port-ui .port-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(82px,14svh,106px);min-height:0}
+ .port-ui .port-hero h1,.theme-mare-negra .port-hero h1{font-size:clamp(23px,6.3vw,28px)}
+ .port-ui .port-hero p,.theme-mare-negra .port-hero p{font-size:9px}
+ .port-ui .port-bottom__actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .port-ui.port-ui--readable .port-statbar{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .port-ui.port-ui--readable .port-statbar>div:nth-child(2){border-right:1px solid #67513b9c}
+}
+@media (max-height:700px) and (max-width:780px),
+       (max-height:700px) and (hover:none) and (pointer:coarse) and (max-width:1024px){
+ .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(74px,13svh,96px);min-height:0}
+ .port-ui .port-hero h1,.theme-mare-negra .port-hero h1{font-size:clamp(22px,4.7vw,28px)}
+ .port-ui .port-center{gap:3px}
+ .port-ui .port-page__header{padding:6px 9px}
+ .port-ui .port-container{gap:4px;padding-top:4px}
+}
+@media (hover:none) and (pointer:coarse) and (orientation:landscape) and (max-width:1024px){
+ /* A largura da paisagem permite seis atalhos em apenas duas linhas. */
+ .port-ui .port-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ .port-ui .port-actions .port-choice--contract,
+ .port-ui .port-actions [data-action="council"]{grid-column:auto;min-height:44px}
+ .port-ui .port-actions .port-choice,.theme-mare-negra .port-actions .port-choice{min-height:44px}
+ .port-ui .port-bottom__actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .port-ui .port-statbar>div{padding:2px}
+ .port-ui .port-section-label{display:none}
+ .port-ui .port-upgrades,.port-ui .port-help-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .port-ui .port-council__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(52px,17svh,65px);min-height:0}
+ .port-ui .port-hero p,.theme-mare-negra .port-hero p{display:none}
+}

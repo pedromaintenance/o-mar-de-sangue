@@ -5,6 +5,7 @@
  */
 const SEA_PORT_UI = {
   root:null, scene:null, lastPadAt:0, lastPadDir:'', lastYardFocus:null,
+  toolsOpen:false,
   readable:false,
   readableKey:'carcaca.mar.port.readable.v1',
   // A ordem das abas é uma regra de navegação, não depende da posição no DOM.
@@ -32,6 +33,7 @@ const SEA_PORT_UI = {
     try{this.readable=localStorage.getItem(this.readableKey)==='1';}
     catch(_){this.readable=false;}
     this.pendingRestore=null;this.restoreArmed=false;this.comparedFps=null;
+    this.toolsOpen=false;
     const root=document.createElement('div');
     root.id='sea-port-ui';
     root.className='port-ui';
@@ -238,6 +240,9 @@ const SEA_PORT_UI = {
   action(value) {
     const scene=this.scene;if(!scene)return;
     const [name,id]=value.split(':');
+    if(name==='tools-toggle'){
+      this.toolsOpen=!this.toolsOpen;this.render('tools-toggle');return;
+    }
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='contracts'){this.goto('contracts');return;}
     if(name==='council'){this.goto('council');return;}
@@ -537,7 +542,15 @@ const SEA_PORT_UI = {
   music() {
     const musicPercent=Math.round(SEA_MUSIC.volume*100);
     const effectsPercent=Math.round(SEA_AUDIO.effectsVolume*100);
-    return '<div class="port-sound" aria-label="Controles de áudio">'+
+    const compact=typeof window!=='undefined'&&typeof window.matchMedia==='function'&&
+      window.matchMedia('(max-width:780px), (hover:none) and (pointer:coarse) and (max-width:1024px)').matches;
+    const expanded=!compact||this.toolsOpen;
+    return '<div class="port-tools">'+
+      '<button class="port-tools__toggle" type="button" data-action="tools-toggle" '+
+      'aria-controls="port-tools-panel" aria-expanded="'+expanded+'">'+
+      '♫ ÁUDIO · OPÇÕES · FPS '+(expanded?'▴':'▾')+'</button>'+
+      '<div class="port-tools__panel" id="port-tools-panel"'+(expanded?'':' hidden')+'>'+
+      '<div class="port-sound" aria-label="Controles de áudio">'+
       '<div class="port-sound__group" aria-label="Volume da música">'+
         '<span class="port-sound__label">♫ MÚSICA</span>'+
         '<button data-action="volume:down" type="button" aria-label="Diminuir volume da música">−</button>'+
@@ -564,7 +577,7 @@ const SEA_PORT_UI = {
         '" aria-label="Alternar leitura ampliada no porto">'+
         (this.readable?'TEXTO PADRÃO':'AMPLIAR TEXTO')+'</button>'+
       '<small data-music-status>'+this.text(SEA_MUSIC.status())+'</small>'+
-      '</div>';
+      '</div></div></div>';
   },
   home(p) {
     const stats=SeaProfile.stats(p);

@@ -362,7 +362,14 @@ const {chromium}=require('playwright-core');
      for(let i=0;i<90;i++)SEA_PERFORMANCE.sample(16.7);
      scene.scene.start('SeaPort',{page:'menu'});
    });
-   await page.locator('#sea-port-ui [data-action="export-fps"]').waitFor({timeout:20000});
+   // V112: mobile footer settings are explicitly expanded before using FPS export.
+   await page.locator('#sea-port-ui [data-action="export-fps"]').waitFor({
+     state:'attached',timeout:20000
+   });
+   if(isMobile)await page.locator('[data-action="tools-toggle"]').click();
+   await page.locator('#sea-port-ui [data-action="export-fps"]').waitFor({
+     state:'visible',timeout:20000
+   });
    assert.equal(await page.locator('[data-action="export-fps"]').isDisabled(),false,
      label+': report must become exportable only after collecting samples');
    const saveBeforeReport=await page.evaluate(()=>
