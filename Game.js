@@ -320,6 +320,10 @@ class SeaBoot extends Phaser.Scene {
         this.load.spritesheet(SEA_FACTIONS.cultFinal20.texture,SEA_FACTIONS.cultFinal20.image,{
             frameWidth:512,frameHeight:512,endFrame:3
         });
+        // Corte Feérica, nível 20: 4 quadros de 512×682; física intacta.
+        this.load.spritesheet(SEA_FACTIONS.courtFinal20.texture,SEA_FACTIONS.courtFinal20.image,{
+            frameWidth:512,frameHeight:682,endFrame:3
+        });
         this.load.image('foe-sloop', 'assets/sprites/enemy_court_ship.png');
         this.load.image('foe-galleon', 'assets/sprites/enemy_galleon.png');
         this.load.image('foe-ram', 'assets/sprites/enemy_ram.png');

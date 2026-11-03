@@ -31,7 +31,7 @@ assert.equal(F.visualPreview('culto',20),root+'navio_culto_dagon_nivel_20_previe
 assert.equal(F.visualPreview('culto',19),F.preview('culto',19));
 assert.equal(F.level20Texture(p('sobreviventes'),20),'player-ship-survivors-final');
 assert.equal(F.level20Asset(p('sobreviventes'),20).frameHeight,682);
-assert.equal(F.level20Texture(p('corte'),20),null);
+assert.equal(F.level20Texture(p('corte'),20),'player-ship-court-final');
 assert.equal(F.level20Texture({faction:F.initial()},20),null);
 assert.equal(F.cultFinal20.frameCount,4);
 assert.equal(F.cultFinal20.frameWidth,512);

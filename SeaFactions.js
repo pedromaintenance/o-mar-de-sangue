@@ -20,6 +20,13 @@ const SEA_FACTIONS = {
     preview:'assets/player/culto_dagon/navio_culto_dagon_nivel_20_preview.png',
     frameWidth:512,frameHeight:512,frameCount:4,fps:4
   }),
+  // V111: navio final da Corte Feérica, quatro pulsos luminosos.
+  courtFinal20:Object.freeze({
+    texture:'player-ship-court-final',
+    image:'assets/player/corte_feerica/navio_corte_feerica_nivel_20_animado.png',
+    preview:'assets/player/corte_feerica/navio_corte_feerica_nivel_20_preview.png',
+    frameWidth:512,frameHeight:682,frameCount:4,fps:4
+  }),
   ids:['sobreviventes','corte','culto'],
   definitions:{
     sobreviventes:{
@@ -75,7 +82,8 @@ const SEA_FACTIONS = {
     if(stage!==20)return null;
     const faction=this.faction(profile);
     return faction==='sobreviventes'?this.final20:
-      faction==='culto'?this.cultFinal20:null;
+      faction==='culto'?this.cultFinal20:
+      faction==='corte'?this.courtFinal20:null;
   },
   level20Texture(profile,stage){
     return this.level20Asset(profile,stage)?.texture||null;
@@ -83,6 +91,7 @@ const SEA_FACTIONS = {
   visualPreview(faction,stage){
     if(stage===20&&faction==='sobreviventes')return this.final20.preview;
     if(stage===20&&faction==='culto')return this.cultFinal20.preview;
+    if(stage===20&&faction==='corte')return this.courtFinal20.preview;
     return this.preview(faction,stage);
   },
   preview(faction,stage){
