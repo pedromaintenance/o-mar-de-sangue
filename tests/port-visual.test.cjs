@@ -28,8 +28,13 @@ const {chromium}=require('playwright-core');
       const focused=()=>page.evaluate(()=>document.activeElement?.dataset?.action);
       assert.equal(await focused(),'mission',label+': initial focus');
       if(isMobile){
+        // V112: duas colunas preservam navegação direcional coerente.
+        await page.keyboard.press('ArrowRight');
+        assert.equal(await focused(),'sandbox',label+': horizontal mobile focus');
         await page.keyboard.press('ArrowDown');
-        assert.equal(await focused(),'sandbox',label+': vertical mobile focus');
+        assert.equal(await focused(),'help',label+': vertical mobile focus');
+        await page.keyboard.press('ArrowLeft');
+        assert.equal(await focused(),'yard:armas',label+': horizontal mobile return');
         await page.keyboard.press('ArrowUp');
         assert.equal(await focused(),'mission',label+': vertical mobile return');
       }else{
