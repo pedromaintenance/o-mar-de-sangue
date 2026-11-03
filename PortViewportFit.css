@@ -142,8 +142,16 @@
  .port-ui .port-container{gap:4px;padding-top:4px}
 }
 @media (hover:none) and (pointer:coarse) and (orientation:landscape) and (max-width:1024px){
- .port-ui .port-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+ /* A largura da paisagem permite seis atalhos em apenas duas linhas. */
+ .port-ui .port-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+ .port-ui .port-actions .port-choice--contract,
+ .port-ui .port-actions [data-action="council"]{grid-column:auto;min-height:44px}
+ .port-ui .port-actions .port-choice,.theme-mare-negra .port-actions .port-choice{min-height:44px}
+ .port-ui .port-bottom__actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .port-ui .port-statbar>div{padding:2px}
+ .port-ui .port-section-label{display:none}
  .port-ui .port-upgrades,.port-ui .port-help-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .port-ui .port-council__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(65px,23svh,85px);min-height:0}
+ .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(52px,17svh,65px);min-height:0}
+ .port-ui .port-hero p,.theme-mare-negra .port-hero p{display:none}
 }
