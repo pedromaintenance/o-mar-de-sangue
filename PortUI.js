@@ -5,7 +5,6 @@
  */
 const SEA_PORT_UI = {
   root:null, scene:null, lastPadAt:0, lastPadDir:'', lastYardFocus:null,
-  toolsOpen:false,
   readable:false,
   readableKey:'carcaca.mar.port.readable.v1',
   // A ordem das abas é uma regra de navegação, não depende da posição no DOM.
@@ -33,7 +32,6 @@ const SEA_PORT_UI = {
     try{this.readable=localStorage.getItem(this.readableKey)==='1';}
     catch(_){this.readable=false;}
     this.pendingRestore=null;this.restoreArmed=false;this.comparedFps=null;
-    this.toolsOpen=false;
     const root=document.createElement('div');
     root.id='sea-port-ui';
     root.className='port-ui';
@@ -240,9 +238,8 @@ const SEA_PORT_UI = {
   action(value) {
     const scene=this.scene;if(!scene)return;
     const [name,id]=value.split(':');
-    if(name==='tools-toggle'){
-      this.toolsOpen=!this.toolsOpen;this.render('tools-toggle');return;
-    }
+    if(name==='settings'){this.goto('settings');return;}
+    if(name==='settings-back'){this.goto('menu');return;}
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
     if(name==='contracts'){this.goto('contracts');return;}
     if(name==='council'){this.goto('council');return;}
@@ -529,28 +526,23 @@ const SEA_PORT_UI = {
   header(page,p) {
     const titles={menu:'O MAR DE SANGUE',yard:'ESTALEIRO',help:'DIÁRIO DE BORDO',
       reset:'O ESQUECIMENTO',result:'FIM DA EXPEDIÇÃO',
-      contracts:'CONTRATOS DA COSTA SUL'};
+      contracts:'CONTRATOS DA COSTA SUL',settings:'CONFIGURAÇÕES'};
     return '<header class="port-top">'+
       '<div class="port-top__brand"><span class="port-top__sigil" aria-hidden="true">✥</span>'+
       '<div><span class="port-eyebrow">CRÔNICAS DA CARCAÇA</span>'+
       '<span class="port-top__title">'+(titles[page]||titles.menu)+'</span></div></div>'+
-      '<div class="port-top__right"><span class="port-top__tag">A COSTA NÃO PERDOA</span>'+
+      '<div class="port-top__right">'+
       '<span class="port-top__coins"><span aria-hidden="true">◈</span> '+this.num(p.gold)+' OURO</span>'+
-      (page!=='menu'?'<button type="button" class="port-mini" data-action="menu">← VOLTAR AO PORTO</button>':'')+
+      (page==='settings'?
+        '<button type="button" class="port-mini" data-action="settings-back">← VOLTAR AO PORTO</button>':
+        '<button type="button" class="port-mini port-mini--settings" data-action="settings" aria-label="Abrir configurações">⚙ CONFIGURAÇÕES</button>'+
+        (page!=='menu'?'<button type="button" class="port-mini" data-action="menu">← VOLTAR AO PORTO</button>':''))+
       '</div></header>';
   },
   music() {
     const musicPercent=Math.round(SEA_MUSIC.volume*100);
     const effectsPercent=Math.round(SEA_AUDIO.effectsVolume*100);
-    const compact=typeof window!=='undefined'&&typeof window.matchMedia==='function'&&
-      window.matchMedia('(max-width:780px), (hover:none) and (pointer:coarse) and (max-width:1024px)').matches;
-    const expanded=!compact||this.toolsOpen;
-    return '<div class="port-tools">'+
-      '<button class="port-tools__toggle" type="button" data-action="tools-toggle" '+
-      'aria-controls="port-tools-panel" aria-expanded="'+expanded+'">'+
-      '♫ ÁUDIO · OPÇÕES · FPS '+(expanded?'▴':'▾')+'</button>'+
-      '<div class="port-tools__panel" id="port-tools-panel"'+(expanded?'':' hidden')+'>'+
-      '<div class="port-sound" aria-label="Controles de áudio">'+
+    return '<div class="port-sound" aria-label="Controles de áudio">'+
       '<div class="port-sound__group" aria-label="Volume da música">'+
         '<span class="port-sound__label">♫ MÚSICA</span>'+
         '<button data-action="volume:down" type="button" aria-label="Diminuir volume da música">−</button>'+
@@ -563,21 +555,52 @@ const SEA_PORT_UI = {
         '<span class="port-sound__volume" aria-label="Volume dos efeitos: '+effectsPercent+'%">'+effectsPercent+'%</span>'+
         '<button data-action="fx-volume:up" type="button" aria-label="Aumentar volume dos efeitos">+</button>'+
       '</div>'+
-      '<button data-action="mute" type="button" aria-label="Ligar ou desligar todo o áudio">'+
+      '<button data-action="mute" type="button" aria-pressed="'+(!SEA_AUDIO.enabled)+'" aria-label="Ligar ou desligar todo o áudio">'+
         (SEA_AUDIO.enabled?'SILENCIAR TUDO':'ATIVAR SOM')+'</button>'+
       '<button data-action="import" type="button">TROCAR TRILHAS</button>'+
-      '<button data-action="compare-fps" type="button" aria-label="Comparar dois relatórios FPS JSON">COMPARAR FPS .JSON</button>'+
-      '<button data-action="export-fps" type="button" aria-label="Baixar relatório de FPS da última viagem"'+
-        (SEA_PERFORMANCE.report()?'':' disabled title="Ative o diagnóstico e conclua uma viagem"')+
-        '>BAIXAR RELATÓRIO FPS</button>'+
-      '<button data-action="performance" type="button" aria-pressed="'+(SEA_PERFORMANCE.enabled?'true':'false')+
-        '" aria-label="Mostrar diagnóstico de desempenho na viagem">'+
-        (SEA_PERFORMANCE.enabled?'OCULTAR FPS':'MOSTRAR FPS')+'</button>'+
-      '<button data-action="readability" type="button" aria-pressed="'+(this.readable?'true':'false')+
-        '" aria-label="Alternar leitura ampliada no porto">'+
-        (this.readable?'TEXTO PADRÃO':'AMPLIAR TEXTO')+'</button>'+
       '<small data-music-status>'+this.text(SEA_MUSIC.status())+'</small>'+
-      '</div></div></div>';
+      '</div>';
+  },
+  settings() {
+    const rollback=SEA_SAVE_TRANSFER.lastRollback();
+    const card=(label,subtitle,content,extra='')=>
+      '<section class="port-settings__card '+extra+'" aria-label="'+label+'">'+
+      '<div class="port-settings__heading"><h2>'+label+'</h2><p>'+subtitle+'</p></div>'+
+      content+'</section>';
+    const controls=(action,label,desc='',disabled='')=>
+      '<button class="port-settings__button" type="button" data-action="'+action+'" '+disabled+'>'+
+      '<strong>'+label+'</strong>'+(desc?'<small>'+desc+'</small>':'')+'</button>';
+    return '<main class="port-page port-settings" id="port-main">'+
+      '<section class="port-page__header"><span class="port-eyebrow">MESA DO CAPITÃO · PREFERÊNCIAS</span>'+
+      '<h1>CONFIGURAÇÕES</h1>'+
+      '<p>Áudio, acessibilidade, relatórios e arquivos da viagem em um só lugar.</p></section>'+
+      '<div class="port-settings__grid">'+
+      card('ÁUDIO','Ajustes independentes de música, efeitos e trilhas.',this.music())+
+      card('INTERFACE','Opções de leitura do Porto.',
+        '<div class="port-settings__buttons">'+
+        '<button class="port-settings__button" type="button" data-action="readability" aria-pressed="'+this.readable+'">'+
+        '<strong>'+(this.readable?'TEXTO PADRÃO':'AMPLIAR TEXTO')+'</strong>'+
+        '<small>'+(this.readable?'Restaurar o tamanho compacto':'Aumentar textos e legendas do menu')+'</small></button>'+
+        '</div><p class="port-settings__note">A preferência é guardada apenas neste navegador.</p>')+
+      card('DESEMPENHO','Diagnóstico opcional; não altera jogo nem progresso.',
+        '<div class="port-settings__buttons">'+
+        '<button class="port-settings__button" type="button" data-action="performance" aria-pressed="'+SEA_PERFORMANCE.enabled+'">'+
+        '<strong>'+(SEA_PERFORMANCE.enabled?'OCULTAR FPS':'MOSTRAR FPS')+'</strong>'+
+        '<small>Indicador durante a navegação · atalho F3</small></button>'+
+        controls('export-fps','BAIXAR RELATÓRIO FPS','Última viagem disponível',
+          SEA_PERFORMANCE.report()?'':'disabled title="Ative o diagnóstico e conclua uma viagem"')+
+        controls('compare-fps','COMPARAR FPS .JSON','Comparação local de dois relatórios')+'</div>')+
+      card('DADOS E PROGRESSO','Faça uma cópia antes de trocar ou apagar o progresso.',
+        '<div class="port-settings__buttons">'+
+        controls('export-backup','↓ GUARDAR SAVE .JSON','Exportar progresso atual (v4)')+
+        controls('restore-file','↑ RESTAURAR SAVE .JSON','Conferir e confirmar importação')+
+        (rollback?controls('restore-rollback','↶ DESFAZER RESTAURAÇÃO','Recuperar o save anterior'):'')+
+        '</div><div class="port-settings__danger">'+
+        controls('reset','REINICIAR PROGRESSO','Apagar o progresso deste dispositivo, com confirmação')+
+        '</div>','port-settings__card--data')+
+      '</div><div class="port-page__foot">'+
+      this.button('settings-back','VOLTAR AO PORTO','Continuar a sua jornada','←','port-choice--return')+
+      '</div></main>';
   },
   home(p) {
     const stats=SeaProfile.stats(p);
@@ -618,15 +641,7 @@ const SEA_PORT_UI = {
           '<div><span>VELAS</span><strong>'+this.num(stats.maxSpeed)+'</strong></div>'+
           '<div><span>EXPEDIÇÕES</span><strong>'+this.num(p.sorties)+'</strong></div>'+
         '</div>'+
-        '<div class="port-bottom"><span>O PODER TEM UM PREÇO. O MAR, OUTRO.</span>'+
-          '<div class="port-bottom__actions">'+
-            '<button class="port-text-button" data-action="export-backup" type="button">↓ GUARDAR SAVE .JSON</button>'+
-            '<button class="port-text-button" data-action="restore-file" type="button">↑ RESTAURAR SAVE .JSON</button>'+
-            (SEA_SAVE_TRANSFER.lastRollback()?
-              '<button class="port-text-button" data-action="restore-rollback" type="button">↶ DESFAZER RESTAURAÇÃO</button>':'')+
-            '<button class="port-text-button" data-action="reset" type="button">REINICIAR PROGRESSO ↗</button>'+
-          '</div>'+
-        '</div>'+
+        '<div class="port-bottom port-bottom--quiet"><span>O PODER TEM UM PREÇO. O MAR, OUTRO.</span></div>'+
       '</main>'+
       '<aside class="port-aside port-aside--r">'+
         '<div class="port-aside__frame"><span class="port-eyebrow">DIÁRIO DA FROTA</span>'+
@@ -775,9 +790,9 @@ const SEA_PORT_UI = {
       ['ATRACAÇÃO','Aproxime-se devagar e afaste inimigos. F, botão A ou toque para atracar.'],
       ['ESTALEIRO','Quinze melhorias sem limite artificial; custos triplicados e crescimento por nível mantido. LB/RB ou Q/E trocam as abas.'],
       ['ÁUDIO E PROGRESSO','ESC/P pausa. M abre a carta. N silencia. FLAC automático. O ouro só é consolidado ao retornar ao porto.'],
-      ['SALVAR E RESTAURAR','No Porto: GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
-       ['LEITURA AMPLIADA','Use AMPLIAR TEXTO no Porto para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
-      ['DESEMPENHO','MOSTRAR FPS no rodapé ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.'],
+      ['SALVAR E RESTAURAR','Em CONFIGURAÇÕES, GUARDAR SAVE baixa o JSON; RESTAURAR compara o progresso e exige duas confirmações. ESC, Backspace ou B cancelam. DESFAZER recupera a última cópia local.'],
+       ['LEITURA AMPLIADA','Em CONFIGURAÇÕES, use AMPLIAR TEXTO para aumentar textos de menus, Diário e comparações. A escolha fica salva apenas neste navegador.'],
+      ['DESEMPENHO','MOSTRAR FPS em CONFIGURAÇÕES ativa um indicador de FPS aproximado e tempos de quadro somente durante viagens. F3 alterna com teclado. Ele não modifica o navio, os inimigos ou o save.'],
       ['RELATÓRIO FPS','Ative MOSTRAR FPS, navegue e retorne ao Porto. Use BAIXAR RELATÓRIO FPS para exportar até 180 janelas de um segundo em JSON. Os dados ficam só na memória e desaparecem ao recarregar.'],
       ['CONTRATOS','No Porto, aceite Resgate dos Afogados. A Carta revela primeiro o naufrágio; recolha os sobreviventes e leve-os ao santuário de Deméter. O pagamento só acontece se concluir a entrega.'],
       ['COMPARAR RELATÓRIOS','Selecione dois relatórios FPS JSON. Além das contagens, veja quadros lentos por 1.000 atualizações e saturação FX por 1.000 quando disponível. Tudo permanece no aparelho, sem modificar saves.']
@@ -927,6 +942,7 @@ const SEA_PORT_UI = {
     const active=preferred||document.activeElement?.dataset?.action||null;
     const p=SeaProfile.load(),page=this.scene.page;
     const body=page==='yard'?this.yard(p):page==='help'?this.help():
+      page==='settings'?this.settings():
       page==='reset'?this.reset():page==='restore'?this.restore():
       page==='fps-compare'?this.fpsCompare():page==='contracts'?this.contracts():
       page==='council'?this.council(p):
@@ -935,9 +951,9 @@ const SEA_PORT_UI = {
       '<span class="port-background__moon"></span><span class="port-background__sea"></span>'+
       '<span class="port-background__vignette"></span></div>'+
       '<div class="port-container">'+this.header(page,p)+body+
-      '<footer class="port-footer"><span>O MAR DE SANGUE · CARCAÇA</span>'+
+      '<footer class="port-footer port-footer--quiet"><span>O MAR DE SANGUE · CARCAÇA</span>'+
       '<span class="port-pad-hint">✥ DIRECIONAL: NAVEGAR · A: CONFIRMAR · B: VOLTAR</span>'+
-      this.music()+'<span class="port-footer__version">PORTO RECONSTRUÍDO</span></footer>'+
+      '<span class="port-footer__version">PORTO RECONSTRUÍDO</span></footer>'+
       '</div><div class="port-toast" hidden role="status"></div>'+
       '<input id="sea-port-tracks" hidden type="file" multiple accept=".flac,.mp3,audio/*">'+
        '<input id="sea-port-backup" hidden type="file" accept=".json,application/json">'+
