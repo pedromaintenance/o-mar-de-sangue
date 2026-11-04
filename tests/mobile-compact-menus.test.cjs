@@ -46,7 +46,7 @@ const {chromium}=require('playwright-core');
    for(const [menu,selector] of [
       ['menu','.port-hero'],['yard','.port-upgrades'],
       ['help','.port-help-grid'],['council','.port-council__grid'],
-      ['contracts','.port-contracts'],['reset','.port-warning']
+      ['contracts','.port-contracts'],['settings','.port-settings'],['reset','.port-warning']
    ]){
     await page.evaluate(target=>{
       const ui=SEA_PORT_UI;
@@ -80,9 +80,9 @@ const {chromium}=require('playwright-core');
        'mobile-compact-'+config.name+'-'+menu+'.png'),fullPage:true});
    }
    if(config.mobile){
-    await page.evaluate(()=>{SEA_PORT_UI.scene.page='menu';SEA_PORT_UI.render()});
-    if(config.mobile)await page.locator('[data-action="tools-toggle"]').click();
+    await page.evaluate(()=>{SEA_PORT_UI.scene.page='settings';SEA_PORT_UI.render()});
     await page.locator('[data-action="readability"]').click();
+    await page.evaluate(()=>{SEA_PORT_UI.scene.page='menu';SEA_PORT_UI.render()});
     const readable=await page.locator('.port-choice__copy strong').first()
       .evaluate(x=>parseFloat(getComputedStyle(x).fontSize));
     assert(readable>=12.5&&readable<=14,
