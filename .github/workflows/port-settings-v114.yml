@@ -1,0 +1,58 @@
+name: V114 - Configuracoes centralizadas
+on:
+  pull_request:
+    paths:
+      - PortUI.js
+      - PortSettings.css
+      - PortViewportFit.css
+      - index.html
+      - sw.js
+      - tests/port-settings-v114.test.cjs
+      - tests/port-visual.test.cjs
+      - tests/port-viewport-fit-v112.test.cjs
+      - tests/mobile-compact-menus.test.cjs
+      - tests/mare-negra-hud-visual.test.cjs
+      - tests/port-ui-rebuild.test.cjs
+      - .github/workflows/port-settings-v114.yml
+  push:
+    branches: [main]
+    paths:
+      - PortUI.js
+      - PortSettings.css
+      - PortViewportFit.css
+      - index.html
+      - sw.js
+      - tests/port-settings-v114.test.cjs
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate scripts, save and controls
+        run: |
+          node --check PortUI.js
+          node tests/port-ui-rebuild.test.cjs
+          node tests/port-controller-navigation.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+  browser-settings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Settings on desktop and phone
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/settings-v114.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/port-settings-v114.test.cjs
+          node tests/port-viewport-fit-v112.test.cjs
