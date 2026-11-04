@@ -59,6 +59,9 @@ const {chromium}=require('playwright-core');
         label+': menu tem overflow horizontal '+JSON.stringify(measure));
       assert(measure.heroWidth>width*(isMobile?.75:.32),
         label+': largura de herói insuficiente '+JSON.stringify(measure));
+      // V114: administrative controls are on Settings, not the home footer.
+      await page.locator('[data-action="settings"]').click();
+      await page.locator('.port-settings').waitFor({timeout:10000});
       // 3.6b: browser file download and profile immutability.
       const stateBeforeBackup=await page.evaluate(()=>({
         save:localStorage.getItem('carcaca.mar-de-sangue.v4'),
@@ -145,6 +148,8 @@ const {chromium}=require('playwright-core');
       }));
       assert.equal(afterRestore.profile.gold,importedData.profile.gold);
       assert.equal(afterRestore.rollback.profile.gold,stateBeforeBackup.profile.gold);
+      await page.locator('[data-action="settings"]').click();
+      await page.locator('.port-settings').waitFor({timeout:10000});
       assert.equal(await page.locator('[data-action="restore-rollback"]').count(),1);
       await page.locator('[data-action="restore-rollback"]').click();
       await page.locator('.port-restore').waitFor({timeout:10000});
@@ -208,8 +213,9 @@ const {chromium}=require('playwright-core');
         SeaProfile.store(p);
         SEA_PORT_UI.render();
       },goldBeforeFocusQA);
-      // 3.5b — exercise both footer mixers with real mouse/touch hitboxes.
-      if(isMobile)await page.locator('[data-action="tools-toggle"]').click();
+      // 3.5b — real audio mixers, now inside dedicated Settings.
+      await page.locator('[data-action="settings"]').click();
+      await page.locator('.port-settings').waitFor({timeout:10000});
       const audioBefore=await page.evaluate(()=>({
         music:SEA_MUSIC.volume,fx:SEA_AUDIO.effectsVolume,
         enabled:SEA_AUDIO.enabled,
@@ -244,8 +250,9 @@ const {chromium}=require('playwright-core');
       const afterReload=await page.evaluate(()=>({music:SEA_MUSIC.volume,fx:SEA_AUDIO.effectsVolume}));
       assert(Math.abs(afterReload.music-.3)<.0001&&Math.abs(afterReload.fx-.9)<.0001,
         'Independent audio preferences must survive page reload');
-      // 3.6e: readable typography is a reversible PORT-only preference.
-      if(isMobile)await page.locator('[data-action="tools-toggle"]').click();
+      // 3.6e: readable typography remains a reversible PORT-only preference.
+      await page.locator('[data-action="settings"]').click();
+      await page.locator('.port-settings').waitFor({timeout:10000});
       const readingBefore=await page.evaluate(()=>({
         size:parseFloat(getComputedStyle(document.querySelector('.port-choice__copy small')).fontSize),
         save:localStorage.getItem('carcaca.mar-de-sangue.v4'),
@@ -270,6 +277,8 @@ const {chromium}=require('playwright-core');
       assert(readable.overflow<=2,label+': readable home horizontal overflow');
       await page.screenshot({path:path.join('port-artifacts',
         label+'-readable-port-3-6e.png'),fullPage:true});
+      await page.locator('[data-action="settings-back"]').first().click();
+      await page.locator('.port-hero').waitFor({timeout:15000});
       await page.locator('[data-action="help"]').click();
       await page.locator('.port-help-grid').waitFor();
       assert(await page.locator('.port-help-grid').innerText().then(t=>t.includes('LEITURA AMPLIADA')));
@@ -290,9 +299,10 @@ const {chromium}=require('playwright-core');
       await page.locator('[data-action="restore-cancel"]').click();
       await page.reload({waitUntil:'domcontentloaded'});
       await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
+      await page.locator('[data-action="settings"]').click();
+      await page.locator('.port-settings').waitFor({timeout:10000});
       assert.equal(await page.locator('[data-action="readability"]').getAttribute('aria-pressed'),'true',
         label+': persisted reading preference must survive reload');
-      if(isMobile)await page.locator('[data-action="tools-toggle"]').click();
       await page.locator('[data-action="readability"]').click();
       assert.equal(await page.locator('[data-action="readability"]').getAttribute('aria-pressed'),'false');
       assert.equal(await page.evaluate(()=>localStorage.getItem('carcaca.mar.port.readable.v1')),'0');
@@ -309,9 +319,10 @@ const {chromium}=require('playwright-core');
         localStorage.getItem('carcaca.mar-de-sangue.v4')),priorPerfSave);
       await page.reload({waitUntil:'domcontentloaded'});
       await page.locator('#sea-port-ui .port-hero').waitFor({timeout:40000});
+      await page.locator('[data-action="settings"]').click();
+      await page.locator('.port-settings').waitFor({timeout:10000});
       assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'true',
         label+': FPS preference must survive reload');
-      if(isMobile)await page.locator('[data-action="tools-toggle"]').click();
       await page.locator('[data-action="performance"]').click();
       assert.equal(await page.locator('[data-action="performance"]').getAttribute('aria-pressed'),'false');
       assert.equal(await page.evaluate(()=>
