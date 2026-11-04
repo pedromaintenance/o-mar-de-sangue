@@ -26,7 +26,8 @@ const {chromium}=require('playwright-core');
     return {
       viewportHeight:root.clientHeight,documentHeight:root.scrollHeight,
       overflowX:root.scrollWidth-root.clientWidth,
-      settingsVisible:!!settings&&settings.getBoundingClientRect().height>=43.5,
+      settingsVisible:!!settings&&settings.getBoundingClientRect().height>0,
+      settingsHeight:settings?.getBoundingClientRect().height||0,
       footerButtons:root.querySelectorAll('.port-footer button').length,
       cards:[...root.querySelectorAll('.port-actions .port-choice')].map(el=>{
        const r=el.getBoundingClientRect();return {h:r.height,w:r.width,top:r.top};
@@ -48,7 +49,7 @@ const {chromium}=require('playwright-core');
       'mobile retrato: contratos e conselho devem ficar em linhas distintas');
    }
    if(v.mobile){
-    assert(state.settingsVisible,'Settings access must remain visible');
+    assert(state.settingsVisible&&state.settingsHeight>=43.5,'Settings must have a mobile-sized tap target');
     assert(state.cards.every(x=>x.h>=43.5),'undersized action target');
     assert(Math.abs(state.cards[0].top-state.cards[1].top)<2,'two-column mobile actions');
     if(v.fit)assert(state.documentHeight<=state.viewportHeight+4,
