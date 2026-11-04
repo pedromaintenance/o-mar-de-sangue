@@ -22,11 +22,13 @@ const {chromium}=require('playwright-core');
    await page.locator('#sea-port-ui .port-hero').waitFor({timeout:60000});
    const state=await page.evaluate(()=>{
     const root=document.querySelector('#sea-port-ui');
-    const tools=root.querySelector('.port-tools__toggle'),panel=root.querySelector('.port-tools__panel');
+    const settings=root.querySelector('[data-action="settings"]');
     return {
       viewportHeight:root.clientHeight,documentHeight:root.scrollHeight,
       overflowX:root.scrollWidth-root.clientWidth,
-      hidden:panel.hidden,expanded:tools.getAttribute('aria-expanded'),
+      settingsVisible:!!settings&&settings.getBoundingClientRect().height>0,
+      settingsHeight:settings?.getBoundingClientRect().height||0,
+      footerButtons:root.querySelectorAll('.port-footer button').length,
       cards:[...root.querySelectorAll('.port-actions .port-choice')].map(el=>{
        const r=el.getBoundingClientRect();return {h:r.height,w:r.width,top:r.top};
       }),
@@ -47,19 +49,19 @@ const {chromium}=require('playwright-core');
       'mobile retrato: contratos e conselho devem ficar em linhas distintas');
    }
    if(v.mobile){
-    assert(state.hidden,'secondary settings start collapsed');
+    assert(state.settingsVisible&&state.settingsHeight>=43.5,'Settings must have a mobile-sized tap target');
     assert(state.cards.every(x=>x.h>=43.5),'undersized action target');
     assert(Math.abs(state.cards[0].top-state.cards[1].top)<2,'two-column mobile actions');
     if(v.fit)assert(state.documentHeight<=state.viewportHeight+4,
       v.name+' scrolling remains: '+JSON.stringify(state));
-    await page.locator('[data-action="tools-toggle"]').click();
-    assert.equal(await page.locator('[data-action="tools-toggle"]').getAttribute('aria-expanded'),'true');
+    assert.equal(state.footerButtons,0,'No footer action buttons');
+    await page.locator('[data-action="settings"]').click();
+    await page.locator('.port-settings').waitFor();
     await page.locator('[data-action="volume:up"]').click();
-    assert.equal(await page.locator('[data-action="tools-toggle"]').getAttribute('aria-expanded'),'true');
-    await page.locator('[data-action="tools-toggle"]').click();
-    assert.equal(await page.locator('[data-action="tools-toggle"]').getAttribute('aria-expanded'),'false');
+    await page.locator('[data-action="settings-back"]').first().click();
+    await page.locator('.port-hero').waitFor();
    }else{
-    assert(!state.hidden,'desktop sound controls must remain expanded');
+    assert(state.settingsVisible,'Desktop header must have Settings');
     assert(state.font>13,'desktop font too small');
    }
    await page.evaluate(()=>{SEA_PORT_UI.scene.page='yard';SEA_PORT_UI.scene.yardGroup='armas';SEA_PORT_UI.render()});
