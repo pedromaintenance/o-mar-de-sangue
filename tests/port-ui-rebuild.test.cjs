@@ -95,12 +95,16 @@ vm.runInContext(script+'\nthis.ui=SEA_PORT_UI;',context);
 const ui=context.ui;
 assert(ui.mount(scene));
 assert(classes.has('port-ui-open'));
-for(const action of ['mission','sandbox','yard:armas','help','reset']){
+for(const action of ['mission','sandbox','yard:armas','help','settings']){
  assert(ui.root.innerHTML.includes('data-action="'+action+'"'));
 }
 assert(ui.root.innerHTML.includes('ship_flagship.png'));
 assert(ui.root.innerHTML.includes('700'));
-assert(ui.root.innerHTML.includes('export-backup'),'Backup should be visible from port');
+assert(!ui.root.innerHTML.includes('export-backup'),'Backup belongs in Settings, not the home menu');
+assert(!ui.root.innerHTML.includes('port-bottom__actions'),'Home menu should not have administrative actions');
+scene.page='settings';ui.render();
+assert(ui.root.innerHTML.includes('DADOS E PROGRESSO'),'Settings should expose save operations');
+assert(ui.root.innerHTML.includes('data-action="reset"'),'Reset entry belongs in Settings');
 const beforeReadable=JSON.stringify(p);
 assert.equal(ui.readable,false,'Default font mode must be unchanged');
 assert(ui.root.innerHTML.includes('data-action="readability"'));
@@ -163,6 +167,7 @@ assert(!ui.root.classList.contains('port-ui--readable'));
 assert(ui.root.innerHTML.includes('AMPLIAR TEXTO'));
 assert.equal(JSON.stringify(p),beforeReadable);
 assert(writes.every(([key])=>key==='carcaca.mar.port.readable.v1'));
+scene.page='menu';ui.render();
 ui.action('mission');assert.equal(starts.at(-1)[0],'Game');
 assert.equal(starts.at(-1)[1].stage,5);
 ui.action('sandbox');assert.equal(starts.at(-1)[1].mode,'sandbox');
@@ -188,9 +193,11 @@ assert(ui.root.innerHTML.includes('reset-confirm'),'Export must not confirm the 
 scene.page='result';scene.report={won:true,mode:'mission',collected:200,reward:150,
  bank:850,kills:8,rammings:3,stage:4,islands:2};
 ui.render();assert(ui.root.innerHTML.includes('OURO RECUPERADO'));
+assert(!ui.root.innerHTML.includes('fx-volume:down'),'No footer audio controls on results page');
+scene.page='settings';ui.render();
 ui.action('volume:up');assert.equal(SEA_MUSIC.volume,.3);
 assert(ui.root.innerHTML.includes('fx-volume:down'),
- 'SFX buttons must be reachable on every port screen');
+ 'SFX buttons must be reachable in Settings');
 ui.action('fx-volume:down');
 assert.equal(SEA_AUDIO.effectsVolume,.9);
 assert.equal(SEA_MUSIC.volume,.3,'FX gain must not change music gain');
