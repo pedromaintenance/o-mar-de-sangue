@@ -16,6 +16,12 @@
  .port-ui .port-hero,.theme-mare-negra .port-hero{height:clamp(210px,28vh,270px)}
  .port-ui .port-hero h1,.theme-mare-negra .port-hero h1{font-size:clamp(39px,4.7vw,68px);margin:5px 0 9px}
  .port-ui .port-actions{gap:8px}
+ /* V113: sexto atalho fecha a terceira linha, em vez de deixar meia linha vazia. */
+ .port-ui .port-actions .port-choice--contract{grid-column:auto}
+ .port-ui .port-actions .port-choice--contract .port-choice__copy strong,
+ .port-ui .port-actions [data-action="council"] .port-choice__copy strong{
+   font-size:clamp(12px,1vw,15px);letter-spacing:.035em;
+ }
  .port-ui .port-actions .port-choice,.theme-mare-negra .port-actions .port-choice{min-height:68px;padding:9px 30px 9px 11px;gap:10px}
  .port-ui .port-choice__icon{flex-basis:38px;height:38px;font-size:20px}
  .port-ui .port-statbar>div{padding:8px 5px}

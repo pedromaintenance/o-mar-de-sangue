@@ -35,6 +35,17 @@ const {chromium}=require('playwright-core');
    });
    assert(state.overflowX<=2,v.name+' horizontal overflow '+JSON.stringify(state));
    assert.equal(state.cards.length,6);
+   // V113: Contratos e Conselho fecham juntos a ultima linha no desktop;
+   // retrato mobile preserva os dois atalhos em largura inteira.
+   if(!v.mobile){
+    assert(Math.abs(state.cards[4].top-state.cards[5].top)<2,
+      'desktop: contratos e conselho precisam compartilhar a terceira linha');
+    assert(Math.abs(state.cards[4].w-state.cards[5].w)<2,
+      'desktop: contratos e conselho precisam ter largura equivalente');
+   }else if(v.h>v.w){
+    assert(state.cards[5].top>state.cards[4].top,
+      'mobile retrato: contratos e conselho devem ficar em linhas distintas');
+   }
    if(v.mobile){
     assert(state.hidden,'secondary settings start collapsed');
     assert(state.cards.every(x=>x.h>=43.5),'undersized action target');
