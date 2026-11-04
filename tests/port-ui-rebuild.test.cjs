@@ -123,7 +123,7 @@ const savedBeforeComparison=JSON.stringify(p);
 ui.action('menu');
 assert.equal(ui.comparedFps,null);
 assert.equal(JSON.stringify(p),savedBeforeComparison);
-scene.page='menu';ui.render();
+scene.page='settings';ui.render();
 
 assert(ui.root.innerHTML.includes('disabled title="Ative o diagnóstico'));
 const mockReport={
