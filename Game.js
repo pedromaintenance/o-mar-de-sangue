@@ -2549,6 +2549,13 @@ class Game extends Phaser.Scene {
             report.contractEscaped=!!this.contract.escaped;
             report.contractHunt=this.contract.id==='hunt';
             report.contractRoute=this.contract.route||null;
+            // Temporary expedition decisions recorded in the debrief; no save schema changes.
+            report.contractDecision=this.contract.id==='rescue'?
+                (this.contract.evacuation==='all'?'TODOS A BORDO · CORSÁRIOS NA ESTEIRA':'EVACUAÇÃO PRIORITÁRIA'):
+                this.contract.id==='hunt'?
+                (this.contract.method==='evidence'?'PROVAS E INFORMANTES':'PERSEGUIÇÃO IMEDIATA'):
+                (this.contract.route==='hidden'?'ENTREGA CLANDESTINA':
+                 this.contract.route==='inform'?'DENÚNCIA À CORTE':'ACORDO COM OS FISCAIS');
         }
         // Ir ao porto garante que todos os efeitos e eventos da cena sejam encerrados.
         this.scene.start('SeaPort', { page: 'result', report });
