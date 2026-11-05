@@ -332,7 +332,7 @@ const SEA_CONTRACTS = {
       s.islandOutcome=all?
         'Você acolhe os últimos sobreviventes e desafia os traficantes que os caçavam.\n'+
         'Um corsário segue seu rastro. Leve TODOS a Deméter por '+c.bounty+' ouro.':
-        'Os feridos prioritários estão a bordo. Quem ficou aguarda outra embarcação.\n'+
+        'Os náufragos feridos estão a bordo. Quem ficou aguarda outra embarcação.\n'+
         'Leve os resgatados ao Santuário de Deméter, marcado na Carta.';
       this.mark(s);
     }else{
