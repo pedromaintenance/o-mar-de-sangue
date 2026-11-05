@@ -1,15 +1,15 @@
-/* O Mar de Sangue — 3.7a: primeiro contrato jogável da Costa Sul.
+/* O Mar de Sangue — V115: dilemas jogáveis dos Contratos da Costa Sul.
  * Resgate com dois portos físicos, risco em combate e pagamento no retorno.
  * Estado somente na cena: não modifica SeaProfile nem o esquema do save v4.
  */
 const SEA_CONTRACTS = {
   offers:Object.freeze({
     rescue:Object.freeze({title:'RESGATE DOS AFOGADOS',bounty:125,
-      description:'Recolha sobreviventes de um naufrágio e conduza-os a um santuário de Deméter. Fuja dos navios hostis: o contrato só paga após a entrega.'}),
+      description:'Um barco de refugiados foi abandonado pela frota. Quem fica para trás? Resgate o grupo e escolha entre uma evacuação segura ou levar todos sob perseguição.'}),
     hunt:Object.freeze({title:'A CAÇADA DOS CONDENADOS',bounty:240,
-      description:'Investigue um naufrágio, siga o rastro de uma fragata da Corte e intercepte o capitão antes que atravesse os limites do arquipélago. A presa não espera por ninguém.'}),
+      description:'A Corte quer silenciar um capitão desertor. Siga o rastro ou compre tempo investigando as provas: menos ouro, mais chances de interceptação.'}),
     smuggle:Object.freeze({title:'PÓLVORA SEM BANDEIRA',bounty:190,
-      description:'Leve pólvora clandestina a uma ruína da Costa Sul. A fiscalização da Corte pode confiscar a carga. Navegue discretamente ou suborne os agentes no destino.'})
+      description:'Carregue pólvora sem registro. Fuja da inspeção, compre o silêncio dos fiscais ou denuncie a rede à Corte e aceite o preço político.'})
   }),
   init(s,id) {
     s.contract=null;
@@ -26,7 +26,7 @@ const SEA_CONTRACTS = {
         Math.hypot(a.x-center.x,a.y-center.y)-Math.hypot(b.x-center.x,b.y-center.y)||a.id-b.id)[0];
       s.contract={id:'hunt',clueId:clue.id,phase:'clue',completed:false,
         escaped:false,targetEnemyId:null,escapeAt:0,exitX:null,exitY:null,
-        bounty:this.offers.hunt.bounty};
+        bounty:this.offers.hunt.bounty,method:'pursuit'};
       this.decorate(s,id,authorized);
       this.mark(s);
       return true;
@@ -55,7 +55,8 @@ const SEA_CONTRACTS = {
     const pickup=[...wrecks].sort((a,b)=>dist(a,center)-dist(b,center)||a.id-b.id)[0];
     const shelter=[...shelters].sort((a,b)=>dist(a,pickup)-dist(b,pickup)||a.id-b.id)[0];
     s.contract={id:'rescue',pickupId:pickup.id,shelterId:shelter.id,
-      phase:'pickup',completed:false,bounty:this.offers.rescue.bounty};
+      phase:'pickup',completed:false,bounty:this.offers.rescue.bounty,
+      evacuation:'priority',pursuerId:null};
     this.decorate(s,id,authorized);
     this.mark(s);
     return true;
@@ -94,7 +95,8 @@ const SEA_CONTRACTS = {
       if(c.escaped)return 'CAÇADA FRACASSADA · A FRAGATA ESCAPOU';
       if(c.phase==='clue')return 'CAÇADA · INVESTIGUE O NAUFRÁGIO MARCADO NA CARTA';
       const remaining=Math.max(0,Math.ceil(c.escapeAt-(s.elapsed||0)));
-      return 'CAÇADA · INTERCEPTE A FRAGATA · '+remaining+'s PARA FUGA';
+      return 'CAÇADA · '+(c.method==='evidence'?'PROVAS EM MÃOS · ':'')+
+        'INTERCEPTE A FRAGATA · '+remaining+'s PARA FUGA';
     }
     if(c.id==='smuggle'){
       if(c.intercepted)return 'CARGA APREENDIDA PELA CORTE';
@@ -103,25 +105,48 @@ const SEA_CONTRACTS = {
     }
     return c.completed?'RESGATE CONCLUÍDO · RETORNE AO PORTO':
       c.phase==='pickup'?'RESGATE · LOCALIZE OS NÁUFRAGOS NA CARTA':
-      'RESGATE · ENTREGUE OS NÁUFRAGOS A DEMÉTER';
+      (c.evacuation==='all'?'RESGATE TOTAL · CORSÁRIOS NA SUA ESTEIRA · ':'RESGATE · ')+
+      'ENTREGUE OS NÁUFRAGOS A DEMÉTER';
+  },
+  scene(s,island){
+    const c=s.contract,target=this.target(s);
+    if(!c||!island||target?.id!==island.id)return null;
+    if(c.id==='rescue')return c.phase==='pickup'?
+      'Entre tábuas partidas, os últimos náufragos suplicam por lugar. Uma escolta inimiga vigia o canal. Decida quem embarca antes que a maré feche.':
+      'As lanternas de Deméter tremem no cais. Os resgatados estão exaustos, e o abrigo conta cada nome para saber quem não voltou.';
+    if(c.id==='hunt')return 'O capitão foi declarado desertor. Um diário manchado registra sua rota; as testemunhas exigem parte da recompensa para revelar o que a Corte apagou.';
+    if(c.id==='smuggle')return 'O armazém não tem bandeira. Há fiscais nas sombras e compradores sem rosto. A suspeita marca '+Math.round(c.suspicion)+'%; a carga pode ser entregue, vendida ou denunciada.';
+    return null;
   },
   options(s,island) {
     const c=s.contract,target=this.target(s);
     if(!c||!target||!island||island.id!==target.id)return null;
-    if(c.id==='hunt')return [{id:'hunt-clue',contractAction:'hunt-clue',
-      name:'INVESTIGAR OS ÚLTIMOS REGISTROS',
-      hint:'Revelar a fragata fugitiva na Carta · iniciar perseguição'}];
+    if(c.id==='hunt')return [
+      {id:'hunt-clue',contractAction:'hunt-clue',
+        name:'SEGUIR AS PEGADAS DA FRAGATA',
+        hint:'105 s para caçar · '+c.bounty+' ouro · alvo resistente'},
+      {id:'hunt-evidence',contractAction:'hunt-evidence',
+        name:'INTERROGAR A TRIPULAÇÃO E REUNIR PROVAS',
+        hint:'160 s para caçar · alvo menos resistente · prêmio 28% menor'}
+    ];
     if(c.id==='smuggle')return [
       {id:'smuggle-hidden',contractAction:'smuggle-hidden',
         name:'ENTREGAR SEM SER VISTO',
         hint:'Suspeita abaixo de 60% · 190 ouro · +12 maldição'},
       {id:'smuggle-bribe',contractAction:'smuggle-bribe',
         name:'COMPRAR O SILÊNCIO DA CORTE',
-        hint:'Acordo corrupto · prêmio reduzido a 115 ouro'}
+        hint:'Acordo corrupto · prêmio reduzido a 115 ouro'},
+      {id:'smuggle-inform',contractAction:'smuggle-inform',
+        name:'ENTREGAR OS NOMES DOS COMPRADORES',
+        hint:'85 ouro · +8 confiança da Corte · −5 do Culto'}
     ];
     return c.phase==='pickup'?
-      [{id:'rescue-pickup',contractAction:'pickup',name:'RECOLHER OS NÁUFRAGOS',
-        hint:'Embarcar sobreviventes · depois buscar o santuário'}]:
+      [
+        {id:'rescue-pickup',contractAction:'pickup',name:'PRIORIZAR OS FERIDOS',
+          hint:'Evacuação controlada · pagamento normal · sem novo perseguidor'},
+        {id:'rescue-all',contractAction:'rescue-all',name:'NÃO DEIXAR NINGUÉM PARA TRÁS',
+          hint:'+'+80+' ouro · um corsário hostil tentará impedir a travessia'}
+      ]:
       [{id:'rescue-deliver',contractAction:'deliver',name:'DESEMBARCAR SOBREVIVENTES',
         hint:'Concluir o resgate · '+c.bounty+' ouro'}];
   },
@@ -173,15 +198,16 @@ const SEA_CONTRACTS = {
     if(c?.id!=='hunt'||c.phase!=='chase')return null;
     return s.enemies?.find(e=>e.id===c.targetEnemyId&&!e.dead)||null;
   },
-  launch(s) {
+  launch(s,method='pursuit') {
     const c=s.contract;
     if(c?.id!=='hunt'||c.phase!=='clue')return false;
+    if(method!=='pursuit'&&method!=='evidence')return false;
     const enemy=s.spawnEnemy?.('fragata',640);
     if(!enemy)return false;
     // Named fugitive, not a generic mission kill. The exit lies on the
     // opposite edge, so the player has a meaningful interception window.
     enemy.huntTarget=true;
-    enemy.hp=Math.round(enemy.hp*1.25);
+    enemy.hp=Math.round(enemy.hp*(method==='evidence'?1.05:1.25));
     enemy.maxhp=enemy.hp;
     enemy.reward=Math.round(enemy.reward*.7);
     enemy.label?.setText('✦ CAPITÃO CONDENADO · FRAGATA');
@@ -190,9 +216,12 @@ const SEA_CONTRACTS = {
     c.exitY=Math.max(125,Math.min(s.H-125,enemy.y));
     c.targetEnemyId=enemy.id;
     c.phase='chase';
-    c.escapeAt=(s.elapsed||0)+105;
+    c.method=method;
+    if(method==='evidence')c.bounty=Math.round(c.bounty*.72);
+    c.escapeAt=(s.elapsed||0)+(method==='evidence'?160:105);
     s.chartWaypointId=null;
-    s.announce?.('A CARTA MARCOU UMA PRESA EM MOVIMENTO · 105s PARA INTERCEPTAR');
+    s.announce?.('A CARTA MARCOU A FRAGATA · '+(method==='evidence'?
+      '160s · PROVAS EM MÃOS, PRÊMIO REDUZIDO':'105s PARA INTERCEPTAR'));
     return true;
   },
   evade(s,e,dt) {
@@ -239,13 +268,18 @@ const SEA_CONTRACTS = {
        (c.phase==='pickup'&&s.islandVisits?.has(target.id))||c.completed||
        c.intercepted)return false;
     if(c.id==='hunt'){
-      if(choice.contractAction!=='hunt-clue'||c.phase!=='clue')return false;
-      if(!this.launch(s)){
+      const method=choice.contractAction==='hunt-clue'?'pursuit':
+        choice.contractAction==='hunt-evidence'?'evidence':null;
+      if(!method||c.phase!=='clue')return false;
+      if(!this.launch(s,method)){
         s.islandError='NÃO FOI POSSÍVEL LOCALIZAR A FRAGATA · TENTE NOVAMENTE';
         return false;
       }
-      s.islandOutcome='Um diário de bordo registra o capitão foragido.\n'+
-        'A Carta revela sua posição atual. Navegue rápido: a presa foge para além do arquipélago.';
+      s.islandOutcome=method==='evidence'?
+        'Os marinheiros testemunham contra a Corte e revelam a rota de fuga.\n'+
+        'A perseguição terá 160 segundos e a fragata está mais frágil, mas os informantes levaram 28% do prêmio.':
+        'Um diário de bordo registra o capitão foragido.\n'+
+        'A Carta revela sua posição atual. Você tem 105 segundos para interceptá-lo.';
       s.islandVisits.add(target.id);s.islandChoiceIndex=0;s.islandError='';
       s.updateHUD?.();
       return true;
@@ -253,16 +287,21 @@ const SEA_CONTRACTS = {
     if(c.id==='smuggle'){
       // A visited ruin can still receive cargo; c.completed prevents replay.
       const hidden=choice.contractAction==='smuggle-hidden';
-      if(!hidden&&choice.contractAction!=='smuggle-bribe')return false;
+      const inform=choice.contractAction==='smuggle-inform';
+      if(!hidden&&!inform&&choice.contractAction!=='smuggle-bribe')return false;
       if(hidden&&c.suspicion>=60){
         s.islandError='SUSPEITA ELEVADA: USE O ACORDO COM A CORTE';
         return false;
       }
-      c.route=hidden?'hidden':'bribe';
+      c.route=hidden?'hidden':inform?'inform':'bribe';
       // The clandestine delivery is worth more than a Court bribe.
       c.bounty=c.commission?
-        (hidden?c.commissionBounty:Math.round(c.commissionBounty*.61)):
-        (hidden?190:115);
+        (hidden?c.commissionBounty:Math.round(c.commissionBounty*(inform?.45:.61))):
+        (hidden?190:inform?85:115);
+      if(inform&&s.alignment){
+        s.alignment.corte=Math.min(100,Math.max(0,(s.alignment.corte||0)+8));
+        s.alignment.culto=Math.min(100,Math.max(0,(s.alignment.culto||0)-5));
+      }
       if(hidden){
         s.curse=Math.min(100,Math.max(0,(s.curse||0)+12));
         if(typeof SEA_WEATHER!=='undefined')SEA_WEATHER.announceTier(s);
@@ -271,6 +310,9 @@ const SEA_CONTRACTS = {
       s.islandOutcome=hidden?
         'A pólvora desaparece pelas passagens da ruína.\n'+
           'Entrega clandestina concluída · prêmio conforme o contrato · +12 maldição.':
+        inform?
+        'Você entrega os nomes dos compradores e abre suas rotas à fiscalização.\n'+
+          'A Corte paga menos, ganha influência e o Culto perde confiança em você.':
         'Os fiscais recebem sua parte e apagam o registro.\n'+
           'A Corte tolera o tráfico por hoje · prêmio reduzido.';
       s.chartWaypointId=null;
@@ -279,12 +321,29 @@ const SEA_CONTRACTS = {
       s.announce?.(this.status(s));
       return true;
     }
-    if((c.phase==='pickup'&&choice.contractAction!=='pickup')||
+    if((c.phase==='pickup'&&!['pickup','rescue-all'].includes(choice.contractAction))||
        (c.phase==='deliver'&&choice.contractAction!=='deliver'))return false;
     if(c.phase==='pickup'){
+      const all=choice.contractAction==='rescue-all';
+      if(all){
+        // Extra risk is required for the bonus: no phantom +80 when spawn fails.
+        const pursuer=s.spawnEnemy?.('corsario',700,{forcedHostile:true});
+        if(!pursuer){
+          s.islandError='NÃO FOI POSSÍVEL MOBILIZAR O PERSEGUIDOR · TENTE OUTRA ROTA';
+          return false;
+        }
+        pursuer.contractPursuer=true;
+        pursuer.label?.setText?.('☠ CORSÁRIO · NÃO DEIXE NINGUÉM ESCAPAR');
+        c.pursuerId=pursuer.id;
+        c.bounty+=80;
+        c.evacuation='all';
+      }
       c.phase='deliver';
-      s.islandOutcome='Os náufragos estão a bordo. Seus perseguidores continuam no mar.\n'+
-        'Leve-os ao Santuário de Deméter, agora marcado na Carta.';
+      s.islandOutcome=all?
+        'Você acolhe os últimos sobreviventes e desafia os traficantes que os caçavam.\n'+
+        'Um corsário segue seu rastro. Leve TODOS a Deméter por '+c.bounty+' ouro.':
+        'Os náufragos feridos estão a bordo. Quem ficou aguarda outra embarcação.\n'+
+        'Leve os resgatados ao Santuário de Deméter, marcado na Carta.';
       this.mark(s);
     }else{
       c.completed=true;
