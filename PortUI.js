@@ -934,7 +934,10 @@ const SEA_PORT_UI = {
       ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?(isHunt?'ALVO ABATIDO':'ENTREGUE'):
         r.contractEscaped?'FUGIU':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
         ['PRÊMIO DO CONTRATO',r.contractBounty||0],
-        ...(r.contractRoute?[[ 'FORMA DA ENTREGA',r.contractRoute==='hidden'?'CLANDESTINA':'SUBORNO À CORTE' ]]:[])]:[]),
+        ...(r.contractDecision?[[ 'DECISÃO DO CAPITÃO',r.contractDecision ]]:[]),
+        ...(r.contractRoute?[[ 'FORMA DA ENTREGA',
+          r.contractRoute==='hidden'?'CLANDESTINA':
+          r.contractRoute==='inform'?'DENÚNCIA À CORTE':'SUBORNO À CORTE' ]]:[])]:[]),
       ['OURO ENCONTRADO',r.collected],
       ...(r.mode==='mission'?[['CUSTO DA CAMPANHA',r.campaignCost??0]]:[]),
       ['OURO RECUPERADO',r.reward],
