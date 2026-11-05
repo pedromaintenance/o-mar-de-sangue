@@ -434,7 +434,8 @@ const SEA_ISLANDS = {
         }
         const labEvent=typeof SEA_ISLAND_RULES!=='undefined'?
             SEA_ISLAND_RULES.event(s,type):null;
-        const contractScene=typeof SEA_CONTRACTS!=='undefined'?
+        const contractScene=typeof SEA_CONTRACTS!=='undefined'&&
+            typeof SEA_CONTRACTS.scene==='function'?
             SEA_CONTRACTS.scene(s,island):null;
         root.add(s.add.text(x,top+244,contractScene||event?.lore||labEvent?.lore||this.lore[type],{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'15px':'13px',
