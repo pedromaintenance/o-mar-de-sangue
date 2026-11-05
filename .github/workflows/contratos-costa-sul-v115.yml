@@ -1,0 +1,65 @@
+name: V115 - Contratos da Costa Sul
+on:
+  pull_request:
+    paths:
+      - SeaContracts.js
+      - SeaFactionPolitics.js
+      - Game.js
+      - PortUI.js
+      - PortContractsV115.css
+      - index.html
+      - sw.js
+      - tests/contratos-costa-sul-v115.test.cjs
+      - tests/contratos-costa-sul-v115-visual.test.cjs
+      - tests/rescue-contract-3-7a.test.cjs
+      - tests/smuggling-contract-3-7a2.test.cjs
+      - .github/workflows/contratos-costa-sul-v115.yml
+  push:
+    branches: [main]
+    paths:
+      - SeaContracts.js
+      - SeaFactionPolitics.js
+      - Game.js
+      - PortUI.js
+      - PortContractsV115.css
+      - index.html
+      - sw.js
+      - tests/contratos-costa-sul-v115.test.cjs
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Static and gameplay regression
+        run: |
+          node --check SeaContracts.js
+          node --check SeaFactionPolitics.js
+          node --check Game.js
+          node --check PortUI.js
+          node tests/contratos-costa-sul-v115.test.cjs
+          node tests/rescue-contract-3-7a.test.cjs
+          node tests/smuggling-contract-3-7a2.test.cjs
+          node tests/hunt-contract-3-7a3.test.cjs
+          node tests/faction-politics-v101.test.cjs
+          node tests/pwa-cache-contract.test.cjs
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Dossier board and three viewports
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/v115-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          sleep 2
+          node tests/contratos-costa-sul-v115-visual.test.cjs
