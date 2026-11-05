@@ -41,7 +41,10 @@
  background:#161c24;color:var(--contract-accent);font-size:24px;
 }
 .port-ui .port-contract-card__file{color:var(--contract-accent);font:700 10px/1.2 Georgia,serif;letter-spacing:.1em}
-.port-ui .port-contract-card h2{color:#efdbbb;font:700 22px/1.13 Georgia,serif;letter-spacing:.03em;margin:5px 0 0}
+.port-ui .port-contract-card h2{
+ color:#efdbbb;font:700 22px/1.13 Georgia,serif;letter-spacing:.03em;
+ margin:5px 0 0;border:0;padding:0;
+}
 .port-ui .port-contract-card__pitch{color:#c9c6c0;font:14px/1.45 Georgia,serif;margin:0;min-height:58px}
 .port-ui .port-contract-card__terms{
  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;border:1px solid #665347;
