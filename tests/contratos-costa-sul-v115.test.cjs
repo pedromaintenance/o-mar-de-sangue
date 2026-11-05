@@ -36,6 +36,8 @@ function make(faction=null){
 function dock(s){s.islandSelected=C.target(s);}
 const s=make();assert(C.init(s,'rescue'));
 assert.equal(C.options(s,C.target(s)).length,2,'evacuation dilemma');
+assert(C.scene(s,C.target(s)).includes('náufragos'),'rescue uses a narrative decision');
+assert.equal(C.scene(s,{id:999}),null,'unrelated islands retain normal stories');
 dock(s);
 assert(C.apply(s,C.options(s,C.target(s))[1]),'all passengers board');
 assert.equal(s.contract.evacuation,'all');
@@ -72,6 +74,7 @@ assert.equal(chase.contract.bounty,173,'28% paid to witnesses');
 assert.equal(chase.spawned.length,1);
 assert.equal(chase.spawned[0].hp,105,'documented vulnerability');
 assert(!C.apply(chase,{contractAction:'hunt-evidence'}));
+assert(C.scene(chase,{id:1})===null,'hunted ship is not a remote island dialogue');
 const pursuit=make();assert(C.init(pursuit,'hunt'));dock(pursuit);
 assert(C.apply(pursuit,C.options(pursuit,C.target(pursuit))[0]));
 assert.equal(pursuit.contract.method,'pursuit');
@@ -80,6 +83,7 @@ assert.equal(pursuit.contract.bounty,240);
 assert.equal(pursuit.spawned[0].hp,125);
 const inform=make();assert(C.init(inform,'smuggle'));dock(inform);
 inform.contract.suspicion=99;
+assert(C.scene(inform,C.target(inform)).includes('99%'),'inspector heat shown in the dock scene');
 assert.equal(C.options(inform,C.target(inform)).length,3);
 assert(C.apply(inform,C.options(inform,C.target(inform))[2]),
  'informing the Court remains an option with high suspicion');
