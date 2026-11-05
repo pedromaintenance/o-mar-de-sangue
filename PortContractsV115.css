@@ -1,0 +1,88 @@
+/* V115 — Dossiês da Costa Sul. Independente de gameplay e menus do Porto. */
+.port-ui .port-contracts{width:min(1130px,100%);max-width:1130px;gap:14px}
+.port-ui .port-contracts__intro{
+ border:1px solid #816449;background:
+ linear-gradient(100deg,rgba(14,17,22,.98) 10%,rgba(52,21,28,.88)),
+ radial-gradient(circle at 90% 20%,#8d272b77,transparent 60%);
+ padding:24px 29px;position:relative;box-shadow:inset 0 0 0 4px #090d10;
+}
+.port-ui .port-contracts__intro:after{
+ content:'✥';position:absolute;right:18px;top:12px;font-size:22px;color:#c99c71;
+}
+.port-ui .port-contracts__intro h1{
+ color:#ead9b8;text-align:left;font:700 clamp(25px,3vw,40px)/1.08 Georgia,serif;
+ letter-spacing:.065em;margin:7px 0 10px;
+}
+.port-ui .port-contracts__intro>p{
+ color:#d3c6b5;font:15px/1.47 Georgia,serif;max-width:760px;margin:0;
+}
+.port-ui .port-contracts__rules{
+ display:flex;flex-wrap:wrap;gap:8px 15px;border-top:1px solid #936e4b77;
+ padding-top:12px;margin-top:15px;color:#d1ae80;font:700 10px/1.3 Georgia,serif;letter-spacing:.075em;
+}
+.port-ui .port-contracts__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.port-ui .port-contract-card{
+ --contract-accent:#b9a17f;min-width:0;display:flex;flex-direction:column;gap:11px;
+ background:linear-gradient(155deg,rgba(23,24,31,.98),rgba(17,21,26,.98));
+ border:1px solid #765d49;padding:18px;box-shadow:inset 0 0 0 3px #0c1116;
+ position:relative;
+}
+.port-ui .port-contract-card::before{
+ content:'';height:3px;position:absolute;left:13px;right:13px;top:0;
+ background:linear-gradient(90deg,transparent,var(--contract-accent),transparent)
+}
+.port-ui .port-contract-card--rescue{--contract-accent:#dfb873}
+.port-ui .port-contract-card--smuggle{--contract-accent:#9477b8}
+.port-ui .port-contract-card--hunt{--contract-accent:#b95352}
+.port-ui .port-contract-card--commission{--contract-accent:#74b0aa}
+.port-ui .port-contract-card__top{display:flex;align-items:start;gap:13px;min-height:54px}
+.port-ui .port-contract-card__icon{
+ display:grid;place-items:center;flex:0 0 48px;height:48px;border:1px solid var(--contract-accent);
+ background:#161c24;color:var(--contract-accent);font-size:24px;
+}
+.port-ui .port-contract-card__file{color:var(--contract-accent);font:700 10px/1.2 Georgia,serif;letter-spacing:.1em}
+.port-ui .port-contract-card h2{color:#efdbbb;font:700 22px/1.13 Georgia,serif;letter-spacing:.03em;margin:5px 0 0}
+.port-ui .port-contract-card__pitch{color:#c9c6c0;font:14px/1.45 Georgia,serif;margin:0;min-height:58px}
+.port-ui .port-contract-card__terms{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;border:1px solid #665347;
+ background:#564338;
+}
+.port-ui .port-contract-card__terms>div{padding:10px 9px;display:grid;gap:4px;background:#161e23}
+.port-ui .port-contract-card__terms span{font:700 9px Georgia,serif;letter-spacing:.06em;color:#aeb0ae}
+.port-ui .port-contract-card__terms strong{font:700 14px/1.2 Georgia,serif;color:#f2d29f}
+.port-ui .port-contract-card__ledger{
+ margin:0;padding:9px 11px;background:#14171dd9;
+ border-left:3px solid var(--contract-accent);color:#b9bfc0;
+ font:12px/1.48 Georgia,serif;flex:1;
+}
+.port-ui .port-contract-card__ledger strong{color:#e6c6a0}
+.port-ui .port-contract-card .port-choice{width:100%;max-width:none;min-height:62px}
+.port-ui .port-contract-card .port-choice__copy strong{font-size:14px}
+.port-ui .port-contract-card--commission{grid-column:1/-1}
+.port-ui .port-contract-card--commission .port-contract-card__pitch{min-height:0}
+.port-ui .port-contracts .port-page__foot{margin-top:2px}
+.port-ui.port-ui--readable .port-contract-card__pitch{font-size:16px;line-height:1.55}
+.port-ui.port-ui--readable .port-contract-card__ledger{font-size:14px;line-height:1.5}
+@media(max-width:780px),(hover:none) and (pointer:coarse) and (max-width:1024px){
+ .port-ui .port-contracts{gap:8px}
+ .port-ui .port-contracts__intro{padding:13px 14px}
+ .port-ui .port-contracts__intro h1{font-size:clamp(22px,5.2vw,28px);margin:5px 0 7px}
+ .port-ui .port-contracts__intro>p{font-size:12px;line-height:1.4}
+ .port-ui .port-contracts__rules{gap:4px 9px;padding-top:8px;margin-top:9px;font-size:9px}
+ .port-ui .port-contracts__grid{grid-template-columns:1fr;gap:8px}
+ .port-ui .port-contract-card{padding:11px;gap:8px}
+ .port-ui .port-contract-card__top{gap:9px;min-height:0}
+ .port-ui .port-contract-card__icon{flex-basis:38px;height:38px;font-size:21px}
+ .port-ui .port-contract-card__file{font-size:9px}
+ .port-ui .port-contract-card h2{font-size:17px;margin:2px 0 0}
+ .port-ui .port-contract-card__pitch{min-height:0;font-size:12px;line-height:1.4}
+ .port-ui .port-contract-card__terms>div{padding:7px}
+ .port-ui .port-contract-card__terms span{font-size:9px}
+ .port-ui .port-contract-card__terms strong{font-size:12px}
+ .port-ui .port-contract-card__ledger{font-size:11px;line-height:1.42;padding:8px}
+ .port-ui .port-contract-card .port-choice{min-height:48px}
+ .port-ui .port-contract-card .port-choice__copy strong{font-size:12px}
+ .port-ui .port-contract-card--commission{grid-column:auto}
+ .port-ui.port-ui--readable .port-contract-card__pitch{font-size:14px}
+ .port-ui.port-ui--readable .port-contract-card__ledger{font-size:13px}
+}
