@@ -108,6 +108,16 @@ const SEA_CONTRACTS = {
       (c.evacuation==='all'?'RESGATE TOTAL · CORSÁRIOS NA SUA ESTEIRA · ':'RESGATE · ')+
       'ENTREGUE OS NÁUFRAGOS A DEMÉTER';
   },
+  scene(s,island){
+    const c=s.contract,target=this.target(s);
+    if(!c||!island||target?.id!==island.id)return null;
+    if(c.id==='rescue')return c.phase==='pickup'?
+      'Entre tábuas partidas, os últimos náufragos suplicam por lugar. Uma escolta inimiga vigia o canal. Decida quem embarca antes que a maré feche.':
+      'As lanternas de Deméter tremem no cais. Os resgatados estão exaustos, e o abrigo conta cada nome para saber quem não voltou.';
+    if(c.id==='hunt')return 'O capitão foi declarado desertor. Um diário manchado registra sua rota; as testemunhas exigem parte da recompensa para revelar o que a Corte apagou.';
+    if(c.id==='smuggle')return 'O armazém não tem bandeira. Há fiscais nas sombras e compradores sem rosto. A suspeita marca '+Math.round(c.suspicion)+'%; a carga pode ser entregue, vendida ou denunciada.';
+    return null;
+  },
   options(s,island) {
     const c=s.contract,target=this.target(s);
     if(!c||!target||!island||island.id!==target.id)return null;
