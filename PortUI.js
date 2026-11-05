@@ -630,7 +630,7 @@ const SEA_PORT_UI = {
           this.button('sandbox','MAR SEM FIM','Saque integral · onda '+this.num(p.bestWave),'∞','')+
           this.button('yard:armas','ESTALEIRO','Reforce seu navio e sua tripulação','⚒','')+
           this.button('help','DIÁRIO DE BORDO','Comandos, regras e navegação','☷','')+
-          this.button('contracts','CONTRATOS DA COSTA SUL','Resgate e contrabando · duas expedições','⚓','port-choice--contract')+
+          this.button('contracts','CONTRATOS DA COSTA SUL','Três dossiês · escolhas, riscos e comissões','⚓','port-choice--contract')+
           this.button('council','CONSELHO DAS TRÊS BANDEIRAS',
             p.faction?.allegiance?'Bandeira atual: '+SEA_FACTIONS.definitions[p.faction.allegiance].label:
             'Faça alianças e transforme a sua embarcação','⚑','')+
@@ -717,32 +717,52 @@ const SEA_PORT_UI = {
       .find(([id])=>politics.commission(id,profile)):null;
     const commission=assignment?assignment[1]:null;
     const commissionBounty=assignment?politics.bounty(profile,assignment[0]):0;
-    return '<main class="port-page port-page--narrow port-contracts" id="port-main">'+
-      '<section class="port-warning" role="region" aria-labelledby="port-contract-title">'+
-      '<span class="port-eyebrow">PACTOS, FISCALIZAÇÃO E SOBREVIVÊNCIA</span>'+
-      '<h1 id="port-contract-title">CONTRATOS DA COSTA SUL</h1>'+
-      '<p>Expedições independentes não avançam a campanha. Comissões de bandeira aumentam a confiança apenas quando concluídas.</p>'+
-      '<h2>'+this.text(rescue.title)+'</h2><p>'+this.text(rescue.description)+'</p>'+
-      '<p>PRÊMIO: <strong>'+this.num(rescue.bounty)+' OURO</strong> · após entrega em Deméter.</p>'+
-      this.button('contract:rescue','ACEITAR RESGATE','Recolher e entregar sobreviventes','⚓','port-choice--primary')+
-      '<h2>'+this.text(smuggle.title)+'</h2><p>'+this.text(smuggle.description)+'</p>'+
-      '<p>Carga embarcada · destino marcado na Carta. A suspeita aumenta perto do fiscal. '+
-        'Entrega secreta: <strong>190 OURO</strong> e +12 maldição (suspeita abaixo de 60%). '+
-        'Suborno na entrega: <strong>115 OURO</strong>. Suspeita em 100% confisca a carga.</p>'+
-      this.button('contract:smuggle','ACEITAR CONTRABANDO','Escapar da inspeção e negociar a entrega','✥','')+
-      '<h2>'+this.text(hunt.title)+'</h2><p>'+this.text(hunt.description)+'</p>'+
-      '<p>PRÊMIO: <strong>'+this.num(hunt.bounty)+' OURO</strong> · somente se a presa for abatida antes da fuga.</p>'+
-      this.button('contract:hunt','ACEITAR CAÇADA','Investigar uma pista e interceptar uma fragata fugitiva','⚔','')+
-      (commission?
-        '<h2>⚑ '+this.text(commission.title)+'</h2><p>'+
-          this.text(commission.desc)+'</p><p>COMISSÃO EXCLUSIVA · '+
-          '<strong>'+this.num(commissionBounty)+' OURO</strong> · +8 de confiança se concluída</p>'+
+    const dossier=(type,code,icon,short,offer,stake,prize,ledger,action)=>
+      '<article class="port-contract-card port-contract-card--'+type+'" aria-label="'+this.text(offer.title)+'">'+
+        '<div class="port-contract-card__top"><span class="port-contract-card__icon" aria-hidden="true">'+icon+'</span>'+
+          '<div><span class="port-contract-card__file">PROCESSO '+code+' · '+this.text(short)+'</span>'+
+          '<h2>'+this.text(offer.title)+'</h2></div></div>'+
+        '<p class="port-contract-card__pitch">'+this.text(offer.description)+'</p>'+
+        '<div class="port-contract-card__terms"><div><span>RECOMPENSA BASE</span><strong>◈ '+this.num(prize)+' OURO</strong></div>'+
+        '<div><span>CONDIÇÃO</span><strong>'+stake+'</strong></div></div>'+
+        '<p class="port-contract-card__ledger">'+ledger+'</p>'+
+        action+'</article>';
+    return '<main class="port-page port-contracts" id="port-main">'+
+      '<section class="port-contracts__intro" role="region" aria-labelledby="port-contract-title">'+
+        '<span class="port-eyebrow">ARQUIVO DOS MORTOS · LICITAÇÕES DO MAR RUBRO</span>'+
+        '<h1 id="port-contract-title">CONTRATOS DA COSTA SUL</h1>'+
+        '<p>O mesmo mar alimenta comunidades, sustenta a Corte e esconde seus contrabandistas. Não há trabalho neutro: escolha quem vai cobrar o preço da viagem.</p>'+
+        '<div class="port-contracts__rules"><span>⚑ EXPEDIÇÕES INDEPENDENTES</span>'+
+          '<span>◈ PRÊMIO SOMENTE COM OBJETIVO CUMPRIDO</span>'+
+          '<span>⚓ SUA DECISÃO MUDA A ROTA</span></div>'+
+      '</section>'+
+      '<section class="port-contracts__grid" aria-label="Dossiês disponíveis">'+
+      dossier('rescue','01','⚓','REFUGIADOS',rescue,'DOIS PORTOS',rescue.bounty,
+        '<strong>QUEM GANHA:</strong> os náufragos e Deméter. <strong>O DILEMA:</strong> evacuação seletiva ou todos a bordo por +80 ouro, com corsário no encalço.',
+        this.button('contract:rescue','ACEITAR RESGATE','Salvar os feridos ou arriscar a nau por todos','⚓','port-choice--primary'))+
+      dossier('smuggle','02','✥','CARGA PROIBIDA',smuggle,'FISCALIZAÇÃO',smuggle.bounty,
+        '<strong>QUEM GANHA:</strong> compradores ocultos ou a Corte. <strong>O DILEMA:</strong> entregar na sombra (+12 maldição), subornar fiscais ou denunciar os compradores.',
+        this.button('contract:smuggle','ACEITAR CONTRABANDO','Fugir da inspeção e escolher o destino da carga','✥',''))+
+      dossier('hunt','03','⚔','MANDADO DE CAÇA',hunt,'PERSEGUIÇÃO',hunt.bounty,
+        '<strong>QUEM GANHA:</strong> quem silenciar o desertor. <strong>O DILEMA:</strong> perseguição rápida ou investigar provas para ganhar 55 segundos e abrir mão de 28% do prêmio.',
+        this.button('contract:hunt','ACEITAR CAÇADA','Investigar o naufrágio e escolher a abordagem','⚔',''))+
+      '<article class="port-contract-card port-contract-card--commission" aria-label="Comissão de facção">'+
+        '<div class="port-contract-card__top"><span class="port-contract-card__icon" aria-hidden="true">⚑</span>'+
+        '<div><span class="port-contract-card__file">PROCESSO 04 · JURAMENTO</span>'+
+        '<h2>COMISSÃO DA BANDEIRA</h2></div></div>'+
+        (commission?
+          '<p class="port-contract-card__pitch"><strong>'+this.text(commission.title)+'</strong> · '+this.text(commission.desc)+'</p>'+
+          '<div class="port-contract-card__terms"><div><span>PAGAMENTO</span><strong>◈ '+
+            this.num(commissionBounty)+' OURO</strong></div><div><span>EFEITO</span><strong>+8 CONFIANÇA SE CUMPRIDA</strong></div></div>'+
+          '<p class="port-contract-card__ledger">Sua bandeira paga por resultados, não por promessas. Trair compradores em uma comissão do Culto não concede a confiança prometida.</p>'+
           this.button('contract:'+assignment[0],'ACEITAR COMISSÃO DA BANDEIRA',
-            'Missão exclusiva para '+SEA_FACTIONS.definitions[factionId].label,
-            '⚑','port-choice--primary') :
-        '<h2>COMISSÕES DAS BANDEIRAS</h2><p>Preste juramento no Conselho para receber ordens próprias.</p>')+
-      this.button('menu','VOLTAR AO PORTO','','←','')+
-      '</section></main>';
+            'Missão exclusiva para '+SEA_FACTIONS.definitions[factionId].label,'⚑','port-choice--primary'):
+          '<p class="port-contract-card__pitch">A Corte, o Culto e os Sobreviventes oferecem contratos diferentes. Nenhuma facção emprega capitães que ainda não prestaram juramento.</p>'+
+          this.button('council','CONHECER AS TRÊS BANDEIRAS',
+            'Escolher um juramento desbloqueia uma comissão exclusiva','⚑',''))+
+      '</article></section>'+
+      '<div class="port-page__foot">'+this.button('menu','VOLTAR AO PORTO','','←','port-choice--return')+'</div>'+
+    '</main>';
   },
   yard(p) {
     const group=this.scene?.yardGroup||'armas';
