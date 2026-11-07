@@ -140,6 +140,9 @@ const SEA_ISLANDS = {
     },
     nearest(s) {
         if (!s.player || s.ended || s.sinking) return null;
+        // Uma embarcação capturável avariada usa o mesmo botão de atracação.
+        const boarding=typeof SEA_BOARDING!=='undefined'?SEA_BOARDING.nearest(s):null;
+        if(boarding)return boarding;
         let found=null;
         // Num mapa maior, portos vizinhos não devem interceptar a atracação
         // quando o capitão chegou ao destino exato de um contrato ativo.
@@ -174,14 +177,18 @@ const SEA_ISLANDS = {
         s.anchorHint.setVisible(visible);
         s.anchorPulse.clear();
         if(!visible)return;
-        let hint=near.allowed?'F / A OU TOQUE PARA ATRACAR':
+        let hint=near.boarding?
+            (near.allowed?'F / A OU TOQUE PARA ABORDAR':'DESACELERE E ACOMPANHE O CASCO AVARIADO'):
+            near.allowed?'F / A OU TOQUE PARA ATRACAR':
             near.threatened?'PERIGO: NAVIOS HOSTIS NAS PROXIMIDADES':
             'REDUZA PARA 67 NÓS OU MENOS';
         s.anchorButton.setFillStyle(near.allowed?0x182521:0x30191e,.97);
         s.anchorButton.setStrokeStyle(2,near.allowed?0xbda47d:0x9a5352,.94);
-        s.anchorText.setText(near.allowed?'⚓ ATRACAR':'⚓ ANCORA INDISPONÍVEL');
+        s.anchorText.setText(near.boarding?
+            (near.allowed?'⚓ ABORDAR':'⚓ ABORDAGEM INDISPONÍVEL'):
+            (near.allowed?'⚓ ATRACAR':'⚓ ANCORA INDISPONÍVEL'));
         s.anchorHint.setText(hint);
-        const island=near.island;
+        const island=near.boarding?near.enemy:near.island;
         s.anchorPulse.lineStyle(2,near.allowed?0xb8a180:0xa65d65,.85);
         const ring=island.radius+s.hullRadius+48+Math.sin(s.elapsed*2.8)*4;
         s.anchorPulse.strokeCircle(island.x,island.y,ring);
@@ -191,6 +198,10 @@ const SEA_ISLANDS = {
         const near=this.nearest(s);
         s.islandCandidate=near;
         if(!near)return false;
+        if(near.boarding){
+            if(!near.allowed){s.announce('REDUZA A VELOCIDADE PARA ABORDAR');return false;}
+            return SEA_BOARDING.board(s,near.enemy);
+        }
         if(!near.allowed){
             s.announce(near.threatened?
                 'AFUGENTE OS HOSTIS ANTES DE ATRACAR':'REDUZA A VELOCIDADE ANTES DE ATRACAR');
