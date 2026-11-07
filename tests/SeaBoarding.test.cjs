@@ -56,4 +56,4 @@ const disabled=enemy({hp:-9,boardingDisabled:true}),sd=scene(disabled);
 assert.equal(B.onDamage(sd,disabled),false);
 assert.equal(disabled.hp,1,'atingir alvo incapacitado não afunda o casco');
 assert.equal(B.updateDisabled(sd,disabled,.05),true,'navio capturado não mantém IA hostil');
-console.log('SeaBoarding — 13 verificações concluídas sem falhas');
+console.log('SeaBoarding — verificações concluídas sem falhas');
