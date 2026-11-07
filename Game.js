@@ -663,6 +663,12 @@ class Game extends Phaser.Scene {
         SEA_ISLANDS.init(this);
         SEA_ATLAS.init(this);
         SEA_CONTRACTS.init(this,this.contractId);
+        // Laboratório opt-in: ?boardingLab=1; não altera a campanha nem contratos publicados.
+        if(this.mode==='sandbox'&&!this.contractId&&typeof location!=='undefined'&&
+           new URLSearchParams(location.search).get('boardingLab')==='1'){
+            const test=this.spawnEnemy('fragata',670,{capturable:true});
+            if(test)test.label?.setText('⚓ LABORATÓRIO · FRAGATA CAPTURÁVEL');
+        }
         SEA_POLITICAL_EVENTS.init(this);
         SEA_MUSIC.load();
         SEA_AUDIO.bind(this, SEA_DESKTOP ? 520 : 468, 22, true);
@@ -979,6 +985,11 @@ class Game extends Phaser.Scene {
         enemy.spriteScale = ship.scaleX;
         enemy.visualPhase = id * 1.39;
         enemy.isMonster = supernatural;
+        // Só navios explicitamente criados com esta opção podem ser capturados.
+        enemy.capturable = options.capturable===true&&!supernatural&&!elite&&
+            ['patrulha','corsario','fragata','galeao','bombardeiro'].includes(type);
+        enemy.boardingDisabled = false;
+        enemy.captured = false;
         enemy.chargeMs=0;enemy.chargeStage=0;
         enemy.lastCounterbatteryAt=-Infinity;
         enemy.counterbatteryNoticeUntil=0;
@@ -1653,6 +1664,7 @@ class Game extends Phaser.Scene {
             const enemy = a.isPlayer ? b : a;
             SEA_FACTION_POLITICS.provoke(enemy);
             enemy.hp = Math.max(0, enemy.hp - Math.round(ed * this.shipStats.ramDamage));
+            SEA_BOARDING.onDamage(this,enemy);
             // Abalroar o tentáculo é atacá-lo; sofrer seu impacto é ser atingido.
             if (enemy.sandboxSentinel) this.summonSandboxKraken(enemy);
             if (enemy.sandboxDagonEye) this.summonSandboxDagon(enemy);
@@ -1663,6 +1675,8 @@ class Game extends Phaser.Scene {
         } else {
             a.hp -= da;
             b.hp -= db;
+            SEA_BOARDING.onDamage(this,a);
+            SEA_BOARDING.onDamage(this,b);
             this.impactFX(hitX, hitY, closingSpeed,
                 `CASCO CONTRA CASCO`);
             if (a.hp <= 0) this.sinkEnemy(a, false);
@@ -1673,6 +1687,12 @@ class Game extends Phaser.Scene {
 
     sinkEnemy(enemy, ramming = false) {
         if (enemy.dead) return;
+        // Um transporte capturável é incapacitado em vez de conceder uma morte,
+        // saque ou progresso de missão. Outros inimigos seguem intocados.
+        if(enemy.capturable&&!enemy.captured){
+            SEA_BOARDING.onDamage(this,enemy);
+            if(enemy.boardingDisabled){enemy.hp=Math.max(1,enemy.hp);return;}
+        }
         enemy.dead = true;
         if (this.mode==='sandbox' && !this.contractId && enemy.type==='kraken' &&
             this.sandboxKrakenTriggered) {
@@ -1881,6 +1901,7 @@ class Game extends Phaser.Scene {
     updateEnemies(dt) {
         for (const e of this.enemies) {
             if (e.dead) continue;
+            if(SEA_BOARDING.updateDisabled(this,e,dt))continue;
             if(e.huntTarget&&SEA_CONTRACTS.evade(this,e,dt))continue;
             // An allied Court patrol wanders peacefully unless provoked.
             if(SEA_FACTION_POLITICS.neutralSail(this,e,dt))continue;
@@ -2225,6 +2246,7 @@ class Game extends Phaser.Scene {
                     if (this.segmentNear(p.px, p.py, p.x, p.y, e.x, e.y, e.radius + 4)) {
                         hit = true; SEA_FACTION_POLITICS.provoke(e);
                         e.hp = Math.max(0, e.hp - p.damage);
+                        SEA_BOARDING.onDamage(this,e);
                         // Um impacto durante os ultimos 40% do preparo
                         // interrompe a proxima salva de um navio nao-chefe.
                         // A verificacao ocorre apos o dano: nao mostra aviso
