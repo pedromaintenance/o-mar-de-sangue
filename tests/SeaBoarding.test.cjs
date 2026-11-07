@@ -12,7 +12,7 @@ let announcements=[];
 let destroys=0;
 let gold=0, kills=0;
 const enemy=(opts={})=>({
-  id:5, type:'fragata', x:105, y:100, radius:65, vx:0, vy:0,
+  id:5, type:'fragata', x:223, y:100, radius:65, vx:0, vy:0,
   hp:200,maxhp:200, dead:false, captured:false,capturable:true,boardingDisabled:false,
   label:{setText(){},setColor(){}},
   ship:{destroy(){destroys++;}},wake:{destroy(){destroys++;}},
