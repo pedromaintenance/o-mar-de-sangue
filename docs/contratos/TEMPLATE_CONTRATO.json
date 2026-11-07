@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "templateId": "CT-XXX",
+  "revision": "0.1",
+  "status": "template",
+  "enabled": false,
+  "title": "TÍTULO A DEFINIR",
+  "subtitle": "",
+  "category": null,
+  "premise": "",
+  "parties": {
+    "publicEmployer": "",
+    "realEmployer": null,
+    "beneficiaries": [],
+    "harmed": [],
+    "factionsInvolved": []
+  },
+  "availability": {
+    "minActiveMainMission": 2,
+    "maxActiveMainMission": null,
+    "eligibleIslandKinds": [],
+    "requiredAllegiance": null,
+    "blockedFlags": [],
+    "selectionWeight": 1,
+    "uniqueWithinBoard": true
+  },
+  "generation": {
+    "seedBound": true,
+    "locationStrategy": null,
+    "targetStrategy": null,
+    "randomizedVariables": [],
+    "guaranteedReachability": true,
+    "freezeOfferAtGeneration": true
+  },
+  "gameplay": {
+    "statePhases": [],
+    "victoryCondition": null,
+    "failureConditions": [],
+    "withdrawalRule": null,
+    "twoAdditionalPressureAxes": [],
+    "requiredRuntimeFeatures": []
+  },
+  "scaling": {
+    "anchor": "activeMainMission",
+    "bands": [],
+    "formulas": {
+      "enemyCount": null,
+      "enemyHPFactor": null,
+      "enemyDamageFactor": null,
+      "timerSeconds": null
+    },
+    "capRules": [],
+    "testsAtMissions": [
+      2,
+      10,
+      25,
+      26
+    ]
+  },
+  "economy": {
+    "benchmark": "typicalNetMainMissionReward",
+    "riskMultiplier": null,
+    "bonusOrPenaltyByChoice": {},
+    "payoutOnce": true,
+    "settleThrough": "SeaProfile.settle"
+  },
+  "choices": [
+    {
+      "choiceId": "CT-XXX-A",
+      "label": "",
+      "triggerPhase": null,
+      "playerFacingHint": "",
+      "immediateGameplayChange": [],
+      "requiredCompletionConditions": [],
+      "rewardMultiplier": 1,
+      "alignmentDelta": {},
+      "specialEffectIds": []
+    }
+  ],
+  "effects": [
+    {
+      "effectId": "fx-ctxxx-a",
+      "triggerChoiceId": "CT-XXX-A",
+      "triggerEvent": null,
+      "target": null,
+      "description": "",
+      "magnitude": null,
+      "duration": {
+        "kind": null,
+        "value": null
+      },
+      "stacking": "nonstacking",
+      "consumptionRule": null,
+      "expiryRule": null,
+      "persistInSave": true
+    }
+  ],
+  "outcomes": {
+    "successEventId": null,
+    "failureEventId": null,
+    "withdrawEventId": null
+  },
+  "reportFields": [
+    "instanceId",
+    "templateId",
+    "generatedAfterMission",
+    "activeMainMission",
+    "choiceId",
+    "result",
+    "rewardSettled"
+  ],
+  "implementation": {
+    "reuse": [],
+    "changes": [],
+    "backwardsCompatibleSaveRequired": true
+  },
+  "tests": {
+    "status": "pending",
+    "cases": []
+  },
+  "editorialNotes": "Preencher e testar uma unidade antes de habilitar o sorteio."
+}
