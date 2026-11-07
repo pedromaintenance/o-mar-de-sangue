@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "templateId": "CT-001",
-  "revision": "0.1",
+  "revision": "0.2",
   "status": "draft",
   "enabled": false,
   "title": "O Dízimo dos Afogados",
@@ -377,12 +377,19 @@
       "persistent_board",
       "seeded_offer_instances",
       "moving_convoy",
-      "transport_capture",
       "branch_specific_objectives",
       "save_persistent_effects",
-      "idempotent_settlement"
+      "idempotent_settlement",
+      "connect_capture_to_ct001_state_machine"
     ],
-    "backwardsCompatibleSaveRequired": true
+    "backwardsCompatibleSaveRequired": true,
+    "implementedCapabilities": [
+      "opt_in_boarding_engine",
+      "capturable_enemy_disable_without_sinking",
+      "dock_button_reuse_for_boarding",
+      "onCapture_optional_hook"
+    ],
+    "laboratoryQuery": "?boardingLab=1"
   },
   "tests": {
     "status": "pending",
@@ -397,5 +404,5 @@
       "touch_and_gamepad_choices"
     ]
   },
-  "editorialNotes": "Proposta de design. Não integrar no sorteio enquanto status=draft/enabled=false. Multiplicador de prêmio e efeitos exigem playtests."
+  "editorialNotes": "Captura generica implementada em laboratorio com opt-in; CT-001 permanece INATIVO até a rota de comboio, as escolhas, a economia e a persistencia serem aprovadas e integradas."
 }
