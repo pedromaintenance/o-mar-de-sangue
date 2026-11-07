@@ -1,0 +1,33 @@
+{
+  "catalogVersion": 1,
+  "designRules": "docs/contratos/CONSTITUICAO.md",
+  "offerBoardPolicy": {
+    "generatedAfter": "newly_cleared_main_mission",
+    "bindsTo": "next_active_main_mission",
+    "minOffers": 3,
+    "maxOffers": 6,
+    "uniqueTemplatePerBoard": true,
+    "deterministicSeed": true,
+    "persistentAcrossReloads": true,
+    "inactiveUntilImplemented": true
+  },
+  "runtimeState": "not_connected_to_game",
+  "legacyRuntimeContractIds": [
+    "rescue",
+    "smuggle",
+    "hunt"
+  ],
+  "note": "Os tres contratos legados continuam em SeaContracts.js; as comissoes de faccao vivem em SeaFactionPolitics.js. O catálogo de design nao altera sua execucao.",
+  "entries": [
+    {
+      "templateId": "CT-001",
+      "title": "O Dízimo dos Afogados",
+      "type": "interception",
+      "status": "draft",
+      "enabled": false,
+      "minActiveMainMission": 2,
+      "markdown": "docs/contratos/CT-001-DIZIMO-DOS-AFOGADOS.md",
+      "json": "docs/contratos/CT-001.json"
+    }
+  ]
+}
