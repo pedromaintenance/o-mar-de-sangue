@@ -45,7 +45,7 @@ assert.equal(s.chartWaypointId,1);
 assert.deepEqual([...s.chartDiscovered],[1]);
 assert.equal(c.status(s),'RESGATE · LOCALIZE OS NÁUFRAGOS NA CARTA');
 assert.equal(c.options(s,{id:9}),null);
-assert.equal(c.options(s,{id:1}).length,1);
+assert.equal(c.options(s,{id:1}).length,2);
 assert.equal(c.apply(s,{contractAction:'deliver'}),false);
 s.islandDocked=true;s.islandSelected=s.islands[0];
 const pickup=c.options(s,s.islandSelected)[0];

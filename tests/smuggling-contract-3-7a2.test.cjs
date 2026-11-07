@@ -57,7 +57,7 @@ assert.deepEqual([...s.chartDiscovered],[2],'only target can be revealed');
 assert.equal(s.chartWaypointId,2);
 assert(c.status(s).includes('SUSPEITA 0%'));
 assert.equal(c.options(s,{id:1}),null);
-assert.equal(c.options(s,c.target(s)).length,2);
+assert.equal(c.options(s,c.target(s)).length,3);
 // Status and heat are stable during intro and when the player pauses.
 s.elapsed=5.5;c.update(s,.1);
 assert.equal(s.spawnCalls.length,0);

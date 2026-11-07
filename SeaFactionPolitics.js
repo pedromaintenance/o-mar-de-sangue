@@ -98,7 +98,9 @@ const SEA_FACTION_POLITICS={
   },
   bonusAtSettlement(s){
     const c=s.contract;
-    if(!c?.commission||!c.completed)return false;
+    // Denunciar os compradores à Corte invalida o juramento do Culto:
+    // não há prêmio de confiança cultista por uma traição explícita.
+    if(!c?.commission||!c.completed||c.route==='inform')return false;
     s.alignment[c.commission]=Math.min(100,
       (Number(s.alignment[c.commission])||0)+8);
     return true;
