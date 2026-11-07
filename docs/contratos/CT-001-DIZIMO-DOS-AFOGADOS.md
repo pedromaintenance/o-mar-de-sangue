@@ -1,7 +1,7 @@
 # CT-001 — O Dízimo dos Afogados
 
-**Versão autoral:** 0.1 — 2026-11-07  
-**Estado:** RASCUNHO, não implementado e não elegível para sorteio  
+**Versão autoral:** 0.2 — 2026-11-07  
+**Estado:** RASCUNHO, captura genérica implementada em laboratório; CT-001 ainda não jogável nem elegível para sorteio  
 **Tipo:** interceptação de comboio, investigação e decisão político-econômica  
 **Constituição:** [regras comuns](./CONSTITUICAO.md)  
 **Dados parametrizados:** [CT-001.json](./CT-001.json)
@@ -46,7 +46,7 @@ A Corte é parte concreta do aparato de cobrança; os Sobreviventes organizam ab
 **Falha:** expiração do prazo com o transporte em fuga, destruição do transporte antes da decisão, naufrágio do jogador ou descumprimento definitivo do objetivo final.  
 **Retirada:** permitida; nenhum prêmio contratual integral, porém valem as regras gerais de retenção de saque já coletado. Não renovar o quadro.
 
-**Risco importante:** o código atual permite destruir navios, mas a mecânica de **imobilizar/abordar alvo** é uma dependência nova. Não se pode fingir que já está pronta: antes da implementação, definir uma interação de casco debilitado + aproximação e botão de abordagem.
+**Atualização do ciclo 2:** existe agora [motor de captura em laboratório](./CAPTURA_NAVIOS_v0.1.md): apenas alvos com `capturable:true` são incapacitados ao atingir 24% do casco e abordáveis pela interação contextual de F/A/toque. Esta peça **não** torna o contrato jogável: ainda faltam a rota do comboio, o gancho de história `onCapture`, as três ramificações e a liquidação persistente.
 
 ## 4. Pressões e escalonamento por missão principal ativa
 
@@ -140,7 +140,7 @@ Todos são **propostas**, não itens ou bônus presentes no jogo atual. Seus efe
 - **SeaFactions.js / SeaFactionPolitics.js:** confiança, juramentos, benefícios e hostilidade da Corte.
 - **PortUI.js:** cartões e entrada para expedições de contrato, atualmente fixos.
 
-**Dependências novas ainda não implementadas:** quadro sorteável persistente, identificação de instâncias, IA de comboio/transportador, captura sem naufrágio, gatilho de abordagem, carga/objetivo acompanhado, entrega por rota, efeitos de próxima expedição, relatório de decisão por instanceId. Implementar em peças testáveis, sem desativar os três contratos existentes.
+**Implementado em laboratório:** incapacitação de alvo marcado, comando de abordagem e gancho `onCapture` opcional. **Dependências ainda não implementadas:** quadro sorteável persistente, identificação de instâncias, IA de comboio/transportador, integração do `onCapture` às fases do CT-001, carga/objetivo acompanhado, entrega por rota, efeitos de próxima expedição e relatório de decisão por instanceId. Implementar em peças testáveis, sem desativar os três contratos existentes.
 
 ## 9. Critérios de aprovação CT-001
 
