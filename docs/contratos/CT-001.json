@@ -1,0 +1,401 @@
+{
+  "schemaVersion": 1,
+  "templateId": "CT-001",
+  "revision": "0.1",
+  "status": "draft",
+  "enabled": false,
+  "title": "O Dízimo dos Afogados",
+  "subtitle": "Tributos e prisioneiros na Costa Sul",
+  "category": "interception",
+  "premise": "Interceptar comboio da Corte Feérica que carrega tributos e pessoas; escolher entre libertar, saquear ou negociar os manifestos.",
+  "parties": {
+    "publicEmployer": "Informante anônimo da Costa Sul",
+    "realEmployer": null,
+    "possibleInformants": [
+      "desertor_de_patrulha",
+      "agente_de_demeter",
+      "corretor_de_tributos"
+    ],
+    "beneficiaries": [
+      "prisioneiros",
+      "comunidades_de_abrigos",
+      "capitao",
+      "intermediarios"
+    ],
+    "harmed": [
+      "aldeias_tributadas",
+      "prisioneiros_abandonados",
+      "tripulacoes_expostas"
+    ],
+    "factionsInvolved": [
+      "sobreviventes",
+      "corte",
+      "culto"
+    ]
+  },
+  "availability": {
+    "minActiveMainMission": 2,
+    "maxActiveMainMission": null,
+    "eligibleIslandKinds": [
+      "wreck",
+      "ruin",
+      "demeter"
+    ],
+    "requiredAllegiance": null,
+    "blockedFlags": [],
+    "selectionWeight": 1,
+    "uniqueWithinBoard": true,
+    "requiresAccessibleClue": true,
+    "requiresAccessibleDemeterShelter": true
+  },
+  "generation": {
+    "seedBound": true,
+    "locationStrategy": "choose_accessible_wreck_or_ruin_for_clue_and_demeter_for_optional_delivery",
+    "targetStrategy": "spawn_navigable_moving_convoy_route_after_clue",
+    "randomizedVariables": [
+      "informantType",
+      "clueIslandId",
+      "shelterIslandId",
+      "convoyRoute",
+      "enemyComposition",
+      "interceptionWindow",
+      "weather",
+      "baseBounty"
+    ],
+    "guaranteedReachability": true,
+    "freezeOfferAtGeneration": true
+  },
+  "gameplay": {
+    "statePhases": [
+      "offered",
+      "clue",
+      "chase",
+      "disable_transport",
+      "choose_route",
+      "fulfill_route",
+      "complete"
+    ],
+    "victoryCondition": "fulfill_chosen_route_and_return_alive",
+    "failureConditions": [
+      "convoy_escapes",
+      "transport_destroyed_before_choice",
+      "player_sinks",
+      "route_final_objective_lost"
+    ],
+    "withdrawalRule": "no_full_contract_bounty_apply_existing_loot_retention",
+    "twoAdditionalPressureAxes": [
+      "time",
+      "naval_combat",
+      "escort_or_counterambush"
+    ],
+    "requiredRuntimeFeatures": [
+      "persistent_contract_board",
+      "moving_convoy",
+      "transport_disable_or_boarding",
+      "branch_delivery",
+      "next_sortie_effects"
+    ],
+    "failIfTransportSunk": true
+  },
+  "scaling": {
+    "anchor": "activeMainMission",
+    "bands": [
+      {
+        "min": 2,
+        "max": 5,
+        "transport": "fragata",
+        "escorts": [
+          "patrulha"
+        ],
+        "reinforcements": [
+          "corsario"
+        ],
+        "pressure": [
+          "timer"
+        ]
+      },
+      {
+        "min": 6,
+        "max": 10,
+        "transport": "galeao",
+        "escorts": [
+          "fragata",
+          "bombardeiro"
+        ],
+        "reinforcements": [],
+        "pressure": [
+          "timer",
+          "visibility"
+        ]
+      },
+      {
+        "min": 11,
+        "max": 15,
+        "transport": "galeao",
+        "escorts": [
+          "fragata",
+          "fragata"
+        ],
+        "reinforcements": [
+          "corsario"
+        ],
+        "pressure": [
+          "timer",
+          "alarm"
+        ]
+      },
+      {
+        "min": 16,
+        "max": 25,
+        "transport": "galeao",
+        "escorts": [
+          "fragata",
+          "bombardeiro"
+        ],
+        "reinforcements": [
+          "corsario",
+          "corsario"
+        ],
+        "pressure": [
+          "timer",
+          "weather"
+        ]
+      },
+      {
+        "min": 26,
+        "max": null,
+        "transport": "galeao",
+        "escorts": [
+          "fragata",
+          "bombardeiro"
+        ],
+        "reinforcements": [
+          "corsario",
+          "corsario"
+        ],
+        "pressure": [
+          "timer",
+          "weather"
+        ],
+        "note": "limited_scaling_requires_validation"
+      }
+    ],
+    "formulas": {
+      "enemyCount": "defined_by_band_plus_choice_triggered_reinforcements",
+      "enemyHPFactor": "use_existing_stats_pending_balancing",
+      "enemyDamageFactor": "use_existing_stats_pending_balancing",
+      "timerSeconds": "ceil(route_distance/effective_navigable_speed + combat_time_allowance_by_band + safety_margin)"
+    },
+    "capRules": [
+      "no_infinite_enemy_scaling",
+      "reject_unreachable_route",
+      "reject_unwinnable_capture"
+    ],
+    "testsAtMissions": [
+      2,
+      10,
+      25,
+      26
+    ]
+  },
+  "economy": {
+    "benchmark": "typicalNetMainMissionReward_including_normal_loot",
+    "riskMultiplier": 6,
+    "bonusOrPenaltyByChoice": {
+      "CT-001-A": 0.8,
+      "CT-001-B": 1.25,
+      "CT-001-C": 1
+    },
+    "baseBountyAbsolute": null,
+    "baseBountyNeedsCalibration": true,
+    "payoutOnce": true,
+    "settleThrough": "SeaProfile.settle"
+  },
+  "choices": [
+    {
+      "choiceId": "CT-001-A",
+      "label": "ABRIR OS PORÕES",
+      "triggerPhase": "choose_route",
+      "playerFacingHint": "Menos ouro, escolta perseguida e um favor temporário de Deméter",
+      "immediateGameplayChange": [
+        "spawn_pursuers",
+        "assign_prisoners_to_escort",
+        "set_destination_demeter"
+      ],
+      "requiredCompletionConditions": [
+        "prisoners_reach_demeter",
+        "return_alive"
+      ],
+      "rewardMultiplier": 0.8,
+      "alignmentDelta": {
+        "sobreviventes": 10,
+        "corte": -7,
+        "culto": -2
+      },
+      "specialEffectIds": [
+        "fx-ct001-demeter-abrigo"
+      ]
+    },
+    {
+      "choiceId": "CT-001-B",
+      "label": "TOMAR O COFRE",
+      "triggerPhase": "choose_route",
+      "playerFacingHint": "Mais ouro, contraemboscada armada e possíveis cobradores na próxima viagem",
+      "immediateGameplayChange": [
+        "lock_tribute_cargo",
+        "spawn_counterambush",
+        "set_escape_objective"
+      ],
+      "requiredCompletionConditions": [
+        "escape_counterambush",
+        "return_alive"
+      ],
+      "rewardMultiplier": 1.25,
+      "alignmentDelta": {
+        "sobreviventes": -6,
+        "corte": -3,
+        "culto": 0
+      },
+      "alignmentCondition": "apply_if_identified",
+      "specialEffectIds": [
+        "fx-ct001-cacadores-tributo"
+      ]
+    },
+    {
+      "choiceId": "CT-001-C",
+      "label": "VENDER O MANIFESTO",
+      "triggerPhase": "choose_route",
+      "playerFacingHint": "Pagamento intermediário, negociar provas e obter salvo-conduto por uma travessia",
+      "immediateGameplayChange": [
+        "set_manifest_delivery",
+        "spawn_optional_whistleblower",
+        "protect_document"
+      ],
+      "requiredCompletionConditions": [
+        "manifest_delivered",
+        "return_alive"
+      ],
+      "rewardMultiplier": 1,
+      "alignmentDelta": {
+        "sobreviventes": -8,
+        "corte": 5,
+        "culto": -4
+      },
+      "alignmentCondition": "court_bonus_only_if_legitimate_rival_house_deal;others_if_discovered",
+      "specialEffectIds": [
+        "fx-ct001-salvo-conduto"
+      ]
+    }
+  ],
+  "effects": [
+    {
+      "effectId": "fx-ct001-demeter-abrigo",
+      "triggerChoiceId": "CT-001-A",
+      "triggerEvent": "contract_completed",
+      "target": "player_ship",
+      "description": "Repara uma única vez até 15% do casco máximo ao sair de combate na próxima expedição",
+      "magnitude": {
+        "maxHpFraction": 0.15
+      },
+      "duration": {
+        "kind": "next_sortie",
+        "value": 1
+      },
+      "stacking": "nonstacking",
+      "consumptionRule": "first_safe_exit_from_combat",
+      "expiryRule": "end_of_next_sortie",
+      "persistInSave": true,
+      "implemented": false
+    },
+    {
+      "effectId": "fx-ct001-cacadores-tributo",
+      "triggerChoiceId": "CT-001-B",
+      "triggerEvent": "contract_completed_and_identified",
+      "target": "world_encounter",
+      "description": "Possível grupo de cobrança armada na próxima expedição",
+      "magnitude": {
+        "extraEncounter": 1
+      },
+      "duration": {
+        "kind": "next_sortie",
+        "value": 1
+      },
+      "stacking": "nonstacking",
+      "consumptionRule": "spawn_one_tribute_hunter_group",
+      "expiryRule": "end_of_next_sortie",
+      "persistInSave": true,
+      "implemented": false,
+      "optionalForApproval": true
+    },
+    {
+      "effectId": "fx-ct001-salvo-conduto",
+      "triggerChoiceId": "CT-001-C",
+      "triggerEvent": "contract_completed_and_buyer_recognizes_deal",
+      "target": "court_patrol",
+      "description": "Uma patrulha comum se mantém neutra em uma travessia; nunca se aplica a perseguidores forçados nem após provocação",
+      "magnitude": {
+        "neutralPatrolCrossings": 1
+      },
+      "duration": {
+        "kind": "next_sortie",
+        "value": 1
+      },
+      "stacking": "nonstacking",
+      "consumptionRule": "one_normal_patrol_crossing",
+      "expiryRule": "end_of_next_sortie",
+      "persistInSave": true,
+      "implemented": false
+    }
+  ],
+  "outcomes": {
+    "successEventId": "ct001_success",
+    "failureEventId": "ct001_failure",
+    "withdrawEventId": "ct001_withdraw"
+  },
+  "reportFields": [
+    "instanceId",
+    "templateId",
+    "generatedAfterMission",
+    "activeMainMission",
+    "choiceId",
+    "result",
+    "rewardSettled",
+    "effectsGranted",
+    "alignmentDeltas"
+  ],
+  "implementation": {
+    "reuse": [
+      "Game.js",
+      "SeaContracts.js",
+      "PortUI.js",
+      "SeaAtlas.js",
+      "SeaIslands.js",
+      "SeaFactionPolitics.js",
+      "SeaFactions.js"
+    ],
+    "changes": [
+      "persistent_board",
+      "seeded_offer_instances",
+      "moving_convoy",
+      "transport_capture",
+      "branch_specific_objectives",
+      "save_persistent_effects",
+      "idempotent_settlement"
+    ],
+    "backwardsCompatibleSaveRequired": true
+  },
+  "tests": {
+    "status": "pending",
+    "cases": [
+      "mission_2_unupgraded_ship",
+      "mission_10_mixed_escort",
+      "mission_25_elite_convoy",
+      "mission_26_plus_bounded",
+      "repeat_reload_no_reroll",
+      "fail_without_bounty",
+      "no_double_reward",
+      "touch_and_gamepad_choices"
+    ]
+  },
+  "editorialNotes": "Proposta de design. Não integrar no sorteio enquanto status=draft/enabled=false. Multiplicador de prêmio e efeitos exigem playtests."
+}
