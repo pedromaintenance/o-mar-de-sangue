@@ -152,7 +152,8 @@ const SEA_ISLANDS = {
             if(s.islandVisits.has(island.id) &&
                !(s.contract?.phase==='deliver'&&island.id===s.contract.shelterId)&&
                !(s.contract?.id==='smuggle'&&!s.contract.completed&&island.id===s.contract.destinationId)&&
-               !(s.contract?.id==='hunt'&&s.contract.phase==='clue'&&island.id===s.contract.clueId))continue;
+               !(s.contract?.id==='hunt'&&s.contract.phase==='clue'&&island.id===s.contract.clueId)&&
+               !(s.contract?.id==='ct001'&&s.contract.phase==='manifest'&&island.id===s.contract.destinationId))continue;
             const d=Math.hypot(s.player.x-island.x,s.player.y-island.y);
             const gap=d-island.radius-s.hullRadius;
             if(gap<-10||gap>112)continue;
@@ -434,7 +435,7 @@ const SEA_ISLANDS = {
             fontFamily:'monospace',fontSize:SEA_DESKTOP?'15px':'11px',
             color:'#b89d78'
         }).setOrigin(.5));
-        root.add(s.add.text(x,top+68,event?.title||this.titles[type],{
+        root.add(s.add.text(x,top+68,island.contractTitle||event?.title||this.titles[type],{
             fontFamily:'Georgia',fontSize:SEA_DESKTOP?'29px':'22px',
             fontStyle:'bold',color:'#e6d0b2',align:'center',wordWrap:{width:width-35}
         }).setOrigin(.5));
