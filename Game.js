@@ -2561,10 +2561,21 @@ class Game extends Phaser.Scene {
         const contractBounty=won&&this.contract?.completed ? this.contract.bounty : 0;
         if(won)SEA_FACTION_POLITICS.bonusAtSettlement(this);
         SEA_FACTIONS.recordContract(this,this.contract);
-        const report = SeaProfile.settle({ won, withdrawn, mode: this.mode, stage: this.stage, wave: this.wave,
-            collected: SEA_MATH.safe(this.gold + commission + contractBounty), kills: this.kills,
-            rammings: this.rammingSinks, islands: this.islandVisits?.size || 0,
-            alignment:this.alignment,faction:this.faction });
+        const settlement={won,withdrawn,mode:this.mode,stage:this.stage,wave:this.wave,
+            collected:SEA_MATH.safe(this.gold+commission+contractBounty),kills:this.kills,
+            rammings:this.rammingSinks,islands:this.islandVisits?.size||0,
+            alignment:this.alignment,faction:this.faction};
+        const laboratory=this.contract?.id==='ct001'&&this.contract.lab===true;
+        // Contrato ainda experimental: relatório simulado, SEM gravar ouro,
+        // reputação, missões, vitórias, estatísticas ou recompensas no save v4.
+        const profile=laboratory?SeaProfile.load():null;
+        const retention=won?1:withdrawn?.75:.4;
+        const previewReward=laboratory?SEA_MATH.safe(Math.floor(settlement.collected*
+            retention*(1+(profile.levels?.cofre||0)*.15))):0;
+        const report=laboratory?{...settlement,laboratory:true,reward:0,
+            previewReward,bank:profile.gold,mission:profile.mission,
+            retention,grossReward:previewReward,campaignCost:0}:
+            SeaProfile.settle(settlement);
         // The after-action chronicle is passed to Port in memory, not the save.
         report.politicalChronicle=(this.politicalEvents||[]).slice(0,8).map(entry=>({
             text:String(entry.text||''),terms:String(entry.terms||'')
