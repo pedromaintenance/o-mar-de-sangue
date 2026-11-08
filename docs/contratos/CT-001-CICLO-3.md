@@ -4,7 +4,7 @@
 **Estado:** vertical slice **jogável somente em laboratório**; contrato **não publicado no quadro de ofertas**  
 **URL do ensaio:** `https://pedromaintenance.github.io/o-mar-de-sangue/?contractLab=ct001` (abrir o modo Sandbox no porto).  
 **Novo módulo:** [SeaContractCT001.js](../../SeaContractCT001.js)  
-**Testes:** [SeaContractCT001.test.cjs](../../tests/SeaContractCT001.test.cjs) e [SeaBoarding.test.cjs](../../tests/SeaBoarding.test.cjs).
+**Testes:** [SeaContractCT001.test.cjs](../../tests/SeaContractCT001.test.cjs), [SeaContractCT001.integration.test.cjs](../../tests/SeaContractCT001.integration.test.cjs) e [SeaBoarding.test.cjs](../../tests/SeaBoarding.test.cjs).
 
 ## O que esta versão faz
 
@@ -38,6 +38,7 @@ A missão principal e os contratos legados continuam sem acesso ao CT-001. Não 
 - [x] Aparecimento do transporte capturável e das escoltas.
 - [x] Incapacitação e abordagem preservam a diferença entre captura e afundamento.
 - [x] A captura dispara `onCapture` e abre a decisão modal.
+- [x] Ensaio de integração automatizado: `SeaContracts` → `SeaBoarding` → modal → Deméter.
 - [x] **Abrir os porões:** destino e pagamento final corretos.
 - [x] **Tomar o cofre:** cobrar a destruição dos reforços antes de pagar.
 - [x] **Vender o manifesto:** destino e pagamento final corretos.
