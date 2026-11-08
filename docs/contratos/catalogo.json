@@ -11,23 +11,26 @@
     "persistentAcrossReloads": true,
     "inactiveUntilImplemented": true
   },
-  "runtimeState": "not_connected_to_game",
+  "runtimeState": "ct001_lab_vertical_slice_only_not_offers_board",
   "legacyRuntimeContractIds": [
     "rescue",
     "smuggle",
     "hunt"
   ],
-  "note": "Os tres contratos legados continuam em SeaContracts.js; as comissoes de faccao vivem em SeaFactionPolitics.js. O catálogo de design nao altera sua execucao.",
+  "note": "Os três contratos legados e comissões de facção permanecem em produção. CT-001 só carrega com ?contractLab=ct001 e sandbox; liquidação experimental não grava no save. Nenhuma oferta aleatória habilitada.",
   "entries": [
     {
       "templateId": "CT-001",
       "title": "O Dízimo dos Afogados",
       "type": "interception",
-      "status": "draft",
+      "status": "draft_lab_playable",
       "enabled": false,
       "minActiveMainMission": 2,
       "markdown": "docs/contratos/CT-001-DIZIMO-DOS-AFOGADOS.md",
-      "json": "docs/contratos/CT-001.json"
+      "json": "docs/contratos/CT-001.json",
+      "revision": "0.3",
+      "laboratoryUrlParam": "contractLab=ct001",
+      "labReport": "docs/contratos/CT-001-CICLO-3.md"
     }
   ]
 }
