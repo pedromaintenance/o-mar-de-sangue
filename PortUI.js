@@ -931,13 +931,14 @@ const SEA_PORT_UI = {
         '</strong><span>'+this.text(entry.terms||'Consequência registrada')+
         '</span></li>').join('')+'</ol></section>':'';
     const data=[
-      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?(isHunt?'ALVO ABATIDO':'ENTREGUE'):
+      ...(r.contractTitle?[[r.contractTitle,r.contractCompleted?(r.contractCapture?'CONTRATO CUMPRIDO':isHunt?'ALVO ABATIDO':'ENTREGUE'):
         r.contractEscaped?'FUGIU':r.contractSeized?'APREENDIDA':'NÃO ENTREGUE'],
         ['PRÊMIO DO CONTRATO',r.contractBounty||0],
         ...(r.contractDecision?[[ 'DECISÃO DO CAPITÃO',r.contractDecision ]]:[]),
         ...(r.contractRoute?[[ 'FORMA DA ENTREGA',
           r.contractRoute==='hidden'?'CLANDESTINA':
           r.contractRoute==='inform'?'DENÚNCIA À CORTE':'SUBORNO À CORTE' ]]:[])]:[]),
+      ...(r.laboratory?[[ 'PAGAMENTO SIMULADO (NÃO CREDITADO)',r.previewReward||0 ]]:[]),
       ['OURO ENCONTRADO',r.collected],
       ...(r.mode==='mission'?[['CUSTO DA CAMPANHA',r.campaignCost??0]]:[]),
       ['OURO RECUPERADO',r.reward],
@@ -948,7 +949,8 @@ const SEA_PORT_UI = {
     ];
     return '<main class="port-page port-page--result" id="port-main">'+
       '<div class="port-page__header"><span class="port-eyebrow">CRÔNICAS DOS QUE REGRESSARAM</span>'+
-      '<h1>'+this.text(state)+'</h1><p>'+this.text(desc)+'</p></div>'+
+      '<h1>'+this.text(state)+'</h1><p>'+this.text(desc)+'</p>'+ 
+      (r.laboratory?'<p><strong>LABORATÓRIO CT-001:</strong> resultado apenas experimental. Nenhum ouro, estatística, reputação ou avanço de campanha foi gravado.</p>':'')+'</div>'+
       '<div class="port-result-grid">'+data.map(([title,value])=>
         '<div><span>'+this.text(title)+'</span><strong>'+(typeof value==='string'?this.text(value):this.num(value))+'</strong></div>').join('')+
       '</div>'+chronicleHtml+'<div class="port-result-actions">'+
