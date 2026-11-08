@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "templateId": "CT-001",
-  "revision": "0.2",
-  "status": "draft",
+  "revision": "0.3",
+  "status": "draft_lab_playable",
   "enabled": false,
   "title": "O Dízimo dos Afogados",
   "subtitle": "Tributos e prisioneiros na Costa Sul",
@@ -374,25 +374,30 @@
       "SeaFactions.js"
     ],
     "changes": [
-      "persistent_board",
+      "persistent_contract_board",
       "seeded_offer_instances",
-      "moving_convoy",
-      "branch_specific_objectives",
-      "save_persistent_effects",
-      "idempotent_settlement",
-      "connect_capture_to_ct001_state_machine"
+      "effects_consumed_in_next_sortie",
+      "save_persistent_consequence_ledger",
+      "authoritative_reward_once_when_approved",
+      "playtest_and_balance_convoy_paths_climate_and_time"
     ],
     "backwardsCompatibleSaveRequired": true,
     "implementedCapabilities": [
       "opt_in_boarding_engine",
       "capturable_enemy_disable_without_sinking",
       "dock_button_reuse_for_boarding",
-      "onCapture_optional_hook"
+      "onCapture_modal_choice",
+      "moving_convoy_with_interception_timer",
+      "enemy_escort_bands_scaled_to_active_mission",
+      "three_playable_routes",
+      "branch_specific_island_deliveries_and_ambush",
+      "political_alignment_changes_in_scene_only",
+      "nonpersistent_settlement_preview"
     ],
-    "laboratoryQuery": "?boardingLab=1"
+    "laboratoryQuery": "?contractLab=ct001"
   },
   "tests": {
-    "status": "pending",
+    "status": "automated_passed_manual_qa_pending",
     "cases": [
       "mission_2_unupgraded_ship",
       "mission_10_mixed_escort",
@@ -401,8 +406,13 @@
       "repeat_reload_no_reroll",
       "fail_without_bounty",
       "no_double_reward",
-      "touch_and_gamepad_choices"
+      "touch_and_gamepad_choices",
+      "all_three_routes_state_machine",
+      "contract_router_to_boarding_capture",
+      "escape_without_bounty",
+      "lab_no_save_mutation",
+      "pwa_load_order_v117"
     ]
   },
-  "editorialNotes": "Captura generica implementada em laboratorio com opt-in; CT-001 permanece INATIVO até a rota de comboio, as escolhas, a economia e a persistencia serem aprovadas e integradas."
+  "editorialNotes": "Ciclo 3: rotas A/B/C, fuga, confronto, captura e escolhas estao jogaveis via ?contractLab=ct001, no modo sandbox. Prêmio exibido e simulado, sem persistencia. Efeitos entre expedicoes e quadro aleatorio nao implementados. Não habilitar."
 }
