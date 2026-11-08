@@ -532,7 +532,11 @@ class Game extends Phaser.Scene {
         this.mode = data?.mode || p.mode || 'mission';
         this.stage = data?.stage || p.mission || 1;
         this.wave = 1;
-        this.contractId = this.mode==='sandbox' &&
+        const ct001Lab=this.mode==='sandbox'&&!data?.contract&&
+            typeof location!=='undefined'&&
+            new URLSearchParams(location.search).get('contractLab')==='ct001';
+        this.contractId=ct001Lab?'ct001':
+            this.mode==='sandbox' &&
             (['rescue','smuggle','hunt'].includes(data?.contract) ||
             Object.hasOwn(SEA_FACTION_POLITICS.commissions,data?.contract||'')) ?
             data.contract : null;
@@ -585,7 +589,8 @@ class Game extends Phaser.Scene {
         this.landmarkGlows = []; this.flotsam = []; this.effectsActive = 0; this.effectsLimit = 48;
         this.foeSerial = 0; this.waveClock = 0; this.nextSpawnTime = 0; this.targetKills = 0; this.targetGold = 0;
         this.survivalTime = 0; this.goalName = ''; this.bossAlert = '';
-        this.currentDifficulty = this.mode === 'mission' ? this.stage : 1;
+        this.currentDifficulty = this.mode === 'mission' ? this.stage :
+            this.contractId==='ct001'?Math.min(25,Math.max(2,this.stage)):1;
         if (this.mode === 'mission') {
             this.objective = this.stage % 5 === 0 ? 'boss' : this.stage % 4 === 1 ? 'kill' : this.stage % 4 === 2 ? 'cargo' : this.stage % 4 === 3 ? 'survive' : 'hunt';
             this.targetKills = this.objective === 'boss' ? 1 : 3 + Math.ceil(this.stage * .75);
@@ -631,7 +636,8 @@ class Game extends Phaser.Scene {
             set lastRamming(v) { this.ship._lastRamming = v; }
         };
         this.cameras.main.startFollow(this.player, true, .095, .095);
-        const startingFoes = this.mode === 'mission' ? (this.objective === 'boss' ? 5 : 7) : 6;
+        const startingFoes = this.contractId==='ct001' ? 0 :
+            this.mode === 'mission' ? (this.objective === 'boss' ? 5 : 7) : 6;
         for (let i = 0; i < startingFoes; i++) this.spawnEnemy(this.chooseFoe(i), 430 + i * 95);
         // Primeira aparição garantida no roteiro; depois entra no conjunto aleatório.
         if (this.mode === 'mission' && this.stage === 7) this.spawnEnemy('recife', 720);
@@ -1902,7 +1908,7 @@ class Game extends Phaser.Scene {
         for (const e of this.enemies) {
             if (e.dead) continue;
             if(SEA_BOARDING.updateDisabled(this,e,dt))continue;
-            if(e.huntTarget&&SEA_CONTRACTS.evade(this,e,dt))continue;
+            if((e.huntTarget||e.ct001Transport)&&SEA_CONTRACTS.evade(this,e,dt))continue;
             // An allied Court patrol wanders peacefully unless provoked.
             if(SEA_FACTION_POLITICS.neutralSail(this,e,dt))continue;
             const distance = Math.max(.01, Phaser.Math.Distance.Between(e.x, e.y, this.player.x, this.player.y));
@@ -2316,7 +2322,9 @@ class Game extends Phaser.Scene {
     progressBattle(dt) {
         if (this.ended) return;
         this.waveClock += dt;
-        if (this.contract) {
+        if (this.contract?.id==='ct001') {
+            // O laboratório tem escoltas roteirizadas; nada de ondas aleatórias.
+        } else if (this.contract) {
             // One-off contract sortie: regular enemies remain dangerous, but
             // endless waves must not overtake a two-stop rescue objective.
             const alive=this.enemies.reduce((n,e)=>n+(!e.dead?1:0),0);
@@ -2570,9 +2578,14 @@ class Game extends Phaser.Scene {
             report.contractSeized=!!this.contract.intercepted;
             report.contractEscaped=!!this.contract.escaped;
             report.contractHunt=this.contract.id==='hunt';
-            report.contractRoute=this.contract.route||null;
+            report.contractRoute=this.contract.id==='ct001'?null:(this.contract.route||null);
+            report.contractCapture=this.contract.id==='ct001'&&!!this.contract.boarded;
             // Temporary expedition decisions recorded in the debrief; no save schema changes.
-            report.contractDecision=this.contract.id==='rescue'?
+            report.contractDecision=this.contract.id==='ct001'?
+                (this.contract.route==='free'?'LIBERTAR OS PRISIONEIROS':
+                 this.contract.route==='loot'?'TOMAR O COFRE':
+                 this.contract.route==='sell'?'VENDER O MANIFESTO':'NENHUMA ROTA ESCOLHIDA'):
+                this.contract.id==='rescue'?
                 (this.contract.evacuation==='all'?'TODOS A BORDO · CORSÁRIOS NA ESTEIRA':'EVACUAÇÃO PRIORITÁRIA'):
                 this.contract.id==='hunt'?
                 (this.contract.method==='evidence'?'PROVAS E INFORMANTES':'PERSEGUIÇÃO IMEDIATA'):
