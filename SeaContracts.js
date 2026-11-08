@@ -9,7 +9,9 @@ const SEA_CONTRACTS = {
     hunt:Object.freeze({title:'A CAÇADA DOS CONDENADOS',bounty:240,
       description:'A Corte quer silenciar um capitão desertor. Siga o rastro ou compre tempo investigando as provas: menos ouro, mais chances de interceptação.'}),
     smuggle:Object.freeze({title:'PÓLVORA SEM BANDEIRA',bounty:190,
-      description:'Carregue pólvora sem registro. Fuja da inspeção, compre o silêncio dos fiscais ou denuncie a rede à Corte e aceite o preço político.'})
+      description:'Carregue pólvora sem registro. Fuja da inspeção, compre o silêncio dos fiscais ou denuncie a rede à Corte e aceite o preço político.'}),
+    ct001:Object.freeze({title:'O DÍZIMO DOS AFOGADOS',bounty:0,
+      description:'LABORATÓRIO · Intercepte um transporte de tributos e escolha entre resgate, saque e venda de provas.'})
   }),
   init(s,id) {
     s.contract=null;
@@ -18,6 +20,7 @@ const SEA_CONTRACTS = {
     if(typeof SEA_FACTION_POLITICS!=='undefined'&&
        Object.hasOwn(SEA_FACTION_POLITICS.commissions,id)&&!authorized)return false;
     const base=authorized?.base||id;
+    if(base==='ct001')return SEA_CT001.init(s);
     if(base==='hunt'){
       const wrecks=s.islands.filter(i=>i.kind==='wreck');
       if(!wrecks.length)return false;
@@ -70,6 +73,7 @@ const SEA_CONTRACTS = {
   },
   target(s) {
     const c=s.contract;
+    if(c?.id==='ct001')return SEA_CT001.target(s);
     if(!c||c.completed)return null;
     if(c.id==='hunt')return c.phase==='clue'?
       s.islands.find(i=>i.id===c.clueId)||null:null;
@@ -89,6 +93,7 @@ const SEA_CONTRACTS = {
   },
   status(s) {
     const c=s.contract;
+    if(c?.id==='ct001')return SEA_CT001.status(s);
     if(!c)return '';
     if(c.id==='hunt'){
       if(c.completed)return 'CAÇADA CONCLUÍDA · ALVO ABATIDO';
@@ -109,6 +114,7 @@ const SEA_CONTRACTS = {
       'ENTREGUE OS NÁUFRAGOS A DEMÉTER';
   },
   scene(s,island){
+    if(s.contract?.id==='ct001')return SEA_CT001.scene(s,island);
     const c=s.contract,target=this.target(s);
     if(!c||!island||target?.id!==island.id)return null;
     if(c.id==='rescue')return c.phase==='pickup'?
@@ -119,6 +125,7 @@ const SEA_CONTRACTS = {
     return null;
   },
   options(s,island) {
+    if(s.contract?.id==='ct001')return SEA_CT001.options(s,island);
     const c=s.contract,target=this.target(s);
     if(!c||!target||!island||island.id!==target.id)return null;
     if(c.id==='hunt')return [
@@ -152,6 +159,7 @@ const SEA_CONTRACTS = {
   },
   update(s,dt) {
     const c=s.contract;
+    if(c?.id==='ct001')return SEA_CT001.update(s,dt);
     if(!c||s.ended||s.sinking)return;
     if(c.id==='hunt'){
       if(c.phase!=='chase'||c.completed||c.escaped)return;
@@ -225,6 +233,7 @@ const SEA_CONTRACTS = {
     return true;
   },
   evade(s,e,dt) {
+    if(s.contract?.id==='ct001')return SEA_CT001.evade(s,e,dt);
     if(!e||e.dead||!e.huntTarget)return false;
     const c=s.contract;
     if(c?.id!=='hunt'||c.phase!=='chase')return false;
@@ -253,6 +262,10 @@ const SEA_CONTRACTS = {
     }
     return true;
   },
+  onCapture(s,e){
+    if(s.contract?.id==='ct001')return SEA_CT001.onCapture(s,e);
+    return false;
+  },
   onSink(s,e) {
     const c=s.contract;
     if(c?.id!=='hunt'||c.phase!=='chase'||c.completed||c.escaped||
@@ -263,6 +276,7 @@ const SEA_CONTRACTS = {
     return true;
   },
   apply(s,choice) {
+    if(s.contract?.id==='ct001')return SEA_CT001.apply(s,choice);
     const c=s.contract,target=this.target(s);
     if(!c||!choice||!target||s.islandSelected?.id!==target.id||
        (c.phase==='pickup'&&s.islandVisits?.has(target.id))||c.completed||
