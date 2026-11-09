@@ -11,13 +11,13 @@
     "persistentAcrossReloads": true,
     "inactiveUntilImplemented": true
   },
-  "runtimeState": "ct001_lab_vertical_slice_only_not_offers_board",
+  "runtimeState": "ct001_lab_plus_persistent_state_and_effect_engine_disabled",
   "legacyRuntimeContractIds": [
     "rescue",
     "smuggle",
     "hunt"
   ],
-  "note": "Os três contratos legados e comissões de facção permanecem em produção. CT-001 só carrega com ?contractLab=ct001 e sandbox; liquidação experimental não grava no save. Nenhuma oferta aleatória habilitada.",
+  "note": "O motor de ofertas 3-6 é seedado e integra o save v4, mas exige pelo menos 3 templates aprovados. Atualmente o catálogo contém CT-001 experimental (enabled=false), sem premiação ou consequências reais. Os legados seguem jogáveis.",
   "entries": [
     {
       "templateId": "CT-001",
@@ -28,7 +28,7 @@
       "minActiveMainMission": 2,
       "markdown": "docs/contratos/CT-001-DIZIMO-DOS-AFOGADOS.md",
       "json": "docs/contratos/CT-001.json",
-      "revision": "0.3",
+      "revision": "0.4",
       "laboratoryUrlParam": "contractLab=ct001",
       "labReport": "docs/contratos/CT-001-CICLO-3.md"
     }
