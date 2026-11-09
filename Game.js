@@ -191,7 +191,8 @@ const SeaProfile = {
     defaults() { const levels = {}; for (const x of SEA_UPGRADES) levels[x.id] = 0;
         return { version: 4, gold: 55, levels, sorties: 0, wins: 0, losses: 0, kills: 0, rammings: 0, earned: 0, best: 0,
             mission: 1, bestMission: 0, bestWave: 0, mode: 'mission',
-            alignment:{sobreviventes:0,corte:0,culto:0}, faction:SEA_FACTIONS.initial() }; },
+            alignment:{sobreviventes:0,corte:0,culto:0}, faction:SEA_FACTIONS.initial(),
+            contractProgress:SEA_CONTRACT_STATE.defaults() }; },
     load() {
         let raw = SEA_SESSION;
         try { raw = JSON.parse(localStorage.getItem(SEA_SAVE_V4)) || JSON.parse(localStorage.getItem(SEA_SAVE_V3)) || raw; } catch (e) {
@@ -207,6 +208,7 @@ const SeaProfile = {
         p.alignment=Object.fromEntries(['sobreviventes','corte','culto'].map(k=>
             [k,SEA_MATH.clamp(Number(raw.alignment?.[k])||0,0,100)]));
         p.faction=SEA_FACTIONS.normalize(raw.faction);
+        p.contractProgress=SEA_CONTRACT_STATE.normalize(raw.contractProgress);
         if (!['mission', 'sandbox'].includes(p.mode)) p.mode = 'mission';
         return p;
     },
@@ -244,6 +246,9 @@ const SeaProfile = {
     leaveFaction() { const p=this.load(),out=SEA_FACTIONS.leave(p); if(out.ok)this.store(p); return out; },
     settle(opts) {
         const p = this.load(); const won = !!opts.won, withdrawn = !!opts.withdrawn;
+        if(opts.contractInstance&&!SEA_CONTRACT_STATE.canSettle(p,opts.contractInstance))
+            throw Error('Instância de contrato não autorizada para liquidação.');
+        const previousMission=p.mission;
         const retention = won ? 1 : withdrawn ? .75 : .4;
         const grossReward = SEA_MATH.safe(Math.floor(opts.collected * retention * (1 + p.levels.cofre * .15)));
         // A campanha consome provisões; só a transferência ao banco muda.
@@ -261,6 +266,7 @@ const SeaProfile = {
             p.bestMission = Math.max(p.bestMission, opts.stage);
             p.mission = Math.max(p.mission, opts.stage + 1);
         }
+        SEA_CONTRACT_STATE.afterSortie(p,opts,previousMission);
         this.store(p);
         return { ...opts, reward, grossReward, campaignCost: grossReward - reward,
             payoutFactor, retention, bank: p.gold, mission: p.mission };
@@ -591,6 +597,8 @@ class Game extends Phaser.Scene {
         this.survivalTime = 0; this.goalName = ''; this.bossAlert = '';
         this.currentDifficulty = this.mode === 'mission' ? this.stage :
             this.contractId==='ct001'?Math.min(25,Math.max(2,this.stage)):1;
+        // A expedição consome efeitos existentes somente no fechamento do save.
+        SEA_CONTRACT_EFFECTS.enter(this);
         if (this.mode === 'mission') {
             this.objective = this.stage % 5 === 0 ? 'boss' : this.stage % 4 === 1 ? 'kill' : this.stage % 4 === 2 ? 'cargo' : this.stage % 4 === 3 ? 'survive' : 'hunt';
             this.targetKills = this.objective === 'boss' ? 1 : 3 + Math.ceil(this.stage * .75);
@@ -1011,6 +1019,7 @@ class Game extends Phaser.Scene {
         }).setOrigin(.5).setDepth(24);
         this.enemies.push(enemy);
         SEA_FACTION_POLITICS.markEnemy(this,enemy,options);
+        SEA_CONTRACT_EFFECTS.onSpawn(this,enemy,options);
         if(type==='dagon') this.spawnDagonEyes(3);
         // O Senhor só invoca olhos ao perder integridade; diferente do Arauto.
         return enemy;
@@ -1893,6 +1902,8 @@ class Game extends Phaser.Scene {
         if (this.sinking) return;
         SEA_CONTRACTS.update(this,dt);
         if (this.ended) return;
+        SEA_CONTRACT_EFFECTS.update(this,dt);
+        if (this.ended) return;
         SEA_POLITICAL_EVENTS.update(this);
         SEA_FACTION_POLITICS.desertion(this);
         if (this.ended) return;
@@ -2566,6 +2577,9 @@ class Game extends Phaser.Scene {
             rammings:this.rammingSinks,islands:this.islandVisits?.size||0,
             alignment:this.alignment,faction:this.faction};
         const laboratory=this.contract?.id==='ct001'&&this.contract.lab===true;
+        if(!laboratory&&this.contract?.instanceId)
+            settlement.contractInstance={instanceId:this.contract.instanceId,
+              templateId:this.contract.templateId,route:this.contract.route};
         // Contrato ainda experimental: relatório simulado, SEM gravar ouro,
         // reputação, missões, vitórias, estatísticas ou recompensas no save v4.
         const profile=laboratory?SeaProfile.load():null;
@@ -2577,6 +2591,9 @@ class Game extends Phaser.Scene {
             retention,grossReward:previewReward,campaignCost:0}:
             SeaProfile.settle(settlement);
         // The after-action chronicle is passed to Port in memory, not the save.
+        report.contractEffectsUsed=SEA_CONTRACT_EFFECTS.report(this);
+        report.contractEffectPreview=laboratory&&won?
+            SEA_CONTRACT_EFFECTS.describeRoute(this.contract?.route):null;
         report.politicalChronicle=(this.politicalEvents||[]).slice(0,8).map(entry=>({
             text:String(entry.text||''),terms:String(entry.terms||'')
         }));
