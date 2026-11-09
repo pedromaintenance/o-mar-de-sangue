@@ -33,7 +33,7 @@ const SEA_CONTRACT_STATE=Object.freeze({
       /^[A-Za-z0-9._:-]+$/.test(id);
   },
   templateId(id){
-    return typeof id==='string'&&/^CT-\\d{3}$/.test(id);
+    return typeof id==='string'&&/^CT-\d{3}$/.test(id);
   },
   validate(value){
     const keys=['version','board','pendingEffects','settledInstances'];
