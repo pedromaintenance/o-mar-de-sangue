@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "templateId": "CT-001",
-  "revision": "0.3",
+  "revision": "0.4",
   "status": "draft_lab_playable",
   "enabled": false,
   "title": "O Dízimo dos Afogados",
@@ -374,12 +374,13 @@
       "SeaFactions.js"
     ],
     "changes": [
-      "persistent_contract_board",
       "seeded_offer_instances",
-      "effects_consumed_in_next_sortie",
-      "save_persistent_consequence_ledger",
       "authoritative_reward_once_when_approved",
-      "playtest_and_balance_convoy_paths_climate_and_time"
+      "playtest_and_balance_convoy_paths_climate_and_time",
+      "three_approved_templates_required_before_activating_board",
+      "connect_unique_offer_id_and_seed_to_ct001_launch",
+      "approve_and_enable_real_settlement_only_after_qa",
+      "real_world_browser_qa_touch_gamepad_and_weather"
     ],
     "backwardsCompatibleSaveRequired": true,
     "implementedCapabilities": [
@@ -392,12 +393,18 @@
       "three_playable_routes",
       "branch_specific_island_deliveries_and_ambush",
       "political_alignment_changes_in_scene_only",
-      "nonpersistent_settlement_preview"
+      "nonpersistent_settlement_preview",
+      "campaign_save_contractProgress_v4_optional",
+      "seeded_offer_board_engine_disabled_until_three_approved",
+      "next_sortie_effects_engine",
+      "lab_effect_preview_only",
+      "strict_v4_backup_validation_and_rollback",
+      "contracts_ci_regression_tests"
     ],
     "laboratoryQuery": "?contractLab=ct001"
   },
   "tests": {
-    "status": "automated_passed_manual_qa_pending",
+    "status": "automated_state_effects_and_backups_passed_manual_qa_pending",
     "cases": [
       "mission_2_unupgraded_ship",
       "mission_10_mixed_escort",
@@ -414,5 +421,5 @@
       "pwa_load_order_v117"
     ]
   },
-  "editorialNotes": "Ciclo 3: rotas A/B/C, fuga, confronto, captura e escolhas estao jogaveis via ?contractLab=ct001, no modo sandbox. Prêmio exibido e simulado, sem persistencia. Efeitos entre expedicoes e quadro aleatorio nao implementados. Não habilitar."
+  "editorialNotes": "Ciclo 4: motor de efeitos (Demeter/cobradores/salvo-conduto) e quadro seedado com persistência v4 implementados e testados. CT-001 continua enabled=false e sem pagamento/concessão real. O catálogo tem menos de 3 templates aprovados e o quadro é desativado."
 }
