@@ -21,9 +21,11 @@ const SEA_SAVE_TRANSFER = {
     // optional three-field alignment object. Never accept arbitrary extras.
     const withAlignment=[...this.profileFields,'alignment'];
     const withFaction=[...withAlignment,'faction'];
-    if(!this.sameKeys(value,this.profileFields)&&
-       !this.sameKeys(value,withAlignment)&&
-       !this.sameKeys(value,withFaction))
+    const allowed=[this.profileFields,withAlignment,withFaction,
+      [...this.profileFields,'contractProgress'],
+      [...withAlignment,'contractProgress'],
+      [...withFaction,'contractProgress']];
+    if(!allowed.some(fields=>this.sameKeys(value,fields)))
       throw Error('O arquivo não tem os campos exatos do save v4.');
     if(value.version!==4)throw Error('Apenas saves v4 são aceitos nesta versão.');
     if(!['mission','sandbox'].includes(value.mode))
@@ -83,6 +85,8 @@ const SEA_SAVE_TRANSFER = {
     if(value.alignment)cleaned.alignment={...value.alignment};
     if(value.faction)cleaned.faction={...value.faction,proofs:{...value.faction.proofs},
       history:value.faction.history.map(e=>({...e}))};
+    if(Object.hasOwn(value,'contractProgress'))
+      cleaned.contractProgress=SEA_CONTRACT_STATE.validate(value.contractProgress);
     return cleaned;
   },
   parse(text) {
@@ -126,7 +130,8 @@ const SEA_SAVE_TRANSFER = {
     // canonical v4 fields in the rollback, while retaining exact raw v4 bytes.
     const previousFields=[...this.profileFields,
       ...(current.alignment?['alignment']:[]),
-      ...(current.faction?['faction']:[])];
+      ...(current.faction?['faction']:[]),
+      ...(current.contractProgress?['contractProgress']:[])];
     const previousProfile=this.profile(Object.fromEntries(
       previousFields.map(field=>[field,current[field]])));
     const snapshot=JSON.stringify({
