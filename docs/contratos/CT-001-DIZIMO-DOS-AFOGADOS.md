@@ -1,7 +1,7 @@
 # CT-001 — O Dízimo dos Afogados
 
-**Versão autoral:** 0.3 — 2026-11-07  
-**Estado:** RASCUNHO, **vertical slice jogável em laboratório**; CT-001 não disponível no quadro nem elegível para sorteio. [Relatório do ciclo 3](./CT-001-CICLO-3.md)  
+**Versão autoral:** 0.4 — 2026-11-08  
+**Estado:** RASCUNHO, **vertical slice jogável em laboratório**; CT-001 não disponível no quadro nem elegível para sorteio. [Ciclo 3 — Jogabilidade](./CT-001-CICLO-3.md) · [Ciclo 4 — Persistência e efeitos](./CT-001-CICLO-4.md)  
 **Tipo:** interceptação de comboio, investigação e decisão político-econômica  
 **Constituição:** [regras comuns](./CONSTITUICAO.md)  
 **Dados parametrizados:** [CT-001.json](./CT-001.json)
@@ -46,7 +46,7 @@ A Corte é parte concreta do aparato de cobrança; os Sobreviventes organizam ab
 **Falha:** expiração do prazo com o transporte em fuga, destruição do transporte antes da decisão, naufrágio do jogador ou descumprimento definitivo do objetivo final.  
 **Retirada:** permitida; nenhum prêmio contratual integral, porém valem as regras gerais de retenção de saque já coletado. Não renovar o quadro.
 
-**Atualização do ciclo 3:** o [motor de captura](./CAPTURA_NAVIOS_v0.1.md) já está conectado ao [CT-001 experimental](./CT-001-CICLO-3.md), com rota de comboio, `onCapture`, três ramificações, fuga e relatório de pagamento simulado. **A oferta aleatória, os efeitos entre expedições e a liquidação persistente ainda não existem.**
+**Atualização do ciclo 4:** o [motor de captura](./CAPTURA_NAVIOS_v0.1.md) está integrado ao [CT-001 experimental](./CT-001-CICLO-3.md), com comboio, `onCapture`, três rotas, fuga e relatório simulado. [SeaContractState.js](../../SeaContractState.js) e [SeaContractEffects.js](../../SeaContractEffects.js) implementam infraestrutura persistente de quadros e consequências de uma expedição, mas o CT-001 continua **sem autorização de sorteio ou liquidação real**. O save v4 aceita o ledger opcional. [Relatório completo](./CT-001-CICLO-4.md).
 
 ## 4. Pressões e escalonamento por missão principal ativa
 
