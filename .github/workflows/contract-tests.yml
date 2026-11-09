@@ -1,0 +1,42 @@
+name: Contratos — testes de regressão
+
+on:
+  push:
+    paths:
+      - 'Game.js'
+      - 'SeaBoarding.js'
+      - 'SeaContracts.js'
+      - 'SeaContract*.js'
+      - 'SeaIslands.js'
+      - 'SeaSaveTransfer.js'
+      - 'PortUI.js'
+      - 'tests/**'
+      - '.github/workflows/contract-tests.yml'
+  pull_request:
+    paths:
+      - 'Game.js'
+      - 'SeaBoarding.js'
+      - 'SeaContracts.js'
+      - 'SeaContract*.js'
+      - 'SeaIslands.js'
+      - 'SeaSaveTransfer.js'
+      - 'PortUI.js'
+      - 'tests/**'
+      - '.github/workflows/contract-tests.yml'
+
+jobs:
+  contract-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Abordagem de navios
+        run: node tests/SeaBoarding.test.cjs
+      - name: CT-001 — rotas e fuga
+        run: node tests/SeaContractCT001.test.cjs
+      - name: CT-001 — integração
+        run: node tests/SeaContractCT001.integration.test.cjs
+      - name: Quadro, efeitos, saves e backups
+        run: node tests/SeaContractPersistence.test.cjs
