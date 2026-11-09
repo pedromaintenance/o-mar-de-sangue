@@ -1,9 +1,10 @@
 # O MAR DE SANGUE — CONSTITUIÇÃO DE GAME DESIGN DOS CONTRATOS
 
 **Versão:** 1.0 — 07/11/2026  
-**Estado:** proposta de cânone de design; **não implementada no jogo**  
+**Estado:** cânone de design; **infraestrutura de persistência e efeitos implementada**, mas **quadro público não habilitado** (menos de 3 contratos aprovados; CT-001 em laboratório).  
 **Escopo:** oferta, geração, dificuldade, recompensa, consequências e processo de criação de contratos.  
-**Integração-alvo:** `pedromaintenance/o-mar-de-sangue`, sem alterar a campanha principal nem substituir contratos existentes sem migração.
+**Integração-alvo:** `pedromaintenance/o-mar-de-sangue`
+**Histórico de implementação:** [ciclo 3 — CT-001 jogável no laboratório](./CT-001-CICLO-3.md) · [ciclo 4 — quadro/efeitos/save v4](./CT-001-CICLO-4.md), sem alterar a campanha principal nem substituir contratos existentes sem migração.
 
 ## 0. Premissa
 
