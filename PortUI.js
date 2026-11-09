@@ -711,6 +711,9 @@ const SEA_PORT_UI = {
   contracts(){
     const rescue=SEA_CONTRACTS.offers.rescue,smuggle=SEA_CONTRACTS.offers.smuggle,
       hunt=SEA_CONTRACTS.offers.hunt,profile=SeaProfile.load();
+    const progress=SEA_CONTRACT_STATE.normalize(profile.contractProgress);
+    const nextEffects=progress.pendingEffects.filter(e=>e.expiresOnSortie===profile.sorties+1);
+    const effectInfo=nextEffects.map(e=>SEA_CONTRACT_EFFECTS.descriptions[e.id]||e.id);
     const politics=typeof SEA_FACTION_POLITICS!=='undefined'?SEA_FACTION_POLITICS:null;
     const factionId=politics?.allegiance(profile);
     const assignment=politics?Object.entries(politics.commissions)
@@ -735,6 +738,8 @@ const SEA_PORT_UI = {
         '<div class="port-contracts__rules"><span>⚑ EXPEDIÇÕES INDEPENDENTES</span>'+
           '<span>◈ PRÊMIO SOMENTE COM OBJETIVO CUMPRIDO</span>'+
           '<span>⚓ SUA DECISÃO MUDA A ROTA</span></div>'+
+        (effectInfo.length?'<p class="port-contract-card__ledger"><strong>EFEITOS DA PRÓXIMA VIAGEM:</strong> '+
+          effectInfo.map(x=>this.text(x)).join(' · ')+'</p>':'')+
       '</section>'+
       '<section class="port-contracts__grid" aria-label="Dossiês disponíveis">'+
       dossier('rescue','01','⚓','REFUGIADOS',rescue,'DOIS PORTOS',rescue.bounty,
@@ -939,6 +944,9 @@ const SEA_PORT_UI = {
           r.contractRoute==='hidden'?'CLANDESTINA':
           r.contractRoute==='inform'?'DENÚNCIA À CORTE':'SUBORNO À CORTE' ]]:[])]:[]),
       ...(r.laboratory?[[ 'PAGAMENTO SIMULADO (NÃO CREDITADO)',r.previewReward||0 ]]:[]),
+      ...(r.contractEffectPreview?[[ 'EFEITO PREVISTO — NÃO CONCEDIDO',r.contractEffectPreview ]]:[]),
+      ...((r.contractEffectsUsed||[]).map(x=>[
+        'EFEITO DA EXPEDIÇÃO · '+(x.used?'ATIVADO':'EXPIRADO'),x.description||x.id])),
       ['OURO ENCONTRADO',r.collected],
       ...(r.mode==='mission'?[['CUSTO DA CAMPANHA',r.campaignCost??0]]:[]),
       ['OURO RECUPERADO',r.reward],
