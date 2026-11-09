@@ -604,6 +604,9 @@ const SEA_PORT_UI = {
   },
   home(p) {
     const stats=SeaProfile.stats(p);
+    const progression=SEA_CONTRACT_STATE.normalize(p.contractProgress);
+    const coming=progression.pendingEffects.filter(e=>e.expiresOnSortie===p.sorties+1)
+      .map(e=>SEA_CONTRACT_EFFECTS.descriptions[e.id]||e.id);
     return '<div class="port-layout port-layout--home">'+
       '<aside class="port-aside port-aside--l">'+
         '<div class="port-aside__frame"><span class="port-eyebrow">ÁGUAS PROIBIDAS</span>'+
@@ -624,7 +627,9 @@ const SEA_PORT_UI = {
             '" alt="Navio do capitão navegando pelas águas malditas">'+
           '<span class="port-hero__seal" aria-hidden="true">✦</span>'+
         '</section>'+
-        '<div class="port-section-label"><span>ESCOLHA O TEU DESTINO</span><span>✣</span></div>'+
+        '<div class="port-section-label"><span>ESCOLHA O TEU DESTINO</span><span>✣</span></div>'+ 
+        (coming.length?'<p class="port-contract-card__ledger" role="status"><strong>PRÓXIMA VIAGEM:</strong> '+
+          coming.map(text=>this.text(text)).join(' · ')+'</p>':'')+
         '<div class="port-actions">'+
           this.button('mission','MISSÕES','Etapa '+this.num(p.mission)+' · 25% do saque ao cofre','⚔','port-choice--primary')+
           this.button('sandbox','MAR SEM FIM','Saque integral · onda '+this.num(p.bestWave),'∞','')+
