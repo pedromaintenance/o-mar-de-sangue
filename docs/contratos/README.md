@@ -11,16 +11,19 @@ Este diretório é o **registro de design** dos contratos opcionais de alto risc
 - [CT-001 — O Dízimo dos Afogados](./CT-001-DIZIMO-DOS-AFOGADOS.md) / [dados JSON](./CT-001.json) — primeira proposta, **rascunho inativo**.
 - [CAPTURA_NAVIOS_v0.1.md](./CAPTURA_NAVIOS_v0.1.md) — laboratório opt-in de incapacitação e abordagem (`?boardingLab=1`), com testes e pendências.
 - [CT-001-CICLO-3.md](./CT-001-CICLO-3.md) — primeiro ciclo **jogável em laboratório**, com interceptação, abordagem, três decisões, pagamentos simulados e QA.
+- [CT-001-CICLO-4.md](./CT-001-CICLO-4.md) — quadro seedado, persistência aditiva do save v4, efeitos de próxima expedição e testes de regressão.
 
 ## Estado do jogo atual
 
 As três expedições existentes estão implementadas em **SeaContracts.js**: Resgate dos Afogados, Pólvora sem Bandeira e A Caçada dos Condenados. **SeaFactionPolitics.js** oferece comissões específicas vinculadas à bandeira. **PortUI.js** ainda apresenta cartões fixos e **Game.js** trata contratos como expedições independentes do modo sandbox.
 
-O save atual é **v4** e não possui o novo quadro persistente de ofertas. Nenhum arquivo deste diretório ativa sorteio, concede ouro ou altera a lógica de facções.
+O save atual continua em **v4**, agora com um objeto opcional e validado `contractProgress`, que registra quadro, efeitos pendentes e histórico de liquidações. O sorteio e os efeitos só produzem consequências reais para **instâncias autorizadas**; hoje, nenhum novo template está aprovado. O laboratório do CT-001 não grava ouro nem reputação.
 
 **Ciclo 2:** um motor de abordagens foi adicionado a `SeaBoarding.js`, carregado antes de `Game.js`, com integração em `Game.js` e `SeaIslands.js`. Só inimigos explicitamente marcados com `capturable:true` são afetados; um alvo-teste pode ser gerado em sandbox com `?boardingLab=1`. O contrato CT-001 continua inativo.
 
-**Ciclo 3:** `SeaContractCT001.js` implementa um primeiro percurso jogável **somente** com `?contractLab=ct001` e modo Sandbox. Apreende o comboio, abre a decisão no convés e conclui uma das três rotas. A recompensa e as alterações políticas são simuladas e **não são gravadas no save**. O contrato ainda não aparece como oferta; o quadro 3–6 ofertas permanece por construir.
+**Ciclo 3:** `SeaContractCT001.js` implementa um primeiro percurso jogável **somente** com `?contractLab=ct001` e modo Sandbox. Apreende o comboio, abre a decisão no convés e conclui uma das três rotas. A recompensa e as alterações políticas são simuladas e **não são gravadas no save**. O contrato ainda não aparece como oferta.
+
+**Ciclo 4:** `SeaContractState.js` implementa a infraestrutura para um quadro persistente com semente e 3–6 ofertas únicas, só geradas após vitória principal com **pelo menos três templates aprovados**. `SeaContractEffects.js` implementa Deméter, cobradores e salvo-conduto por uma expedição. O backup v4 mantém compatibilidade legada; o porto mostra efeitos pendentes e simulações. **Hoje `approvedTemplates=[]`, portanto nenhum quadro novo é criado e o CT-001 não paga efeitos reais.**
 
 ## Processo unitário
 
@@ -41,7 +44,7 @@ O Dízimo dos Afogados apresenta um comboio com tributos e prisioneiros. O capit
 - **Tomar o cofre:** lucro maior e contraemboscada, com possibilidade de perseguição na próxima viagem.
 - **Vender o manifesto:** entregar provas por dinheiro e influência, assumindo o custo da cumplicidade.
 
-**Pendência central:** decidir como o jogador **imobiliza/aborda** o transporte sem afundá-lo. Essa mecânica é inédita e precisa ser desenhada antes de qualquer implementação.
+**Captura já desenvolvida no laboratório:** o transporte é imobilizado a 24% do casco e abordado pela ação contextual. Pendências centrais agora são **QA físico e de controles**, balanceamento de recompensas, parâmetros de sorteio por instância e aprovação editorial do CT-001.
 
 ## Critério de não regressão
 
