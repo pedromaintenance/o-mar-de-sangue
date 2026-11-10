@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1a1018">
+<title>Observatório CT-001 · O Mar de Sangue</title>
+<style>
+:root{color-scheme:dark;--bg:#161017;--panel:#281b24;--line:#59414b;--text:#f3e9dd;--muted:#b9a7a5;--gold:#deb38a;--good:#8fc9a0}
+*{box-sizing:border-box}body{font-family:system-ui,sans-serif;background:radial-gradient(ellipse at top,#40202b,var(--bg) 65%);color:var(--text);margin:0;line-height:1.5}main,header,footer{padding:24px max(18px,calc((100% - 1120px)/2))}
+header{padding-top:46px;border-bottom:1px solid var(--line)}
+.eyebrow,th{color:var(--gold);font:700 12px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+h1{font:normal clamp(36px,6vw,68px) Georgia,serif;margin:10px 0}h1 span{color:var(--gold)}
+h2{font:normal 27px Georgia,serif;margin:0 0 5px}.intro,.note{color:var(--muted);max-width:800px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
+button,.picker{font:600 14px system-ui;padding:12px 16px;border-radius:8px;border:1px solid var(--line);background:#39242d;color:var(--text);cursor:pointer}
+.picker{background:var(--gold);color:#22141a}.picker input{font-size:12px;max-width:185px}
+button:disabled{opacity:.4;cursor:default}.status{color:var(--gold);font-size:13px;min-height:22px}
+.notice{border-left:3px solid var(--gold);padding:12px 16px;background:var(--panel);font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi,section{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:19px}
+.kpi small{color:var(--muted);font:700 11px ui-monospace,monospace}.kpi strong{display:block;font:32px Georgia,serif;margin-top:10px}
+section{margin:18px 0}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:700px;font-size:14px}
+th{text-align:left;font-size:11px;padding:12px 8px;border-bottom:1px solid var(--line)}
+td{padding:12px 8px;border-bottom:1px solid #45343e}
+.empty{text-align:center;color:var(--muted);padding:28px}
+.meter{height:6px;background:#44333a;width:90px;border-radius:8px;overflow:hidden;margin-top:7px}
+.meter i{display:block;height:100%;background:var(--good)}
+footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);margin-top:30px}
+a{color:var(--gold)}@media(max-width:680px){.kpis{grid-template-columns:repeat(2,1fr)}.kpi strong{font-size:25px}}
+</style></head>
+<body>
+<header>
+<div class="eyebrow">CARCAÇA / O MAR DE SANGUE / LABORATÓRIO</div>
+<h1>Observatório <span>CT-001</span></h1>
+<p class="intro">Compare partidas do Dízimo dos Afogados por missão e decisão. Importe arquivos JSON do laboratório. Todos os cálculos acontecem localmente, sem envio de arquivos ou alteração do save.</p>
+<div class="controls">
+<label class="picker">ADICIONAR PLAYTESTS <input id="files" type="file" multiple accept=".json,application/json"></label>
+<button id="export" disabled>EXPORTAR SÍNTESE JSON</button>
+<button id="clear" disabled>LIMPAR</button>
+</div>
+<p class="status" id="status" role="status">Nenhum arquivo importado.</p>
+<p class="notice">Os prêmios são <strong>simulados</strong>. O jogo ainda não forneceu medições reais da renda de missões principais. Uma amostra pequena não é suficiente para aprovar balanceamento.</p>
+</header>
+<main>
+<div class="kpis">
+<div class="kpi"><small>PARTIDAS</small><strong id="total">0</strong></div>
+<div class="kpi"><small>CONCLUSÃO</small><strong id="success">—</strong></div>
+<div class="kpi"><small>TEMPO MEDIANO</small><strong id="duration">—</strong></div>
+<div class="kpi"><small>OURO SIMULADO / MIN</small><strong id="gpm">—</strong></div>
+</div>
+<section><h2>Comparação por decisão</h2>
+<p class="note">Indicadores calculados exclusivamente dos arquivos importados. Relatórios v1 não contêm duração total.</p>
+<div class="tablewrap"><table><thead><tr><th>MISSÃO</th><th>ESCOLHA</th><th>TESTES</th><th>SUCESSO</th><th>TEMPO MEDIANO</th><th>CAPTURA</th><th>OURO/MIN</th></tr></thead><tbody id="groups"></tbody></table></div>
+</section>
+<section><h2>Registro das partidas</h2>
+<p class="note">A mesma semente repete a configuração inicial do comboio; o combate e o clima não são determinísticos.</p>
+<div class="tablewrap"><table><thead><tr><th>DATA</th><th>CENÁRIO</th><th>SEMENTE</th><th>EQUIPAMENTO</th><th>ROTA</th><th>DESFECHO</th><th>TEMPO</th><th>PRÊMIO</th></tr></thead><tbody id="runs"></tbody></table></div>
+</section>
+<section><h2>Modelo de economia — hipótese, não medição</h2>
+<p class="note">Referência calculada com a fórmula provisória. Não representa o dinheiro observado nas missões principais.</p>
+<div class="tablewrap"><table><thead><tr><th>MISSÃO</th><th>PROXY PRINCIPAL</th><th>BASE CT-001</th><th>LIBERTAR</th><th>SAQUEAR</th><th>VENDER</th></tr></thead><tbody id="models"></tbody></table></div>
+</section>
+</main>
+<footer>
+Observatório local; nenhum dado sai do navegador. <a href="./docs/contratos/CT-001-CICLO-5.md">Documentação de referência</a>.
+</footer>
+<script src="./SeaContractAnalytics.js"></script>
+<script>
+(function(){
+'use strict';
+const A=SEA_CT001_ANALYTICS,rows=[],keys=new Set();
+const el=id=>document.getElementById(id);
+const fmt=n=>n==null?'—':Number(n).toLocaleString('pt-BR',{maximumFractionDigits:1});
+const secs=n=>n==null?'—':fmt(n)+' s';
+function cell(tr,value){const td=document.createElement('td');td.textContent=String(value==null?'—':value);tr.appendChild(td);return td}
+function empty(tbody,count,message){const tr=document.createElement('tr'),td=cell(tr,message);td.colSpan=count;td.className='empty';tbody.appendChild(tr)}
+function render(){
+  const result=A.summarize(rows);
+  el('total').textContent=result.tests;
+  el('success').textContent=result.tests?fmt(100*result.wins/result.tests)+'%':'—';
+  el('duration').textContent=secs(result.medianDuration);
+  el('gpm').textContent=fmt(result.goldPerMinute);
+  el('export').disabled=!rows.length;el('clear').disabled=!rows.length;
+  const groups=el('groups');groups.textContent='';
+  if(!result.groups.length)empty(groups,7,'Importe relatórios para comparar os resultados.');
+  for(const g of result.groups){
+    const tr=document.createElement('tr');cell(tr,'M'+g.stage);cell(tr,g.label);
+    cell(tr,g.n);const td=cell(tr,fmt(g.successRate*100)+'%');
+    const meter=document.createElement('div'),bar=document.createElement('i');
+    meter.className='meter';bar.style.width=Math.max(0,Math.min(100,g.successRate*100))+'%';
+    meter.appendChild(bar);td.appendChild(meter);
+    cell(tr,secs(g.medianTime));cell(tr,secs(g.medianCapture));cell(tr,fmt(g.goldPerMinute));
+    groups.appendChild(tr);
+  }
+  const runs=el('runs');runs.textContent='';
+  if(!rows.length)empty(runs,8,'Nenhum playtest carregado.');
+  for(const r of rows.slice().reverse()){
+    const tr=document.createElement('tr');
+    cell(tr,r.generatedAt.slice(0,16).replace('T',' '));cell(tr,'M'+r.stage);
+    cell(tr,r.seed);cell(tr,r.schema===1?'v1':r.benchmark?'PRESET':'REAL');
+    cell(tr,A.routes[r.route]||r.route);
+    cell(tr,r.completed&&r.won?'CONCLUÍDO':r.withdrawn?'RETIRADA':'FALHA');
+    cell(tr,secs(r.elapsedSeconds));cell(tr,fmt(r.simulatedReward));runs.appendChild(tr);
+  }
+}
+for(const stage of [2,10,25]){
+  const m=A.modelProxy(stage),tr=document.createElement('tr');
+  cell(tr,'M'+stage);cell(tr,fmt(m.mainProxy));cell(tr,fmt(m.proposedBase));
+  cell(tr,fmt(Math.round(m.proposedBase*.8)));
+  cell(tr,fmt(Math.round(m.proposedBase*1.25)));cell(tr,fmt(m.proposedBase));
+  el('models').appendChild(tr);
+}
+el('files').addEventListener('change',async evt=>{
+  const files=Array.from(evt.target.files||[]),errors=[];
+  let imported=0,duplicates=0;
+  if(files.length>100){el('status').textContent='Máximo de 100 arquivos de uma vez.';evt.target.value='';return}
+  for(const file of files){
+    if(rows.length>=500){errors.push('Capacidade de 500 arquivos atingida.');break}
+    if(file.size>262144){errors.push(file.name+': acima de 256 KB.');continue}
+    try{
+      const item=A.validate(JSON.parse(await file.text()));
+      if(keys.has(item.key)){duplicates++;continue}
+      keys.add(item.key);rows.push(item);imported++;
+    }catch(e){errors.push(file.name+': '+e.message)}
+  }
+  evt.target.value='';render();
+  el('status').textContent=imported+' importados; '+duplicates+' repetidos; '+errors.length+
+    ' inválidos. Total: '+rows.length+'. '+errors.slice(0,2).join(' | ');
+});
+el('clear').addEventListener('click',()=>{
+  rows.length=0;keys.clear();render();el('status').textContent='Dados de análise descartados; save preservado.';
+});
+el('export').addEventListener('click',()=>{
+  if(!rows.length)return;
+  const payload=A.summarize(rows),blob=new Blob([JSON.stringify(payload,null,2)+'\n'],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='ct001-sintese-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+});
+render();
+})();
+</script>
+</body></html>
