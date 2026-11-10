@@ -153,7 +153,9 @@ const SEA_ISLANDS = {
                !(s.contract?.phase==='deliver'&&island.id===s.contract.shelterId)&&
                !(s.contract?.id==='smuggle'&&!s.contract.completed&&island.id===s.contract.destinationId)&&
                !(s.contract?.id==='hunt'&&s.contract.phase==='clue'&&island.id===s.contract.clueId)&&
-               !(s.contract?.id==='ct001'&&s.contract.phase==='manifest'&&island.id===s.contract.destinationId))continue;
+               !(s.contract?.id==='ct001'&&
+                 ((s.contract.phase==='manifest'&&island.id===s.contract.destinationId)||
+                  (s.contract.phase==='deliver'&&island.id===s.contract.shelterId))))continue;
             const d=Math.hypot(s.player.x-island.x,s.player.y-island.y);
             const gap=d-island.radius-s.hullRadius;
             if(gap<-10||gap>112)continue;
