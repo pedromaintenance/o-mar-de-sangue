@@ -1,6 +1,6 @@
 # CT-001 — O Dízimo dos Afogados
 
-**Versão autoral:** 0.5 — 2026-11-09  
+**Versão autoral:** 0.6 — 2026-11-10  
 **Estado:** RASCUNHO, **vertical slice jogável em laboratório**; CT-001 não disponível no quadro nem elegível para sorteio. [Ciclo 3 — Jogabilidade](./CT-001-CICLO-3.md) · [Ciclo 4 — Persistência e efeitos](./CT-001-CICLO-4.md) · [Ciclo 5 — Rotas, balanceamento e telemetria](./CT-001-CICLO-5.md)  
 **Tipo:** interceptação de comboio, investigação e decisão político-econômica  
 **Constituição:** [regras comuns](./CONSTITUICAO.md)  
@@ -47,6 +47,8 @@ A Corte é parte concreta do aparato de cobrança; os Sobreviventes organizam ab
 **Retirada:** permitida; nenhum prêmio contratual integral, porém valem as regras gerais de retenção de saque já coletado. Não renovar o quadro.
 
 **Atualização do ciclo 4:** o [motor de captura](./CAPTURA_NAVIOS_v0.1.md) está integrado ao [CT-001 experimental](./CT-001-CICLO-3.md), com comboio, `onCapture`, três rotas, fuga e relatório simulado. [SeaContractState.js](../../SeaContractState.js) e [SeaContractEffects.js](../../SeaContractEffects.js) implementam infraestrutura persistente de quadros e consequências de uma expedição, mas o CT-001 continua **sem autorização de sorteio ou liquidação real**. O save v4 aceita o ledger opcional. [Relatório completo](./CT-001-CICLO-4.md).
+
+**Atualização do ciclo 6:** o laboratório permite simular as missões 2, 10 e 25 com equipamento e facção temporários, seed controlada e exportação JSON v2. O [observatório local de playtests](../../ct001-playtests.html) aceita múltiplas partidas e calcula conclusão, tempos e ouro simulado/minuto, sem modificar o save. **Não existem dados de partidas reais importadas ou autorização de pagamento.** [Relatório do ciclo 6](./CT-001-CICLO-6.md).
 
 **Atualização do ciclo 5:** o comboio usa [rotas navegáveis A*](../../SeaConvoyNavigation.js), orientação móvel no radar/Carta, janela de abordagem por estágio e relatório exportável em JSON. A economia de prêmio ainda é **proxy**, não validada por ouro/minuto. Os testes simulados somam 1.070 verificações aprovadas; **QA real em navegador pendente**. [Relatório e planilha de comparação](./CT-001-CICLO-5.md).
 
