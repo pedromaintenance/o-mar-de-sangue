@@ -182,6 +182,53 @@ const SEA_PORT_UI = {
     const n=this.root.querySelector('.port-toast');
     if(n){n.textContent=message;n.hidden=false;}
   },
+  ct001Telemetry(report) {
+    if(!report?.laboratory||!report.contractDiagnostics)return null;
+    const d=report.contractDiagnostics;
+    // Whitelist: nunca exportar conta, dispositivo, saves ou histórico político.
+    const n=value=>typeof value==='number'&&Number.isFinite(value)?
+      Math.max(0,Math.round(value)):null;
+    return {
+      format:'mar-de-sangue-ct001-playtest',schema:1,
+      generatedAt:new Date().toISOString(),
+      contractId:'CT-001',version:'0.5',
+      stage:n(d.stage),routeLength:n(d.routeLength),
+      routeNodes:n(d.routeNodes),interceptionWindowSeconds:n(d.initialWindow),
+      captureSeconds:n(d.captureSeconds),escapeSeconds:n(d.escapeSeconds),
+      phase:String(d.phase||''),route:d.choice||null,
+      failureReason:d.failureReason||null,
+      result:{won:!!report.won,withdrawn:!!report.withdrawn,
+        completed:!!report.contractCompleted,
+        kills:n(report.kills),rammings:n(report.rammings),
+        collectedGold:n(report.collected),
+        contractBounty:n(report.contractBounty),
+        simulatedReward:n(report.previewReward)}
+    };
+  },
+  exportCT001Report() {
+    const payload=this.ct001Telemetry(this.scene?.report);
+    if(!payload){this.notify('Nenhum teste CT-001 disponível para exportar.');return false;}
+    let anchor=null,url=null;
+    try{
+      const blob=new Blob([JSON.stringify(payload,null,2)+'\n'],
+        {type:'application/json;charset=utf-8'});
+      url=URL.createObjectURL(blob);
+      anchor=document.createElement('a');
+      anchor.href=url;
+      anchor.download='mar-de-sangue-ct001-teste-'+
+        payload.generatedAt.slice(0,10)+'.json';
+      anchor.style.display='none';document.body.append(anchor);
+      anchor.click();
+      this.notify('Relatório CT-001 preparado. O save não foi alterado.');
+      return true;
+    }catch(_){
+      this.notify('Não foi possível exportar o teste CT-001.');
+      return false;
+    }finally{
+      anchor?.remove();
+      if(url)setTimeout(()=>URL.revokeObjectURL(url),3000);
+    }
+  },
   exportBackup() {
     // A portable copy of the normalized v4 profile. Never touch game saves.
     let objectUrl=null,anchor=null;
@@ -289,6 +336,7 @@ const SEA_PORT_UI = {
       this.render('readability');return;
     }
     if(name==='export-backup'){this.exportBackup();return;}
+    if(name==='export-ct001'){this.exportCT001Report();return;}
     if(name==='restore-file'){
       this.root.querySelector('#sea-port-backup')?.click();return;
     }
@@ -976,6 +1024,9 @@ const SEA_PORT_UI = {
       '<div class="port-result-grid">'+data.map(([title,value])=>
         '<div><span>'+this.text(title)+'</span><strong>'+(typeof value==='string'?this.text(value):this.num(value))+'</strong></div>').join('')+
       '</div>'+chronicleHtml+'<div class="port-result-actions">'+
+      (r.laboratory&&r.contractDiagnostics?
+        this.button('export-ct001','EXPORTAR TESTE CT-001 (JSON)',
+          'Distância, tempo, resultado e recompensa simulada · sem alterar o save','↓',''):'')+
         this.button('yard:armas','MELHORAR O NAVIO','Abrir estaleiro','⚒','')+
         this.button(r.contractTitle?'contracts':'next',r.contractTitle?'OUTRO CONTRATO':r.mode==='mission'?'PRÓXIMA MISSÃO':'NOVA JORNADA','Voltar ao Mar de Sangue','⚔','port-choice--primary')+
         this.button('menu','MENU PRINCIPAL','','←','')+
