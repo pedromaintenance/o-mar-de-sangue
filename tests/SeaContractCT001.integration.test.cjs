@@ -17,7 +17,7 @@ const ctx={
   SEA_ISLANDS:{render(s){s.dialogRendered=true}}
 };
 const loaded=[
-  'SeaContractCT001.js','SeaContracts.js','SeaBoarding.js'
+  'SeaConvoyNavigation.js','SeaContractCT001.js','SeaContracts.js','SeaBoarding.js'
 ].map(read).join('\n');
 vm.runInNewContext(loaded+'\nthis.testExports={CT:SEA_CT001,C:SEA_CONTRACTS,B:SEA_BOARDING};',ctx);
 const {C,B}=ctx.testExports;
