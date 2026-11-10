@@ -48,7 +48,9 @@ const report={
 };
 const p=P.ct001Telemetry(report);
 assert.equal(p.format,'mar-de-sangue-ct001-playtest');
-assert.equal(p.schema,1);
+assert.equal(p.schema,2);
+assert.equal(p.benchmark,false);
+assert.equal(p.seed,null);
 assert.equal(p.result.simulatedReward,320);
 assert.equal(p.captureSeconds,41);
 assert.equal(p.route,'free');
