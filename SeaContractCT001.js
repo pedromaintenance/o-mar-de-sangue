@@ -172,13 +172,16 @@ const SEA_CT001 = Object.freeze({
     const desired=Math.atan2(dx,-dy);
     const angle=Math.atan2(Math.sin(desired-e.heading),Math.cos(desired-e.heading));
     e.heading+=Math.max(-1.45*delta,Math.min(1.45*delta,angle));
-    e.vx+=Math.sin(e.heading)*175*delta;
-    e.vy-=Math.cos(e.heading)*175*delta;
+    // A tripulação reduz pano para virar: evita entrar de proa nas ilhas.
+    const throttle=Math.max(.08,1-Math.min(1,Math.abs(angle)/1.15));
+    e.vx+=Math.sin(e.heading)*175*throttle*delta;
+    e.vy-=Math.cos(e.heading)*175*throttle*delta;
     if(typeof SEA_WEATHER!=='undefined')SEA_WEATHER.enemyCurrent(s,e,delta);
     const friction=Math.exp(-1.25*delta);
     e.vx*=friction;e.vy*=friction;
     const speed=Math.hypot(e.vx,e.vy),cap=Math.max(75,Math.min(130,e.speed*1.05));
-    if(speed>cap){e.vx*=cap/speed;e.vy*=cap/speed;}
+    const turnCap=Math.max(38,cap*(1-.7*Math.min(1,Math.abs(angle)/1.5)));
+    if(speed>turnCap){e.vx*=turnCap/speed;e.vy*=turnCap/speed;}
     e.x+=e.vx*delta;e.y+=e.vy*delta;
     s.collideWorldBounds?.(e);
     for(const island of s.islands||[]){
