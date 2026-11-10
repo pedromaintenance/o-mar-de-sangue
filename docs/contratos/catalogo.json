@@ -17,7 +17,7 @@
     "smuggle",
     "hunt"
   ],
-  "note": "CT-001 v0.5: perseguição por rota A*, prazo de abordagem, marcador móvel e exportação JSON disponíveis somente em ?contractLab=ct001 + Sandbox; recompensas simuladas, nenhum contrato novo habilitado no quadro.",
+  "note": "CT-001 v0.6 tem cenários M2/10/25 e observatório para relatórios locais; continua enabled=false, sem prêmios/efeitos reais e sem quadro público até pelo menos 3 contratos aprovados.",
   "entries": [
     {
       "templateId": "CT-001",
@@ -28,10 +28,10 @@
       "minActiveMainMission": 2,
       "markdown": "docs/contratos/CT-001-DIZIMO-DOS-AFOGADOS.md",
       "json": "docs/contratos/CT-001.json",
-      "revision": "0.5",
+      "revision": "0.6",
       "laboratoryUrlParam": "contractLab=ct001",
       "labReport": "docs/contratos/CT-001-CICLO-3.md",
-      "qaStatus": "simulated_passed_browser_pending"
+      "qaStatus": "simulated_logic_passed_browser_and_economy_pending"
     }
   ]
 }
