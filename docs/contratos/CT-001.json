@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "templateId": "CT-001",
-  "revision": "0.4",
+  "revision": "0.5",
   "status": "draft_lab_playable",
   "enabled": false,
   "title": "O Dízimo dos Afogados",
@@ -380,7 +380,10 @@
       "three_approved_templates_required_before_activating_board",
       "connect_unique_offer_id_and_seed_to_ct001_launch",
       "approve_and_enable_real_settlement_only_after_qa",
-      "real_world_browser_qa_touch_gamepad_and_weather"
+      "real_world_browser_qa_touch_gamepad_and_weather",
+      "real_browser_and_mobile_qa",
+      "empirical_reward_per_minute_calibration",
+      "approval_before_random_offer_board_and_settlement"
     ],
     "backwardsCompatibleSaveRequired": true,
     "implementedCapabilities": [
@@ -399,12 +402,18 @@
       "next_sortie_effects_engine",
       "lab_effect_preview_only",
       "strict_v4_backup_validation_and_rollback",
-      "contracts_ci_regression_tests"
+      "contracts_ci_regression_tests",
+      "island_safe_convoy_route_a_star",
+      "route_based_interception_window",
+      "boarding_deadline_after_disable",
+      "moving_target_marker_in_atlas_and_radar",
+      "ct001_playtest_json_export",
+      "realistic_collision_chase_simulation_tests"
     ],
     "laboratoryQuery": "?contractLab=ct001"
   },
   "tests": {
-    "status": "automated_state_effects_and_backups_passed_manual_qa_pending",
+    "status": "1070_simulated_assertions_passed_in_7_suites_browser_qa_pending",
     "cases": [
       "mission_2_unupgraded_ship",
       "mission_10_mixed_escort",
@@ -421,5 +430,5 @@
       "pwa_load_order_v117"
     ]
   },
-  "editorialNotes": "Ciclo 4: motor de efeitos (Demeter/cobradores/salvo-conduto) e quadro seedado com persistência v4 implementados e testados. CT-001 continua enabled=false e sem pagamento/concessão real. O catálogo tem menos de 3 templates aprovados e o quadro é desativado."
+  "editorialNotes": "Ciclo 5: navio navega por rotas seguras A*, contorna ilhas com desaceleração em curvas, pode ser rastreado na Carta e expõe telemetria JSON para QA. Simulação 25/25 rotas e 1070 verificações de lógica aprovadas. CT-001 permanece enabled=false, sem dinheiro real."
 }
