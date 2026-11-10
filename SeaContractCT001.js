@@ -1,7 +1,7 @@
-/* O Mar de Sangue — CT-001 v0.3, vertical slice de laboratório.
+/* O Mar de Sangue — CT-001 v0.5, vertical slice de laboratório.
  * Isolado: só roda quando Game recebe contractId 'ct001' pelo parâmetro
  * explícito ?contractLab=ct001 no modo sandbox. Não gera ofertas nem
- * altera os contratos legados. Efeitos entre expedições ficam pendentes.
+ * altera os contratos legados. Rotas e prazo auditáveis; QA visual pendente.
  */
 const SEA_CT001 = Object.freeze({
   id:'ct001',
@@ -38,7 +38,9 @@ const SEA_CT001 = Object.freeze({
     s.contract={id:this.id,lab:true,phase:'clue',completed:false,
       failed:false,escaped:false,activeMainMission:stage,clueId:wreck.id,
       shelterId:sanctuary.id,destinationId:ruin.id,targetEnemyId:null,
-      exitX:null,exitY:null,escapeAt:0,route:null,
+      exitX:null,exitY:null,escapeAt:0,boardUntil:0,route:null,
+      routeWaypoints:[],routeIndex:0,routeDistance:0,initialWindow:0,
+      launchedAt:0,capturedAt:null,failureReason:null,
       baseBounty:this.baseBounty(stage),bounty:0,ambushIds:[],boarded:false};
     s.chartDiscovered?.add(wreck.id);
     s.chartWaypointId=wreck.id;s.atlasFocusedId=wreck.id;
@@ -66,9 +68,15 @@ const SEA_CT001 = Object.freeze({
     if(c.completed)return 'DÍZIMO DOS AFOGADOS · CONTRATO CONCLUÍDO';
     if(c.failed)return 'DÍZIMO DOS AFOGADOS · OPERAÇÃO FRACASSADA';
     if(c.phase==='clue')return 'DÍZIMO · LOCALIZE O MANIFESTO NO NAUFRÁGIO MARCADO';
-    if(c.phase==='chase')return 'DÍZIMO · INTERCEPTE O TRANSPORTE · '+
-      Math.max(0,Math.ceil(c.escapeAt-(s.elapsed||0)))+'s';
-    if(c.phase==='board')return 'DÍZIMO · TRANSPORTE AVARIADO · ABORDE DEVAGAR';
+    if(c.phase==='chase'){
+      const e=(s.enemies||[]).find(e=>e.id===c.targetEnemyId&&!e.dead);
+      const d=e&&s.player?Math.round(Math.hypot(s.player.x-e.x,s.player.y-e.y)):null;
+      return 'DÍZIMO · INTERCEPTE O TRANSPORTE · '+
+        (d===null?'ALVO NÃO LOCALIZADO':d+' UNID. · ')+
+        Math.max(0,Math.ceil(c.escapeAt-(s.elapsed||0)))+'s';
+    }
+    if(c.phase==='board')return 'DÍZIMO · ABORDE O CASCO AVARIADO · '+
+      Math.max(0,Math.ceil(c.boardUntil-(s.elapsed||0)))+'s';
     if(c.phase==='choose')return 'DÍZIMO · ESCOLHA O DESTINO DA CARGA';
     if(c.phase==='deliver')return 'DÍZIMO · LEVE OS PRISIONEIROS A DEMÉTER';
     if(c.phase==='manifest')return 'DÍZIMO · ENTREGUE AS PROVAS ÀS RUÍNAS';
@@ -124,19 +132,29 @@ const SEA_CT001 = Object.freeze({
     if(!target||!target.capturable)return false;
     target.ct001Transport=true;target.reward=0;
     target.label?.setText?.('⚑ TRANSPORTE DE TRIBUTOS · CAPTURE');
+    const plan=SEA_CONVOY_NAV.plan(s,target,target.x<s.W/2,target.radius);
+    if(!plan){
+      // Não deixar um transporte órfão quando o mapa não tem rota segura.
+      target.dead=true;
+      for(const key of ['ship','wake','bar','label'])target[key]?.destroy?.();
+      s.announce?.('SEM CORREDOR NAVEGÁVEL PARA O COMBOIO · TENTE NOVAMENTE');
+      return false;
+    }
     c.targetEnemyId=target.id;
-    c.exitX=target.x<s.W/2?s.W-110:110;
-    c.exitY=Math.max(130,Math.min(s.H-130,target.y));
-    const distance=Math.hypot(c.exitX-target.x,c.exitY-target.y);
-    c.escapeAt=(s.elapsed||0)+Math.max(125,Math.min(220,
-      Math.ceil(110+distance/115+Math.max(0,c.activeMainMission-2)*1.2)));
+    c.routeWaypoints=plan.waypoints;
+    c.routeIndex=0;
+    c.routeDistance=Math.round(plan.length);
+    c.exitX=plan.end.x;c.exitY=plan.end.y;
+    c.initialWindow=SEA_CONVOY_NAV.captureWindow(s,target,plan,c.activeMainMission);
+    c.launchedAt=s.elapsed||0;
+    c.escapeAt=c.launchedAt+c.initialWindow;
     for(const [index,type] of band.escorts.entries()){
       const guard=s.spawnEnemy?.(type,480+index*100,{forcedHostile:true});
       if(guard){guard.ct001Escort=true;guard.label?.setText?.('⚔ ESCOLTA DA CORTE · '+SEA_FOES[type].name);}
     }
     c.phase='chase';
     s.chartWaypointId=null;
-    s.announce?.('COMBOIO À VISTA · AVARIE, NÃO AFUNDE · '+Math.round(c.escapeAt-(s.elapsed||0))+'s');
+    s.announce?.('COMBOIO À VISTA · ROTA NAVEGÁVEL · AVARIE, NÃO AFUNDE · '+c.initialWindow+'s');
     return true;
   },
   evade(s,e,dt){
@@ -144,7 +162,13 @@ const SEA_CT001 = Object.freeze({
     if(!this.active(s)||!e?.ct001Transport||e.dead||e.boardingDisabled||
        c.targetEnemyId!==e.id||c.phase!=='chase')return false;
     const delta=Math.max(.001,Math.min(.1,Number(dt)||0));
-    const dx=c.exitX-e.x,dy=c.exitY-e.y;
+    while(c.routeIndex<c.routeWaypoints.length-1){
+      const waypoint=c.routeWaypoints[c.routeIndex];
+      if(Math.hypot(e.x-waypoint.x,e.y-waypoint.y)>Math.max(105,e.radius+44))break;
+      c.routeIndex++;
+    }
+    const waypoint=c.routeWaypoints[c.routeIndex]||{x:c.exitX,y:c.exitY};
+    const dx=waypoint.x-e.x,dy=waypoint.y-e.y;
     const desired=Math.atan2(dx,-dy);
     const angle=Math.atan2(Math.sin(desired-e.heading),Math.cos(desired-e.heading));
     e.heading+=Math.max(-1.45*delta,Math.min(1.45*delta,angle));
@@ -167,7 +191,7 @@ const SEA_CT001 = Object.freeze({
     const c=s.contract;
     if(!this.active(s)||!e?.ct001Transport||c.targetEnemyId!==e.id||
        !['chase','board'].includes(c.phase)||c.boarded)return false;
-    c.boarded=true;c.phase='choose';c.escapeAt=0;
+    c.boarded=true;c.phase='choose';c.capturedAt=s.elapsed||0;c.escapeAt=0;
     c.deckIsland={id:'ct001-deck',kind:'wreck',contractTitle:'O DÍZIMO DOS AFOGADOS',
       x:e.x,y:e.y,radius:88};
     s.chartWaypointId=null;
@@ -185,6 +209,7 @@ const SEA_CT001 = Object.freeze({
     const c=s.contract;
     if(!this.active(s)||c.completed||c.failed)return false;
     c.failed=true;c.escaped=true;c.bounty=0;c.phase='failed';
+    c.failureReason=reason;
     s.announce?.(reason);
     s.finish?.(false,true);
     return true;
@@ -211,7 +236,17 @@ const SEA_CT001 = Object.freeze({
     if(c.phase==='chase'||c.phase==='board'){
       const target=(s.enemies||[]).find(e=>e.id===c.targetEnemyId&&!e.dead);
       if(!target)return this.fail(s,'TRANSPORTE PERDIDO · CONTRATO FRACASSADO');
-      if(target.boardingDisabled){c.phase='board';return;}
+      if(target.boardingDisabled){
+        if(c.phase!=='board'){
+          c.phase='board';
+          const seconds=Math.max(38,55-Math.floor(c.activeMainMission*.6));
+          c.boardUntil=(s.elapsed||0)+seconds;
+          s.announce?.('TRANSPORTE IMOBILIZADO · '+seconds+'s PARA ABORDAR');
+        }
+        if((s.elapsed||0)>=c.boardUntil)
+          this.fail(s,'A ESCOLTA RESGATOU O TRANSPORTE ANTES DA ABORDAGEM');
+        return;
+      }
       if(Math.hypot(target.x-c.exitX,target.y-c.exitY)<120||
           (s.elapsed||0)>=c.escapeAt)this.fail(s,'O COMBOIO PASSOU PELO LIMITE · SEM RECOMPENSA');
       return;
@@ -225,6 +260,16 @@ const SEA_CT001 = Object.freeze({
         s.finish?.(true);
       }
     }
+  },
+  metrics(s){
+    const c=s.contract;
+    if(!this.active(s))return null;
+    return {stage:c.activeMainMission,routeLength:c.routeDistance,
+      routeNodes:c.routeWaypoints.length,initialWindow:c.initialWindow,
+      captureSeconds:c.capturedAt===null?null:Math.round(c.capturedAt-c.launchedAt),
+      escapeSeconds:c.failed?Math.round((s.elapsed||0)-c.launchedAt):null,
+      failureReason:c.failureReason||null,phase:c.phase,choice:c.route||null,
+      bounty:c.bounty||0};
   },
   apply(s,choice){
     const c=s.contract,t=this.target(s);
