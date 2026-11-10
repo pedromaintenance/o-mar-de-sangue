@@ -16,7 +16,12 @@ const SEA_ATLAS = {
     landmarks(s) {return (s.islands||[]).filter(i=>s.chartDiscovered?.has(i.id));},
     destination(s) {return this.landmarks(s).find(i=>i.id===s.chartWaypointId)||null;},
     navigation(s) {
-        const island=this.destination(s);
+        const contract=s.contract;
+        const tracked=contract?.id==='ct001'&&['chase','board'].includes(contract.phase)?
+            s.enemies?.find(e=>e.id===contract.targetEnemyId&&!e.dead):null;
+        // A carta acompanha o único transporte identificado no manifesto.
+        const island=tracked?{id:'CONVOIO',kind:'ct001',x:tracked.x,y:tracked.y,
+            radius:tracked.radius,contractTracker:true}:this.destination(s);
         if(!island||!s.player)return null;
         const dx=island.x-s.player.x,dy=island.y-s.player.y;
         const bearing=(Math.atan2(dx,-dy)*180/Math.PI+360)%360;
@@ -162,6 +167,21 @@ const SEA_ATLAS = {
             if(isl.id===s.chartWaypointId)
                 g.lineStyle(2,0xf2b86d,1).strokeCircle(mx,my,14);
         }
+        // Apenas o comboio identificado pelo manifesto é revelado neste contrato.
+        const contract=s.contract;
+        const convoy=contract?.id==='ct001'&&['chase','board'].includes(contract.phase)?
+            s.enemies?.find(e=>e.id===contract.targetEnemyId&&!e.dead):null;
+        if(convoy){
+            const hx=L+convoy.x*scaleX,hy=T+convoy.y*scaleY;
+            g.lineStyle(2,0xe1b879,.98).strokeCircle(hx,hy,10);
+            g.lineStyle(1,0xe1b879,.92).strokeCircle(hx,hy,15);
+            g.lineStyle(2,0xf2d9a5,1).lineBetween(hx-6,hy,hx+6,hy);
+            g.lineBetween(hx,hy-6,hx,hy+6);
+            txt(cx,top+(desktop?507:446),
+                (contract.phase==='board'?'⚓ ABORDAR TRANSPORTE · ':'✥ COMBOIO EM MOVIMENTO · ')+
+                Math.max(0,Math.ceil((contract.phase==='board'?contract.boardUntil:contract.escapeAt)-(s.elapsed||0)))+'s',
+                desktop?12:10,'#e5bc88',{mono:true});
+        }
         // One disclosed ship, not the location of any undiscovered island.
         const fugitive=typeof SEA_CONTRACTS!=='undefined'?SEA_CONTRACTS.hunted(s):null;
         if(fugitive){
@@ -183,7 +203,8 @@ const SEA_ATLAS = {
         txt(L+14,T+13,'N',12,'#e1c99f',{bold:true});
         const visitedCount=Array.from(s.chartDiscovered).filter(id=>s.islandVisits?.has(id)).length;
         const focused=known.find(i=>i.id===s.atlasFocusedId);
-        const labelFor=island=>island?.politicalEcho&&!island.politicalEcho.resolved?
+        const labelFor=island=>island?.contractTracker?'COMBOIO DA CORTE':
+            island?.politicalEcho&&!island.politicalEcho.resolved?
             'ECO POLÍTICO':this.kindNames[island?.kind]||'ILHA';
         const title=nav?labelFor(nav.island):focused?labelFor(focused):null;
         txt(cx,top+(desktop?525:463),
