@@ -189,16 +189,23 @@ const SEA_PORT_UI = {
     const n=value=>typeof value==='number'&&Number.isFinite(value)?
       Math.max(0,Math.round(value)):null;
     return {
-      format:'mar-de-sangue-ct001-playtest',schema:1,
+      format:'mar-de-sangue-ct001-playtest',schema:2,
       generatedAt:new Date().toISOString(),
-      contractId:'CT-001',version:'0.5',
-      stage:n(d.stage),routeLength:n(d.routeLength),
+      contractId:'CT-001',version:'0.6',
+      stage:n(d.stage),actualSaveMission:n(d.actualSaveMission),
+      benchmark:!!d.benchmark,seed:n(d.seed),
+      routeLength:n(d.routeLength),
       routeNodes:n(d.routeNodes),interceptionWindowSeconds:n(d.initialWindow),
       captureSeconds:n(d.captureSeconds),escapeSeconds:n(d.escapeSeconds),
       phase:String(d.phase||''),route:d.choice||null,
       failureReason:d.failureReason||null,
       result:{won:!!report.won,withdrawn:!!report.withdrawn,
         completed:!!report.contractCompleted,
+        elapsedSeconds:n(report.labElapsedSeconds),
+        hullMax:n(report.labShip?.maxHP),
+        hullRemaining:n(report.labShip?.remainingHP),
+        cannonDamage:n(report.labShip?.cannonDamage),
+        cannonBalls:n(report.labShip?.balls),
         kills:n(report.kills),rammings:n(report.rammings),
         collectedGold:n(report.collected),
         contractBounty:n(report.contractBounty),
@@ -288,6 +295,14 @@ const SEA_PORT_UI = {
     if(name==='settings'){this.goto('settings');return;}
     if(name==='settings-back'){this.goto('menu');return;}
     if(name==='mission'||name==='sandbox'){this.start(name);return;}
+    if(name==='ct001-scenario'&&SEA_CT001_LAB.scenarios.includes(Number(id))&&
+        typeof location!=='undefined'&&
+        new URLSearchParams(location.search).get('contractLab')==='ct001'){
+      const params=new URLSearchParams(location.search);
+      params.set('ct001Stage',id);
+      if(!params.has('ct001Seed'))params.set('ct001Seed',String(SEA_CT001_LAB.seedDefault));
+      location.assign(location.pathname+'?'+params.toString());return;
+    }
     if(name==='contracts'){this.goto('contracts');return;}
     if(name==='council'){this.goto('council');return;}
     if(name==='faction'&&id){
@@ -652,6 +667,9 @@ const SEA_PORT_UI = {
   },
   home(p) {
     const stats=SeaProfile.stats(p);
+    const labActive=typeof location!=='undefined'&&
+      new URLSearchParams(location.search).get('contractLab')==='ct001';
+    const labSettings=labActive?SEA_CT001_LAB.config(location.search,p.mission):null;
     const progression=SEA_CONTRACT_STATE.normalize(p.contractProgress);
     const coming=progression.pendingEffects.filter(e=>e.expiresOnSortie===p.sorties+1)
       .map(e=>SEA_CONTRACT_EFFECTS.descriptions[e.id]||e.id);
@@ -680,7 +698,13 @@ const SEA_PORT_UI = {
           coming.map(text=>this.text(text)).join(' · ')+'</p>':'')+
         '<div class="port-actions">'+
           this.button('mission','MISSÕES','Etapa '+this.num(p.mission)+' · 25% do saque ao cofre','⚔','port-choice--primary')+
-          this.button('sandbox','MAR SEM FIM','Saque integral · onda '+this.num(p.bestWave),'∞','')+
+          this.button('sandbox',labActive?'TESTAR CT-001 · M'+labSettings.stage:'MAR SEM FIM',
+            labActive?(labSettings.benchmark?'Navio de referência · save protegido':'Navio do capitão · save protegido'):
+              'Saque integral · onda '+this.num(p.bestWave),'∞','')+
+          (labActive?SEA_CT001_LAB.scenarios.map(stage=>
+            this.button('ct001-scenario:'+stage,'CENÁRIO M'+stage,
+              'Equipamento temporário · posição inicial reproduzível','⚑','')
+          ).join(''):'')+
           this.button('yard:armas','ESTALEIRO','Reforce seu navio e sua tripulação','⚒','')+
           this.button('help','DIÁRIO DE BORDO','Comandos, regras e navegação','☷','')+
           this.button('contracts','CONTRATOS DA COSTA SUL','Três dossiês · escolhas, riscos e comissões','⚓','port-choice--contract')+
@@ -998,6 +1022,11 @@ const SEA_PORT_UI = {
           r.contractRoute==='inform'?'DENÚNCIA À CORTE':'SUBORNO À CORTE' ]]:[])]:[]),
       ...(r.laboratory?[[ 'PAGAMENTO SIMULADO (NÃO CREDITADO)',r.previewReward||0 ]]:[]),
       ...(r.contractDiagnostics?.initialWindow?[ 
+        ['CENÁRIO DE QA', 'MISSÃO '+r.contractDiagnostics.stage+
+          (r.contractDiagnostics.benchmark?' · NAVIO SIMULADO':' · NAVIO REAL')],
+        ['SEMENTE DO TESTE',r.contractDiagnostics.seed??'PADRÃO'],
+        ['DURAÇÃO DA EXPEDIÇÃO', (r.labElapsedSeconds??0)+'s'],
+        ['CASCO RESTANTE', (r.labShip?.remainingHP??0)+' / '+(r.labShip?.maxHP??0)],
         ['ROTA DO COMBOIO (UNIDADES)',r.contractDiagnostics.routeLength],
         ['PONTOS DE NAVEGAÇÃO',r.contractDiagnostics.routeNodes],
         ['JANELA DE INTERCEPTAÇÃO',r.contractDiagnostics.initialWindow+'s'],
@@ -1014,13 +1043,16 @@ const SEA_PORT_UI = {
       ['OURO RECUPERADO',r.reward],
       ['INIMIGOS AFUNDADOS',r.kills],['ABALROAMENTOS',r.rammings],
       ['COFRE DO CAPITÃO',r.bank],
-      [r.mode==='mission'?'ETAPA':'ONDA',r.mode==='mission'?r.stage:r.wave],
+      [r.laboratory?'CENÁRIO':r.mode==='mission'?'ETAPA':'ONDA',
+        r.laboratory?(r.contractDiagnostics?.stage||r.stage):
+          r.mode==='mission'?r.stage:r.wave],
       ['ILHAS EXPLORADAS',r.islands]
     ];
     return '<main class="port-page port-page--result" id="port-main">'+
       '<div class="port-page__header"><span class="port-eyebrow">CRÔNICAS DOS QUE REGRESSARAM</span>'+
       '<h1>'+this.text(state)+'</h1><p>'+this.text(desc)+'</p>'+ 
-      (r.laboratory?'<p><strong>LABORATÓRIO CT-001:</strong> resultado apenas experimental. Nenhum ouro, estatística, reputação ou avanço de campanha foi gravado.</p>':'')+'</div>'+
+      (r.laboratory?'<p><strong>LABORATÓRIO CT-001:</strong> resultado apenas experimental. Nenhum ouro, estatística, reputação ou avanço de campanha foi gravado. '+
+        (r.contractDiagnostics?.benchmark?'O navio e a missão foram simulados.':'O equipamento real do capitão foi utilizado.')+'</p>':'')+'</div>'+
       '<div class="port-result-grid">'+data.map(([title,value])=>
         '<div><span>'+this.text(title)+'</span><strong>'+(typeof value==='string'?this.text(value):this.num(value))+'</strong></div>').join('')+
       '</div>'+chronicleHtml+'<div class="port-result-actions">'+
