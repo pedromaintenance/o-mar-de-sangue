@@ -34,6 +34,10 @@ jobs:
           node-version: '22'
       - name: Abordagem de navios
         run: node tests/SeaBoarding.test.cjs
+      - name: CT-001 — planejamento costeiro
+        run: node tests/SeaConvoyNavigation.test.cjs
+      - name: CT-001 — perseguicao fisica e prazo
+        run: node tests/SeaConvoyChase.test.cjs
       - name: CT-001 — rotas e fuga
         run: node tests/SeaContractCT001.test.cjs
       - name: CT-001 — integração
