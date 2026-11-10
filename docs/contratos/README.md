@@ -12,6 +12,7 @@ Este diretório é o **registro de design** dos contratos opcionais de alto risc
 - [CAPTURA_NAVIOS_v0.1.md](./CAPTURA_NAVIOS_v0.1.md) — laboratório opt-in de incapacitação e abordagem (`?boardingLab=1`), com testes e pendências.
 - [CT-001-CICLO-3.md](./CT-001-CICLO-3.md) — primeiro ciclo **jogável em laboratório**, com interceptação, abordagem, três decisões, pagamentos simulados e QA.
 - [CT-001-CICLO-4.md](./CT-001-CICLO-4.md) — quadro seedado, persistência aditiva do save v4, efeitos de próxima expedição e testes de regressão.
+- [CT-001-CICLO-5.md](./CT-001-CICLO-5.md) — rotas marítimas A*, prazo de abordagem, Carta/radar, auditoria econômica e exportação JSON de playtest.
 
 ## Estado do jogo atual
 
@@ -24,6 +25,8 @@ O save atual continua em **v4**, agora com um objeto opcional e validado `contra
 **Ciclo 3:** `SeaContractCT001.js` implementa um primeiro percurso jogável **somente** com `?contractLab=ct001` e modo Sandbox. Apreende o comboio, abre a decisão no convés e conclui uma das três rotas. A recompensa e as alterações políticas são simuladas e **não são gravadas no save**. O contrato ainda não aparece como oferta.
 
 **Ciclo 4:** `SeaContractState.js` implementa a infraestrutura para um quadro persistente com semente e 3–6 ofertas únicas, só geradas após vitória principal com **pelo menos três templates aprovados**. `SeaContractEffects.js` implementa Deméter, cobradores e salvo-conduto por uma expedição. O backup v4 mantém compatibilidade legada; o porto mostra efeitos pendentes e simulações. **Hoje `approvedTemplates=[]`, portanto nenhum quadro novo é criado e o CT-001 não paga efeitos reais.**
+
+**Ciclo 5:** a perseguição usa planejamento de rota A* em `SeaConvoyNavigation.js`, com desaceleração nas curvas, alvo móvel rastreado em Carta/radar, prazo de abordagem e dados exportáveis em JSON após a viagem. Sete suítes de testes totalizam 1.070 verificações aprovadas em lógica simulada. **Ainda não existe QA completa de navegador, então o CT-001 segue desabilitado para a campanha.**
 
 ## Processo unitário
 
