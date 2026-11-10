@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "templateId": "CT-001",
-  "revision": "0.5",
+  "revision": "0.6",
   "status": "draft_lab_playable",
   "enabled": false,
   "title": "O Dízimo dos Afogados",
@@ -408,12 +408,18 @@
       "boarding_deadline_after_disable",
       "moving_target_marker_in_atlas_and_radar",
       "ct001_playtest_json_export",
-      "realistic_collision_chase_simulation_tests"
+      "realistic_collision_chase_simulation_tests",
+      "reference_scenarios_m2_m10_m25",
+      "scene_only_temporary_ship_and_neutral_faction",
+      "seeded_ct001_enemy_spawns",
+      "playtest_json_schema_v2",
+      "local_multi_report_analytics_dashboard",
+      "benchmark_ci_regressions"
     ],
     "laboratoryQuery": "?contractLab=ct001"
   },
   "tests": {
-    "status": "1070_simulated_assertions_passed_in_7_suites_browser_qa_pending",
+    "status": "1269_logic_assertions_passed_10_suites_browser_qa_pending",
     "cases": [
       "mission_2_unupgraded_ship",
       "mission_10_mixed_escort",
@@ -430,5 +436,5 @@
       "pwa_load_order_v117"
     ]
   },
-  "editorialNotes": "Ciclo 5: navio navega por rotas seguras A*, contorna ilhas com desaceleração em curvas, pode ser rastreado na Carta e expõe telemetria JSON para QA. Simulação 25/25 rotas e 1070 verificações de lógica aprovadas. CT-001 permanece enabled=false, sem dinheiro real."
+  "editorialNotes": "Ciclo 6: três cenários de QA (M2 M10 M25), equipamento temporário sem persistência, seeds de spawn e observatório de playtests. Nenhum playtest real recebido ou resultado empírico medido; CT-001 continua inativo e bloqueado."
 }
