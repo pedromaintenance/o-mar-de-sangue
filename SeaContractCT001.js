@@ -1,4 +1,4 @@
-/* O Mar de Sangue — CT-001 v0.5, vertical slice de laboratório.
+/* O Mar de Sangue — CT-001 v0.6, vertical slice de laboratório.
  * Isolado: só roda quando Game recebe contractId 'ct001' pelo parâmetro
  * explícito ?contractLab=ct001 no modo sandbox. Não gera ofertas nem
  * altera os contratos legados. Rotas e prazo auditáveis; QA visual pendente.
@@ -25,7 +25,9 @@ const SEA_CT001 = Object.freeze({
     return Math.max(240,Math.round(principal*6));
   },
   init(s){
-    const stage=Math.max(2,Math.floor(Number(s.profile?.mission)||2));
+    const stage=Math.max(2,Math.floor(Number(s.ct001LabConfig?.stage||s.profile?.mission)||2));
+    s.ct001SpawnRandom=typeof SEA_CT001_LAB!=='undefined'?
+      SEA_CT001_LAB.rng(s.ct001LabConfig?.seed??SEA_CT001_LAB.seedDefault):Math.random;
     const dist=(i,p)=>Math.hypot(i.x-p.x,i.y-p.y);
     const origin=s.player||{x:s.W/2,y:s.H/2};
     const wreck=[...(s.islands||[])].filter(i=>i.kind==='wreck')
@@ -41,6 +43,8 @@ const SEA_CT001 = Object.freeze({
       exitX:null,exitY:null,escapeAt:0,boardUntil:0,route:null,
       routeWaypoints:[],routeIndex:0,routeDistance:0,initialWindow:0,
       launchedAt:0,capturedAt:null,failureReason:null,
+      labSeed:s.ct001LabConfig?.seed??null,labBenchmark:!!s.ct001LabConfig?.benchmark,
+      actualSaveMission:s.ct001LabConfig?.actualStage??Math.max(1,Number(s.profile?.mission)||1),
       baseBounty:this.baseBounty(stage),bounty:0,ambushIds:[],boarded:false};
     s.chartDiscovered?.add(wreck.id);
     s.chartWaypointId=wreck.id;s.atlasFocusedId=wreck.id;
@@ -128,7 +132,8 @@ const SEA_CT001 = Object.freeze({
     const c=s.contract;
     if(!this.active(s)||c.phase!=='clue')return false;
     const band=this.band(c.activeMainMission);
-    const target=s.spawnEnemy?.(band.ship,620,{capturable:true,forcedHostile:true});
+    const target=s.spawnEnemy?.(band.ship,620,{capturable:true,forcedHostile:true,
+      random:s.ct001SpawnRandom});
     if(!target||!target.capturable)return false;
     target.ct001Transport=true;target.reward=0;
     target.label?.setText?.('⚑ TRANSPORTE DE TRIBUTOS · CAPTURE');
@@ -149,7 +154,8 @@ const SEA_CT001 = Object.freeze({
     c.launchedAt=s.elapsed||0;
     c.escapeAt=c.launchedAt+c.initialWindow;
     for(const [index,type] of band.escorts.entries()){
-      const guard=s.spawnEnemy?.(type,480+index*100,{forcedHostile:true});
+      const guard=s.spawnEnemy?.(type,480+index*100,{forcedHostile:true,
+        random:s.ct001SpawnRandom});
       if(guard){guard.ct001Escort=true;guard.label?.setText?.('⚔ ESCOLTA DA CORTE · '+SEA_FOES[type].name);}
     }
     c.phase='chase';
@@ -267,7 +273,9 @@ const SEA_CT001 = Object.freeze({
   metrics(s){
     const c=s.contract;
     if(!this.active(s))return null;
-    return {stage:c.activeMainMission,routeLength:c.routeDistance,
+    return {stage:c.activeMainMission,benchmark:c.labBenchmark,
+      seed:c.labSeed,actualSaveMission:c.actualSaveMission,
+      routeLength:c.routeDistance,
       routeNodes:c.routeWaypoints.length,initialWindow:c.initialWindow,
       captureSeconds:c.capturedAt===null?null:Math.round(c.capturedAt-c.launchedAt),
       escapeSeconds:c.failed?Math.round((s.elapsed||0)-c.launchedAt):null,
@@ -289,7 +297,8 @@ const SEA_CT001 = Object.freeze({
       s.islandVisits.add(t.id);
     }else if(c.phase==='choose'){
       if(action==='ct001-free'){
-        const pursuer=s.spawnEnemy?.('corsario',570,{forcedHostile:true});
+        const pursuer=s.spawnEnemy?.('corsario',570,{forcedHostile:true,
+          random:s.ct001SpawnRandom});
         if(!pursuer){s.islandError='CORSÁRIO NÃO PÔDE SER MOBILIZADO · TENTE DE NOVO';return false;}
         pursuer.label?.setText?.('☠ CAÇADOR DE PRISIONEIROS');
         c.phase='deliver';c.route='free';
@@ -299,7 +308,8 @@ const SEA_CT001 = Object.freeze({
       }else if(action==='ct001-loot'){
         const ids=[];
         for(const type of ['patrulha','corsario']){
-          const e=s.spawnEnemy?.(type,510+ids.length*135,{forcedHostile:true});
+          const e=s.spawnEnemy?.(type,510+ids.length*135,{forcedHostile:true,
+            random:s.ct001SpawnRandom});
           if(e){e.ct001Ambush=true;ids.push(e.id);
             e.label?.setText?.('⚔ COBRADOR DOS TRIBUTOS');}
         }
@@ -308,7 +318,8 @@ const SEA_CT001 = Object.freeze({
         s.islandOutcome='O cofre foi confiscado, mas a Corte não aceita a perda.\n'+
           'Derrote os cobradores que chegaram para recuperar a carga.';
       }else if(action==='ct001-sell'){
-        const inspector=s.spawnEnemy?.('patrulha',640,{forcedHostile:true});
+        const inspector=s.spawnEnemy?.('patrulha',640,{forcedHostile:true,
+          random:s.ct001SpawnRandom});
         if(!inspector){s.islandError='NÃO FOI POSSÍVEL ABRIR A ROTA DE NEGOCIAÇÃO';return false;}
         inspector.label?.setText?.('⚔ FISCAL DOS MANIFESTOS');
         c.phase='manifest';c.route='sell';this.mark(s);
