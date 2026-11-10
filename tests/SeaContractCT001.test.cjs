@@ -5,7 +5,8 @@ const fs=require('node:fs');
 const vm=require('node:vm');
 const path=require('node:path');
 const assert=require('node:assert/strict');
-const code=fs.readFileSync(path.join(__dirname,'../SeaContractCT001.js'),'utf8');
+const navCode=fs.readFileSync(path.join(__dirname,'../SeaConvoyNavigation.js'),'utf8');
+const code=navCode+'\n'+fs.readFileSync(path.join(__dirname,'../SeaContractCT001.js'),'utf8');
 const world={
   Math,SEA_ECONOMY:{missionPayoutMultiplier:.25,
     missionCommission:stage=>Math.round(24+4.5*stage+6*Math.sqrt(stage))},
