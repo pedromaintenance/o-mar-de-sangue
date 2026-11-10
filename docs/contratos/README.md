@@ -13,6 +13,8 @@ Este diretório é o **registro de design** dos contratos opcionais de alto risc
 - [CT-001-CICLO-3.md](./CT-001-CICLO-3.md) — primeiro ciclo **jogável em laboratório**, com interceptação, abordagem, três decisões, pagamentos simulados e QA.
 - [CT-001-CICLO-4.md](./CT-001-CICLO-4.md) — quadro seedado, persistência aditiva do save v4, efeitos de próxima expedição e testes de regressão.
 - [CT-001-CICLO-5.md](./CT-001-CICLO-5.md) — rotas marítimas A*, prazo de abordagem, Carta/radar, auditoria econômica e exportação JSON de playtest.
+- [CT-001-CICLO-6.md](./CT-001-CICLO-6.md) — cenários M2/M10/M25, equipamentos de benchmark, seed repetível, JSON v2 e observatório local.
+- [Observatório de playtests](../../ct001-playtests.html) — importa relatórios CT-001 sem backend e compara as rotas.
 
 ## Estado do jogo atual
 
@@ -27,6 +29,8 @@ O save atual continua em **v4**, agora com um objeto opcional e validado `contra
 **Ciclo 4:** `SeaContractState.js` implementa a infraestrutura para um quadro persistente com semente e 3–6 ofertas únicas, só geradas após vitória principal com **pelo menos três templates aprovados**. `SeaContractEffects.js` implementa Deméter, cobradores e salvo-conduto por uma expedição. O backup v4 mantém compatibilidade legada; o porto mostra efeitos pendentes e simulações. **Hoje `approvedTemplates=[]`, portanto nenhum quadro novo é criado e o CT-001 não paga efeitos reais.**
 
 **Ciclo 5:** a perseguição usa planejamento de rota A* em `SeaConvoyNavigation.js`, com desaceleração nas curvas, alvo móvel rastreado em Carta/radar, prazo de abordagem e dados exportáveis em JSON após a viagem. Sete suítes de testes totalizam 1.070 verificações aprovadas em lógica simulada. **Ainda não existe QA completa de navegador, então o CT-001 segue desabilitado para a campanha.**
+
+**Ciclo 6:** o modo laboratório aceita `ct001Stage=2|10|25` e `ct001Seed`. O navio de benchmark e a bandeira neutra são cópias temporárias de cena; o save real não recebe as melhorias. O porto apresenta três cenários de referência. O exportador passou para JSON v2, e `ct001-playtests.html` agrupa resultados importados, sem gerar medições fictícias. Dez suítes com 1.269 verificações de lógica passaram; a validação no navegador e a economia real continuam pendentes. **Não habilitar CT-001.**
 
 ## Processo unitário
 
