@@ -42,5 +42,7 @@ jobs:
         run: node tests/SeaContractCT001.test.cjs
       - name: CT-001 — integração
         run: node tests/SeaContractCT001.integration.test.cjs
+      - name: CT-001 — interface e telemetria
+        run: node tests/SeaContractCT001.interface.test.cjs
       - name: Quadro, efeitos, saves e backups
         run: node tests/SeaContractPersistence.test.cjs
