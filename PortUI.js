@@ -949,6 +949,15 @@ const SEA_PORT_UI = {
           r.contractRoute==='hidden'?'CLANDESTINA':
           r.contractRoute==='inform'?'DENÚNCIA À CORTE':'SUBORNO À CORTE' ]]:[])]:[]),
       ...(r.laboratory?[[ 'PAGAMENTO SIMULADO (NÃO CREDITADO)',r.previewReward||0 ]]:[]),
+      ...(r.contractDiagnostics?.initialWindow?[ 
+        ['ROTA DO COMBOIO (UNIDADES)',r.contractDiagnostics.routeLength],
+        ['PONTOS DE NAVEGAÇÃO',r.contractDiagnostics.routeNodes],
+        ['JANELA DE INTERCEPTAÇÃO',r.contractDiagnostics.initialWindow+'s'],
+        ['TEMPO ATÉ A CAPTURA',r.contractDiagnostics.captureSeconds===null?
+          'NÃO CAPTURADO':r.contractDiagnostics.captureSeconds+'s'],
+        ...(r.contractDiagnostics.failureReason?[[
+          'MOTIVO DA FALHA',r.contractDiagnostics.failureReason]]:[])
+      ]:[]),
       ...(r.contractEffectPreview?[[ 'EFEITO PREVISTO — NÃO CONCEDIDO',r.contractEffectPreview ]]:[]),
       ...((r.contractEffectsUsed||[]).map(x=>[
         'EFEITO DA EXPEDIÇÃO · '+(x.used?'ATIVADO':'EXPIRADO'),x.description||x.id])),
