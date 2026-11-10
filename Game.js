@@ -541,6 +541,9 @@ class Game extends Phaser.Scene {
         const ct001Lab=this.mode==='sandbox'&&!data?.contract&&
             typeof location!=='undefined'&&
             new URLSearchParams(location.search).get('contractLab')==='ct001';
+        this.ct001LabConfig=ct001Lab?
+            SEA_CT001_LAB.config(location.search,p.mission):null;
+        if(this.ct001LabConfig)this.stage=this.ct001LabConfig.stage;
         this.contractId=ct001Lab?'ct001':
             this.mode==='sandbox' &&
             (['rescue','smuggle','hunt'].includes(data?.contract) ||
@@ -552,7 +555,12 @@ class Game extends Phaser.Scene {
         // Dobrar cada eixo quadruplica a área navegável.
         this.W = 4400 * SEA_WORLD_SCALE.linear;
         this.H = 3400 * SEA_WORLD_SCALE.linear;
-        this.profile = SeaProfile.load(); this.shipStats = SeaProfile.stats(this.profile);
+        this.profile = SeaProfile.load();
+        // Somente cenário CT-001 explícito: navio/bandeira locais à cena.
+        // O save v4 permanece intacto e nunca recebe este equipamento.
+        if(this.ct001LabConfig?.benchmark)
+            this.profile=SEA_CT001_LAB.sceneProfile(this.profile,this.ct001LabConfig);
+        this.shipStats = SeaProfile.stats(this.profile);
         SEA_FACTION_POLITICS.shipStats(this);
         // Normaliza o atlas do chefe em runtime. A arte original tem 4 quadros
         // horizontais sem espaçamento, proa para baixo. Não afeta outros navios.
@@ -928,10 +936,11 @@ class Game extends Phaser.Scene {
             !options.fromWaveBoss) return null;
         const px = this.player?.x ?? this.W / 2, py = this.player?.y ?? this.H / 2;
         const rebirth = this.mode==='sandbox' && type==='tentaculo' && options.rebirthFrom;
+        const spawnRandom=typeof options.random==='function'?options.random:Math.random;
         let pos = rebirth ? this.findSandboxTentacleRebirthPosition(options.rebirthFrom,f.radius) : null;
         for (let tries = 0; !rebirth && tries < 34; tries++) {
-            const angle = Math.random() * 2 * Math.PI;
-            const d = spacing + Math.random() * 260;
+            const angle = spawnRandom() * 2 * Math.PI;
+            const d = spacing + spawnRandom() * 260;
             const x = SEA_MATH.clamp(px + Math.cos(angle) * d, 115, this.W - 115);
             const y = SEA_MATH.clamp(py + Math.sin(angle) * d, 115, this.H - 115);
             if (Math.hypot(x - px, y - py) < 190) continue;
@@ -981,7 +990,9 @@ class Game extends Phaser.Scene {
             type==='enguia'?0:initialMonsterFrame)
             .setScale((f.radius * 2.25) / sourceH).setDepth(15);
         const enemy = { id, type, ship, x: pos.x, y: pos.y, hp: maxhp, maxhp,
-            cooldown: Phaser.Math.Between(450, 1250), heading: Math.random() * 6.28,
+            cooldown:typeof options.random==='function'?
+                450+Math.floor(spawnRandom()*801):Phaser.Math.Between(450,1250),
+            heading:spawnRandom()*6.28,
             speed: f.speed * (1 + Math.min(.85, this.currentDifficulty * .014)),
             atk: f.atk * (1 + Math.max(0, this.currentDifficulty - 1) * (this.mode === 'sandbox' ? .16 : .095)),
             reward: Math.round(f.reward * (1 + this.currentDifficulty * .31)),
@@ -2585,12 +2596,18 @@ class Game extends Phaser.Scene {
         const profile=laboratory?SeaProfile.load():null;
         const retention=won?1:withdrawn?.75:.4;
         const previewReward=laboratory?SEA_MATH.safe(Math.floor(settlement.collected*
-            retention*(1+(profile.levels?.cofre||0)*.15))):0;
+            retention*(1+(this.profile.levels?.cofre||0)*.15))):0;
         const report=laboratory?{...settlement,laboratory:true,reward:0,
             previewReward,bank:profile.gold,mission:profile.mission,
             retention,grossReward:previewReward,campaignCost:0}:
             SeaProfile.settle(settlement);
         // The after-action chronicle is passed to Port in memory, not the save.
+        if(laboratory){
+            report.labElapsedSeconds=Math.max(0,Math.round(this.elapsed));
+            report.labShip={maxHP:this.maxShipHP,remainingHP:Math.round(this.shipHP),
+                cannonDamage:Math.round(this.shipStats.cannonDamage),
+                balls:this.shipStats.balls};
+        }
         report.contractEffectsUsed=SEA_CONTRACT_EFFECTS.report(this);
         report.contractEffectPreview=laboratory&&won?
             SEA_CONTRACT_EFFECTS.describeRoute(this.contract?.route):null;
