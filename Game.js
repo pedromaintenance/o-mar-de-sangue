@@ -2270,7 +2270,7 @@ class Game extends Phaser.Scene {
                         // se o tiro ja afundou a embarcacao.
                         const gunWindup=SEA_GUNNERY.chargeMs(Math.max(0,
                             (this.currentDifficulty-1)*.5));
-                        if(SEA_GUNNERY.counterbatteryReady(e,this.time.now,gunWindup)){
+                        if(!e.boardingDisabled&&SEA_GUNNERY.counterbatteryReady(e,this.time.now,gunWindup)){
                             e.chargeMs=0;e.chargeStage=0;
                             e.lastCounterbatteryAt=this.time.now;
                             e.counterbatteryNoticeUntil=this.time.now+650;
@@ -2608,6 +2608,7 @@ class Game extends Phaser.Scene {
             report.contractHunt=this.contract.id==='hunt';
             report.contractRoute=this.contract.id==='ct001'?null:(this.contract.route||null);
             report.contractCapture=this.contract.id==='ct001'&&!!this.contract.boarded;
+            report.contractDiagnostics=this.contract.id==='ct001'?SEA_CT001.metrics(this):null;
             // Temporary expedition decisions recorded in the debrief; no save schema changes.
             report.contractDecision=this.contract.id==='ct001'?
                 (this.contract.route==='free'?'LIBERTAR OS PRISIONEIROS':
