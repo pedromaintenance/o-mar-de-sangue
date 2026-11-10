@@ -40,6 +40,8 @@ jobs:
         run: node tests/SeaConvoyChase.test.cjs
       - name: CT-001 — cenários de referência
         run: node tests/SeaContractLab.test.cjs
+      - name: CT-001 — benchmarks reproduzíveis
+        run: node tests/SeaCT001Benchmark.integration.test.cjs
       - name: CT-001 — analítica dos playtests
         run: node tests/SeaContractAnalytics.test.cjs
       - name: CT-001 — rotas e fuga
