@@ -1,0 +1,168 @@
+/* Mobile readability patch v121 — O Mar de Sangue.
+ * Only Porto home + Estaleiro. Loaded after PortViewportFit/PortContracts.
+ * Leaves other Porto pages, desktop styles and Phaser controls alone.
+ */
+@media (max-width:780px), (hover:none) and (pointer:coarse) and (max-width:1024px) {
+  /* HOME: two generous columns instead of the previous tiny 3-column cards. */
+  .port-ui .port-layout--home .port-actions {
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice,
+  .theme-mare-negra .port-layout--home .port-actions .port-choice {
+    min-height:64px;
+    padding:9px 30px 9px 11px;
+    gap:10px;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice--contract,
+  .port-ui .port-layout--home .port-actions [data-action="council"] {
+    grid-column:auto;
+    min-height:64px;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice__icon {
+    width:35px;
+    height:35px;
+    flex:0 0 35px;
+    font-size:21px;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice__copy strong,
+  .theme-mare-negra .port-layout--home .port-actions .port-choice__copy strong {
+    font-size:clamp(15px,2vw,17px);
+    line-height:1.18;
+    letter-spacing:.02em;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice__copy small,
+  .theme-mare-negra .port-layout--home .port-actions .port-choice__copy small {
+    display:block;
+    font-size:11px;
+    line-height:1.25;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice__arrow {
+    right:9px;
+    font-size:17px;
+  }
+  /* READABLE setting should never shrink the newly enlarged home menu. */
+  .port-ui.port-ui--readable .port-layout--home .port-actions .port-choice__copy strong {
+    font-size:17px;
+  }
+  .port-ui.port-ui--readable .port-layout--home .port-actions .port-choice__copy small {
+    font-size:12px;
+  }
+  /* ESTALEIRO only: remove excess vertical whitespace without hiding upgrades. */
+  .port-ui .port-page--yard {
+    gap:6px;
+  }
+  .port-ui .port-page--yard .port-page__header {
+    padding:7px 11px;
+  }
+  .port-ui .port-page--yard .port-page__header h1,
+  .theme-mare-negra .port-page--yard .port-page__header h1 {
+    font-size:clamp(20px,3.2vw,26px);
+    line-height:1.05;
+    margin:2px 0 3px;
+  }
+  .port-ui .port-page--yard .port-page__header>p {
+    font-size:11px;
+    line-height:1.2;
+    margin:2px 0;
+  }
+  .port-ui .port-page--yard .port-page__balance {
+    font-size:11px;
+    margin-top:3px;
+  }
+  .port-ui .port-page--yard .port-page__balance strong {
+    font-size:17px;
+  }
+  .port-ui .port-page--yard .port-ship-evolution {
+    margin:4px 0 0;
+    padding:3px 6px;
+    font-size:11px;
+    line-height:1.15;
+  }
+  .port-ui .port-page--yard .port-ship-evolution strong {
+    font-size:14px;
+  }
+  .port-ui .port-page--yard .port-ship-evolution p,
+  .port-ui .port-page--yard .port-page__header .port-ship-evolution p {
+    font-size:10px;
+    line-height:1.2;
+    margin:2px 0 0;
+  }
+  .port-ui .port-page--yard .port-tabs {
+    gap:4px;
+    padding:2px;
+  }
+  .port-ui .port-page--yard .port-tabs__hint {
+    font-size:9px;
+    line-height:1.1;
+    padding:0;
+  }
+  .port-ui .port-page--yard .port-tabs button {
+    min-height:44px;
+    padding:5px 4px;
+    font-size:11px;
+  }
+  .port-ui .port-page--yard .port-upgrades {
+    gap:7px;
+  }
+  .port-ui .port-page--yard .port-upgrade {
+    min-height:0;
+    padding:8px;
+    gap:4px 8px;
+  }
+}
+/* Typical phone in landscape: screenshot showed tiny 3-column home cards and
+ * a tall center-aligned yard title. Align the yard summary in two short columns. */
+@media (hover:none) and (pointer:coarse) and (orientation:landscape) and (max-width:1024px) {
+  .port-ui .port-layout--home .port-actions {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+  }
+  .port-ui .port-page--yard .port-page__header {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
+    column-gap:13px;
+    row-gap:1px;
+    align-items:center;
+    text-align:left;
+    padding:7px 11px;
+  }
+  .port-ui .port-page--yard .port-page__header>.port-eyebrow {
+    grid-column:1;grid-row:1;
+    font-size:10px;
+  }
+  .port-ui .port-page--yard .port-page__header>h1 {
+    grid-column:1;grid-row:2;
+  }
+  .port-ui .port-page--yard .port-page__header>p {
+    grid-column:1;grid-row:3;
+  }
+  .port-ui .port-page--yard .port-page__balance {
+    grid-column:2;grid-row:1;
+    margin:0;
+    text-align:left;
+  }
+  .port-ui .port-page--yard .port-ship-evolution {
+    grid-column:2;grid-row:2 / 4;
+    min-width:0;max-width:none;
+    width:100%;margin:0;
+  }
+  .port-ui .port-page--yard .port-tabs {
+    flex-wrap:nowrap;
+  }
+  .port-ui .port-page--yard .port-tabs button {
+    min-width:0;
+    flex:1 1 0;
+  }
+}
+/* Narrow portrait phones: larger one-column buttons and no horizontal scroll. */
+@media (max-width:420px) and (orientation:portrait) {
+  .port-ui .port-layout--home .port-actions {
+    grid-template-columns:minmax(0,1fr);
+    gap:9px;
+  }
+  .port-ui .port-layout--home .port-actions .port-choice {
+    min-height:69px;
+  }
+}
