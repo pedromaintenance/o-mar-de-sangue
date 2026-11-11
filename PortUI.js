@@ -851,7 +851,7 @@ const SEA_PORT_UI = {
     const tabs=[['casco','CASCO'],['motor','NAVEGAÇÃO'],['armas','ARMAMENTO'],['apoio','APOIO']];
     const list=SEA_UPGRADES.filter(u=>u.group===group);
     const visual=SEA_PLAYER_SHIP.progress(p.levels);
-    return '<main class="port-page" id="port-main">'+
+    return '<main class="port-page port-page--yard" id="port-main">'+
       '<div class="port-page__header"><span class="port-eyebrow">FERRARIA, MADEIRA E RUNAS</span>'+
         '<h1>O ESTALEIRO</h1><p>Não existe teto para a ambição. Apenas um preço crescente.</p>'+
         '<div class="port-page__balance">◈ COFRE DO CAPITÃO <strong>'+this.num(p.gold)+'</strong></div>'+
