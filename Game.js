@@ -1079,8 +1079,20 @@ class Game extends Phaser.Scene {
         this.add.text(14, 9, this.mode === 'mission' ? `MISSÃO ${this.stage} · ${this.missionBoss==='dagon_senhor' ? 'Dagon, Senhor das Profundezas' : SEA_MISSION_TITLES[(this.stage - 1) % SEA_MISSION_TITLES.length]}` : `O MAR DE SANGUE · SANDBOX ONDA ${this.wave}`, {
             fontFamily: 'Georgia', fontSize: '14px', fontStyle: 'bold', color: '#ddc5a4'
         }).setScrollFactor(0).setDepth(100);
-        this.hud = this.add.text(14, 37, '', { fontFamily: 'monospace', fontSize: '12px', color: '#e8d9c4' }).setScrollFactor(0).setDepth(100);
-        this.quest = this.add.text(15, 63, '', {
+        // No celular, mostrar o casco ATUAL / MÁXIMO em fonte grande.
+        // Ouro e velocidade continuam visíveis, em um bloco separado.
+        this.hud = this.add.text(14, SEA_TOUCH?33:37, '', {
+            fontFamily:'monospace',fontSize:SEA_TOUCH?'24px':'12px',
+            fontStyle:SEA_TOUCH?'bold':'normal',color:'#f3e8d5',
+            stroke:SEA_TOUCH?'#060a0d':undefined,
+            strokeThickness:SEA_TOUCH?3:0
+        }).setScrollFactor(0).setDepth(103);
+        this.hudResources=SEA_TOUCH?this.add.text(290,35,'',{
+            fontFamily:'monospace',fontSize:'15px',fontStyle:'bold',
+            color:'#e9cb9d',lineSpacing:1,
+            stroke:'#060a0d',strokeThickness:2
+        }).setScrollFactor(0).setDepth(103):null;
+        this.quest = this.add.text(15, SEA_TOUCH?69:63, '', {
             fontFamily: 'monospace', fontSize: '12px', color: '#d2b58f'
         }).setScrollFactor(0).setDepth(100);
         // Botão visível em desktop e celular; clique e toque passam pelo mesmo
@@ -2440,7 +2452,15 @@ class Game extends Phaser.Scene {
         return `SOBREVIVER AO CERCO · ${Math.max(0, Math.ceil(this.survivalTime - this.waveClock))} s`;
     }
     updateHUD() {
-        this.hud.setText(`CASCO ${Math.ceil(this.shipHP)}/${SEA_MATH.nice(this.maxShipHP)}   OURO ${SEA_MATH.nice(this.gold)}   NÓS ${Math.abs(this.speed | 0)}`);
+        const hullText='CASCO '+Math.max(0,Math.ceil(this.shipHP))+' / '+SEA_MATH.nice(this.maxShipHP);
+        this.hud.setText(SEA_TOUCH?hullText:
+            `CASCO ${Math.ceil(this.shipHP)}/${SEA_MATH.nice(this.maxShipHP)}   OURO ${SEA_MATH.nice(this.gold)}   NÓS ${Math.abs(this.speed | 0)}`);
+        if(SEA_TOUCH){
+            // Preserva legibilidade mesmo com cascos muito altos em saves antigos.
+            this.hud.setScale(Math.min(1,260/Math.max(1,this.hud.width)));
+            this.hudResources?.setText('OURO '+SEA_MATH.nice(this.gold)+
+                '\nNÓS '+Math.abs(this.speed|0));
+        }
         if(this.impulseButtonText){
             const cd=SEA_IMPULSE.cooldown(this.profile?.levels?.impulso||0);
             const remaining=Math.max(0,cd-(this.elapsed-this.lastImpulseAt));
